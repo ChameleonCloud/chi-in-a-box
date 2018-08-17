@@ -8,10 +8,6 @@ events {
 }
 
 http {
-  ssl_session_timeout 10m;
-  ssl_session_cache shared:SSL:10m;
-  ssl_session_tickets off;
-
   # Use Docker networking resolver
   resolver 127.0.0.11 valid=300s ipv6=off;
   resolver_timeout 5s;
@@ -23,7 +19,7 @@ http {
   ssl_dhparam /etc/nginx/dhparam.pem;
   ssl_ciphers ECDHE-RSA-AES256-GCM-SHA512:DHE-RSA-AES256-GCM-SHA512:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-SHA384;
   ssl_ecdh_curve secp384r1;
-  ssl_session_timeout  10m;
+  ssl_session_timeout 10m;
   ssl_session_cache shared:SSL:10m;
   ssl_session_tickets off;
   add_header X-Frame-Options DENY;
