@@ -21,3 +21,5 @@
     dest: "/etc/nginx/conf.d/{{ nginx_server_name }}.conf"
     mode: 0644
   tags: nginx
+  notify:
+    - reload nginx

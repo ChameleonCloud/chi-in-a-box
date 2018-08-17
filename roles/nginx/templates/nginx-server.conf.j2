@@ -22,7 +22,7 @@ server {
   ssl_session_timeout  10m;
   ssl_session_cache shared:SSL:10m;
   ssl_session_tickets off;
-  resolver {% for dns_server in nginx_dns_servers %} {{ dns_server }} {% end %} valid=300s;
+  resolver {% for dns_server in nginx_dns_servers %} {{ dns_server }} {% endfor %} valid=300s;
   resolver_timeout 5s;
   add_header X-Frame-Options DENY;
   add_header X-Content-Type-Options nosniff;

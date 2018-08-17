@@ -7,7 +7,7 @@ Restart=always
 ExecStart=/bin/docker run --name=nginx \
                           -v /etc/nginx:/etc/nginx \
                           -v /etc/pki/tls:/ssl \
-                          -p 80:80 -p 443:443 \
+                          --net=nginx -p 80:80 -p 443:443 \
                           {{ nginx_docker_image }}
 ExecStop=/bin/docker stop -t 2 nginx
 ExecStopPost=/bin/docker rm -f nginx

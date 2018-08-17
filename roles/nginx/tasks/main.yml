@@ -1,4 +1,8 @@
 ---
+- name: Create Docker network.
+  docker_network:
+    name: "{{ nginx_docker_network_name }}"
+
 - name: Pull Nginx image.
   docker_image:
     name: "{{ nginx_docker_image }}"
@@ -22,12 +26,16 @@
     dest: /etc/nginx/nginx.conf
     mode: 0644
   tags: nginx
+  notify:
+    - reload nginx
 
-- name: Add Nginx systemd service (nginx.service).
+- name: Configure Nginx systemd service (nginx.service).
   template:
     src: nginx.service.j2
     dest: /etc/systemd/system/nginx.service
   tags: systemd
+  notify:
+    - restart nginx
 
 - name: Enable Nginx on boot.
   systemd:

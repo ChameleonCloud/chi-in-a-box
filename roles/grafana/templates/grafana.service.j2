@@ -5,7 +5,7 @@ After=docker.service
 [Service]
 Restart=always
 ExecStart=/bin/docker run --name=grafana \
-                          --net={{ grafana_docker_network_name }} \
+                          --net={{ nginx_docker_network_name }} \
                           -v {{ grafana_docker_volume_name }}:/var/lib/grafana \
                           {{ grafana_docker_image }}
 ExecStop=/bin/docker stop -t 2 grafana
