@@ -9,8 +9,8 @@ server {
   listen 443 ssl;
   server_name {{ nginx_server_name }};
   # By convention, these certificates will be named after the server_name
-  ssl_certificate /certs/{{ nginx_server_name }}.crt;
-  ssl_certificate_key /certs/private/{{ nginx_server_name }}.pem;
+  ssl_certificate /ssl/certs/{{ nginx_server_name }}.crt;
+  ssl_certificate_key /ssl/private/{{ nginx_server_name }}.key;
 
   # Secure SSL parameters recommended by https://cipherli.st/
   # Last updated: 2018-08-17
