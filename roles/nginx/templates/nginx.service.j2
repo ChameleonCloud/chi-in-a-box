@@ -11,6 +11,7 @@ ExecStart=/bin/docker run --name=nginx \
                           {{ nginx_docker_image }}
 ExecStop=/bin/docker stop -t 2 nginx
 ExecStopPost=/bin/docker rm -f nginx
+ExecReload=/bin/docker exec nginx nginx -s reload
 
 [Install]
 WantedBy=multi-user.target

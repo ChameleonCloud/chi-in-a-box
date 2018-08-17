@@ -12,5 +12,27 @@ http {
   ssl_session_cache shared:SSL:10m;
   ssl_session_tickets off;
 
+  # Use Docker networking resolver
+  resolver 127.0.0.11 valid=300s ipv6=off;
+  resolver_timeout 5s;
+
+  # Secure SSL parameters recommended by https://cipherli.st/
+  # Last updated: 2018-08-17
+  ssl_protocols TLSv1.3;
+  ssl_prefer_server_ciphers on;
+  ssl_dhparam /etc/nginx/dhparam.pem;
+  ssl_ciphers ECDHE-RSA-AES256-GCM-SHA512:DHE-RSA-AES256-GCM-SHA512:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-SHA384;
+  ssl_ecdh_curve secp384r1;
+  ssl_session_timeout  10m;
+  ssl_session_cache shared:SSL:10m;
+  ssl_session_tickets off;
+  add_header X-Frame-Options DENY;
+  add_header X-Content-Type-Options nosniff;
+  add_header X-XSS-Protection "1; mode=block";
+  # Disabling the following because they can be very destructive
+  #ssl_stapling on;
+  #ssl_stapling_verify on;
+  #add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload";
+
   include conf.d/*.conf;
 }
