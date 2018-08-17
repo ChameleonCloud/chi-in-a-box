@@ -1,0 +1,16 @@
+[Unit]
+Description=Nginx server
+After=docker.service
+
+[Service]
+Restart=always
+ExecStart=/bin/docker run --name=nginx \
+                          -v /etc/nginx:/etc/nginx \
+                          -v /etc/pki/tls:/certs \
+                          -p 443:443 \
+                          {{ nginx_docker_image }}
+ExecStop=/bin/docker stop -t 2 nginx
+ExecStopPost=/bin/docker rm -f nginx
+
+[Install]
+WantedBy=multi-user.target

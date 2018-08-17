@@ -1,6 +1,7 @@
 # Docker options.
 docker_package: docker-ce
-docker_yum_repo_url: https://download.docker.com/linux/centos/docker-ce.repo
+docker_yum_repo_url: https://download.docker.com/linux/centos/7/$basearch/stable
+docker_yum_gpgkey: https://download.docker.com/linux/centos/gpg
 
 # Docker Compose options.
 docker_install_compose: True

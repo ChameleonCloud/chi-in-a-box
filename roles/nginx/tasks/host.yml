@@ -1,6 +1,22 @@
+# This task is intended to be imported from another task when you need
+# to set up a virtual host on the nginx config
+#
+# Example:
+#
+#   - name: Create Nginx configuration for proxy to Grafana.
+#     include_role:
+#       name: nginx
+#       tasks_from: server
+#       vars:
+#         nginx_server_name: "{{ grafana_server_name }}"
+#         nginx_server_conf: |
+#           location / {
+#             ... do something ...
+#           }
+#
 ---
-- name: Create Nginx config for {{ nginx_server_name }}
+- name: "Create Nginx config for {{ nginx_server_name }}"
   template:
     src: nginx-server.conf.j2
-    dest: /etc/nginx/conf.d/{{ nginx_server_name }}.conf
+    dest: "/etc/nginx/conf.d/{{ nginx_server_name }}.conf"
     mode: 0644

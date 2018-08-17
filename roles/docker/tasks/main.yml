@@ -4,6 +4,7 @@
     name: docker-ce
     description: Docker CE YUM repo
     baseurl: "{{ docker_yum_repo_url }}"
+    gpgkey: "{{ docker_yum_gpgkey }}"
 
 - name: Install Docker.
   package:

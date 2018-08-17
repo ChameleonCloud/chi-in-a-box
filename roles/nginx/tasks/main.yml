@@ -20,21 +20,14 @@
     size: 2048
 
 - name: Add Nginx systemd service (nginx.service).
-  systemdunit:
-    name: 'nginx.service'
-    state: present
-    content: |
-      [Unit]
-      Description=Nginx server
-      After=docker.service
-      [Service]
-      Restart=always
-      ExecStart=/bin/docker run --name=nginx \
-                                -v /etc/nginx:/etc/nginx \
-                                -v /etc/pki/tls:/certs \
-                                -p 443:443 \
-                                {{ nginx_docker_image }}
-      ExecStop=/bin/docker stop -t 2 nginx
-      ExecStopPost=/bin/docker rm -f nginx
-      [Install]
-      WantedBy=multi-user.target
+  template:
+    src: nginx.service.j2
+    dest: /etc/systemd/system/nginx.service
+
+- name: Enable Nginx on boot.
+  systemd:
+    name: nginx.service
+    # TODO: this is a thorny part of ansible and we shouldn't have to do this ourselves.
+    daemon_reload: yes
+    state: started
+    enabled: yes
