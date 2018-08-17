@@ -7,6 +7,9 @@
     create_home: False
     comment: Prometheus Node Exporter
 
+# TODO: this could really be better. We could download different versions side
+# by side and symlink the latest, which would probably help ansible figure out
+# when it actually needed to do work.
 - name: "Install node_exporter to {{ node_exporter_path }}"
   block:
     - name: Download node_exporter binary tarball.
@@ -25,6 +28,7 @@
       notify:
         - restart node_exporter
 
+# I'm not sure this is even necessary...
 - name: Allow user to run node_exporter.
   lineinfile:
     dest: /etc/sudoers
