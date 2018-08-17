@@ -1,7 +1,7 @@
 [grafana]
 chameleon04
 
-[all_exporters]
+[all_exporters:children]
 node_exporters
 
 [node_exporters]
