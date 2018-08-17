@@ -3,7 +3,7 @@
   docker_image:
     name: "{{ prometheus_docker_image }}"
 
-- name: Add Prometheus systemd service (prometheus.service).
+- name: Configure Prometheus systemd service (prometheus.service).
   systemdunit:
     name: 'prometheus.service'
     state: present

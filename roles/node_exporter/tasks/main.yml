@@ -1,0 +1,51 @@
+---
+- name: Create node_exporter user.
+  user:
+    name: node_exporter
+    system: True
+    shell: /sbin/nologin
+    create_home: False
+    comment: Prometheus Node Exporter
+
+- name: "Install node_exporter to {{ node_exporter_path }}"
+  block:
+    - name: Download node_exporter binary tarball.
+      get_url:
+        url: "{{ node_exporter_url }}"
+        dest: "/opt/node_exporter.tar.gz"
+    - name: Unarchive node_exporter binary tarball.
+      unarchive:
+        copy: no
+        src: "/opt/node_exporter.tar.gz"
+        dest: "{{ node_exporter_path }}"
+        extra_opts:
+          - --strip-components=1
+        creates: "{{ node_exporter_path }}/node_exporter"
+      register: prometheus_node_exporter_updated
+      notify:
+        - restart node_exporter
+
+- name: Allow user to run node_exporter.
+  lineinfile:
+    dest: /etc/sudoers
+    state: present
+    regexp: "^node_exporter"
+    line: "node_exporter localhost={{ node_exporter_path }}/node_exporter"
+    validate: "visudo -cf %s"
+
+- name: Configure node_exporter systemd service (node_exporter.service).
+  template:
+    src: node_exporter.service.j2
+    dest: /etc/systemd/system/node_exporter.service
+  tags: systemd
+  notify:
+    - restart node_exporter
+
+- name: Enable node_exporter on boot.
+  systemd:
+    name: node_exporter.service
+    # TODO: this is a thorny part of ansible and we shouldn't have to do this ourselves.
+    daemon_reload: yes
+    state: started
+    enabled: yes
+  tags: systemd

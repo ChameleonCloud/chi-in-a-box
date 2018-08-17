@@ -1,0 +1,4 @@
+---
+- hosts: node_exporters
+  roles:
+    - node_exporter
