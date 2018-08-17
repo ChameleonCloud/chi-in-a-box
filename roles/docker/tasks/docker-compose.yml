@@ -1,4 +1,12 @@
 ---
+- name: Ensure pip is installed.
+  package:
+    name: python-pip
+
+- name: Install docker-py dependency.
+  pip:
+    name: docker-py
+
 - name: Check current docker-compose version.
   command: docker-compose --version
   register: docker_compose_current_version
