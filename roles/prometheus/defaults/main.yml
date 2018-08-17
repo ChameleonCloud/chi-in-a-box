@@ -1,0 +1,2 @@
+prometheus_docker_image: prom/prometheus:v2.3.2
+prometheus_docker_volume_name: prometheus-data

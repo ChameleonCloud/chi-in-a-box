@@ -1,0 +1,25 @@
+---
+- name: Pull Prometheus image.
+  docker_image:
+    name: "{{ prometheus_docker_image }}"
+
+- name: Add Prometheus systemd service (prometheus.service).
+  systemdunit:
+    name: 'prometheus.service'
+    state: present
+    content: |
+      [Unit]
+      Description=Prometheus server
+      After=docker.service
+      [Service]
+      Restart=always
+      ExecStart=/bin/docker run --name=prometheus \
+                              {% for host in groups['all_exporters'] %}
+                                --add-host="{{ host }}:{{ hostvars[host].ansible_eth0.ipv4.address }}" \
+                              {% endfor %}
+                                -v {{ prometheus_docker_volume_name }}:/data \
+                                {{ prometheus_docker_image }}
+      ExecStop=/bin/docker stop -t 2 prometheus
+      ExecStopPost=/bin/docker rm -f prometheus
+      [Install]
+      WantedBy=multi-user.target
