@@ -1,2 +1,8 @@
 [grafana]
-chameleon04.tacc.utexas.edu
+chameleon04
+
+[all_exporters]
+node_exporters
+
+[node_exporters]
+chameleon04
