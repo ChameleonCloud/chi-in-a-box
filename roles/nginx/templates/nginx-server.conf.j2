@@ -9,7 +9,7 @@ server {
   listen 443 ssl;
   server_name {{ nginx_server_name }};
   # By convention, these certificates will be named after the server_name
-  ssl_certificate /ssl/certs/{{ nginx_server_name }}.cer;
+  ssl_certificate /ssl/certs/{{ nginx_server_name }}.bundle.cer;
   ssl_certificate_key /ssl/private/{{ nginx_server_name }}.key;
 
   {{ nginx_server_conf }}
