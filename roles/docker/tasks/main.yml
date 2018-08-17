@@ -1,0 +1,21 @@
+---
+- name: Add Docker CE repository.
+  yum_repository:
+    name: docker-ce
+    description: Docker CE YUM repo
+    baseurl: "{{ docker_yum_repo_url }}"
+
+- name: Install Docker.
+  package:
+    name: docker-ce
+    state: present
+  notify: restart docker
+
+- name: Ensure Docker is started and enabled at boot.
+  service:
+    name: docker
+    state: started
+    enabled: yes
+
+- include_tasks: docker-compose.yml
+  when: docker_install_compose

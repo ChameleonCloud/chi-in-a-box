@@ -1,0 +1,5 @@
+nginx_docker_image: nginx:1.15
+
+nginx_dns_servers:
+  - 130.202.101.6
+  - 130.202.101.37

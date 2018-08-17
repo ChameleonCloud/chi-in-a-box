@@ -1,0 +1,16 @@
+worker_processes auto;
+worker_rlimit_nofile 8192;
+
+error_log stderr;
+
+events {
+  worker_connections 4096;
+}
+
+http {
+  ssl_session_timeout 10m;
+  ssl_session_cache shared:SSL:10m;
+  ssl_session_tickets off;
+
+  include conf.d/*.conf;
+}

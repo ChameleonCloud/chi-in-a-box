@@ -1,0 +1,8 @@
+# Docker options.
+docker_package: docker-ce
+docker_yum_repo_url: https://download.docker.com/linux/centos/docker-ce.repo
+
+# Docker Compose options.
+docker_install_compose: True
+docker_compose_version: "1.22.0"
+docker_compose_path: /usr/local/bin/docker-compose

@@ -1,0 +1,6 @@
+grafana_docker_network_name: grafana
+grafana_docker_image: grafana/grafana:5.2.2
+grafana_docker_volume_name: grafana-data
+
+grafana_hostname: grafana.chameleon.tacc.utexas.edu
+grafana_port: 3000

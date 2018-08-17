@@ -1,0 +1,42 @@
+---
+- name: Create Docker network for Grafana and proxy.
+  docker_network:
+    name: "{{ grafana_docker_network_name }}"
+
+- name: Pull Grafana image.
+  docker_image:
+    name: "{{ grafana_docker_image }}"
+
+- name: Add Grafana systemd service (grafana.service).
+  systemdunit:
+    name: 'grafana.service'
+    state: present
+    content: |
+      [Unit]
+      Description=Grafana server
+      After=docker.service
+      [Service]
+      Restart=always
+      ExecStart=/bin/docker run --name=grafana \
+                                --net={{ grafana_docker_network_name }} \
+                                -v {{ grafana_docker_volume_name }}:/var/lib/grafana \
+                                {{ grafana_docker_image }}
+      ExecStop=/bin/docker stop -t 2 grafana
+      ExecStopPost=/bin/docker rm -f grafana
+      [Install]
+      WantedBy=multi-user.target
+
+- name: Create Nginx configuration for proxy to Grafana.
+  include_role:
+    name: nginx
+    tasks_from: server
+    vars:
+      nginx_server_name: {{ grafana_server_name }}
+      nginx_server_conf: |
+        location / {
+          proxy_pass http://grafana:3000;
+          proxy_set_header Host $host;
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header X-Forwarded-Proto $scheme;
+        }
