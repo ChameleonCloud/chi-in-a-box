@@ -11,6 +11,7 @@
   template:
     src: grafana.service.j2
     dest: /etc/systemd/system/grafana.service
+  tags: systemd
 
 - name: Enable Grafana service on boot.
   systemd:
@@ -19,6 +20,7 @@
     daemon_reload: yes
     state: started
     enabled: yes
+  tags: systemd
 
 - name: Create Nginx configuration for proxy to Grafana.
   include_role:

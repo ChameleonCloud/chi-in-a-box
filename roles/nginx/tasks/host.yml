@@ -20,3 +20,4 @@
     src: nginx-server.conf.j2
     dest: "/etc/nginx/conf.d/{{ nginx_server_name }}.conf"
     mode: 0644
+  tags: nginx
