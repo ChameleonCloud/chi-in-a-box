@@ -11,7 +11,7 @@
 - name: Configure Alertmanager.
   template:
     src: alertmanager.yml.j2
-    dest: "{{ prometheus_alertmanager_config_dir }}/config.yml"
+    dest: "{{ prometheus_alertmanager_config_dir }}/alertmanager.yml"
   notify:
     - restart alertmanager
 
