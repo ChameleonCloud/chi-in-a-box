@@ -1,6 +1,14 @@
 prometheus_docker_image: prom/prometheus:v2.3.2
 prometheus_docker_volume_name: prometheus-data
 prometheus_docker_network_name: prometheus
-
 prometheus_port: 9090
 prometheus_config_dir: /etc/prometheus
+
+prometheus_install_alertmanager: True
+prometheus_alertmanager_docker_image: prom/alertmanager:v0.15.2
+prometheus_alertmanager_docker_volume_name: alertmanager-data
+prometheus_alertmanager_port: 9093
+prometheus_alertmanager_config_dir: /etc/alertmanager
+
+# This should be encrypted! It is a secret value.
+prometheus_alertmanager_slack_api_url: ''

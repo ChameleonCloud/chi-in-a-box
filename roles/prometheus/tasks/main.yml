@@ -54,3 +54,6 @@
     state: started
     enabled: yes
   tags: systemd
+
+- include_tasks: alertmanager.yml
+  when: prometheus_install_alertmanager
