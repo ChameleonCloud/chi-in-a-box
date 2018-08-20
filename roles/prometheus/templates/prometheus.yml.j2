@@ -23,7 +23,7 @@ scrape_configs:
 {% for host in groups['node_exporters'] %}
   - job_name: '{{ host }}-node'
     static_configs:
-      - targets: ['{{ hostvars[host].ansible_eth0.ipv4.address }}:9100']
+      - targets: ['{{ hostvars[host].ansible_default_ipv4.address }}:9100']
 {% endfor %}
   # - job_name: 'ceph'
   #   static_configs:
