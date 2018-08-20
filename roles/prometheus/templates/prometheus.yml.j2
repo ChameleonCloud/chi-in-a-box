@@ -1,0 +1,36 @@
+---
+global:
+  scrape_interval:     15s
+  evaluation_interval: 15s
+
+# Alertmanager configuration
+# alerting:
+#   alertmanagers:
+#   - static_configs:
+#     - targets:
+#       - alertmanager:9093
+
+# Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
+rule_files:
+  - "/etc/prometheus/*-rules.yml"
+
+# A scrape configuration containing exactly one endpoint to scrape:
+# Here it's Prometheus itself.
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+    - targets: ['localhost:9090']
+{% for host in groups['node_exporters'] %}
+  - job_name: '{{ host }}-node'
+    static_configs:
+      - targets: ['{{ hostvars[host].ansible_eth0.ipv4.address }}:9100']
+{% endfor %}
+  # - job_name: 'ceph'
+  #   static_configs:
+  #   - targets: ['r730xd-1:9128']
+  # - job_name: 'openstack'
+  #   static_configs:
+  #   - targets: ['admin02:9103']
+  # - job_name: 'mysql'
+  #   static_configs:
+  #   - targets: ['admin02:9104']

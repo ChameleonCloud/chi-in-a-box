@@ -1,0 +1,16 @@
+[Unit]
+Description=Prometheus server
+After=docker.service
+
+[Service]
+Restart=always
+ExecStart=/bin/docker run --name=prometheus \
+                          -v {{ prometheus_config_dir }}:/etc/prometheus \
+                          -v {{ prometheus_docker_volume_name }}:/prometheus \
+                          -p {{ prometheus_port }}:9090 \
+                          {{ prometheus_docker_image }}
+ExecStop=/bin/docker stop -t 2 prometheus
+ExecStopPost=/bin/docker rm -f prometheus
+
+[Install]
+WantedBy=multi-user.target

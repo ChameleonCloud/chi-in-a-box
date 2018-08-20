@@ -10,6 +10,3 @@ admin01
 [node_exporters:children]
 controller
 ceph
-
-[all_exporters:children]
-node_exporters

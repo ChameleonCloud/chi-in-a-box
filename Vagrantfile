@@ -6,8 +6,10 @@ Vagrant.configure('2') do |config|
     ansible.become = true
     ansible.become_user = 'root'
     ansible.groups = {
+      'all_exporters' => ['default'],
       'grafana' => ['default'],
       'node_exporters' => ['default'],
+      'prometheus' => ['default'],
     }
   end
 end
