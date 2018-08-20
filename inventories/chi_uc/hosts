@@ -4,6 +4,9 @@ admin01
 [ceph]
 r730xd-[1:5]
 
+[prometheus]
+admin01
+
 [node_exporters:children]
 controller
 ceph
