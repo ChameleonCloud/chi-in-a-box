@@ -9,8 +9,8 @@ ExecStart=/bin/docker run --name=alertmanager \
                           -v {{ prometheus_alertmanager_docker_volume_name }}:/alertmanager \
                           -p {{ prometheus_alertmanager_port }}:9093 \
                           {{ prometheus_alertmanager_docker_image }}
-ExecStop=/bin/docker stop -t 2 prometheus
-ExecStopPost=/bin/docker rm -f prometheus
+ExecStop=/bin/docker stop -t 2 alertmanager
+ExecStopPost=/bin/docker rm -f alertmanager
 
 [Install]
 WantedBy=multi-user.target
