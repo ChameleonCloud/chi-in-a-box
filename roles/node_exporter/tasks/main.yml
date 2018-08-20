@@ -17,15 +17,17 @@
     - name: Download node_exporter binary tarball.
       get_url:
         url: "{{ node_exporter_url }}"
-        dest: "/opt/node_exporter.tar.gz"
+        dest: "/tmp/node_exporter.tar.gz"
     - name: Unarchive node_exporter binary tarball.
       unarchive:
         copy: no
-        src: "/opt/node_exporter.tar.gz"
+        src: "/tmp/node_exporter.tar.gz"
         dest: "{{ node_exporter_path }}"
         extra_opts:
           - --strip-components=1
         creates: "{{ node_exporter_path }}/node_exporter"
+      become: yes
+      become_user: root
       register: prometheus_node_exporter_updated
       notify:
         - restart node_exporter
@@ -38,6 +40,8 @@
     regexp: "^node_exporter"
     line: "node_exporter localhost={{ node_exporter_path }}/node_exporter"
     validate: "visudo -cf %s"
+  become: yes
+  become_user: root
 
 - name: Configure node_exporter systemd service (node_exporter.service).
   template:
@@ -54,4 +58,6 @@
     daemon_reload: yes
     state: started
     enabled: yes
+  become: yes
+  become_user: root
   tags: systemd
