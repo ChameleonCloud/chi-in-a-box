@@ -20,10 +20,10 @@ scrape_configs:
   - job_name: 'prometheus'
     static_configs:
     - targets: ['localhost:9090']
-{% for host in groups['node_exporters'] %}
+{% for host in node_exporters %}
   - job_name: '{{ host }}-node'
     static_configs:
-      - targets: ['{{ hostvars[host].ansible_default_ipv4.address }}:9100']
+      - targets: ['{{ node_exporters[host] }}:9100']
 {% endfor %}
   # - job_name: 'ceph'
   #   static_configs:

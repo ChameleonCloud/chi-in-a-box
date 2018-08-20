@@ -3,6 +3,29 @@
   docker_image:
     name: "{{ prometheus_docker_image }}"
 
+- name: Gather node_exporter hosts.
+  block:
+    - name: Gather facts from all node_exporters.
+      setup:
+      delegate_to: "{{ item }}"
+      delegate_facts: True
+      with_items: "{{ groups['node_exporters'] }}"
+    - name: Precompute fact for internal node_exporter ipv4 addresses.
+      set_fact:
+        node_exporters: >
+          {{ { item.inventory_hostname: item.ansible_interfaces
+             | map('regex_replace', '^', 'ansible_')
+             | map('replace', '-', '_')
+             | map('extract', item)
+             | selectattr('ipv4', 'defined')
+             | selectattr('ipv4.address', 'match', '10.*')
+             | map(attribute='ipv4.address')
+             | list
+             | last } | combine(node_exporters | default({})) }}
+      loop: "{{ groups['node_exporters'] | map('extract', hostvars) | list }}"
+      loop_control:
+        label: "{{ item.inventory_hostname }}"
+
 - name: Create Prometheus configuration directory.
   file:
     path: "{{ prometheus_config_dir }}"
