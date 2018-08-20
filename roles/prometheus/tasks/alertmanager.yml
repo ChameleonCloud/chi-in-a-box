@@ -12,7 +12,7 @@
   template:
     src: alertmanager.yml.j2
     dest: "{{ prometheus_alertmanager_config_dir }}/alertmanager.yml"
-    mode: "0600"
+    # mode: "0600"
   notify:
     - restart alertmanager
 
