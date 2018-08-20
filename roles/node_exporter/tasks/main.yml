@@ -6,6 +6,8 @@
     shell: /sbin/nologin
     create_home: False
     comment: Prometheus Node Exporter
+  become: yes
+  become_user: root
 
 # TODO: this could really be better. We could download different versions side
 # by side and symlink the latest, which would probably help ansible figure out
