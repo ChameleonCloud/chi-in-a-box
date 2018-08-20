@@ -1,12 +1,12 @@
 [controller]
 admin01
 
-[storage]
+[ceph]
 r730xd-[1:5]
 
 [node_exporters:children]
 controller
-storage
+ceph
 
 [all_exporters:children]
 node_exporters
