@@ -47,6 +47,8 @@
   template:
     src: node_exporter.service.j2
     dest: /etc/systemd/system/node_exporter.service
+  become: yes
+  become_user: root
   tags: systemd
   notify:
     - restart node_exporter
