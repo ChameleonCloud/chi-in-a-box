@@ -7,4 +7,8 @@ grafana_config_path: /etc/grafana
 
 grafana_auth_ldap_hostname: ldap.tacc.utexas.edu
 grafana_auth_ldap_port: 389
-grafana_auth_ldap_treebase: ou=People,dc=tacc,dc=utexas,dc=edu
+grafana_auth_ldap_user_treebase: ou=People,dc=tacc,dc=utexas,dc=edu
+grafana_auth_ldap_user_search_filter: (uid=%s)
+grafana_auth_ldap_group_treebase: ou=Chameleon,ou=Systems,dc=tacc,dc=utexas,dc=edu
+grafana_auth_ldap_group_search_filter: (&(objectClass=groupOfNames)(member=uid=%s,ou=People,dc=tacc,dc=utexas,dc=edu))
+grafana_auth_ldap_editor_group: Chameleon

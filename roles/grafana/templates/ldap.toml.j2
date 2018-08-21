@@ -13,28 +13,23 @@ ssl_skip_verify = false
 # Bind as authenticating user directly
 bind_dn = "uid=%s,{{ grafana_auth_ldap_treebase }}"
 
-search_filter = "(uid=%s)"
-search_base_dns = ["{{ grafana_auth_ldap_treebase }}"]
+search_filter = "{{ grafana_auth_ldap_user_search_filter }}"
+search_base_dns = ["{{ grafana_auth_ldap_user_treebase }}"]
+group_search_filter = "{{ grafana_auth_ldap_group_search_filter }}"
+group_search_base_dns = ["{{ grafana_auth_ldap_group_treebase }}"]
 
-# In POSIX LDAP schemas, without memberOf attribute a secondary query must be made for groups.
-# This is done by enabling group_search_filter below. You must also set member_of= "cn"
-# in [servers.attributes] below.
-
-## Group search filter, to retrieve the groups of which the user is a member (only set if memberOf attribute is not available)
-# group_search_filter = "(&(objectClass=posixGroup)(memberUid=%s))"
-## An array of the base DNs to search through for groups. Typically uses ou=groups
-# group_search_base_dns = ["ou=groups,dc=grafana,dc=org"]
-
-# Specify names of the ldap attributes your ldap uses
 [servers.attributes]
 name = "givenName"
 surname = "sn"
 username = "cn"
-member_of = "memberOf"
 email =  "email"
+# This is required to be set to "cn" in order for Grafana to perform the
+# secondary group look up with the custom filters we defined above.
+# Otherwise it tries to use whatever `memberOf` it can find in the directory,
+# which we don't want to do in most cases due to lack of support.
+member_of = "cn"
 
-# Map ldap groups to grafana org roles
 [[servers.group_mappings]]
-group_dn = "*"
+group_dn = "{{ grafana_auth_ldap_editor_group }}"
 org_role = "Editor"
 org_id = 1
