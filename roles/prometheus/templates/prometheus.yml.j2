@@ -24,6 +24,8 @@ scrape_configs:
   - job_name: '{{ host }}-node'
     static_configs:
       - targets: ['{{ node_exporters[host] }}:9100']
+        labels:
+          hostname: '{{ host }}'
 {% endfor %}
   # - job_name: 'ceph'
   #   static_configs:
