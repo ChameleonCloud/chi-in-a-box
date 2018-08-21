@@ -3,6 +3,19 @@
   docker_image:
     name: "{{ grafana_docker_image }}"
 
+- name: Configure Grafana.
+  block:
+    - name: Create Grafana config directory.
+      file:
+        path: "{{ grafana_config_path }}"
+        state: directory
+    - name: Configure Grafana LDAP authentication.
+      template:
+        src: ldap.toml.j2
+        dest: "{{ grafana_config_path }}/ldap.toml"
+      notify:
+        - restart grafana
+
 - name: Configure Grafana systemd service (grafana.service).
   template:
     src: grafana.service.j2

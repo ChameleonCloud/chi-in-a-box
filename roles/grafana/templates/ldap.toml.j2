@@ -1,0 +1,40 @@
+# {{ ansible_managed }}
+#
+# To troubleshoot and get more log info enable ldap debug logging via
+# GF_LOG_FILTERS=ldap:debug
+
+[[servers]]
+host = "{{ grafana_auth_ldap_hostname }}"
+port = {{ grafana_auth_ldap_port }}
+use_ssl = false
+start_tls = false
+ssl_skip_verify = false
+
+# Bind as authenticating user directly
+bind_dn = "uid=%s,{{ grafana_auth_ldap_treebase }}"
+
+search_filter = "(uid=%s)"
+search_base_dns = ["{{ grafana_auth_ldap_treebase }}"]
+
+# In POSIX LDAP schemas, without memberOf attribute a secondary query must be made for groups.
+# This is done by enabling group_search_filter below. You must also set member_of= "cn"
+# in [servers.attributes] below.
+
+## Group search filter, to retrieve the groups of which the user is a member (only set if memberOf attribute is not available)
+# group_search_filter = "(&(objectClass=posixGroup)(memberUid=%s))"
+## An array of the base DNs to search through for groups. Typically uses ou=groups
+# group_search_base_dns = ["ou=groups,dc=grafana,dc=org"]
+
+# Specify names of the ldap attributes your ldap uses
+[servers.attributes]
+name = "givenName"
+surname = "sn"
+username = "cn"
+member_of = "memberOf"
+email =  "email"
+
+# Map ldap groups to grafana org roles
+[[servers.group_mappings]]
+group_dn = "*"
+org_role = "Editor"
+org_id = 1
