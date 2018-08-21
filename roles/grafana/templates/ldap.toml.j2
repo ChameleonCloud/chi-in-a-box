@@ -11,7 +11,7 @@ start_tls = false
 ssl_skip_verify = false
 
 # Bind as authenticating user directly
-bind_dn = "uid=%s,{{ grafana_auth_ldap_treebase }}"
+bind_dn = "uid=%s,{{ grafana_auth_ldap_user_treebase }}"
 
 search_filter = "{{ grafana_auth_ldap_user_search_filter }}"
 search_base_dns = ["{{ grafana_auth_ldap_user_treebase }}"]
