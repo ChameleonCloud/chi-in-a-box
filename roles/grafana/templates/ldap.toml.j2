@@ -22,7 +22,7 @@ group_search_base_dns = ["{{ grafana_auth_ldap_group_treebase }}"]
 name = "givenName"
 surname = "sn"
 username = "cn"
-email =  "email"
+email = "mail"
 # This is required to be set to "cn" in order for Grafana to perform the
 # secondary group look up with the custom filters we defined above.
 # Otherwise it tries to use whatever `memberOf` it can find in the directory,
