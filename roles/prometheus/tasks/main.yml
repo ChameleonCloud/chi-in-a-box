@@ -35,7 +35,7 @@
       with_items: "{{ groups['ceph_exporter'] }}"
     - name: Precompute fact for internal exporter ipv4 addresses.
       set_fact:
-        node_exporters: >
+        ceph_exporters: >
           {{ { item.inventory_hostname: item.ansible_interfaces
              | map('regex_replace', '^', 'ansible_')
              | map('replace', '-', '_')
@@ -45,8 +45,8 @@
              | map(attribute='ipv4.address')
              | list
              | last
-             | regex_replace('$', ':{{ item.ceph_exporter_port }}')
-             } | combine(ceph_exporter | default({})) }}
+             | regex_replace('$', ':' + item.ceph_exporter_port)
+             } | combine(ceph_exporters | default({})) }}
       loop: "{{ groups['ceph_exporter'] | map('extract', hostvars) | list }}"
       loop_control:
         label: "{{ item.inventory_hostname }}"
