@@ -45,7 +45,7 @@
              | map(attribute='ipv4.address')
              | list
              | last
-             | regex_replace('$', ':' + item.ceph_exporter_port)
+             | regex_replace('$', ':9128')
              } | combine(ceph_exporters | default({})) }}
       loop: "{{ groups['ceph_exporter'] | map('extract', hostvars) | list }}"
       loop_control:
