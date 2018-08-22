@@ -1,5 +1,5 @@
 ---
-- name: restart ceph-exporter
+- name: restart ceph_exporter
   service:
-    name: ceph-exporter
+    name: ceph_exporter
     state: restarted

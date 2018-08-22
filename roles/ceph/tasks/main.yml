@@ -1,3 +1,6 @@
 ---
 - debug:
     msg: "TODO: install and manage Ceph configuration"
+
+- include_tasks: exporter.yml
+  when: ceph_exporter

@@ -3,17 +3,17 @@
   docker_image:
     name: "{{ ceph_exporter_docker_image }}"
 
-- name: Configure Ceph exporter systemd service (ceph-exporter.service).
+- name: Configure Ceph exporter systemd service (ceph_exporter.service).
   template:
-    src: ceph-exporter.service.j2
-    dest: /etc/systemd/system/ceph-exporter.service
+    src: ceph_exporter.service.j2
+    dest: /etc/systemd/system/ceph_exporter.service
   tags: systemd
   notify:
-    - restart ceph-exporter
+    - restart ceph_exporter
 
 - name: Enable Ceph exporter service on boot.
   systemd:
-    service: ceph-exporter.service
+    service: ceph_exporter.service
     # TODO: this is a thorny part of ansible and we shouldn't have to do this ourselves.
     daemon_reload: yes
     state: started

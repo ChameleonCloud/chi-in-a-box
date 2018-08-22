@@ -1,6 +1,6 @@
 ---
 ceph_exporter: False
 ceph_exporter_docker_image: digitalocean/ceph_exporter:2.0.0-luminous
-ceph_exporter_port: 9148
+ceph_exporter_port: 9128
 
 ceph_config_dir: /etc/ceph
