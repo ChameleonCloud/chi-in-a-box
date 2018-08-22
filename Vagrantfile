@@ -6,8 +6,9 @@ Vagrant.configure('2') do |config|
     ansible.tags = ENV.fetch('TAGS', '').split
     ansible.become = true
     ansible.become_user = 'root'
+    # TODO: generate this dynamically somehow
     ansible.groups = {
-      'all_exporters' => ['default'],
+      'ceph' => ['default'],
       'grafana' => ['default'],
       'node_exporters' => ['default'],
       'prometheus' => ['default'],

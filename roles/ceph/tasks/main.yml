@@ -1,0 +1,3 @@
+---
+- debug:
+    msg: "TODO: install and manage Ceph configuration"

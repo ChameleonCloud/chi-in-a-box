@@ -4,6 +4,9 @@ admin01
 [ceph]
 r730xd-[1:5]
 
+[ceph_exporter]
+r730xd-1
+
 [prometheus]
 admin01
 
