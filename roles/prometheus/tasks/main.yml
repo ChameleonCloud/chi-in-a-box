@@ -10,7 +10,7 @@
       delegate_to: "{{ item }}"
       delegate_facts: True
       with_items: "{{ groups['node_exporters'] }}"
-    - name: Precompute fact for internal node_exporter ipv4 addresses.
+    - name: Precompute fact for internal exporter ipv4 addresses.
       set_fact:
         node_exporters: >
           {{ { item.inventory_hostname: item.ansible_interfaces
@@ -23,6 +23,31 @@
              | list
              | last } | combine(node_exporters | default({})) }}
       loop: "{{ groups['node_exporters'] | map('extract', hostvars) | list }}"
+      loop_control:
+        label: "{{ item.inventory_hostname }}"
+
+- name: Gather ceph_exporter hosts.
+  block:
+    - name: Gather facts from all ceph_exporter.
+      setup:
+      delegate_to: "{{ item }}"
+      delegate_facts: True
+      with_items: "{{ groups['ceph_exporter'] }}"
+    - name: Precompute fact for internal exporter ipv4 addresses.
+      set_fact:
+        node_exporters: >
+          {{ { item.inventory_hostname: item.ansible_interfaces
+             | map('regex_replace', '^', 'ansible_')
+             | map('replace', '-', '_')
+             | map('extract', item)
+             | selectattr('ipv4', 'defined')
+             | selectattr('ipv4.address', 'match', '10.*')
+             | map(attribute='ipv4.address')
+             | list
+             | last
+             | regex_replace('$', ':{{ item.ceph_exporter_port }}')
+             } | combine(ceph_exporter | default({})) }}
+      loop: "{{ groups['ceph_exporter'] | map('extract', hostvars) | list }}"
       loop_control:
         label: "{{ item.inventory_hostname }}"
 

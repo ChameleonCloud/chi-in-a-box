@@ -27,9 +27,13 @@ scrape_configs:
         labels:
           hostname: '{{ host }}'
 {% endfor %}
-  # - job_name: 'ceph'
-  #   static_configs:
-  #   - targets: ['r730xd-1:9128']
+{% for host in ceph_exporters %}
+  - job_name: '{{ host }}-ceph'
+    static_configs:
+      - targets: ['{{ ceph_exporters[host] }}']
+        labels:
+          hostname: '{{ host }}'
+{% endfor %}
   # - job_name: 'openstack'
   #   static_configs:
   #   - targets: ['admin02:9103']
