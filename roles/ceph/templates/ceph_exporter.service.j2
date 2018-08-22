@@ -6,7 +6,7 @@ After=docker.service
 Restart=always
 ExecStart=/bin/docker run --name=ceph_exporter \
                           -v {{ ceph_config_dir }}:/etc/ceph \
-                          -p {{ ceph_exporter_port }}:9148 \
+                          -p {{ ceph_exporter_port }}:9128 \
                           {{ ceph_exporter_docker_image }}
 ExecStop=/bin/docker stop -t 2 ceph_exporter
 ExecStopPost=/bin/docker rm -f ceph_exporter
