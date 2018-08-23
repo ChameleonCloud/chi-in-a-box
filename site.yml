@@ -1,7 +1,4 @@
-#!/usr/bin/env ansible-playbook
-
-- include: playbooks/ceph.yml
-- include: playbooks/grafana.yml
-- include: playbooks/mysql.yml
-- include: playbooks/node_exporter.yml
-- include: playbooks/prometheus.yml
+# Include all playbooks automatically
+- include: "{{ item }}"
+  with_fileglob:
+    - playbooks/*.yml
