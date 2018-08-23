@@ -1,7 +1,7 @@
 PLAYBOOKS     := $(basename $(notdir $(shell find playbooks -name '*.yml')))
 TEST_TARGETS  := $(PLAYBOOKS:%=%-test)
 SHELL_TARGETS := $(PLAYBOOKS:%=%-shell)
-SHELL_TARGETS := $(PLAYBOOKS:%=%-shell)
+WATCH_TARGETS := $(PLAYBOOKS:%=%-watch)
 
 TAGS ?= all
 
