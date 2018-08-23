@@ -1,8 +1,9 @@
 PLAYBOOKS     := $(basename $(notdir $(shell find playbooks -name '*.yml')))
 TEST_TARGETS  := $(PLAYBOOKS:%=%-test)
 SHELL_TARGETS := $(PLAYBOOKS:%=%-shell)
+SHELL_TARGETS := $(PLAYBOOKS:%=%-shell)
 
-TAGS         ?= all
+TAGS ?= all
 
 .PHONY: $(TEST_TARGETS)
 $(TEST_TARGETS): %-test:
@@ -10,4 +11,8 @@ $(TEST_TARGETS): %-test:
 
 .PHONY: $(SHELL_TARGETS)
 $(SHELL_TARGETS): %-shell:
-	PLAYBOOK=$* TAGS=$(TAGS) vagrant ssh
+	PLAYBOOK=$* vagrant ssh
+
+.PHONY: $(WATCH_TARGETS)
+$(WATCH_TARGETS): %-watch:
+	PLAYBOOK=$* vagrant rsync-auto

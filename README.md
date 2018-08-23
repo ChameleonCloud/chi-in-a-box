@@ -16,15 +16,23 @@ vagrant install vagrant-vbguest
 
 ### Testing playbooks locally
 
-You can test your playbooks using a Vagrant VM before you push it up. There is a convenient `make` target to run any playbook located in `playbooks/`:
+You can test your playbooks using a Vagrant VM before you push it up. There is a convenient `make` target to run any playbook located in [`playbooks/`](./playbooks):
 
 ```
 # Tests playbooks/grafana.yml
-make test-grafana
+make grafana-test
 ```
 
-**Note**: If you are doing a lot with testing playbooks like this, you'll probably want to make sure your local directory is properly synced with the Vagrant VM. This often doesn't work properly out of the box. To ensure that your working directory is always properly synced, you can use `rsync-auto`:
+Each playbook is run in _its own Vagrant VM_. This means you will have many VMs running if you are testing multiple playbooks.
+
+**Note**: If you are doing a lot with testing playbooks like this, you'll probably want to make sure your local directory is properly synced with the Vagrant VM. This often doesn't work properly out of the box. To ensure that your working directory is always properly synced, you can run a "watch" task in a separate tab:
 
 ```
-vagrant rsync-auto
+# Automatically syncs working directory to test VM.
+# (example is for grafana playbook VM)
+make grafana-watch
 ```
+
+## Region inventories
+
+These playbooks are generic enough to be applied against multiple regions (sites). Each region is defined using an inventory file located in [`inventories/`](./inventories)

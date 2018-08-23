@@ -12,7 +12,7 @@ Vagrant.configure('2') do |config|
   config.vm.define host_name do |host|
     host.vm.provision 'ansible_local' do |ansible|
       ansible.playbook = "playbooks/#{playbook_name}.yml"
-      ansible.tags = ENV.fetch('TAGS', '').split
+      ansible.tags = ENV.fetch('TAGS', '').split(',')
       ansible.extra_vars = extra_vars
       # TODO: this isn't super great, as we miss testing bad permission issues.
       # However, most hosts override this at the host level anyways. Not sure
