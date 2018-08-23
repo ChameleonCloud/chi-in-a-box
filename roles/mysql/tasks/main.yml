@@ -1,0 +1,8 @@
+---
+# Can uncomment this when we're comfortable managing MariaDB installs w/ Ansible.
+# - name: Install MariaDB server.
+#   package:
+#     name: mariadb-server
+
+- include_tasks: prometheus_exporter.yml
+  when: mysql_prometheus_exporter_enable

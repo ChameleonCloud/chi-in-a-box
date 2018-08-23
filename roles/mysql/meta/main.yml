@@ -1,0 +1,3 @@
+---
+dependencies:
+  - { role: docker, when: mysql_prometheus_exporter_enable }

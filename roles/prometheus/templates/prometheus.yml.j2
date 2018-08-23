@@ -34,9 +34,13 @@ scrape_configs:
         labels:
           hostname: '{{ host }}'
 {% endfor %}
+{% for host in mysql_exporters %}
+  - job_name: '{{ host }}-mysql'
+    static_configs:
+      - targets: ['{{ mysql_exporters[host] }}']
+        labels:
+          hostname: '{{ host }}'
+{% endfor %}
   # - job_name: 'openstack'
   #   static_configs:
   #   - targets: ['admin02:9103']
-  # - job_name: 'mysql'
-  #   static_configs:
-  #   - targets: ['admin02:9104']

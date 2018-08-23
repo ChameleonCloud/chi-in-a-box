@@ -51,6 +51,31 @@
       loop_control:
         label: "{{ item.inventory_hostname }}"
 
+- name: Gather mysql_exporter hosts.
+  block:
+    - name: Gather facts from all mysql_exporter.
+      setup:
+      delegate_to: "{{ item }}"
+      delegate_facts: True
+      with_items: "{{ groups['mysql_exporter'] }}"
+    - name: Precompute fact for internal exporter ipv4 addresses.
+      set_fact:
+        mysql_exporters: >
+          {{ { item.inventory_hostname: item.ansible_interfaces
+             | map('regex_replace', '^', 'ansible_')
+             | map('replace', '-', '_')
+             | map('extract', item)
+             | selectattr('ipv4', 'defined')
+             | selectattr('ipv4.address', 'match', '10.*')
+             | map(attribute='ipv4.address')
+             | list
+             | last
+             | regex_replace('$', ':9104')
+             } | combine(mysql_exporters | default({})) }}
+      loop: "{{ groups['mysql_exporter'] | map('extract', hostvars) | list }}"
+      loop_control:
+        label: "{{ item.inventory_hostname }}"
+
 - name: Create Prometheus configuration directory.
   file:
     path: "{{ prometheus_config_dir }}"

@@ -1,0 +1,16 @@
+# {{ ansible_managed }}
+[Unit]
+Description=MySQL metrics exporter
+After=docker.service
+
+[Service]
+Restart=always
+ExecStart=/bin/docker run --name=%N \
+                          -p {{ mysql_prometheus_exporter_port }}:9104 \
+                          -v {{ mysql_prometheus_exporter_config_path }}/my.cnf:/root/.my.cnf \
+                          {{ mysql_prometheus_exporter_docker_image }}
+ExecStop=/bin/docker stop -t 2 %N
+ExecStopPost=/bin/docker rm -f %N
+
+[Install]
+WantedBy=multi-user.target

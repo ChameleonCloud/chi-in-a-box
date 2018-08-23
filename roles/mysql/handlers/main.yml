@@ -1,0 +1,5 @@
+---
+- name: restart prometheus exporter
+  service:
+    name: "{{ mysql_prometheus_exporter_service_name }}"
+    state: restarted

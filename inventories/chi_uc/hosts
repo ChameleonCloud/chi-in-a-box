@@ -7,6 +7,12 @@ r730xd-[1:5]
 [ceph_exporter]
 r730xd-1
 
+[mysql]
+admin01
+
+[mysql_exporter]
+admin01
+
 [prometheus]
 admin01
 
