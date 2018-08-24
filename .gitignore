@@ -1,3 +1,5 @@
+# File that contains what region/site we're targeting.
+.ansible-inventory
 # Ansible caches facts here
 .facts/
 # Vagrant caches its state here

@@ -7,6 +7,9 @@ Ansible playbooks for deploying Chameleon operations systems
 This requires Vagrant and Virtualbox (with guest additions) if you want to test playbooks locally.
 
 **Mac OS X**
+
+Can be installed easily using Homebrew.
+
 ```
 brew cask install vagrant
 brew cask install virtualbox
@@ -33,6 +36,47 @@ Each playbook is run in _its own Vagrant VM_. This means you will have many VMs 
 make grafana-watch
 ```
 
-## Region inventories
+Sometimes you may want to see what's going on inside the VM. You can launch a shell into the VM using a different `make` target.
 
-These playbooks are generic enough to be applied against multiple regions (sites). Each region is defined using an inventory file located in [`inventories/`](./inventories)
+```
+# SSH into the test VM. (Requires that a prior 'test' run has already happened.)
+make grafana-shell
+```
+
+If you want to tear down the VM, you can run the `clean` target:
+
+```
+# Wipe the test VM.
+make grafana-clean
+```
+
+## Deployment
+
+Each Chameleon site is deployed separately. This allows each site to customize the deploy to their specific concerns. Each site is represented via an inventory located in [`inventories/`](./inventories). Inventories are the primary way that the behavior of the generic playbooks is customized.
+
+### Creating a new site inventory
+
+To create a new site inventory (probably won't happen very often, only when deploying a new site), you need to initialize a few things, like an Ansible Vault password, and an inventory directory. This can be done for you by running the `./ansible-inventory` script.
+
+```shell
+$> ./ansible-inventory
+Enter the name of the inventory: chi_some_site_name
+Creating inventory directory structure:
+  - ./inventories/chi_some_site_name
+Creating initial hosts file:
+  - ./inventories/chi_some_site_name/hosts
+Creating initial vault password in ./vault_password
+Your new inventory environment is now set up.
+```
+
+### Applying playbooks
+
+Playbooks are set up to target a host group with the same name. This means the `grafana` playbook will target the `grafana` host group etc. To run a playbook, you can use the `./ansible-playbook` wrapper script, which just sets up two important parameters for you: the Ansible Vault configuration, and the inventory path. This requires you have already done the setup using `./ansible-inventory`.
+
+```shell
+# Run the 'grafana' playbook (deploys/updates grafana)
+$> ./ansible-playbook playbooks/grafana.yml
+# Run only the tasks tagged 'configuration' in the 'grafana' playbook
+# (Any arguments normally passed to ansible-playbook can be passed here.)
+$> ./ansible-playbook --tags configuration playbooks/grafana.yml
+```
