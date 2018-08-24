@@ -61,13 +61,13 @@ To create a new site inventory (probably won't happen very often, only when depl
 ```bash
 ./ansible-inventory
 # Output:
-Enter the name of the inventory: chi_some_site_name
-Creating inventory directory structure:
-  - ./inventories/chi_some_site_name
-Creating initial hosts file:
-  - ./inventories/chi_some_site_name/hosts
-Creating initial vault password in ./vault_password
-Your new inventory environment is now set up.
+# Enter the name of the inventory: chi_some_site_name
+# Creating inventory directory structure:
+#   - ./inventories/chi_some_site_name
+# Creating initial hosts file:
+#   - ./inventories/chi_some_site_name/hosts
+# Creating initial vault password in ./vault_password
+# Your new inventory environment is now set up.
 ```
 
 ### Applying playbooks
