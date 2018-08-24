@@ -59,7 +59,8 @@ Each Chameleon site is deployed separately. This allows each site to customize t
 To create a new site inventory (probably won't happen very often, only when deploying a new site), you need to initialize a few things, like an Ansible Vault password, and an inventory directory. This can be done for you by running the `./ansible-inventory` script.
 
 ```bash
-$> ./ansible-inventory
+./ansible-inventory
+# Output:
 Enter the name of the inventory: chi_some_site_name
 Creating inventory directory structure:
   - ./inventories/chi_some_site_name
@@ -75,8 +76,8 @@ Playbooks are set up to target a host group with the same name. This means the `
 
 ```bash
 # Run the 'grafana' playbook (deploys/updates grafana)
-$> ./ansible-playbook playbooks/grafana.yml
+./ansible-playbook playbooks/grafana.yml
 # Run only the tasks tagged 'configuration' in the 'grafana' playbook
 # (Any arguments normally passed to ansible-playbook can be passed here.)
-$> ./ansible-playbook --tags configuration playbooks/grafana.yml
+./ansible-playbook --tags configuration playbooks/grafana.yml
 ```
