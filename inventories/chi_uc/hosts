@@ -1,17 +1,26 @@
 [controller]
 admin01
 
+# The Ceph storage cluster is the storage backend for the Swift object store.
 [ceph]
 r730xd-[1:5]
+
+# These are the old storage node(s) for UC. They mostly
+# hold Gnocchi metrics, but also have the MySQL server running there.
+[storage]
+fx2-01
 
 [ceph_exporter]
 r730xd-1
 
+[docker_registry]
+fx2-01
+
 [mysql]
-admin01
+fx2-01
 
 [mysql_exporter]
-admin01
+fx2-01
 
 [prometheus]
 admin01
@@ -19,3 +28,4 @@ admin01
 [node_exporters:children]
 controller
 ceph
+storage

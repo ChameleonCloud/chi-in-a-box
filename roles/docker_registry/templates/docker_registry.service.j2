@@ -1,0 +1,15 @@
+[Unit]
+Description=Docker Registry server
+After=docker.service
+
+[Service]
+Restart=always
+ExecStart=/bin/docker run --name=%N \
+                          --net={{ nginx_docker_network_name }} \
+                          -v {{ docker_registry_config_path }}/config.yml:/etc/docker/registry/config.yml:ro \
+                          {{ docker_registry_image }}
+ExecStop=/bin/docker stop -t 2 %N
+ExecStopPost=/bin/docker rm -f %N
+
+[Install]
+WantedBy=multi-user.target

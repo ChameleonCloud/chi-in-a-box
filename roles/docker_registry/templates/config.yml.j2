@@ -1,0 +1,25 @@
+---
+version: 0.1
+log:
+  fields:
+    service: {{ docker_registry_service_name }}
+storage:
+  cache:
+    blobdescriptor: inmemory
+  swift:
+    username: {{ docker_registry_swift_username }}
+    password: {{ docker_registry_swift_password }}
+    authurl: {{ docker_registry_swift_authurl }}
+    domain: {{ docker_registry_swift_domain }}
+    region: {{ docker_registry_swift_region }}
+    container: {{ docker_registry_swift_containername }}
+    endpointtype: {{ docker_registry_swift_endpointtype }}
+http:
+  addr: :{{ docker_registry_port }}
+  headers:
+    X-Content-Type-Options: [nosniff]
+health:
+  storagedriver:
+    enabled: true
+    interval: 10s
+    threshold: 3

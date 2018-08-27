@@ -19,4 +19,4 @@
     enabled: yes
 
 - include_tasks: docker-compose.yml
-  when: docker_install_compose
+  when: docker_compose_enable

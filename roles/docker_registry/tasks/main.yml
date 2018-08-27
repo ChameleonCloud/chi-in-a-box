@@ -1,0 +1,61 @@
+---
+- name: Pull Docker Registry image.
+  docker_image:
+    name: "{{ docker_registry_image }}"
+
+- name: Install dependencies for os_user module.
+  pip:
+    name: openstacksdk
+
+- name: Create OpenStack user for Swift storage.
+  os_user:
+    name: "{{ docker_registry_swift_username }}"
+    password: "{{ docker_registry_swift_password }}"
+    region_name: CHI@TACC
+  when: docker_registry_swift_create_user
+
+- name: Configure Docker Registry.
+  block:
+    - name: Create Docker Registry config directory.
+      file:
+        path: "{{ docker_registry_config_path }}"
+        state: directory
+    - name: Create Docker Registry config.
+      template:
+        src: config.yml.j2
+        dest: "{{ docker_registry_config_path }}/config.yml"
+      notify:
+        - restart docker registry
+    - name: Configure Docker Registry systemd service.
+      template:
+        src: docker_registry.service.j2
+        dest: "/etc/systemd/system/{{ docker_registry_service_name }}.service"
+      notify:
+        - restart docker registry
+  tags: configuration
+
+- name: Enable Docker Registry service on boot.
+  systemd:
+    service: "{{ docker_registry_service_name }}"
+    # TODO: this is a thorny part of ansible and we shouldn't have to do this ourselves.
+    daemon_reload: yes
+    state: started
+    enabled: yes
+
+- name: Create Nginx configuration for proxy to Docker Registry.
+  include_role:
+    name: nginx
+    tasks_from: host
+  vars:
+    nginx_server_name: "{{ docker_registry_hostname }}"
+    nginx_server_conf: |
+      location / {
+        # Using variable for slight indirection, lets Nginx start without
+        # requiring upstream be resolved.
+        set $docker_registry_host {{ docker_registry_service_name }}
+        proxy_pass http://$docker_registry_host:{{ docker_registry_port }};
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+      }

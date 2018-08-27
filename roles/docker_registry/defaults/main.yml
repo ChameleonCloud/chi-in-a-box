@@ -1,0 +1,16 @@
+---
+docker_registry_image: registry:2
+docker_registry_config_path: /etc/docker/registry
+docker_registry_hostname: docker.uc.chameleoncloud.org
+docker_registry_port: 5000
+docker_registry_service_name: docker_registry
+
+# Swift storage backend configuration
+docker_registry_swift_username: docker_registry
+docker_registry_swift_password: ''
+docker_registry_swift_create_user: False
+docker_registry_swift_authurl: https://chi.uc.chameleoncloud.org:5000/v3
+docker_registry_swift_domain: default
+docker_registry_swift_region: CHI@UC
+docker_registry_swift_containername: docker_registry
+docker_registry_swift_endpointtype: internal
