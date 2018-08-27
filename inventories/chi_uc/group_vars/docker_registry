@@ -1,4 +1,5 @@
 ---
+docker_registry_swift_create_user: True  
 docker_registry_swift_password: !vault |
           $ANSIBLE_VAULT;1.2;AES256;chi_uc
           33363062323832643434623838316165396333633130613361306664663462333063363437623963
