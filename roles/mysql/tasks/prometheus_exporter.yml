@@ -11,6 +11,7 @@
       package:
         name: "{{ item }}"
       loop:
+        - gcc
         - mariadb-devel
         - python-devel
     - name: Install mysqlclient.

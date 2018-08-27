@@ -1,4 +1,6 @@
 ---
+openstack_keystone_master_region: CHI@TACC
+
 slack_api_url: !vault |
           $ANSIBLE_VAULT;1.2;AES256;chi_uc
           61663431376236623836376266383762323731613534343030333162646336343138636539393864

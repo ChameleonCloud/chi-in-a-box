@@ -11,7 +11,7 @@
   os_user:
     name: "{{ docker_registry_swift_username }}"
     password: "{{ docker_registry_swift_password }}"
-    region_name: CHI@TACC
+    region_name: "{{ openstack_keystone_master_region }}"
   when: docker_registry_swift_create_user
 
 - name: Configure Docker Registry.
