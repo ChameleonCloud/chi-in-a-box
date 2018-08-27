@@ -5,7 +5,10 @@
 
 - name: Install dependencies for os_user module.
   pip:
-    name: openstacksdk
+    name: "{{ item }}"
+  loop:
+    - openstacksdk
+    - shade
 
 - name: Create OpenStack user for Swift storage.
   os_user:
@@ -13,6 +16,7 @@
     password: "{{ docker_registry_swift_password }}"
     region_name: "{{ openstack_keystone_master_region }}"
   when: docker_registry_swift_create_user
+  no_log: True
 
 - name: Configure Docker Registry.
   block:
