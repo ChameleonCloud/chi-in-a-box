@@ -13,7 +13,7 @@ setup: venv
 
 venv: requirements.txt
 	@ echo "Initializing virtualenv"
-	@ virtualenv $@
+	@ virtualenv --system-site-packages $@
 	@ echo "Installing base dependencies to virtualenv directory"
 	@ $@/bin/pip install -r requirements.txt
 	@ touch $@
