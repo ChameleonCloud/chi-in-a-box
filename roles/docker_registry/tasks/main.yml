@@ -2,21 +2,20 @@
 - name: Pull Docker Registry image.
   docker_image:
     name: "{{ docker_registry_image }}"
+  tags:
+    - pull
 
-# - name: Install dependencies for os_user module.
-#   pip:
-#     name: "{{ item }}"
-#   loop:
-#     - openstacksdk
-#     - shade
-#
+# TODO: uncomment when we have a more stable way of running advanced
+# Ansible modules on the deployment host. Currently these modules require
+# other pip dependencies which can mess up a production environment.
 # - name: Create OpenStack user for Swift storage.
-#   os_user:
+#   local_action:
+#     module: os_user
 #     name: "{{ docker_registry_swift_username }}"
 #     password: "{{ docker_registry_swift_password }}"
 #     region_name: "{{ openstack_keystone_master_region }}"
-#   when: docker_registry_swift_create_user
 #   no_log: True
+#   when: docker_registry_swift_create_user
 
 - name: Configure Docker Registry.
   block:
@@ -36,7 +35,8 @@
         dest: "/etc/systemd/system/{{ docker_registry_service_name }}.service"
       notify:
         - restart docker registry
-  tags: configuration
+  tags:
+    - configuration
 
 - name: Enable Docker Registry service on boot.
   systemd:
@@ -63,3 +63,5 @@
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
       }
+    tags:
+      - configuration

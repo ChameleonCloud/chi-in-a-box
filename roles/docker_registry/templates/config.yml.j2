@@ -9,8 +9,9 @@ storage:
   swift:
     username: {{ docker_registry_swift_username }}
     password: {{ docker_registry_swift_password }}
-    authurl: {{ docker_registry_swift_authurl }}
     domain: {{ docker_registry_swift_domain }}
+    tenant: {{ docker_registry_swift_tenant }}
+    authurl: {{ docker_registry_swift_authurl }}
     region: {{ docker_registry_swift_region }}
     container: {{ docker_registry_swift_containername }}
     endpointtype: {{ docker_registry_swift_endpointtype }}
