@@ -71,7 +71,7 @@
       notify:
         - restart prometheus exporter
   tags:
-    - configure
+    - configuration
 
 - name: Enable MySQL exporter service on boot.
   systemd:

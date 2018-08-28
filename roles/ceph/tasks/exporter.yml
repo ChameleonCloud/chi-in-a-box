@@ -2,12 +2,15 @@
 - name: Pull Ceph exporter image.
   docker_image:
     name: "{{ ceph_exporter_docker_image }}"
+  tags:
+    - pull
 
 - name: Configure Ceph exporter systemd service (ceph_exporter.service).
   template:
     src: ceph_exporter.service.j2
     dest: /etc/systemd/system/ceph_exporter.service
-  tags: systemd
+  tags:
+    - configuration
   notify:
     - restart ceph_exporter
 
@@ -18,4 +21,3 @@
     daemon_reload: yes
     state: started
     enabled: yes
-  tags: systemd

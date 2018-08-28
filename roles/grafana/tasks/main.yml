@@ -2,6 +2,8 @@
 - name: Pull Grafana image.
   docker_image:
     name: "{{ grafana_docker_image }}"
+  tags:
+    - pull
 
 - name: Configure Grafana.
   block:
@@ -15,14 +17,14 @@
         dest: "{{ grafana_config_path }}/ldap.toml"
       notify:
         - restart grafana
-
-- name: Configure Grafana systemd service (grafana.service).
-  template:
-    src: grafana.service.j2
-    dest: /etc/systemd/system/grafana.service
-  tags: systemd
-  notify:
-    - restart grafana
+    - name: Configure Grafana systemd service (grafana.service).
+      template:
+        src: grafana.service.j2
+        dest: /etc/systemd/system/grafana.service
+      notify:
+        - restart grafana
+  tags:
+    - configuration
 
 - name: Enable Grafana service on boot.
   systemd:
@@ -31,7 +33,6 @@
     daemon_reload: yes
     state: started
     enabled: yes
-  tags: systemd
 
 - name: Create Nginx configuration for proxy to Grafana.
   include_role:
@@ -47,3 +48,5 @@
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
       }
+  tags:
+    - configuration

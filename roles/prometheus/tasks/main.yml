@@ -82,20 +82,22 @@
     state: directory
 
 - name: Configure Prometheus.
-  template:
-    src: prometheus.yml.j2
-    dest: "{{ prometheus_config_dir }}/prometheus.yml"
-    # mode: "0600"
-  notify:
-    - restart prometheus
-
-- name: Configure Prometheus systemd service (prometheus.service).
-  template:
-    src: prometheus.service.j2
-    dest: /etc/systemd/system/prometheus.service
-  tags: systemd
-  notify:
-    - restart prometheus
+  block:
+    - name: Configure Prometheus.
+      template:
+        src: prometheus.yml.j2
+        dest: "{{ prometheus_config_dir }}/prometheus.yml"
+        # mode: "0600"
+      notify:
+        - restart prometheus
+    - name: Configure Prometheus systemd service (prometheus.service).
+      template:
+        src: prometheus.service.j2
+        dest: /etc/systemd/system/prometheus.service
+      notify:
+        - restart prometheus
+  tags:
+    - configuration
 
 - name: Enable Prometheus service on boot.
   systemd:
@@ -104,7 +106,6 @@
     daemon_reload: yes
     state: started
     enabled: yes
-  tags: systemd
 
 - include_tasks: alertmanager.yml
   when: prometheus_install_alertmanager
