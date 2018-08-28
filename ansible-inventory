@@ -18,11 +18,12 @@ inventory_dir="$DIR/inventories/$name"
 echo "Creating inventory directory structure: "
 echo "  - ./inventories/$name"
 mkdir -p "$inventory_dir"
-echo "  - ./inventories/group_vars/ansible"
+echo "  - ./inventories/$name/group_vars/ansible"
 mkdir -p "$inventory_dir/group_vars"
 cat >"$inventory_dir/group_vars/ansible" <<ANSIBLE_GROUP_VARS
 ---
 ansible_connection: local
+pip_virtualenv: $DIR/venv
 ANSIBLE_GROUP_VARS
 
 echo "Creating initial hosts file: "
