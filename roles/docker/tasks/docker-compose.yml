@@ -1,11 +1,8 @@
 ---
-- name: Ensure pip is installed.
-  package:
-    name: python-pip
-
 - name: Install docker-py dependency.
   pip:
     name: docker-py
+    virtualenv: "{{ pip_virtualenv }}"
 
 - name: Check current docker-compose version.
   command: docker-compose --version

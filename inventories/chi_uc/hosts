@@ -1,3 +1,7 @@
+# The Ansible deployment host.
+[ansible]
+admin01
+
 [controller]
 admin01
 

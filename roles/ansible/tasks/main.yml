@@ -1,0 +1,19 @@
+---
+- name: Install dependencies for Ansible modules.
+  block:
+    - name: Install package dependencies.
+      package:
+        name: "{{ item }}"
+      loop:
+        # For mysql_user module
+        - mariadb-devel
+    - name: Install python dependencies.
+      pip:
+        name: "{{ item }}"
+        virtualenv: "{{ pip_virtualenv }}"
+      loop:
+        # For mysql_user module
+        - mysqlclient
+        # For os_user module
+        - openstacksdk
+        - shade

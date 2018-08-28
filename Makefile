@@ -6,6 +6,22 @@ CLEAN_TARGETS := $(PLAYBOOKS:%=%-clean)
 
 TAGS ?= all
 
+.PHONY: setup
+setup: venv
+	@ echo "Initializing Ansible inventory, if possible"
+	@ ./ansible-inventory
+
+venv: requirements.txt
+	@ echo "Initializing virtualenv"
+	@ virtualenv $@
+	@ echo "Installing base dependencies to virtualenv directory"
+	@ $@/bin/pip install -r requirements.txt
+	@ touch $@
+
+#
+# Develoment targets
+#
+
 .PHONY: $(TEST_TARGETS)
 $(TEST_TARGETS): %-test:
 	PLAYBOOK=$* TAGS=$(TAGS) vagrant up --provision

@@ -1,0 +1,16 @@
+---
+- name: Create virtualenv.
+  block:
+    - name: Create virtualenv directory.
+      file:
+        path: "{{ pip_virtualenv }}"
+        state: directory
+    - name: Install virtualenv.
+      package:
+        name: python-virtualenv
+        state: present
+    - name: Set fact for virtualenv path.
+      set_fact:
+        ansible_python_interpreter: "{{ pip_virtualenv }}/bin/python"
+  tags:
+    - always

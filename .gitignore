@@ -8,3 +8,5 @@
 *.retry
 # The vault passwords are stored here by convention
 vault_password
+# The virtualenv environment
+venv/
