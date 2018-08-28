@@ -5,26 +5,27 @@
   tags:
     - pull
 
-- name: Install mysqlclient dependency for mysql_user module.
+- name: Create MySQL exporter user.
   block:
     - name: Install package dependencies.
-      package:
+      local_action:
+        module: package
         name: "{{ item }}"
       loop:
         - gcc
         - mariadb-devel
         - python-devel
     - name: Install mysqlclient.
-      pip:
+      local_action:
+        module: pip
         name: mysqlclient
-
-- name: Create MySQL exporter user.
-  block:
     - name: Ensure password is set.
       fail: msg="Please set a value for the 'mysql_prometheus_exporter_mysql_password' variable."
       when: mysql_prometheus_exporter_mysql_password is not defined
     - name: Create user.
-      mysql_user:
+      local_action:
+        module: mysql_user
+        login_host: "{{ inventory_hostname }}"
         name: "{{ mysql_prometheus_exporter_mysql_user }}"
         password: "{{ mysql_prometheus_exporter_mysql_password }}"
         priv: "*.*:PROCESS,REPLICATION CLIENT,SELECT"
