@@ -54,6 +54,20 @@ make grafana-clean
 
 Each Chameleon site is deployed separately. This allows each site to customize the deploy to their specific concerns. Each site is represented via an inventory located in [`inventories/`](./inventories). Inventories are the primary way that the behavior of the generic playbooks is customized.
 
+### Deployment node setup
+
+To set up a virtualenv and install the Ansible python module(s), first run the `setup` make task:
+
+```bash
+make setup
+```
+
+This should also prompt you to create a new site inventory (see next section "Creating a new site inventory" for what exactly this means.) If you have done that, then the next step is to provision the Ansible deploy node (which should be localhost, effectively) with Ansible. It's Ansible all the way down! This will install any other python modules and packages which are necessary for the operation of the Ansible tasks. It's the expectation that as new modules are introduced to this repo, their dependencies are properly bootstrapped by the `ansible` role.
+
+```bash
+./ansible-playbook playbooks/ansible.yml
+```
+
 ### Creating a new site inventory
 
 To create a new site inventory (probably won't happen very often, only when deploying a new site), you need to initialize a few things, like an Ansible Vault password, and an inventory directory. This can be done for you by running the `./ansible-inventory` script.
