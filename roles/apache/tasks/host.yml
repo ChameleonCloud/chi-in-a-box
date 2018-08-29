@@ -23,6 +23,8 @@
   template:
     src: vhost.conf.j2
     dest: "{{ apache_config_path }}/100-{{ apache_server_name }}.conf"
+  vars:
+    apache_server_name_normalized: "{{ apache_server_name | replace('.', '_') }}"
   tags:
     - configuration
     - apache
