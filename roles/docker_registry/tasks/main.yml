@@ -45,23 +45,3 @@
     daemon_reload: yes
     state: started
     enabled: yes
-
-- name: Create Nginx configuration for proxy to Docker Registry.
-  include_role:
-    name: nginx
-    tasks_from: host
-  vars:
-    nginx_server_name: "{{ docker_registry_hostname }}"
-    nginx_server_conf: |
-      location / {
-        # Using variable for slight indirection, lets Nginx start without
-        # requiring upstream be resolved.
-        set $docker_registry_host {{ docker_registry_service_name }}
-        proxy_pass http://$docker_registry_host:{{ docker_registry_port }};
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-      }
-    tags:
-      - configuration
