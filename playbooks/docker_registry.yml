@@ -2,26 +2,35 @@
 - hosts: docker_registry
   roles:
     - docker_registry
+  tasks:
+    - name: Set facts for gathering in frontend hosts.
+      set_fact:
+        docker_registry_hostname: "{{ docker_registry_hostname }}"
+        docker_registry_port: "{{ docker_registry_port }}"
+      tags:
+        - configuration
 
 - hosts: frontends
   tasks:
-    - name: Gather facts from docker registry host.
-      setup:
-      delegate_to: "{{ groups.docker_registry[0] }}"
-      delegate_facts: True
-    - name: Precompute facts needed for virtual host setup.
-      set_fact:
-        docker_registry_hostname: >
-          {{ hostvars[groups.docker_registry[0]].docker_registry_hostname }}
-        docker_registry_port: >
-          {{ hostvars[groups.docker_registry[0]].docker_registry_port }}
-        docker_registry_ipv4_address: >
-          {{ hostvars[groups.docker_registry[0]].ansible_default_ipv4.address }}
-    - include_role:
-        name: apache
-        tasks_from: host
-        vars:
-          apache_server_name: "{{ docker_registry_hostname }}"
-          apache_server_conf: >
-            ProxyPass / http://{{ docker_registry_ipv4_address }}:{{ docker_registry_port }}/
-            ProxyPassReverse / http://{{ docker_registry_ipv4_address }}:{{ docker_registry_port }}/
+    - name: Configure virtual host for docker registry backend.
+      block:
+        - name: Gather facts from docker registry host.
+          setup:
+          delegate_to: "{{ groups.docker_registry[0] }}"
+          delegate_facts: True
+        - name: Precompute convenience facts needed for virtual host configuration.
+          set_fact:
+            docker_registry_hostname: "{{ hostvars[groups.docker_registry[0]].docker_registry_hostname }}"
+            docker_registry_port: "{{ hostvars[groups.docker_registry[0]].docker_registry_port }}"
+            docker_registry_ipv4_address: "{{ hostvars[groups.docker_registry[0]].ansible_default_ipv4.address }}"
+        - name: Configure virtual host.
+          include_role:
+            name: apache
+            tasks_from: host
+          vars:
+            apache_server_name: "{{ docker_registry_hostname }}"
+            apache_server_conf: >
+              ProxyPass / http://{{ docker_registry_ipv4_address }}:{{ docker_registry_port }}/
+              ProxyPassReverse / http://{{ docker_registry_ipv4_address }}:{{ docker_registry_port }}/
+      tags:
+        - configuration

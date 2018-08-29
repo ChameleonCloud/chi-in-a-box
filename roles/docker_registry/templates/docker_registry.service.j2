@@ -5,7 +5,7 @@ After=docker.service
 [Service]
 Restart=always
 ExecStart=/bin/docker run --name=%N \
-                          --net={{ nginx_docker_network_name }} \
+                          -p {{ docker_registry_port }}:5000 \
                           -v {{ docker_registry_config_path }}/config.yml:/etc/docker/registry/config.yml:ro \
                           {{ docker_registry_image }}
 ExecStop=/bin/docker stop -t 2 %N

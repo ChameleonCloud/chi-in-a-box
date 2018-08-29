@@ -14,11 +14,15 @@
 #           ProxyPassReverse / http://{{ grafana_host }}:{{ grafana_port }}/
 #
 ---
+- name: Create Apache configuration directories.
+  file:
+    name: "{{ apache_config_path }}"
+    state: directory
+
 - name: "Create Apache configuration for {{ apache_server_name }}"
   template:
     src: vhost.conf.j2
-    dest: "/etc/httpd/conf.d/100-{{ apache_server_name }}.conf"
-    mode: 0644
+    dest: "{{ apache_config_path }}/100-{{ apache_server_name }}.conf"
   tags:
     - configuration
     - apache

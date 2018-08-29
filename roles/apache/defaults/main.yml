@@ -2,8 +2,9 @@
 # When this is disabled, Ansible will not attempt to provision the Apache install.
 # However it can still generate files in the conf.d directory.
 apache_enabled: False
-
 apache_server_port: 443
+apache_config_path: /etc/httpd/conf.d
+apache_log_path: /var/log/httpd
 apache_service_name: httpd
 apache_ssl_certificate_path: /etc/pki/tls/certs
 apache_ssl_certificate_key_path: /etc/pki/tls/private

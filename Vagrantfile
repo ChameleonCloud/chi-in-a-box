@@ -25,6 +25,9 @@ Vagrant.configure('2') do |config|
         # By convention, our playbooks target a host group with the same name
         # as the playbook
         playbook_name => [host_name],
+
+        # General groups used by multiple playbooks (potentially)
+        'frontends' => [host_name],
       }
     end
   end
