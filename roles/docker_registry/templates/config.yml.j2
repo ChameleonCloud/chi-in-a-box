@@ -16,7 +16,9 @@ storage:
     container: {{ docker_registry_swift_containername }}
     endpointtype: {{ docker_registry_swift_endpointtype }}
 http:
-  addr: :{{ docker_registry_port }}
+  addr: :5000
+  debug:
+    addr: localhost:5001
   headers:
     X-Content-Type-Options: [nosniff]
 health:
