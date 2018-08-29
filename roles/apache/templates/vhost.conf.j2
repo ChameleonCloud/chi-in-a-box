@@ -1,12 +1,12 @@
 # {{ ansible_managed }}
 # Virtual host for {{ apache_server_name }}
 
-<VirtualHost {{ ansible_default_ipv4.address }}:{{ apache_server_port }}>
+<VirtualHost *:{{ apache_server_port }}>
   ServerName {{ apache_server_name }}
 
   ## SSL termination
 {% if apache_server_ssl_certificate_file is not defined -%}
-  {% set apache_server_ssl_certificate_file = apache_server_name_normalized ~ '.cer' %}
+  {% set apache_server_ssl_certificate_file = apache_server_name_normalized ~ '.crt' %}
 {%- endif %}
 {% if apache_server_ssl_certificate_key_file is not defined -%}
   {% set apache_server_ssl_certificate_key_file = apache_server_name_normalized ~ '.key' %}
