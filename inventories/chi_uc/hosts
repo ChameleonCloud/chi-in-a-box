@@ -9,6 +9,10 @@ admin01
 [ceph]
 r730xd-[1:5]
 
+# The SSL termination nodes
+[frontends]
+admin01
+
 # These are the old storage node(s) for UC. They mostly
 # hold Gnocchi metrics, but also have the MySQL server running there.
 [storage]
