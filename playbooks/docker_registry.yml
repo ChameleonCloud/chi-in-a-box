@@ -22,7 +22,7 @@
           set_fact:
             docker_registry_hostname: "{{ hostvars[groups.docker_registry[0]].docker_registry_hostname }}"
             docker_registry_port: "{{ hostvars[groups.docker_registry[0]].docker_registry_port }}"
-            docker_registry_ipv4_address: "{{ hostvars[groups.docker_registry[0]].ansible_default_ipv4.address }}"
+            docker_registry_internal_address: "{{ groups.docker_registry[0] }}"
         - name: Configure virtual host.
           include_role:
             name: apache
@@ -30,7 +30,7 @@
           vars:
             apache_server_name: "{{ docker_registry_hostname }}"
             apache_server_conf: |
-              ProxyPass / http://{{ docker_registry_ipv4_address }}:{{ docker_registry_port }}/
-              ProxyPassReverse / http://{{ docker_registry_ipv4_address }}:{{ docker_registry_port }}/
+              ProxyPass / http://{{ docker_registry_internal_address }}:{{ docker_registry_port }}/
+              ProxyPassReverse / http://{{ docker_registry_internal_address }}:{{ docker_registry_port }}/
       tags:
         - configuration
