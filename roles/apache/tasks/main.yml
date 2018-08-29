@@ -1,0 +1,21 @@
+---
+- name: Install dependencies for Apache.
+  package:
+    name: "{{ item }}"
+  loop:
+    - httpd
+    # For HTTP Authentication via LDAP
+    - mod_ldap
+    # For SSL termination
+    - mod_ssl
+    # For Python web server support
+    - mod_wsgi
+  when: apache_enabled
+
+- name: Enable Apache on boot.
+  systemd:
+    name: "{{ apache_service_name }}"
+    # TODO: this is a thorny part of ansible and we shouldn't have to do this ourselves.
+    daemon_reload: yes
+    state: started
+    enabled: yes

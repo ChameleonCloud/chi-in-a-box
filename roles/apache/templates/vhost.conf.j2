@@ -1,0 +1,39 @@
+# {{ ansible_managed }}
+<VirtualHost {{ ansible_default_ipv4.address }}:{{ apache_server_port }}>
+  ServerName {{ apache_server_name }}
+
+  ## SSL termination
+  {% if apache_server_ssl_certificate_file is not defined %}
+    {% set apache_server_ssl_certificate_file = apache_server_name ~ '.cer' %}
+  {% endif %}
+  {% if apache_server_ssl_certificate_key_file is not defined %}
+    {% set apache_server_ssl_certificate_key_file = apache_server_name ~ '.key' %}
+  {% endif %}
+  SSLEngine on
+  SSLCertificateFile      "{{ apache_ssl_certificate_path }}/{{ apache_server_ssl_certificate_file }}"
+  SSLCertificateKeyFile   "{{ apache_ssl_certificate_key_path }}/{{ apache_server_ssl_certificate_key_file }}"
+  SSLCACertificatePath    "{{ apache_ssl_certificate_path }}"
+  {% if apache_server_ssl_ca_file is defined %}
+  SSLCACertificateFile    "{{ apache_ssl_certificate_path }}/{{ apache_server_ssl_ca_file }}"
+  {% endif %}
+
+  DocumentRoot "/"
+  ServerSignature Off
+
+  <Directory "/">
+    Options Indexes FollowSymLinks MultiViews
+    AllowOverride None
+    Require all granted
+  </Directory>
+
+  ## Logging
+  ErrorLog "{{ apache_server_log_path }}/{{ apache_server_name }}_error.log"
+  CustomLog "{{ apache_server_log_path }}/{{ apache_server_name }}_access.log" combined
+
+  ## Proxy rules
+  ProxyRequests Off
+  ProxyPreserveHost On
+  RequestHeader set X-Forwarded-Proto "https"
+
+  {{ apache_server_conf }}
+</VirtualHost>
