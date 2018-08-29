@@ -29,7 +29,7 @@
             tasks_from: host
           vars:
             apache_server_name: "{{ docker_registry_hostname }}"
-            apache_server_conf: >
+            apache_server_conf: |
               ProxyPass / http://{{ docker_registry_ipv4_address }}:{{ docker_registry_port }}/
               ProxyPassReverse / http://{{ docker_registry_ipv4_address }}:{{ docker_registry_port }}/
       tags:
