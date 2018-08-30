@@ -95,3 +95,14 @@ Playbooks are set up to target a host group with the same name. This means the `
 # (Any arguments normally passed to ansible-playbook can be passed here.)
 ./ansible-playbook --tags configuration playbooks/grafana.yml
 ```
+
+## Configuration secrets
+
+Secrets like database and user passwords or sensitive API keys should be encrypted with [Ansible Vault](https://docs.ansible.com/ansible/latest/user_guide/vault.html). Once a deploy node is set up, there should be a Vault password generated in a file called `vault_password` in the Ansible working directory. This is used as a symmetrical cipher key to encrypt and decrypt secrets. This key should **never be stored in source control.** To encrypt a secret, you can use the `./ansible-vault` wrapper script, which sets up the Vault configuration for you. Using the `encrypt_string` command, you can generate valid YAML that you can then paste wherever necessary in your variable or task definitions.
+
+```bash
+# Create new variable named 'my_variable_name'. This will output valid YAML
+# setting that variable to a value that will be decrypted by Ansible at runtime.
+echo "my variable value" | ./ansible-vault encrypt_string --stdin-name="my_variable_name"
+```
+

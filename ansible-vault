@@ -7,5 +7,5 @@ DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 inventory_name="$(cat "$DIR/.ansible-inventory")"
 
 exec venv/bin/ansible-vault \
-  --vault-id="${inventory_name}@vault_password"
+  --vault-id="${inventory_name}@vault_password" \
   "$@"
