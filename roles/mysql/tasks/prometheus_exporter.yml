@@ -27,6 +27,7 @@
         module: mysql_user
         login_host: "{{ inventory_hostname }}"
         name: "{{ mysql_prometheus_exporter_mysql_user }}"
+        host: 127.0.0.1
         password: "{{ mysql_prometheus_exporter_mysql_password }}"
         priv: "*.*:PROCESS,REPLICATION CLIENT,SELECT"
 
