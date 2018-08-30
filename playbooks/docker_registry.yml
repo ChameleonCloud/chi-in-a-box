@@ -30,6 +30,12 @@
           vars:
             apache_server_name: "{{ docker_registry_hostname }}"
             apache_server_conf: |
+              AuthType Basic
+              AuthName "Restricted"
+              AuthBasicProvider external
+              AuthExternal keystone
+              require valid-user
+
               ProxyPass / http://{{ docker_registry_internal_address }}:{{ docker_registry_port }}/
               ProxyPassReverse / http://{{ docker_registry_internal_address }}:{{ docker_registry_port }}/
       tags:
