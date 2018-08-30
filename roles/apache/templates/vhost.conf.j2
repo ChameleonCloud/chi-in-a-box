@@ -4,6 +4,10 @@
 <VirtualHost *:{{ apache_server_port }}>
   ServerName {{ apache_server_name }}
 
+  # Allow Keystone authentication to be used
+  DefineExternalAuth keystone-user environment /etc/httpd/keystone_user.sh
+  DefineExternalGroup keystone-project environment /etc/httpd/keystone_project.sh
+
   ## SSL termination
 {% if apache_server_ssl_certificate_file is not defined -%}
   {% set apache_server_ssl_certificate_file = apache_server_name_normalized ~ '.crt' %}
@@ -19,14 +23,7 @@
   SSLCACertificateFile    "{{ apache_ssl_certificate_path }}/{{ apache_server_ssl_ca_file }}"
 {% endif %}
 
-  DocumentRoot "/"
   ServerSignature Off
-
-  <Directory "/">
-    Options Indexes FollowSymLinks MultiViews
-    AllowOverride None
-    Require all granted
-  </Directory>
 
   ## Logging
   ErrorLog "{{ apache_log_path }}/{{ apache_server_name_normalized }}_error.log"

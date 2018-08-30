@@ -22,6 +22,7 @@
           set_fact:
             docker_registry_hostname: "{{ hostvars[groups.docker_registry[0]].docker_registry_hostname }}"
             docker_registry_port: "{{ hostvars[groups.docker_registry[0]].docker_registry_port }}"
+            docker_registry_auth_allow_push_projects: "{{ hostvars[groups.docker_registry[0]].docker_registry_auth_allow_push_projects }}"
             docker_registry_internal_address: "{{ groups.docker_registry[0] }}"
         - name: Configure virtual host.
           include_role:
@@ -40,10 +41,16 @@
                 AuthType Basic
                 AuthName "Registry Authentication"
                 AuthBasicProvider external
-                AuthExternal keystone
+                AuthExternal keystone-user
+                GroupExternal keystone-project
 
-                # Limit all operations to authenticated users
+                # Read access to all authentified users
                 Require valid-user
+
+                # TODO: Write access to operators
+                <Limit POST PUT DELETE PATCH>
+                  # Require external-group {{ docker_registry_auth_allow_push_projects }}
+                </Limit>
               </Location>
       tags:
         - configuration

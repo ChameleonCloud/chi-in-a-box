@@ -14,10 +14,13 @@
     - mod_wsgi
   when: apache_enabled
 
-- name: Install external Keystone authentication script.
+- name: Install external Keystone authentication scripts.
   template:
-    src: keystone_auth.sh.j2
-    dest: "{{ apache_config_path }}/keystone_auth.sh"
+    src: "{{ item }}.j2"
+    dest: "{{ apache_config_path }}/{{ item }}"
+  loop:
+    - keystone_project.sh
+    - keystone_user.sh
 
 - debug:
     msg: |

@@ -1,0 +1,32 @@
+#!/bin/sh
+# {{ ansible_managed }}
+# External authentication (AuthN) provider intended to be used via Apache
+# external authentication module. Use in Apache configuration like so:
+#
+#   AuthType Basic
+#   AuthName "Restricted"
+#   AuthBasicProvider external
+#   AuthExternal keystone
+#   Require valid-user
+#
+# Requires 'authnz_external' enabled in Apache.
+#
+curl -sSf \
+  -H "Content-Type: application/json" \
+  --data-binary @- \
+  "{{ apache_keystone_auth_url }}/auth/tokens" >/dev/null <<JSON
+{
+  "auth": {
+    "identity": {
+      "methods": ["password"],
+      "password": {
+        "user": {
+          "name": "$USER",
+          "domain": { "id": "default" },
+          "password": "$PASSWORD"
+        }
+      }
+    }
+  }
+}
+JSON
