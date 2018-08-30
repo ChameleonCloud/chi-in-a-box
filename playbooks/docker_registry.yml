@@ -30,13 +30,20 @@
           vars:
             apache_server_name: "{{ docker_registry_hostname }}"
             apache_server_conf: |
-              AuthType Basic
-              AuthName "Restricted"
-              AuthBasicProvider external
-              AuthExternal keystone
-              require valid-user
+              ProxyPass        /v2 http://{{ docker_registry_internal_address }}:{{ docker_registry_port }}/v2
+              ProxyPassReverse /v2 http://{{ docker_registry_internal_address }}:{{ docker_registry_port }}/v2
 
-              ProxyPass / http://{{ docker_registry_internal_address }}:{{ docker_registry_port }}/
-              ProxyPassReverse / http://{{ docker_registry_internal_address }}:{{ docker_registry_port }}/
+              <Location /v2>
+                Order deny,allow
+                Allow from all
+
+                AuthType Basic
+                AuthName "Registry Authentication"
+                AuthBasicProvider external
+                AuthExternal keystone
+
+                # Limit all operations to authenticated users
+                Require valid-user
+              </Location>
       tags:
         - configuration
