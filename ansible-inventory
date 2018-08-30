@@ -37,22 +37,22 @@ cat >"$inventory_dir/hosts" <<INVENTORY_HOSTS
 $(hostname)
 
 # The primary OpenStack controller host
-# [controller]
+[controller]
 
 # The Ceph cluster hosts
-# [ceph]
+[ceph]
 
 # The Ceph cluster monitoring host (usually the master)
-# [ceph_exporter]
+[ceph_exporter]
 
 # The MySQL host(s)
-# [mysql]
+[mysql]
 
 # The MySQL hosts to install metrics exporters on
-# [mysql_exporter]
+[mysql_exporter]
 
 # The Prometheus server host
-# [prometheus]
+[prometheus]
 
 # By default node metric exporters will be installed on all
 # hosts in all groups. Comment out host groups you don't want
