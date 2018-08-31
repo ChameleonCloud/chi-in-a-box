@@ -45,12 +45,19 @@
                 AuthExternal keystone-user
                 GroupExternal keystone-project
 
-                # Read access to all authentified users
-                Require valid-user
+                # Read access to all authentified users and internal nodes
+                <Limit GET HEAD>
+                  <RequireAny>
+                    Require valid-user
+                    {% for addr in groups['all'] | map('extract', hostvars, 'ansible_host') | list %}
+                    Require ip {{ addr }}
+                    {% endfor %}
+                  </RequireAny>
+                </Limit>
 
-                # TODO: Write access to operators
+                # TODO: Write access to operators by group membership
                 <Limit POST PUT DELETE PATCH>
-                  # Require external-group {{ docker_registry_auth_allow_push_projects }}
+                  Require user jason_a
                 </Limit>
               </Location>
       tags:

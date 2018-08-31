@@ -6,7 +6,6 @@
 
   # Allow Keystone authentication to be used
   DefineExternalAuth keystone-user environment /etc/httpd/keystone_user.sh
-  DefineExternalGroup keystone-project environment /etc/httpd/keystone_project.sh
 
   ## SSL termination
 {% if apache_server_ssl_certificate_file is not defined -%}

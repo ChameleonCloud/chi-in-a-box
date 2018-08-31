@@ -19,7 +19,6 @@
     src: "{{ item }}.j2"
     dest: "{{ apache_config_path }}/{{ item }}"
   loop:
-    - keystone_project.sh
     - keystone_user.sh
 
 - debug:
