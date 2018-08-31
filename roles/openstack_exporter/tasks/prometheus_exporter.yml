@@ -1,0 +1,38 @@
+---
+- name: Pull openstack exporter image.
+  docker_image:
+    name: "{{ openstack_prometheus_exporter_docker_image }}"
+  tags:
+    - pull
+
+- name: Check password is set.
+  fail:
+    msg: Please set a value for the 'openstack_prometheus_exporter_password'
+  when: openstack_prometheus_exporter_password is not defined
+
+- name: Configure OpenStack exporter.
+  block:
+    - name: Create config directory.
+      file:
+        path: "{{ openstack_prometheus_exporter_config_path }}"
+        state: directory
+    - name: Create OpenStack env variable list.
+      template:
+        src: prometheus_exporter.env-list.j2
+        dest: "{{ openstack_prometheus_exporter_config_path }}/env-list"
+      notify: restart prometheus exporter
+    - name: Configure systemd service.
+      template:
+        src: prometheus_exporter.service.j2
+        dest: "/etc/systemd/system/{{ openstack_prometheus_exporter_service_name }}"
+      notify:
+        - restart prometheus exporter
+
+  tags:
+    - configuration
+- name: Enable OpenStack exporter service on boot.
+  systemd:
+    service: "{{ openstack_prometheus_exporter_service_name }}"
+    daemon_reload: yes
+    state: started
+    enabled: yes

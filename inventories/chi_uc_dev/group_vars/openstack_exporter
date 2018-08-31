@@ -1,0 +1,9 @@
+---
+openstack_prometheus_exporter_enable: yes
+openstack_prometheus_exporter_auth_url: 'https://dev.uc.chameleoncloud.org:35357'
+openstack_prometheus_exporter_project_name: 'openstack'
+openstack_prometheus_exporter_username: 'admin'
+openstack_prometheus_exporter_user_domain_name: 'default'
+openstack_prometheus_exporter_region_name: 'CHI_DEV_UC'
+openstack_prometheus_exporter_no_cache: 'true'
+openstack_prometheus_exporter_tenant_name: 'openstack'

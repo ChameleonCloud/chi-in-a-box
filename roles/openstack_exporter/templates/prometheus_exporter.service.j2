@@ -1,0 +1,13 @@
+# {{ ansible_managed }}
+[Unit]
+Description=OpenStack metrics exporter
+After=docker.service
+
+[Service]
+Restart=always
+ExecStart=/bin/docker run --name=%N \
+                          --net=host \
+                          --env-file /root/adminrc \
+                          {{ openstack_prometheus_exporter_docker_image }}
+ExecStop=/bin/docker stop -t 2 %N
+ExecStopPost=/bin/docker rm -f %N

@@ -1,0 +1,12 @@
+---
+openstack_prometheus_exporter_port: 9103
+openstack_prometheus_exporter_enable: False
+openstack_prometheus_exporter_docker_image: rakeshpatnaik/prometheus-openstack-exporter
+openstack_prometheus_exporter_service_name: prometheus-openstack-expoerter
+openstack_prometheus_exporter_adminrc_path: /root/adminrc
+
+openstack_prometheus_exporter_timeout: 20
+openstack_prometheus_exporter_polling_interval: 60
+openstack_prometheus_exporter_retries: 1
+openstack_prometheus_exporter_cpu_oc_ratio: 1.5
+openstack_prometheus_exporter_ram_oc_ratio: 1
