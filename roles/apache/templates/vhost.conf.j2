@@ -33,5 +33,5 @@
   ProxyPreserveHost On
   RequestHeader set X-Forwarded-Proto "https"
 
-  {{ apache_server_conf }}
+  {{ apache_server_conf | indent(2) }}
 </VirtualHost>
