@@ -45,13 +45,10 @@
                 AuthExternal keystone-user
                 GroupExternal keystone-project
 
-                # Read access to all authentified users and internal nodes
+                # Read access to all authentified users
                 <Limit GET HEAD>
                   <RequireAny>
                     Require valid-user
-                    {% for addr in groups['all'] | map('extract', hostvars, 'ansible_host') | list %}
-                    Require ip {{ addr }}
-                    {% endfor %}
                   </RequireAny>
                 </Limit>
 
