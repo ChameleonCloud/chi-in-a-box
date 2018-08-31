@@ -40,16 +40,15 @@
                 Allow from all
 
                 AuthType Basic
-                AuthName "Registry Authentication"
-                AuthBasicProvider external
+                AuthName "Docker Registry authentication"
+                AuthBasicProvider socache external
                 AuthExternal keystone-user
-                GroupExternal keystone-project
+                AuthExternalProvideCache On
+                AuthnCacheProvideFor keystone-user
 
                 # Read access to all authentified users
                 <Limit GET HEAD>
-                  <RequireAny>
-                    Require valid-user
-                  </RequireAny>
+                  Require valid-user
                 </Limit>
 
                 # TODO: Write access to operators by group membership
