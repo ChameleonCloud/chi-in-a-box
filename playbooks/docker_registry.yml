@@ -7,7 +7,7 @@
       set_fact:
         docker_registry_hostname: "{{ docker_registry_hostname }}"
         docker_registry_port: "{{ docker_registry_port }}"
-        docker_registry_auth_allow_push_projects: "{{ docker_registry_auth_allow_push_projects }}"
+        docker_registry_push_users: "{{ docker_registry_push_users }}"
       tags:
         - configuration
 
@@ -23,7 +23,7 @@
           set_fact:
             docker_registry_hostname: "{{ hostvars[groups.docker_registry[0]].docker_registry_hostname }}"
             docker_registry_port: "{{ hostvars[groups.docker_registry[0]].docker_registry_port }}"
-            docker_registry_auth_allow_push_projects: "{{ hostvars[groups.docker_registry[0]].docker_registry_auth_allow_push_projects }}"
+            docker_registry_push_users: "{{ hostvars[groups.docker_registry[0]].docker_registry_push_users }}"
             docker_registry_internal_address: "{{ groups.docker_registry[0] }}"
         - name: Configure virtual host.
           include_role:
@@ -53,7 +53,7 @@
 
                 # TODO: Write access to operators by group membership
                 <Limit POST PUT DELETE PATCH>
-                  Require user jason_a
+                  Require user {{ docker_registry_push_users | join(' ') }}
                 </Limit>
               </Location>
       tags:
