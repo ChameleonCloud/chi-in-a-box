@@ -1,0 +1,16 @@
+[Unit]
+Description=Database server for JupyterHub
+After=docker.service
+
+[Service]
+Restart=always
+ExecStart=/bin/docker run --name=%N \
+                          --net={{ jupyterhub_docker_network }} \
+                          --mount 'type=volume,src={{ jupyterhub_db_docker_volume_name }},dst=/var/lib/mysql' \
+                          --env-file={{ jupyterhub_config_path }}/%N.env \
+                          {{ jupyterhub_db_docker_image }}
+ExecStop=/bin/docker stop -t 2 %N
+ExecStopPost=/bin/docker rm -f %N
+
+[Install]
+WantedBy=multi-user.target

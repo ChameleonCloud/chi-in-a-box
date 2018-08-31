@@ -24,6 +24,9 @@ r730xd-1
 [docker_registry]
 fx2-01
 
+[jupyterhub]
+fx2-01
+
 [mysql]
 fx2-01
 
