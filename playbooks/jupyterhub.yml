@@ -1,0 +1,46 @@
+---
+- hosts: jupyterhub
+  roles:
+    - jupyterhub
+  tasks:
+    - name: Set facts for gathering in frontend hosts.
+      set_fact:
+        jupyterhub_hostname: "{{ jupyterhub_hostname }}"
+        jupyterhub_port: "{{ jupyterhub_port }}"
+      tags:
+        - configuration
+
+- hosts: frontends
+  tasks:
+    - name: Configure virtual host for JupyterHub backend.
+      block:
+        - name: Gather facts from JupyterHub host.
+          setup:
+          delegate_to: "{{ groups.jupyterhub[0] }}"
+          delegate_facts: True
+        - name: Precompute convenience facts needed for virtual host configuration.
+          set_fact:
+            jupyterhub_hostname: "{{ hostvars[groups.jupyterhub[0]].jupyterhub_hostname }}"
+            jupyterhub_port: "{{ hostvars[groups.jupyterhub[0]].jupyterhub_port }}"
+            jupyterhub_internal_address: "{{ groups.jupyterhub[0] }}"
+        - name: Configure virtual host.
+          include_role:
+            name: apache
+            tasks_from: host
+          vars:
+            apache_server_name: "{{ jupyterhub_hostname }}"
+            apache_server_conf: |
+              RewriteEngine On
+              RewriteCond %{HTTP:Connection} Upgrade [NC]
+              RewriteCond %{HTTP:Upgrade} websocket [NC]
+              RewriteRule /(.*) ws://{{ jupyterhub_internal_address }}:{{ jupyterhub_port }}/$1 [P,L]
+
+              <Location "/">
+                # preserve Host header to avoid cross-origin problems
+                ProxyPreserveHost on
+                # proxy to JupyterHub
+                ProxyPass         http://{{ jupyterhub_internal_address }}:{{ jupyterhub_port }}/
+                ProxyPassReverse  http://{{ jupyterhub_internal_address }}:{{ jupyterhub_port }}/
+              </Location>
+      tags:
+        - configuration

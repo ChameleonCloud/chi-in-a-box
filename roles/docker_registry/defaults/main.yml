@@ -6,6 +6,13 @@ docker_registry_port: 5000
 docker_registry_debug_port: 5001
 docker_registry_service_name: docker_registry
 
+docker_registry_push_users:
+  - hammock
+  - jakecoll
+  - jason_a
+  - priteau
+  - zzhenz
+
 # Swift storage backend configuration
 docker_registry_swift_username: docker_registry
 docker_registry_swift_password: ''

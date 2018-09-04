@@ -7,6 +7,7 @@
       set_fact:
         docker_registry_hostname: "{{ docker_registry_hostname }}"
         docker_registry_port: "{{ docker_registry_port }}"
+        docker_registry_push_users: "{{ docker_registry_push_users }}"
       tags:
         - configuration
 
@@ -22,6 +23,7 @@
           set_fact:
             docker_registry_hostname: "{{ hostvars[groups.docker_registry[0]].docker_registry_hostname }}"
             docker_registry_port: "{{ hostvars[groups.docker_registry[0]].docker_registry_port }}"
+            docker_registry_push_users: "{{ hostvars[groups.docker_registry[0]].docker_registry_push_users }}"
             docker_registry_internal_address: "{{ groups.docker_registry[0] }}"
         - name: Configure virtual host.
           include_role:
@@ -30,7 +32,29 @@
           vars:
             apache_server_name: "{{ docker_registry_hostname }}"
             apache_server_conf: |
-              ProxyPass / http://{{ docker_registry_internal_address }}:{{ docker_registry_port }}/
-              ProxyPassReverse / http://{{ docker_registry_internal_address }}:{{ docker_registry_port }}/
+              ProxyPass        /v2 http://{{ docker_registry_internal_address }}:{{ docker_registry_port }}/v2
+              ProxyPassReverse /v2 http://{{ docker_registry_internal_address }}:{{ docker_registry_port }}/v2
+
+              <Location /v2>
+                Order deny,allow
+                Allow from all
+
+                AuthType Basic
+                AuthName "Docker Registry authentication"
+                AuthBasicProvider socache external
+                AuthExternal keystone-user
+                AuthExternalProvideCache On
+                AuthnCacheProvideFor keystone-user
+
+                # Read access to all authentified users
+                <Limit GET HEAD>
+                  Require valid-user
+                </Limit>
+
+                # TODO: Write access to operators by group membership
+                <Limit POST PUT DELETE PATCH>
+                  Require user {{ docker_registry_push_users | join(' ') }}
+                </Limit>
+              </Location>
       tags:
         - configuration

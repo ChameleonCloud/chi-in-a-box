@@ -1,2 +1,3 @@
 ---
+ansible_connection: local
 pip_virtualenv: /etc/ansible/venv

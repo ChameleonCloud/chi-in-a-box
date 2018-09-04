@@ -15,6 +15,12 @@ admin02
 # The Ceph cluster monitoring host (usually the master)
 # [ceph_exporter]
 
+<<<<<<< HEAD
+=======
+[frontends]
+admin02
+
+>>>>>>> master
 [jupyterhub]
 admin02
 
@@ -26,9 +32,12 @@ admin02
 [mysql_exporter]
 admin02
 
+<<<<<<< HEAD
 [openstack_exporter]
 admin02
 
+=======
+>>>>>>> master
 # The Prometheus server host
 [prometheus]
 admin02

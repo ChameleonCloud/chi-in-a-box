@@ -4,6 +4,8 @@
     name: "{{ item }}"
   loop:
     - httpd
+    # For external authentication via Keystone
+    - mod_authnz_external
     # For HTTP Authentication via LDAP
     - mod_ldap
     # For SSL termination
@@ -11,6 +13,20 @@
     # For Python web server support
     - mod_wsgi
   when: apache_enabled
+
+- name: Install external Keystone authentication scripts.
+  template:
+    src: "{{ item }}.j2"
+    dest: "{{ apache_config_path }}/{{ item }}"
+  loop:
+    - keystone_user.sh
+
+- debug:
+    msg: |
+      TODO: include basic global Apache configuration.
+      This should include setting up the external authentication module:
+        AddExternalAuth keystone /path/to/keystone_auth.sh
+        SetExternalAuthMethod keystone pipe
 
 - name: Enable Apache on boot.
   systemd:

@@ -1,0 +1,10 @@
+---
+- name: restart jupyterhub
+  service:
+    name: "{{ jupyterhub_service_name }}"
+    state: restarted
+
+- name: restart jupyterhub db
+  service:
+    name: "{{ jupyterhub_db_service_name }}"
+    state: restarted

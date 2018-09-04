@@ -1,0 +1,54 @@
+---
+- name: Pull JupyterHub images.
+  docker_image:
+    name: "{{ item }}"
+  loop:
+    - "{{ jupyterhub_docker_image }}"
+    - "{{ jupyterhub_db_docker_image }}"
+    - "{{ jupyterhub_notebook_docker_image }}"
+  tags:
+    - pull
+
+- name: Create Docker network.
+  docker_network:
+    name: "{{ jupyterhub_docker_network }}"
+
+- name: Configure JupyterHub.
+  block:
+    - name: Create JupyterHub config directory
+      file:
+        name: "{{ jupyterhub_config_path }}"
+        state: directory
+    - name: Create JupyterHub service environment configurations.
+      template:
+        src: "{{ item }}.j2"
+        dest: "{{ jupyterhub_config_path }}/{{ item }}"
+        mode: "0640"
+      loop:
+        - jupyterhub-db.env
+        - jupyterhub.env
+    - name: Configure JupyterHub systemd service.
+      template:
+        src: jupyterhub.service.j2
+        dest: "/etc/systemd/system/{{ jupyterhub_service_name }}.service"
+      notify:
+        - restart jupyterhub
+    - name: Configure JupyterHub database systemd service.
+      template:
+        src: jupyterhub-db.service.j2
+        dest: "/etc/systemd/system/{{ jupyterhub_db_service_name }}.service"
+      notify:
+        - restart jupyterhub db
+  tags:
+    - configuration
+
+- name: Enable JupyterHub services on boot.
+  systemd:
+    service: "{{ item }}"
+    # TODO: this is a thorny part of ansible and we shouldn't have to do this ourselves.
+    daemon_reload: yes
+    state: started
+    enabled: yes
+  loop:
+    - "{{ jupyterhub_service_name }}"
+    - "{{ jupyterhub_db_service_name }}"
