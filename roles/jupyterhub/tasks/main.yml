@@ -9,6 +9,10 @@
   tags:
     - pull
 
+- name: Create Docker network.
+  docker_network:
+    name: "{{ jupyterhub_docker_network }}"
+
 - name: Configure JupyterHub.
   block:
     - name: Create JupyterHub config directory
@@ -21,8 +25,8 @@
         dest: "{{ jupyterhub_config_path }}/{{ item }}"
         mode: "0640"
       loop:
-        - db.env
-        - hub.env
+        - jupyterhub-db.env
+        - jupyterhub.env
     - name: Configure JupyterHub systemd service.
       template:
         src: jupyterhub.service.j2
