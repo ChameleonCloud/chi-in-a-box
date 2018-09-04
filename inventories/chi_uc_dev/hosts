@@ -15,6 +15,9 @@ admin02
 # The Ceph cluster monitoring host (usually the master)
 # [ceph_exporter]
 
+[frontends]
+admin02
+
 [jupyterhub]
 admin02
 

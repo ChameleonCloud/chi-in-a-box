@@ -1,4 +1,5 @@
 ---
+jupyterhub_hostname: jupyter.dev.chameleoncloud.org
 jupyterhub_crypt_key: !vault |
           $ANSIBLE_VAULT;1.2;AES256;chi_uc_dev
           35376632343933333364333037323435383838653537343637616632663537356338643364333831
