@@ -8,21 +8,28 @@ admin02
 # The primary OpenStack controller host
 [controller]
 admin02
+
 # The Ceph cluster hosts
 [ceph]
 
 # The Ceph cluster monitoring host (usually the master)
 # [ceph_exporter]
 
+[jupyterhub]
+admin02
+
 # The MySQL host(s)
 [mysql]
 admin02
+
 # The MySQL hosts to install metrics exporters on
 [mysql_exporter]
 admin02
+
 # The Prometheus server host
 [prometheus]
 admin02
+
 # By default node metric exporters will be installed on all
 # hosts in all groups. Comment out host groups you don't want
 # to install the node exporters on.
