@@ -7,7 +7,11 @@ After=docker.service
 Restart=always
 ExecStart=/bin/docker run --name=%N \
                           --net=host \
-                          --env-file /root/adminrc \
+                          --env-file {{ openstack_prometheus_exporter_config_path }}/env-list \
                           {{ openstack_prometheus_exporter_docker_image }}
 ExecStop=/bin/docker stop -t 2 %N
 ExecStopPost=/bin/docker rm -f %N
+
+[Install]
+WantedBy=multi-user.target
+

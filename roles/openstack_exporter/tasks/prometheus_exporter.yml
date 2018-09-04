@@ -20,13 +20,14 @@
       template:
         src: prometheus_exporter.env-list.j2
         dest: "{{ openstack_prometheus_exporter_config_path }}/env-list"
-      notify: restart prometheus exporter
+      notify:
+        - restart openstack exporter
     - name: Configure systemd service.
       template:
         src: prometheus_exporter.service.j2
-        dest: "/etc/systemd/system/{{ openstack_prometheus_exporter_service_name }}"
+        dest: "/etc/systemd/system/{{ openstack_prometheus_exporter_service_name }}.service"
       notify:
-        - restart prometheus exporter
+        - restart openstack exporter
 
   tags:
     - configuration
