@@ -4,7 +4,7 @@ After=docker.service
 
 [Service]
 Restart=always
-ExecStart=/bin/docker run --name=grafana \
+ExecStart=/bin/docker run --name=%N \
                           --net={{ nginx_docker_network_name }} \
                           -v {{ grafana_docker_volume_name }}:/var/lib/grafana \
                           -v {{ grafana_config_path }}/ldap.toml:/etc/grafana/ldap.toml \
@@ -12,8 +12,8 @@ ExecStart=/bin/docker run --name=grafana \
                           -e GF_AUTH_LDAP_ENABLED=true \
                           -e GF_AUTH_LDAP_CONFIG_FILE=/etc/grafana/ldap.toml \
                           {{ grafana_docker_image }}
-ExecStop=/bin/docker stop -t 2 grafana
-ExecStopPost=/bin/docker rm -f grafana
+ExecStop=/bin/docker stop -t 2 %N
+ExecStopPost=/bin/docker rm -f %N
 
 [Install]
 WantedBy=multi-user.target
