@@ -1,7 +1,7 @@
 ---
 docker_registry_image: registry:2
 docker_registry_config_path: /etc/docker/registry
-docker_registry_hostname: docker.uc.chameleoncloud.org
+docker_registry_hostname: docker.chameleoncloud.org
 docker_registry_port: 5000
 docker_registry_debug_port: 5001
 docker_registry_service_name: docker_registry
