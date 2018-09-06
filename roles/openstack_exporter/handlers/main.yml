@@ -1,0 +1,5 @@
+---
+- name: restart openstack exporter
+  service:
+    name: "{{ openstack_prometheus_exporter_service_name }}"
+    state: restarted

@@ -29,6 +29,9 @@ admin02
 [mysql_exporter]
 admin02
 
+[openstack_exporter]
+admin02
+
 # The Prometheus server host
 [prometheus]
 admin02

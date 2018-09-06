@@ -33,6 +33,9 @@ fx2-01
 [mysql_exporter]
 fx2-01
 
+[openstack_exporter]
+admin01
+
 [prometheus]
 admin01
 
