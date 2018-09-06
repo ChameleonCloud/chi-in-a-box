@@ -19,6 +19,7 @@
     - name: Create OpenStack env variable list.
       template:
         src: prometheus_exporter.env.list.j2
+        mode: 0600
         dest: "{{ openstack_prometheus_exporter_config_path }}/{{ openstack_prometheus_exporter_service_name }}.env"
       notify:
         - restart openstack exporter
