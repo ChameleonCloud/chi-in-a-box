@@ -32,5 +32,9 @@
     - reload apache
 
 - name: Create cron job to periodically renew certificate.
-  debug:
-    msg: Test
+  cron:
+    name: "Renew SSL certificate for {{ apache_server_name }}"
+    minute: 0
+    hour: 5,2
+    job: "certbot renew -d {{ apache_server_name }}"
+  when: apache_ssl_letsencrypt_enabled
