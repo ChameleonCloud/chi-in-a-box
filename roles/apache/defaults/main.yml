@@ -3,7 +3,8 @@
 # However it can still generate files in the conf.d directory.
 apache_enabled: no
 
-apache_server_port: 443
+apache_server_http_port: 80
+apache_server_https_port: 443
 apache_server_priority: 50
 apache_config_path: /etc/httpd
 apache_log_path: /var/log/httpd
