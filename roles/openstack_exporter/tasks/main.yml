@@ -28,7 +28,6 @@
         dest: "/etc/systemd/system/{{ openstack_prometheus_exporter_service_name }}.service"
       notify:
         - restart openstack exporter
-
   tags:
     - configuration
 - name: Enable OpenStack exporter service on boot.
