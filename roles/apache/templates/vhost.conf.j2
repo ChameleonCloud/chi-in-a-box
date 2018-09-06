@@ -16,7 +16,8 @@
   SSLEngine on
 {% if apache_ssl_letsencrypt_enabled %}
   # Using certbot-generated certificates in {{ apache_ssl_letsencrypt_certificate_path }}
-  SSLCertificateFile      "{{ apache_ssl_letsencrypt_certificate_path }}/{{ apache_server_name }}/fullchain.pem"
+  SSLCertificateFile      "{{ apache_ssl_letsencrypt_certificate_path }}/{{ apache_server_name }}/cert.pem"
+  SSLCertificateChainFile "{{ apache_ssl_letsencrypt_certificate_path }}/{{ apache_server_name }}/chain.pem"
   SSLCertificateKeyFile   "{{ apache_ssl_letsencrypt_certificate_path }}/{{ apache_server_name }}/privkey.pem"
 {% else %}
   {% if apache_server_ssl_certificate_file is not defined %}
