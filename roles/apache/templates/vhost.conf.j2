@@ -8,18 +8,24 @@
   DefineExternalAuth keystone-user environment /etc/httpd/keystone_user.sh
 
   ## SSL termination
-{% if apache_server_ssl_certificate_file is not defined -%}
-  {% set apache_server_ssl_certificate_file = apache_server_name_normalized ~ '.crt' %}
-{%- endif %}
-{% if apache_server_ssl_certificate_key_file is not defined -%}
-  {% set apache_server_ssl_certificate_key_file = apache_server_name_normalized ~ '.key' %}
-{%- endif %}
   SSLEngine on
+{% if apache_ssl_letsencrypt_enabled %}
+  # Using certbot-generated certificates in {{ apache_ssl_letsencrypt_certificate_path }}
+  SSLCertificateFile      "{{ apache_ssl_letsencrypt_certificate_path }}/{{ apache_server_name }}/fullchain.pem"
+  SSLCertificateKeyFile   "{{ apache_ssl_letsencrypt_certificate_path }}/{{ apache_server_name }}/privkey.pem"
+{% else %}
+  {% if apache_server_ssl_certificate_file is not defined %}
+    {% set apache_server_ssl_certificate_file = apache_server_name_normalized ~ '.crt' %}
+  {% endif %}
+  {% if apache_server_ssl_certificate_key_file is not defined %}
+    {% set apache_server_ssl_certificate_key_file = apache_server_name_normalized ~ '.key' %}
+  {% endif %}
   SSLCertificateFile      "{{ apache_ssl_certificate_path }}/{{ apache_server_ssl_certificate_file }}"
   SSLCertificateKeyFile   "{{ apache_ssl_certificate_key_path }}/{{ apache_server_ssl_certificate_key_file }}"
+  {% if apache_server_ssl_ca_file is defined %}
   SSLCACertificatePath    "{{ apache_ssl_certificate_path }}"
-{% if apache_server_ssl_ca_file is defined %}
   SSLCACertificateFile    "{{ apache_ssl_certificate_path }}/{{ apache_server_ssl_ca_file }}"
+  {% endif %}
 {% endif %}
 
   ServerSignature Off

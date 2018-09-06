@@ -30,3 +30,7 @@
     - apache
   notify:
     - reload apache
+
+- name: Create cron job to periodically renew certificate.
+  debug:
+    msg: Test

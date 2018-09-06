@@ -12,6 +12,8 @@
     - mod_ssl
     # For Python web server support
     - mod_wsgi
+    # For issuing/renewing SSL certificates through LetsEncrypt
+    - python2-certbot-apache
   when: apache_enabled
 
 - name: Install external Keystone authentication scripts.
