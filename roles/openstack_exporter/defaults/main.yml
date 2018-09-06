@@ -1,13 +1,12 @@
 ---
 openstack_prometheus_exporter_port: 19103
-openstack_prometheus_exporter_enable: False
 openstack_prometheus_exporter_docker_image: rakeshpatnaik/prometheus-openstack-exporter:v0.2
 openstack_prometheus_exporter_service_name: prometheus-openstack-exporter
 openstack_prometheus_exporter_config_path: /etc/prometheus/openstack-exporter
-openstack_prometheus_exporter_project_name: 'openstack'
-openstack_prometheus_exporter_username: 'admin'
-openstack_prometheus_exporter_user_domain_name: 'default'
-openstack_prometheus_exporter_no_cache: 'true'
+openstack_prometheus_exporter_project_name: openstack
+openstack_prometheus_exporter_username: admin
+openstack_prometheus_exporter_user_domain_name: default
+openstack_prometheus_exporter_no_cache: true
 
 openstack_prometheus_exporter_timeout: 20
 openstack_prometheus_exporter_polling_interval: 60
