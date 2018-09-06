@@ -27,9 +27,12 @@
   cron:
     name: Check for SSL certificate renewals
     minute: 0
-    hour: 5,2
-    # https://certbot.eff.org/lets-encrypt/centosrhel7-apache.html
-    job: python -c 'import random; import time; time.sleep(random.random() * 3600)' && certbot renew
+    hour: 4,21
+    # Adding some jitter is recommended to avoid load on the LE servers
+    job:
+      python -c 'import random; import time; time.sleep(random.random() * 3600)'
+        && certbot renew
+        | /usr/bin/logger -t certbot
 
 - debug:
     msg: |
