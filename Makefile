@@ -19,7 +19,7 @@ venv: requirements.txt
 	@ touch $@
 
 #
-# Develoment targets
+# Development targets
 #
 
 .PHONY: $(TEST_TARGETS)
