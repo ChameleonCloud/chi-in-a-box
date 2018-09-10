@@ -2,8 +2,8 @@ require 'json'
 
 Vagrant.configure('2') do |config|
   playbook_name = ENV['PLAYBOOK']
-  host_name = ENV.fetch('HOST', "#{playbook_name}.local")
   inventory = ENV.fetch('INVENTORY')
+  host_name = if inventory then "inventory.local" else "#{playbook_name}.local" end
   # Check if additional variables are defined
   extra_vars = if ENV['VARS'] then JSON.parse(ENV['VARS']) else {} end
 
