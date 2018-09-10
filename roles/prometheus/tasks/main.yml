@@ -4,6 +4,7 @@
     name: "{{ prometheus_docker_image }}"
 
 - name: Gather node_exporter hosts.
+  when: groups.node_exporters
   block:
     - name: Gather facts from all node_exporters.
       setup:
@@ -27,6 +28,7 @@
         label: "{{ item.inventory_hostname }}"
 
 - name: Gather ceph_exporter hosts.
+  when: groups.ceph_exporters
   block:
     - name: Gather facts from all ceph_exporter.
       setup:
@@ -52,6 +54,7 @@
         label: "{{ item.inventory_hostname }}"
 
 - name: Gather mysql_exporter hosts.
+  when: mysql_exporters
   block:
     - name: Gather facts from all mysql_exporter.
       setup:
@@ -76,6 +79,32 @@
       loop_control:
         label: "{{ item.inventory_hostname }}"
 
+- name: Gather openstack_exporter hosts.
+  when: openstack_exporters
+  block:
+    - name: Gather facts from all openstack_exporter.
+      setup:
+      delegate_to: "{{ item }}"
+      delegate_facts: True
+      with_items: "{{ groups['openstack_exporter'] }}"
+    - name: Precompute fact for internal exporter ipv4 addresses.
+      set_fact:
+        openstack_exporter: >
+          {{ {item.inventory_hostname: item.ansible_interfaces
+             | map('regex_replace', '^', 'ansible_')
+             | map('replace', '-', '_')
+             | map('extract', item)
+             | selectattr('ipv4', 'defined')
+             | selectattr('ipv4.address', 'match', '10.*')
+             | map(attribute='ipv4.address')
+             | list
+             | last
+             | regex_replace('$', ':9103')
+             |} | combine(openstack_exporters | default({})) }}
+      loop: "{{ groups['openstack_exporter'] | map('extract', hostvars) | list }}"
+      loop_control:
+        label: "{{ item.inventory_hostname }}"
+
 - name: Create Prometheus configuration directory.
   file:
     path: "{{ prometheus_config_dir }}"
@@ -83,6 +112,10 @@
 
 - name: Configure Prometheus.
   block:
+    - name: Create config directory.
+      file:
+        path: "{{ prometheus_config_dir }}"
+        state: directory
     - name: Configure Prometheus.
       template:
         src: prometheus.yml.j2

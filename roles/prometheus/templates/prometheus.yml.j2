@@ -20,27 +20,39 @@ scrape_configs:
   - job_name: 'prometheus'
     static_configs:
     - targets: ['localhost:9090']
-{% for host in node_exporters %}
-  - job_name: '{{ host }}-node'
+{% if node_exporters is defined %}
+  {% for host in node_exporters %}
+    - job_name: '{{ host }}-node'
+      static_configs:
+        - targets: ['{{ node_exporters[host] }}:9100']
+          labels:
+            hostname: '{{ host }}'
+  {% endfor %}
+{% endif %}
+{% if ceph_exporters is defined %}
+  {% for host in ceph_exporters %}
+    - job_name: '{{ host }}-ceph'
+      static_configs:
+        - targets: ['{{ ceph_exporters[host] }}']
+          labels:
+            hostname: '{{ host }}'
+  {% endfor %}
+{% endif %}
+{% if mysql_exporter is defined %}
+  {% for host in mysql_exporters %}
+    - job_name: '{{ host }}-mysql'
+      static_configs:
+        - targets: ['{{ mysql_exporters[host] }}']
+          labels:
+            hostname: '{{ host }}'
+  {% endfor %}
+{% endif %}
+{% if openstack_exportes is defined %}
+{% for host in openstack_exporters %}
+  - job_name: '{{ host }}-openstack'
     static_configs:
-      - targets: ['{{ node_exporters[host] }}:9100']
+      - targets: ['{{ openstack_exporters[host] }}']
         labels:
           hostname: '{{ host }}'
 {% endfor %}
-{% for host in ceph_exporters %}
-  - job_name: '{{ host }}-ceph'
-    static_configs:
-      - targets: ['{{ ceph_exporters[host] }}']
-        labels:
-          hostname: '{{ host }}'
-{% endfor %}
-{% for host in mysql_exporters %}
-  - job_name: '{{ host }}-mysql'
-    static_configs:
-      - targets: ['{{ mysql_exporters[host] }}']
-        labels:
-          hostname: '{{ host }}'
-{% endfor %}
-  # - job_name: 'openstack'
-  #   static_configs:
-  #   - targets: ['admin02:9103']
+{% endif %}
