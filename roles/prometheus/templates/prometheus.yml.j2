@@ -38,7 +38,7 @@ scrape_configs:
             hostname: '{{ host }}'
   {% endfor %}
 {% endif %}
-{% if mysql_exporter is defined %}
+{% if mysql_exporters is defined %}
   {% for host in mysql_exporters %}
     - job_name: '{{ host }}-mysql'
       static_configs:
@@ -47,11 +47,11 @@ scrape_configs:
             hostname: '{{ host }}'
   {% endfor %}
 {% endif %}
-{% if openstack_exportes is defined %}
-{% for host in openstack_exporters %}
+{% if openstack_exporter is defined %}
+{% for host in openstack_exporter %}
   - job_name: '{{ host }}-openstack'
     static_configs:
-      - targets: ['{{ openstack_exporters[host] }}']
+      - targets: ['{{ openstack_exporter[host] }}']
         labels:
           hostname: '{{ host }}'
 {% endfor %}

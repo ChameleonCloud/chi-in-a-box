@@ -4,7 +4,7 @@
     name: "{{ prometheus_docker_image }}"
 
 - name: Gather node_exporter hosts.
-  when: groups.node_exporters
+  when: groups.node_exporters is defined
   block:
     - name: Gather facts from all node_exporters.
       setup:
@@ -28,7 +28,7 @@
         label: "{{ item.inventory_hostname }}"
 
 - name: Gather ceph_exporter hosts.
-  when: groups.ceph_exporters
+  when: groups.ceph_exporters is defined
   block:
     - name: Gather facts from all ceph_exporter.
       setup:
@@ -54,7 +54,7 @@
         label: "{{ item.inventory_hostname }}"
 
 - name: Gather mysql_exporter hosts.
-  when: mysql_exporters
+  when: groups.mysql_exporters is defined 
   block:
     - name: Gather facts from all mysql_exporter.
       setup:
@@ -80,7 +80,7 @@
         label: "{{ item.inventory_hostname }}"
 
 - name: Gather openstack_exporter hosts.
-  when: openstack_exporters
+  when: groups.openstack_exporter is defined
   block:
     - name: Gather facts from all openstack_exporter.
       setup:
@@ -100,7 +100,7 @@
              | list
              | last
              | regex_replace('$', ':9103')
-             |} | combine(openstack_exporters | default({})) }}
+             } | combine(openstack_exporter | default({})) }}
       loop: "{{ groups['openstack_exporter'] | map('extract', hostvars) | list }}"
       loop_control:
         label: "{{ item.inventory_hostname }}"
