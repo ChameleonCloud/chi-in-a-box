@@ -38,7 +38,7 @@ scrape_configs:
             hostname: '{{ host }}'
   {% endfor %}
 {% endif %}
-{% if mysql_exporters is defined %}
+{% if mysql_exporter is defined %}
   {% for host in mysql_exporters %}
     - job_name: '{{ host }}-mysql'
       static_configs:
