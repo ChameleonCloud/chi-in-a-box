@@ -1,5 +1,5 @@
 ---
-openstack_prometheus_exporter_port: 19103
+openstack_prometheus_exporter_port: 9103
 openstack_prometheus_exporter_docker_image: rakeshpatnaik/prometheus-openstack-exporter:v0.2
 openstack_prometheus_exporter_service_name: prometheus-openstack-exporter
 openstack_prometheus_exporter_config_path: /etc/prometheus/openstack-exporter
