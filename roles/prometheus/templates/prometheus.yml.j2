@@ -20,6 +20,7 @@ scrape_configs:
   - job_name: 'prometheus'
     static_configs:
     - targets: ['localhost:9090']
+{% if node_exporters is defined %}
 {% for host in node_exporters %}
   - job_name: '{{ host }}-node'
     static_configs:
@@ -27,6 +28,8 @@ scrape_configs:
         labels:
           hostname: '{{ host }}'
 {% endfor %}
+{% endif %}
+{% if ceph_exporters is defined %}
 {% for host in ceph_exporters %}
   - job_name: '{{ host }}-ceph'
     static_configs:
@@ -34,6 +37,8 @@ scrape_configs:
         labels:
           hostname: '{{ host }}'
 {% endfor %}
+{% endif %}
+{% if mysql_exporter is defined %}
 {% for host in mysql_exporters %}
   - job_name: '{{ host }}-mysql'
     static_configs:
@@ -41,6 +46,13 @@ scrape_configs:
         labels:
           hostname: '{{ host }}'
 {% endfor %}
-  # - job_name: 'openstack'
-  #   static_configs:
-  #   - targets: ['admin02:9103']
+{% endif %}
+{% if openstack_exporter is defined %}
+{% for host in openstack_exporter %}
+  - job_name: '{{ host }}-openstack'
+    static_configs:
+      - targets: ['{{ openstack_exporter[host] }}']
+        labels:
+          hostname: '{{ host }}'
+{% endfor %}
+{% endif %}
