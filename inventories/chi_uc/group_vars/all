@@ -1,4 +1,5 @@
 ---
+openstack_keystone_auth_url: https://chi.uc.chameleoncloud.org:5000/v3
 openstack_keystone_master_region: CHI@TACC
 
 slack_api_url: !vault |
