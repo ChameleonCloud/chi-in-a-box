@@ -3,7 +3,7 @@ require 'json'
 Vagrant.configure('2') do |config|
   playbook_name = ENV['PLAYBOOK']
   inventory = ENV.fetch('INVENTORY', '')
-  host_name = if inventory then "default" else "#{playbook_name}.local" end
+  host_name = if inventory.empty? then "#{playbook_name}.local" else "default" end
   # Check if additional variables are defined
   extra_vars = if ENV['VARS'] then JSON.parse(ENV['VARS']) else {} end
 
@@ -23,9 +23,7 @@ Vagrant.configure('2') do |config|
       ansible.become = true
       ansible.become_user = 'root'
 
-      if inventory
-        ansible.inventory_path = inventory
-      else
+      if inventory.empty?
         ansible.groups = {
           # By convention, our playbooks target a host group with the same name
           # as the playbook
@@ -33,7 +31,10 @@ Vagrant.configure('2') do |config|
           # General groups used by multiple playbooks (potentially)
           'frontends' => [host_name],
         }
+      else
+        ansible.inventory_path = inventory
       end
+      puts ansible.inventory_path
     end
   end
 end

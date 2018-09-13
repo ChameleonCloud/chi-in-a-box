@@ -3,108 +3,6 @@
   docker_image:
     name: "{{ prometheus_docker_image }}"
 
-- name: Gather node_exporter hosts.
-  when: groups.node_exporters is defined
-  block:
-    - name: Gather facts from all node_exporters.
-      setup:
-      delegate_to: "{{ item }}"
-      delegate_facts: True
-      with_items: "{{ groups['node_exporters'] }}"
-    - name: Precompute fact for internal exporter ipv4 addresses.
-      set_fact:
-        node_exporters: >
-          {{ { item.inventory_hostname: item.ansible_interfaces
-             | map('regex_replace', '^', 'ansible_')
-             | map('replace', '-', '_')
-             | map('extract', item)
-             | selectattr('ipv4', 'defined')
-             | selectattr('ipv4.address', 'match', '10.*')
-             | map(attribute='ipv4.address')
-             | list
-             | last } | combine(node_exporters | default({})) }}
-      loop: "{{ groups['node_exporters'] | map('extract', hostvars) | list }}"
-      loop_control:
-        label: "{{ item.inventory_hostname }}"
-
-- name: Gather ceph_exporter hosts.
-  when: groups.ceph_exporters is defined
-  block:
-    - name: Gather facts from all ceph_exporter.
-      setup:
-      delegate_to: "{{ item }}"
-      delegate_facts: True
-      with_items: "{{ groups['ceph_exporter'] }}"
-    - name: Precompute fact for internal exporter ipv4 addresses.
-      set_fact:
-        ceph_exporters: >
-          {{ { item.inventory_hostname: item.ansible_interfaces
-             | map('regex_replace', '^', 'ansible_')
-             | map('replace', '-', '_')
-             | map('extract', item)
-             | selectattr('ipv4', 'defined')
-             | selectattr('ipv4.address', 'match', '10.*')
-             | map(attribute='ipv4.address')
-             | list
-             | last
-             | regex_replace('$', ':9128')
-             } | combine(ceph_exporters | default({})) }}
-      loop: "{{ groups['ceph_exporter'] | map('extract', hostvars) | list }}"
-      loop_control:
-        label: "{{ item.inventory_hostname }}"
-
-- name: Gather mysql_exporter hosts.
-  when: groups.mysql_exporters is defined 
-  block:
-    - name: Gather facts from all mysql_exporter.
-      setup:
-      delegate_to: "{{ item }}"
-      delegate_facts: True
-      with_items: "{{ groups['mysql_exporter'] }}"
-    - name: Precompute fact for internal exporter ipv4 addresses.
-      set_fact:
-        mysql_exporters: >
-          {{ { item.inventory_hostname: item.ansible_interfaces
-             | map('regex_replace', '^', 'ansible_')
-             | map('replace', '-', '_')
-             | map('extract', item)
-             | selectattr('ipv4', 'defined')
-             | selectattr('ipv4.address', 'match', '10.*')
-             | map(attribute='ipv4.address')
-             | list
-             | last
-             | regex_replace('$', ':9104')
-             } | combine(mysql_exporters | default({})) }}
-      loop: "{{ groups['mysql_exporter'] | map('extract', hostvars) | list }}"
-      loop_control:
-        label: "{{ item.inventory_hostname }}"
-
-- name: Gather openstack_exporter hosts.
-  when: groups.openstack_exporter is defined
-  block:
-    - name: Gather facts from all openstack_exporter.
-      setup:
-      delegate_to: "{{ item }}"
-      delegate_facts: True
-      with_items: "{{ groups['openstack_exporter'] }}"
-    - name: Precompute fact for internal exporter ipv4 addresses.
-      set_fact:
-        openstack_exporter: >
-          {{ {item.inventory_hostname: item.ansible_interfaces
-             | map('regex_replace', '^', 'ansible_')
-             | map('replace', '-', '_')
-             | map('extract', item)
-             | selectattr('ipv4', 'defined')
-             | selectattr('ipv4.address', 'match', '10.*')
-             | map(attribute='ipv4.address')
-             | list
-             | last
-             | regex_replace('$', ':9103')
-             } | combine(openstack_exporter | default({})) }}
-      loop: "{{ groups['openstack_exporter'] | map('extract', hostvars) | list }}"
-      loop_control:
-        label: "{{ item.inventory_hostname }}"
-
 - name: Create Prometheus configuration directory.
   file:
     path: "{{ prometheus_config_dir }}"
@@ -112,6 +10,26 @@
 
 - name: Configure Prometheus.
   block:
+    - name: Get network facts for all nodes.
+      setup:
+        gather_subset: network
+      delegate_to: "{{ item }}"
+      delegate_facts: True
+      loop: "{{ groups.all }}"
+    - name: Set fact for internal host addresses.
+      set_fact:
+        ansible_internal_ipv4_addresses: >
+          {{ { item.inventory_hostname: item.ansible_interfaces
+             | map('regex_replace', '^', 'ansible_')
+             | map('replace', '-', '_')
+             | map('extract', item)
+             | selectattr('ipv4', 'defined')
+             | selectattr('ipv4.address', 'match', '10.*')
+             | map(attribute='ipv4.address')
+             | list | last} | combine(ansible_internal_ipv4_addresses | default({})) }}
+      loop: "{{ groups.all | map('extract', hostvars) | list }}"
+      loop_control:
+        label: "{{ item.inventory_hostname }}"
     - name: Create config directory.
       file:
         path: "{{ prometheus_config_dir }}"

@@ -14,45 +14,16 @@ global:
 rule_files:
   - "/etc/prometheus/*-rules.yml"
 
-# A scrape configuration containing exactly one endpoint to scrape:
-# Here it's Prometheus itself.
 scrape_configs:
   - job_name: 'prometheus'
     static_configs:
     - targets: ['localhost:9090']
-{% if node_exporters is defined %}
-{% for host in node_exporters %}
-  - job_name: '{{ host }}-node'
+{% for job in prometheus_jobs if groups[job.inventory_group] is defined %}
+  - job_name: '{{ job.name }}'
     static_configs:
-      - targets: ['{{ node_exporters[host] }}:9100']
+{% for host in groups[job.inventory_group] %}
+      - targets: ['{{ ansible_internal_ipv4_addresses[host] }}:{{ job.port }}']
         labels:
           hostname: '{{ host }}'
 {% endfor %}
-{% endif %}
-{% if ceph_exporters is defined %}
-{% for host in ceph_exporters %}
-  - job_name: '{{ host }}-ceph'
-    static_configs:
-      - targets: ['{{ ceph_exporters[host] }}']
-        labels:
-          hostname: '{{ host }}'
 {% endfor %}
-{% endif %}
-{% if mysql_exporter is defined %}
-{% for host in mysql_exporters %}
-  - job_name: '{{ host }}-mysql'
-    static_configs:
-      - targets: ['{{ mysql_exporters[host] }}']
-        labels:
-          hostname: '{{ host }}'
-{% endfor %}
-{% endif %}
-{% if openstack_exporter is defined %}
-{% for host in openstack_exporter %}
-  - job_name: '{{ host }}-openstack'
-    static_configs:
-      - targets: ['{{ openstack_exporter[host] }}']
-        labels:
-          hostname: '{{ host }}'
-{% endfor %}
-{% endif %}
