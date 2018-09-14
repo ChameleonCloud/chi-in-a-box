@@ -2,6 +2,7 @@
 - name: Pull JupyterHub images.
   docker_image:
     name: "{{ item }}"
+    force: yes
   loop:
     - "{{ jupyterhub_docker_image }}"
     - "{{ jupyterhub_db_docker_image }}"
