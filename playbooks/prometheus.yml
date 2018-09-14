@@ -4,3 +4,23 @@
     - prometheus
   vars:
     prometheus_alertmanager_slack_api_url: "{{ slack_api_url | default('') }}"
+    # [jca 2018-09-14]
+    # TODO: hard-coding these port numbers isn't great. But, it's pretty hard
+    # to get variables set on remote hosts available within a task like this.
+    # Probably the way forward is to move all the prometheus exporters into
+    # the prometheus role as separate tasks and then use the include_role/tasks_from
+    # to include them here. That way all the information needed for prometheus
+    # would at least be in one place.
+    prometheus_jobs:
+      - name: ceph
+        inventory_group: ceph_exporter
+        port: 9128
+      - name: node
+        inventory_group: node_exporter
+        port: 9100
+      - name: mysql
+        inventory_group: mysql_exporter
+        port: 9104
+      - name: openstack
+        inventory_group: openstack_exporter
+        port: 9103

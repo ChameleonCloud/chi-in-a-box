@@ -39,7 +39,7 @@ admin01
 [prometheus]
 admin01
 
-[node_exporters:children]
+[node_exporter:children]
 controller
 ceph
 storage
