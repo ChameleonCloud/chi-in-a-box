@@ -18,3 +18,4 @@ jupyterhub_db_password: ''
 jupyterhub_db_db: jupyterhub
 
 jupyterhub_notebook_docker_image: docker.chameleoncloud.org/jupyterhub-user:latest
+jupyterhub_notebook_workdir: /work
