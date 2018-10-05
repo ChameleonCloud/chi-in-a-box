@@ -103,6 +103,6 @@ Secrets like database and user passwords or sensitive API keys should be encrypt
 ```bash
 # Create new variable named 'my_variable_name'. This will output valid YAML
 # setting that variable to a value that will be decrypted by Ansible at runtime.
-echo "my variable value" | ./ansible-vault encrypt_string --stdin-name="my_variable_name"
+echo "my variable value" | tr -d '\n' | ./ansible-vault encrypt_string --stdin-name="my_variable_name"
 ```
 
