@@ -25,10 +25,9 @@
             docker_registry_port: "{{ hostvars[groups.docker_registry[0]].docker_registry_port }}"
             docker_registry_push_users: "{{ hostvars[groups.docker_registry[0]].docker_registry_push_users }}"
             docker_registry_internal_address: "{{ groups.docker_registry[0] }}"
-            docker_registry_htpasswd: "{{ apache_config_path }}/{{ hostvars[groups.docker_registry[0]].docker_registry_hostname }}.htpasswd"
         - name: Create password for readonly user.
           htpasswd:
-            path: "{{ docker_registry_htpasswd }}"
+            path: "/etc/httpd/{{ docker_registry_hostname }}.htpasswd"
             name: "{{ docker_registry_readonly_user }}"
             password: "{{ docker_registry_readonly_password }}"
             mode: 0640
@@ -49,7 +48,7 @@
                 AuthType Basic
                 AuthName "Docker Registry authentication"
                 AuthBasicProvider file socache external
-                AuthUserFile {{ docker_registry_htpasswd }}
+                AuthUserFile /etc/httpd/{{ docker_registry_hostname }}.htpasswd
                 AuthExternal keystone-user
                 AuthExternalProvideCache On
                 AuthnCacheProvideFor keystone-user
