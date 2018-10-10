@@ -1,0 +1,18 @@
+---
+
+- hosts: maintenance_nodes
+  gather_facts: no 
+  tasks:
+    
+  - name: Install Dell Repo
+    shell: wget -q -O - http://linux.dell.com/repo/hardware/dsu/bootstrap.cgi | bash
+
+  - name: Install DSU
+    yum: 
+      name: dell-system-update
+      state: latest
+
+  - name: Run DSU
+    command: "dsu --non-interactive"
+    async: 45
+    poll: 0
