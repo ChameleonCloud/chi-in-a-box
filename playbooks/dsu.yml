@@ -3,7 +3,12 @@
 - hosts: maintenance_nodes
   gather_facts: no 
   tasks:
-    
+
+  - name: Install wget
+    yum:
+      name: wget
+      state: latest
+
   - name: Install Dell Repo
     shell: wget -q -O - http://linux.dell.com/repo/hardware/dsu/bootstrap.cgi | bash
 
