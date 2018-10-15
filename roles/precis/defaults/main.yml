@@ -1,0 +1,12 @@
+---
+precis_config_path: /etc/experiment-precis
+precis_docker_network: experiment-precis
+
+precis_event_listener_docker_image: docker.chameleoncloud.org/experiment-precis/event-listener:latest
+precis_event_listener_service_name: experiment-precis-event-listener
+
+precis_endpoint_docker_image: docker.chameleoncloud.org/experiment-precis/endpoint:latest
+precis_endpoint_service_name: experiment-precis-endpoint
+
+precis_generator_docker_image: docker.chameleoncloud.org/experiment-precis/generator:latest
+precis_generator_service_name: experiment-precis-generator

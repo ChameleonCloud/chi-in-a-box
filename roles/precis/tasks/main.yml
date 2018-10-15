@@ -1,0 +1,54 @@
+---
+- name: Pull precis service container images.
+  docker_image:
+    name: "{{ item }}"
+    state: present
+    force: yes
+  loop:
+    - "{{ precis_event_listener_docker_image }}"
+    - "{{ precis_endpoint_docker_image }}"
+    - "{{ precis_generator_docker_image }}"
+  tags:
+    - pull
+
+- name: Create Docker network.
+  docker_network:
+    name: "{{ precis_docker_network }}"
+
+- name: Configure precis services.
+  block:
+    - name: Create config directory.
+      file:
+        path: "{{ precis_config_path }}"
+        state: directory
+    - name: Create service configurations.
+      template:
+        src: "{{ item.src }}"
+        mode: 0600
+        dest: "{{ item.dest }}"
+      loop:
+        - { src: 'precis_event_listener.conf.j2', dest: "{{ precis_config_path }}/event_listener.conf" }
+        - { src: 'precis_service.conf.j2', dest: "{{ precis_config_path }}/service.conf" }
+    - name: Configure systemd service.
+      template:
+        src: "{{ item.template }}"
+        dest: "/etc/systemd/system/{{ item.service }}.service"
+      notify:
+        - "restart {{ item.service }}"
+      loop:
+        - { template: 'precis_event_listener.service.j2', service: precis_event_listener_service_name }
+        - { template: 'precis_endpoint.service.j2', service: precis_endpoint_service_name }
+        - { template: 'precis_generator.service.j2', service: precis_generator_service_name }
+  tags:
+    - configuration
+
+- name: Enable precis services on boot.
+  systemd:
+    service: "{{ item }}"
+    daemon_reload: yes
+    state: started
+    enabled: yes
+  loop:
+    - "{{ precis_event_listener_service_name }}"
+    - "{{ precis_endpoint_service_name }}"
+    - "{{ precis_generator_service_name }}"

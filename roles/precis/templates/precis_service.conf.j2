@@ -1,0 +1,13 @@
+[rabbitmq]
+rabbitmq_host: rabbitmq
+rabbitmq_user: %(EP_RABBITMQ_USERNAME)s
+rabbitmq_pass: %(EP_RABBITMQ_PASSWORD)s
+cep_rpc_queue_name: %(EP_RABBITMQ_RPC_QUEUE_NAME)s
+
+[mysql]
+mysql_host: mysql
+mysql_user: %(EP_MYSQL_USERNAME)s
+mysql_pass: %(EP_MYSQL_PASSWORD)s
+
+[serviceaccount]
+auth_url: %(EP_OS_AUTH_URL)s
