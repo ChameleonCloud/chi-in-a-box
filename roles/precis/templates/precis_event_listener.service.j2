@@ -7,7 +7,7 @@ After=docker.service
 Restart=always
 ExecStart=/bin/docker run --name=%N \
                           --net={{ precis_docker_network }} \
-                          --mount 'type=bind,src={{ precis_config_path }}/event_listener.conf,dst=/etc/experiment-precis/event_listener.conf' \
+                          --mount 'type=bind,src={{ precis_config_path }}/event_listener.conf,dst=/etc/experiment_precis/event_listener.conf' \
                           {{ precis_event_listener_docker_image }}
 ExecStop=/bin/docker stop -t 2 %N
 ExecStopPost=/bin/docker rm -f %N
