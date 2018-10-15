@@ -1,13 +1,13 @@
 [rabbitmq]
-rabbitmq_host: rabbitmq
-rabbitmq_user: %(EP_RABBITMQ_USERNAME)s
-rabbitmq_pass: %(EP_RABBITMQ_PASSWORD)s
-cep_rpc_queue_name: %(EP_RABBITMQ_RPC_QUEUE_NAME)s
+rabbitmq_host: {{ precis_rabbitmq_host }}
+rabbitmq_user: {{ precis_rabbitmq_user }}
+rabbitmq_pass: {{ precis_rabbitmq_password }}
+cep_rpc_queue_name: {{ precis_rabbitmq_rpc_queue }}
 
 [mysql]
-mysql_host: mysql
-mysql_user: %(EP_MYSQL_USERNAME)s
-mysql_pass: %(EP_MYSQL_PASSWORD)s
+mysql_host: {{ precis_rabbitmq_host }}
+mysql_user: {{ precis_mysql_user }}
+mysql_pass: {{ precis_mysql_password }}
 
 [serviceaccount]
-auth_url: %(EP_OS_AUTH_URL)s
+auth_url: {{ openstack_keystone_auth_url }}

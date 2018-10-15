@@ -1,4 +1,25 @@
 ---
+- name: Create RabbitMQ user.
+  rabbitmq_user:
+    user: "{{ precis_rabbitmq_user }}"
+    password: "{{ precis_rabbitmq_password }}"
+    permissions:
+      - vhost: /
+        configure_priv: "^({{ precis_rabbitmq_listener_queue }}|{{ precis_rabbitmq_rpc_queue }})$"
+        read_priv: "^(nova|neutron|heat|blazar|ironic|glance|openstack|{{ precis_rabbitmq_listener_queue }}|{{ precis_rabbitmq_rpc_queue }})$"
+        write_priv: "^({{ precis_rabbitmq_listener_queue }}|{{ precis_rabbitmq_rpc_queue }})$"
+    state: present
+
+- name: Create MySQL user.
+  local_action:
+    module: mysql_user
+    login_host: "{{ inventory_hostname }}"
+    name: "{{ precis_mysql_user }}"
+    host: 127.0.0.1
+    password: "{{ precis_mysql_password }}"
+    priv: "{{ precis_mysql_database }}.*:ALL"
+    state: present
+
 - name: Pull precis service container images.
   docker_image:
     name: "{{ item }}"
