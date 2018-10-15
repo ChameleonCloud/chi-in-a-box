@@ -32,6 +32,10 @@ admin02
 [openstack_exporter]
 admin02
 
+# Experiment precis service(s)
+[precis]
+admin02
+
 # The Prometheus server host
 [prometheus]
 admin02
