@@ -48,8 +48,8 @@
         mode: 0600
         dest: "{{ item.dest }}"
       loop:
-        - { src: 'precis_event_listener.conf.j2', dest: "{{ precis_config_path }}/event_listener.conf" }
-        - { src: 'precis_service.conf.j2', dest: "{{ precis_config_path }}/service.conf" }
+        - { src: "precis_event_listener.conf.j2", dest: "{{ precis_config_path }}/event_listener.conf" }
+        - { src: "precis_service.conf.j2", dest: "{{ precis_config_path }}/service.conf" }
     - name: Configure systemd service.
       template:
         src: "{{ item.template }}"
@@ -57,9 +57,9 @@
       notify:
         - "restart {{ item.service }}"
       loop:
-        - { template: 'precis_event_listener.service.j2', service: precis_event_listener_service_name }
-        - { template: 'precis_endpoint.service.j2', service: precis_endpoint_service_name }
-        - { template: 'precis_generator.service.j2', service: precis_generator_service_name }
+        - { template: "precis_event_listener.service.j2", service: "{{ precis_event_listener_service_name }}" }
+        - { template: "precis_endpoint.service.j2", service: "{{ precis_endpoint_service_name }}" }
+        - { template: "precis_generator.service.j2", service: "{{ precis_generator_service_name }}" }
   tags:
     - configuration
 
