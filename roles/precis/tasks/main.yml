@@ -1,5 +1,6 @@
 ---
 - name: Create RabbitMQ user.
+  delegate_to: "{{ groups[precis_rabbitmq_inventory_group][0] }}"
   rabbitmq_user:
     user: "{{ precis_rabbitmq_user }}"
     password: "{{ precis_rabbitmq_password }}"
@@ -11,9 +12,8 @@
     state: present
 
 - name: Create MySQL user.
-  local_action:
-    module: mysql_user
-    login_host: "{{ inventory_hostname }}"
+  delegate_to: "{{ groups[precis_mysql_inventory_group][0] }}"
+  mysql_user:
     name: "{{ precis_mysql_user }}"
     host: 127.0.0.1
     password: "{{ precis_mysql_password }}"
