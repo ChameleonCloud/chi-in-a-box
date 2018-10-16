@@ -1,6 +1,6 @@
 ---
 precis_config_path: /etc/experiment-precis
-precis_docker_network: experiment-precis
+precis_docker_network: host
 # Corresponds to the default user 1001 used in s2i builds
 precis_user: 1001
 

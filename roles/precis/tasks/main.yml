@@ -57,6 +57,7 @@
 - name: Create Docker network.
   docker_network:
     name: "{{ precis_docker_network }}"
+  when: precis_docker_network != "host"
 
 - name: Configure precis services.
   block:
