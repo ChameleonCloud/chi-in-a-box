@@ -1,15 +1,19 @@
 ---
-- name: "restart {{ precis_event_listener_service_name }}"
+- name: "restart precis event listener"
   service:
     name: "{{ precis_event_listener_service_name }}"
     state: restarted
 
-- name: "restart {{ precis_endpoint_service_name }}"
+- name: "restart precis endpoint"
   service:
     name: "{{ precis_endpoint_service_name }}"
     state: restarted
 
-- name: "restart {{ precis_generator_service_name }}"
+- name: "restart precis generator"
   service:
     name: "{{ precis_generator_service_name }}"
     state: restarted
+
+- name: "reload systemd daemon"
+  service:
+    daemon_reload: yes
