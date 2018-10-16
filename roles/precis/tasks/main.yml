@@ -1,15 +1,35 @@
 ---
-- name: Create RabbitMQ user.
-  delegate_to: "{{ groups[precis_rabbitmq_inventory_group][0] }}"
-  rabbitmq_user:
-    user: "{{ precis_rabbitmq_user }}"
-    password: "{{ precis_rabbitmq_password }}"
-    permissions:
-      - vhost: /
-        configure_priv: "^({{ precis_rabbitmq_listener_queue }}|{{ precis_rabbitmq_rpc_queue }})$"
-        read_priv: "^(nova|neutron|heat|blazar|ironic|glance|openstack|{{ precis_rabbitmq_listener_queue }}|{{ precis_rabbitmq_rpc_queue }})$"
-        write_priv: "^({{ precis_rabbitmq_listener_queue }}|{{ precis_rabbitmq_rpc_queue }})$"
-    state: present
+- name: Create RabbitMQ entities.
+  block:
+    - name: Create RabbitMQ user.
+      delegate_to: "{{ groups[precis_rabbitmq_inventory_group][0] }}"
+      rabbitmq_user:
+        user: "{{ precis_rabbitmq_user }}"
+        password: "{{ precis_rabbitmq_password }}"
+        permissions:
+          - vhost: /
+            configure_priv: "^({{ precis_rabbitmq_listener_queue }}|{{ precis_rabbitmq_rpc_queue }})$"
+            read_priv: "^({{ precis_rabbitmq_listener_queue }}|{{ precis_rabbitmq_rpc_queue }})$"
+            write_priv: "^{{ precis_rabbitmq_rpc_queue }}$"
+        state: present
+    - name: Create RabbitMQ listener queue.
+      delegate_to: "{{ groups[precis_rabbitmq_inventory_group][0] }}"
+      rabbitmq_queue:
+        name: "{{ precis_rabbitmq_listener_queue }}"
+        vhost: /
+        durable: no
+        state: present
+    - name: Create RabbitMQ exchange bindings.
+      delegate_to: "{{ groups[precis_rabbitmq_inventory_group][0] }}"
+      rabbitmq_binding:
+        name: "{{ item }}"
+        destination: "{{ precis_rabbitmq_listener_queue }}"
+        destination_type: queue
+        routing_key: "*.notification"
+        state: present
+      loop: "{{ precis_rabbitmq_listener_bindings }}"
+  tags:
+    - rabbitmq
 
 - name: Create MySQL user.
   delegate_to: "{{ groups[precis_mysql_inventory_group][0] }}"
@@ -19,6 +39,8 @@
     password: "{{ precis_mysql_password }}"
     priv: "{{ precis_mysql_database }}.*:ALL"
     state: present
+  tags:
+    - mysql
 
 - name: Pull precis service container images.
   docker_image:
