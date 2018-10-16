@@ -1,6 +1,8 @@
 ---
 precis_config_path: /etc/experiment-precis
 precis_docker_network: experiment-precis
+# Corresponds to the default user 1001 used in s2i builds
+precis_user: 1001
 
 precis_rabbitmq_inventory_group: rabbitmq
 precis_rabbitmq_user: exp_precis
@@ -18,6 +20,7 @@ precis_event_listener_service_name: experiment-precis-event-listener
 
 precis_endpoint_docker_image: docker.chameleoncloud.org/experiment-precis/endpoint:latest
 precis_endpoint_service_name: experiment-precis-endpoint
+precis_endpoint_port: 8910
 
 precis_generator_docker_image: docker.chameleoncloud.org/experiment-precis/generator:latest
 precis_generator_service_name: experiment-precis-generator

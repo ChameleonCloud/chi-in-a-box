@@ -47,6 +47,7 @@
         src: "{{ item.src }}"
         mode: 0600
         dest: "{{ item.dest }}"
+        owner: "{{ precis_user }}"
       loop:
         - { src: "precis_event_listener.conf.j2", dest: "{{ precis_config_path }}/event_listener.conf" }
         - { src: "precis_service.conf.j2", dest: "{{ precis_config_path }}/service.conf" }
