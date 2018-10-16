@@ -5,8 +5,8 @@ After=docker.service
 
 [Service]
 Restart=always
-ExecStart=/bin/docker run --name=%N \
-                          --net={{ precis_docker_network }} \
+ExecStart=/bin/docker run --name %N \
+                          --net {{ precis_docker_network }} \
                           --mount 'type=bind,src={{ precis_config_path }}/service.conf,dst=/etc/experiment_precis/service.conf' \
                           {{ precis_generator_docker_image }}
 ExecStop=/bin/docker stop -t 2 %N

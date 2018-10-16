@@ -5,10 +5,10 @@ After=docker.service
 
 [Service]
 Restart=always
-ExecStart=/bin/docker run --name=%N \
-                          --net={{ precis_docker_network }} \
-                          --publish='{{ precis_endpoint_port }}:8080' \
-                          --mount='type=bind,src={{ precis_config_path }}/service.conf,dst=/etc/experiment_precis/service.conf' \
+ExecStart=/bin/docker run --name %N \
+                          --net {{ precis_docker_network }} \
+                          --publish '{{ precis_endpoint_port }}:8080' \
+                          --mount 'type=bind,src={{ precis_config_path }}/service.conf,dst=/etc/experiment_precis/service.conf' \
                           {{ precis_endpoint_docker_image }}
 ExecStop=/bin/docker stop -t 2 %N
 ExecStopPost=/bin/docker rm -f %N
