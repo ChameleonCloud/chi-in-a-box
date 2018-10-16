@@ -24,6 +24,13 @@ precis_mysql_inventory_group: mysql
 precis_mysql_database: experiment_precis
 precis_mysql_user: exp_precis
 # precis_mysql_password: ''
+precis_mysql_external_database_privileges:
+  - blazar.*:SELECT
+  - glance.*:SELECT
+  - heat.*:SELECT
+  - neutron.*:SELECT
+  - nova.*:SELECT
+  - nova_api.*:SELECT
 
 precis_event_listener_docker_image: docker.chameleoncloud.org/experiment-precis/event-listener:latest
 precis_event_listener_service_name: experiment-precis-event-listener

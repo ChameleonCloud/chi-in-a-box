@@ -37,7 +37,7 @@
     name: "{{ precis_mysql_user }}"
     host: 127.0.0.1
     password: "{{ precis_mysql_password }}"
-    priv: "{{ precis_mysql_database }}.*:ALL"
+    priv: "{{ precis_mysql_database }}.*:ALL/{{ precis_mysql_external_database_privileges | join('/') }}"
     state: present
   tags:
     - mysql
