@@ -4,11 +4,11 @@ debug: False
 [event_listener]
 
 [rabbitmq]
-rabbitmq_host: {{ groups[precis_rabbitmq_inventory_group][0] }}
+rabbitmq_host: {{ precis_rabbitmq_host | default(groups[precis_rabbitmq_inventory_group][0]) }}
 rabbitmq_user: {{ precis_rabbitmq_user }}
 rabbitmq_pass: {{ precis_rabbitmq_password }}
 
 [mysql]
-mysql_host: {{ groups[precis_mysql_inventory_group][0] }}
+mysql_host: {{ precis_mysql_host | default(groups[precis_mysql_inventory_group][0]) }}
 mysql_user: {{ precis_mysql_user }}
 mysql_pass: {{ precis_mysql_password }}
