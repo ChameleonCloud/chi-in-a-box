@@ -4,9 +4,10 @@ precis_docker_network: host
 # Corresponds to the default user 1001 used in s2i builds
 precis_user: 1001
 
+# precis_rabbitmq_host: ''
 precis_rabbitmq_inventory_group: rabbitmq
 precis_rabbitmq_user: exp_precis
-precis_rabbitmq_password: ''
+# precis_rabbitmq_password: ''
 precis_rabbitmq_listener_queue: experiment_precis_event_queue
 precis_rabbitmq_listener_bindings:
   - blazar
@@ -18,10 +19,11 @@ precis_rabbitmq_listener_bindings:
   - openstack
 precis_rabbitmq_rpc_queue: cep_rpc_queue
 
+# precis_mysql_host: ''
 precis_mysql_inventory_group: mysql
 precis_mysql_database: experiment_precis
 precis_mysql_user: exp_precis
-precis_mysql_password: ''
+# precis_mysql_password: ''
 
 precis_event_listener_docker_image: docker.chameleoncloud.org/experiment-precis/event-listener:latest
 precis_event_listener_service_name: experiment-precis-event-listener

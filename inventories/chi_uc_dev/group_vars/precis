@@ -1,4 +1,5 @@
 ---
+precis_mysql_host: 127.0.0.1
 precis_mysql_password: !vault |
           $ANSIBLE_VAULT;1.2;AES256;chi_uc_dev
           63636665363065636662326632346436663866613238356634626236613764346335396131653232
