@@ -35,7 +35,7 @@
   delegate_to: "{{ groups[precis_mysql_inventory_group][0] }}"
   mysql_user:
     name: "{{ precis_mysql_user }}"
-    host: %
+    host: "%"
     password: "{{ precis_mysql_password }}"
     priv: "{{ precis_mysql_database }}.*:ALL/{{ precis_mysql_external_database_privileges | join('/') }}"
     state: present
