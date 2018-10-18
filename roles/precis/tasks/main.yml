@@ -77,17 +77,23 @@
           group_var: precis_mysql_inventory_group
         - host_var: precis_rabbitmq_host
           group_var: precis_rabbitmq_inventory_group
-    - name: Create service configurations.
+    - name: Create event listener configuration.
       template:
-        src: "{{ item.src }}"
+        src: "precis_event_listener.conf.j2"
         mode: 0600
-        dest: "{{ item.dest }}"
+        dest: "{{ precis_config_path }}/event_listener.conf"
         owner: "{{ precis_user }}"
-      loop:
-        - src: "precis_event_listener.conf.j2"
-          dest: "{{ precis_config_path }}/event_listener.conf"
-        - src: "precis_service.conf.j2"
-          dest: "{{ precis_config_path }}/service.conf"
+      notify:
+        - restart precis event listner
+    - name: Create service configuration.
+      template:
+        src: "precis_service.conf.j2"
+        mode: 0600
+        dest: "{{ precis_config_path }}/service.conf"
+        owner: "{{ precis_user }}"
+      notify:
+        - restart precis endpoint
+        - restart precis generator
     - name: Configure systemd service.
       template:
         src: "{{ item.template }}"
