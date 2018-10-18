@@ -6,13 +6,13 @@ debug: False
 [generator]
 
 [rabbitmq]
-rabbitmq_host: {{ precis_rabbitmq_host | default(groups[precis_rabbitmq_inventory_group][0]) }}
+rabbitmq_host: {{ precis_rabbitmq_host }}
 rabbitmq_user: {{ precis_rabbitmq_user }}
 rabbitmq_pass: {{ precis_rabbitmq_password }}
 cep_rpc_queue_name: {{ precis_rabbitmq_rpc_queue }}
 
 [mysql]
-mysql_host: {{ precis_mysql_host | default(groups[precis_mysql_inventory_group][0]) }}
+mysql_host: {{ precis_mysql_host }}
 mysql_user: {{ precis_mysql_user }}
 mysql_pass: {{ precis_mysql_password }}
 

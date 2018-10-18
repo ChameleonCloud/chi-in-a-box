@@ -35,7 +35,7 @@
   delegate_to: "{{ groups[precis_mysql_inventory_group][0] }}"
   mysql_user:
     name: "{{ precis_mysql_user }}"
-    host: 127.0.0.1
+    host: %
     password: "{{ precis_mysql_password }}"
     priv: "{{ precis_mysql_database }}.*:ALL/{{ precis_mysql_external_database_privileges | join('/') }}"
     state: present
@@ -65,6 +65,18 @@
       file:
         path: "{{ precis_config_path }}"
         state: directory
+    - name: Set default host addresses.
+      when: vars[item.host_var] is not defined
+      set_fact:
+        "{{ item.host_var }}": >
+          {{ groups[vars[item.group_var]]
+             | map('extract', hostvars, ['ansible_default_ipv4', 'address'])
+             | list | first }}
+      loop:
+        - host_var: precis_mysql_host
+          group_var: precis_mysql_inventory_group
+        - host_var: precis_rabbitmq_host
+          group_var: precis_rabbitmq_inventory_group
     - name: Create service configurations.
       template:
         src: "{{ item.src }}"
