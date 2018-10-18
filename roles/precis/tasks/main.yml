@@ -68,7 +68,7 @@
     - name: Set default host addresses.
       when: vars[item.host_var] is not defined
       set_fact:
-        "{{ item.host_var }}": >
+        "{{ item.host_var }}": >-
           {{ groups[vars[item.group_var]]
              | map('extract', hostvars, ['ansible_default_ipv4', 'address'])
              | list | first }}

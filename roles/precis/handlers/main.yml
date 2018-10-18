@@ -1,4 +1,12 @@
 ---
+# This needs to run before the other handlers.
+# "Handlers are run in the order they are listed, not in the order that they
+# are notified."[1]
+# [1]: https://docs.ansible.com/ansible/latest/reference_appendices/glossary.html#notify
+- name: "reload systemd daemon"
+  service:
+    daemon_reload: yes
+
 - name: "restart precis event listener"
   service:
     name: "{{ precis_event_listener_service_name }}"
@@ -13,7 +21,3 @@
   service:
     name: "{{ precis_generator_service_name }}"
     state: restarted
-
-- name: "reload systemd daemon"
-  service:
-    daemon_reload: yes
