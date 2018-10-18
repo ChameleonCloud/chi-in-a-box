@@ -14,7 +14,7 @@ docker_registry_push_users:
   - jakecoll
   - jason_a
   - priteau
-  - zzhenz
+  - zzhen
 
 # Swift storage backend configuration
 docker_registry_swift_username: docker_registry
