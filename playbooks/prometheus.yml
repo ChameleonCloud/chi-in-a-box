@@ -59,13 +59,13 @@
                 Allow from all
 
                 AuthType Basic
-                AuthName "Docker Registry authentication"
+                AuthName "Alertmanager authentication"
                 AuthBasicProvider socache external
                 AuthExternal keystone-user
                 AuthExternalProvideCache On
                 AuthnCacheProvideFor keystone-user
 
-                Require user {{ alertmanager_users | join(' ')}}
+                Require user {{ alertmanager_users | join(' ') }}
 
                 # preserve Host header to avoid cross-origin problems
                 ProxyPreserveHost on

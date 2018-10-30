@@ -12,6 +12,7 @@ prometheus_alertmanager_config_dir: /etc/alertmanager
 prometheus_alertmanager_docker_network: alertmanager
 alertmanager_users:
   - jakecoll
+  - jason_a
 
 # This should be encrypted! It is a secret value.
 prometheus_alertmanager_slack_api_url: ''
