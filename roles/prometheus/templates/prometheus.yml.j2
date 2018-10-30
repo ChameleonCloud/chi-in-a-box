@@ -4,11 +4,11 @@ global:
   evaluation_interval: 30s
 
 # Alertmanager configuration
-# alerting:
-#   alertmanagers:
-#   - static_configs:
-#     - targets:
-#       - alertmanager:9093
+alerting:
+  alertmanagers:
+  - static_configs:
+    - targets:
+      - {{ prometheus_alertmanager_hostname }}:{{ prometheus_alertmanager_port }}
 
 # Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
 rule_files:

@@ -55,6 +55,18 @@
             apache_server_name: "{{ prometheus_alertmanager_hostname }}"
             apache_server_conf: |
               <Location "/">
+                Order deny,allow
+                Allow from all
+
+                AuthType Basic
+                AuthName "Docker Registry authentication"
+                AuthBasicProvider socache external
+                AuthExternal keystone-user
+                AuthExternalProvideCache On
+                AuthnCacheProvideFor keystone-user
+
+                Require user {{ alertmanager_users | join(' ')}}
+
                 # preserve Host header to avoid cross-origin problems
                 ProxyPreserveHost on
                 # proxy to Alertmanager
