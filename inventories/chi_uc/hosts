@@ -36,6 +36,10 @@ fx2-01
 [openstack_exporter]
 admin01
 
+# Experiment precis service(s)
+[precis]
+admin01
+
 [prometheus]
 admin01
 
