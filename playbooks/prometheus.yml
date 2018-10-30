@@ -7,6 +7,7 @@
       set_fact:
         prometheus_alertmanager_hostname: "{{ prometheus_alertmanager_hostname }}"
         prometheus_alertmanager_port: "{{ prometheus_alertmanager_port }}"
+        prometheus_alertmanager_users: "{{ prometheus_alertmanager_users}}"
       tags:
         - configuration
   vars:
@@ -44,6 +45,7 @@
           set_fact:
               prometheus_alertmanager_hostname: "{{ hostvars[groups.prometheus[0]].prometheus_alertmanager_hostname }}"
               prometheus_alertmanager_port: "{{ hostvars[groups.prometheus[0]].prometheus_alertmanager_port }}"
+              prometheus_alertmanager_users: "{{ hostvars[groups.prometheus[0]].prometheus_alertmanager_users }}"
               prometheus_internal_address: "{{ groups.prometheus[0] }}"
           tags:
             - configuration
@@ -65,7 +67,7 @@
                 AuthExternalProvideCache On
                 AuthnCacheProvideFor keystone-user
 
-                Require user {{ alertmanager_users | join(' ') }}
+                Require user {{ prometheus_alertmanager_users | join(' ') }}
 
                 # preserve Host header to avoid cross-origin problems
                 ProxyPreserveHost on
