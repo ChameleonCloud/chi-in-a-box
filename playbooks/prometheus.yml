@@ -7,7 +7,7 @@
       set_fact:
         prometheus_alertmanager_hostname: "{{ prometheus_alertmanager_hostname }}"
         prometheus_alertmanager_port: "{{ prometheus_alertmanager_port }}"
-        prometheus_alertmanager_users: "{{ prometheus_alertmanager_users}}"
+        prometheus_alertmanager_users: "{{ prometheus_alertmanager_users }}"
       tags:
         - configuration
   vars:

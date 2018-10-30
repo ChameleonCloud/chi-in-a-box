@@ -10,7 +10,7 @@ prometheus_alertmanager_docker_volume_name: alertmanager-data
 prometheus_alertmanager_port: 9093
 prometheus_alertmanager_config_dir: /etc/alertmanager
 prometheus_alertmanager_docker_network: alertmanager
-alertmanager_users:
+prometheus_alertmanager_users:
   - jakecoll
   - jason_a
 
