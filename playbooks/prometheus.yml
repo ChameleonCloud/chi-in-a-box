@@ -2,6 +2,13 @@
 - hosts: prometheus
   roles:
     - prometheus
+  tasks:
+    - name: Set facts for gathering in frontend hosts.
+      set_fact:
+        prometheus_alertmanager_hostname: "{{ prometheus_alertmanager_hostname }}"
+        prometheus_alertmanager_port: "{{ prometheus_alertmanager_port }}"
+      tags:
+        - configuration
   vars:
     prometheus_alertmanager_slack_api_url: "{{ slack_api_url | default('') }}"
     # [jca 2018-09-14]
@@ -28,16 +35,18 @@
 - hosts: frontends
   tasks:
     - name: Configure virtual host for Prometheus Alertmanager.
-      block: Gather facts for Alertmanager host.
+      block:
         - name: Gather facts from Alertmanager host.
           setup:
           delegate_to: "{{ groups.prometheus[0] }}"
           delegate_facts: True
         - name: Precompute convenience facts needed for virtual host configuration.
           set_fact:
-              prometheus_alertmanager_hostname: "{{ prometheus_alertmanager_hostname }}"
-              prometheus_alertmanager_port: "{{ hostvars[groups.prometheus[0]].prometheus_alertmanager_port}}"
+              prometheus_alertmanager_hostname: "{{ hostvars[groups.prometheus[0]].prometheus_alertmanager_hostname }}"
+              prometheus_alertmanager_port: "{{ hostvars[groups.prometheus[0]].prometheus_alertmanager_port }}"
               prometheus_internal_address: "{{ groups.prometheus[0] }}"
+          tags:
+            - configuration
         - name: Configure virtual host.
           include_role:
             name: apache
@@ -45,16 +54,12 @@
           vars:
             apache_server_name: "{{ prometheus_alertmanager_hostname }}"
             apache_server_conf: |
-              RewriteEngine On
-              RewriteCond %{HTTP:Connection} Upgrade [NC]
-              RewriteCond %{HTTP:Upgrade} websocket [NC]
-              RewriteRule /(.*) ws://{{ prometheus_internal_address }}:{{ prometheus_alertmanager_port }}/$1 [P,L]
-
               <Location "/">
                 # preserve Host header to avoid cross-origin problems
                 ProxyPreserveHost on
                 # proxy to Alertmanager
                 ProxyPass         http://{{ prometheus_internal_address }}:{{ prometheus_alertmanager_port }}/
                 ProxyPassReverse  http://{{ prometheus_internal_address }}:{{ prometheus_alertmanager_port }}/
+              </Location>
           tags:
             - configuration

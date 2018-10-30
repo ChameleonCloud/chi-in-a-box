@@ -5,11 +5,13 @@ After=docker.service
 [Service]
 Restart=always
 ExecStart=/bin/docker run --name=%N \
-                          --net {{  }} \
+                          --net {{ prometheus_alertmanager_docker_network }} \
                           --publish {{ prometheus_alertmanager_port }}:9093 \
                           --expose 9093 \
+                          --mount 'type=bind,src=/var/run/docker.sock,dst=/var/run/docker.sock' \
                           -v {{ prometheus_alertmanager_config_dir }}:/etc/alertmanager \
                           -v {{ prometheus_alertmanager_docker_volume_name }}:/alertmanager \
+                          --config.file={{ prometheus_alertmanager_config_dir }}/alertmanager.yaml \
                           {{ prometheus_alertmanager_docker_image }}
 ExecStop=/bin/docker stop -t 2 %N
 ExecStopPost=/bin/docker rm -f %N

@@ -10,7 +10,7 @@
 
 - name: Create Docker network.
   docker_network:
-    name: "{{ alertmanager_docker_network }}"
+    name: "{{ prometheus_alertmanager_docker_network }}"
 
 - name: Configure Alertmanager.
   block:

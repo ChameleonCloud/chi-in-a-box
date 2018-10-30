@@ -1,6 +1,6 @@
 ---
-global:
-  slack_api_url: {{ prometheus_alertmanager_slack_api_url }}
+# global:
+#   slack_api_url: {{ prometheus_alertmanager_slack_api_url }}
 
 # The directory from which notification templates are read.
 templates:
@@ -29,7 +29,8 @@ route:
   repeat_interval: 3h
 
   # A default receiver
-  receiver: 'slack'
+  # receiver: 'slack'
+  receiver: dummy
 
 # Inhibition rules allow to mute a set of alerts given that another alert is
 # firing.
@@ -44,6 +45,7 @@ inhibit_rules:
   equal: ['alertname', 'cluster', 'service']
 
 receivers:
-- name: 'slack'
-  slack_configs:
-  - channel: '#notifications'
+  -name: dummy
+#- name: 'slack'
+#  slack_configs:
+#  - channel: '#notifications'

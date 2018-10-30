@@ -1,2 +1,2 @@
 ---
-alertmanager_hostname: alert.chameleoncloud.org
+prometheus_alertmanager_hostname: alert.chameleoncloud.org
