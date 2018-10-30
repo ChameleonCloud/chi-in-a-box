@@ -87,7 +87,7 @@
         dest: "{{ precis_config_path }}/event_listener.conf"
         owner: "{{ precis_user }}"
       notify:
-        - restart precis event listner
+        - restart precis event listener
     - name: Create service configuration.
       template:
         src: "precis_service.conf.j2"

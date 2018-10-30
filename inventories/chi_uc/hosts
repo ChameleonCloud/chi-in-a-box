@@ -43,6 +43,9 @@ admin01
 [prometheus]
 admin01
 
+[rabbitmq]
+admin01
+
 [node_exporter:children]
 controller
 ceph
