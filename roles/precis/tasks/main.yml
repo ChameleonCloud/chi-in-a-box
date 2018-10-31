@@ -8,9 +8,9 @@
         password: "{{ precis_rabbitmq_password }}"
         permissions:
           - vhost: /
-            configure_priv: "^({{ precis_rabbitmq_listener_queue }}|{{ precis_rabbitmq_rpc_queue }})$"
-            read_priv: "^({{ precis_rabbitmq_listener_queue }}|{{ precis_rabbitmq_rpc_queue }})$"
-            write_priv: "^{{ precis_rabbitmq_rpc_queue }}$"
+            configure_priv: "^experiment_precis_.*"
+            read_priv: ".*"
+            write_priv: "^experiment_precis_.*|amq.default"
         state: present
     # - name: Create RabbitMQ listener queue.
     #   delegate_to: "{{ groups[precis_rabbitmq_inventory_group][0] }}"
@@ -70,7 +70,7 @@
       set_fact:
         "{{ item.host_var }}": >-
           {{ groups[vars[item.group_var]]
-             | map('extract', hostvars, ['ansible_default_ipv4', 'address'])
+             | map('extract', hostvars, 'network_interface_internal_ipv4_address')
              | list | first }}
       loop:
         - host_var: precis_mysql_host
@@ -79,7 +79,7 @@
           group_var: precis_rabbitmq_inventory_group
     - name: Set bind address.
       set_fact:
-        precis_endpoint_bind_address: "{{ lookup('vars', 'ansible_' + precis_endpoint_bind_interface)['ipv4']['address'] }}"
+        precis_endpoint_bind_address: "{{ ansible_facts[network_interface_internal]['ipv4']['address'] }}"
     - name: Create event listener configuration.
       template:
         src: "precis_event_listener.conf.j2"

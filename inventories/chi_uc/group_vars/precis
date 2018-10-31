@@ -1,6 +1,4 @@
 ---
-precis_endpoint_bind_interface: br_em1
-
 precis_mysql_password: !vault |
           $ANSIBLE_VAULT;1.2;AES256;chi_uc
           61383231313163363336663130303031373563303335393032646261346430386632326663303736

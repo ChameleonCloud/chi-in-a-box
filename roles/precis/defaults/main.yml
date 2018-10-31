@@ -17,7 +17,7 @@ precis_rabbitmq_listener_bindings:
   - neutron
   - nova
   - openstack
-precis_rabbitmq_rpc_queue: cep_rpc_queue
+precis_rabbitmq_rpc_queue: experiment_precis_service_queue
 
 # precis_mysql_host: ''
 precis_mysql_inventory_group: mysql

@@ -1,0 +1,14 @@
+---
+- name: Set external interface address.
+  set_fact:
+    network_interface_external_ipv4_address: "{{ ansible_facts[network_interface_external]['ipv4']['address'] }}"
+  when: network_interface_external is defined
+  tags:
+    - always
+
+- name: Set internal interface address.
+  set_fact:
+    network_interface_internal_ipv4_address: "{{ ansible_facts[network_interface_internal]['ipv4']['address'] }}"
+  when: network_interface_internal is defined
+  tags:
+    - always
