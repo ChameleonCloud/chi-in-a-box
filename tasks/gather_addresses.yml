@@ -1,0 +1,5 @@
+---
+- name: Gather interfaces.
+  set_fact:
+    network_interface_external_ipv4_address: "{{ ansible_facts[network_interface_external]['ipv4']['address'] }}"
+    network_interface_internal_ipv4_address: "{{ ansible_facts[network_interface_internal]['ipv4']['address'] }}"

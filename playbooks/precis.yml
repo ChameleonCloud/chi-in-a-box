@@ -1,4 +1,14 @@
 ---
+- hosts: mysql
+  tasks:
+    - include gather_addresses.yml
+
+- hosts: rabbitmq
+  tasks:
+    - include gather_addresses.yml
+
 - hosts: precis
+  tasks:
+    - include gather_addresses.yml
   roles:
     - precis
