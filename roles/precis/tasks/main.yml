@@ -8,9 +8,9 @@
         password: "{{ precis_rabbitmq_password }}"
         permissions:
           - vhost: /
-            configure_priv: "^({{ precis_rabbitmq_listener_queue }}|{{ precis_rabbitmq_rpc_queue }})$"
-            read_priv: "^({{ precis_rabbitmq_listener_queue }}|{{ precis_rabbitmq_rpc_queue }})$"
-            write_priv: "^{{ precis_rabbitmq_rpc_queue }}$"
+            configure_priv: "^experiment_precis_.*"
+            read_priv: ".*"
+            write_priv: "^experiment_precis_.*|amq.default"
         state: present
     # - name: Create RabbitMQ listener queue.
     #   delegate_to: "{{ groups[precis_rabbitmq_inventory_group][0] }}"
