@@ -20,6 +20,7 @@
   template:
     src: "{{ item }}.j2"
     dest: "{{ apache_config_path }}/{{ item }}"
+    mode: a+x
   loop:
     - keystone_user.sh
 

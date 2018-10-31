@@ -1,0 +1,2 @@
+---
+prometheus_alertmanager_hostname: alert.uc.chameleoncloud.org

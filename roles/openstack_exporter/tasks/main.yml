@@ -1,6 +1,7 @@
 ---
 - name: Pull openstack exporter image.
   docker_image:
+    force: yes
     name: "{{ openstack_prometheus_exporter_docker_image }}"
   tags:
     - pull
