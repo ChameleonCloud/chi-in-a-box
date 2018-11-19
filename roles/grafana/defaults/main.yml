@@ -13,4 +13,5 @@ grafana_auth_ldap_group_treebase: ou=Chameleon,ou=Systems,dc=tacc,dc=utexas,dc=e
 grafana_auth_ldap_group_search_filter: (&(objectClass=groupOfNames)(member=uid=%s,ou=People,dc=tacc,dc=utexas,dc=edu))
 grafana_auth_ldap_editor_group: Chameleon
 
-grafana_gnocchi_plugin_id: gnocchixyz-gnocchi-datasource
+grafana_plugins:
+  - gnocchixyz-gnocchi-datasource
