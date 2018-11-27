@@ -1,8 +1,42 @@
+# Ansible inventory for 'chi_tacc'
+# Not sure what this is? https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html
+
+# The Ansible deployment host
 [ansible]
-chameleon01
+master2
 
-[grafana]
-chameleon04
+# The primary OpenStack controller host
+[controller]
+chi01
 
-[node_exporters]
-chameleon[01:06]
+#Gnochi_host
+[gnocchi]
+
+# The Ceph cluster hosts
+[ceph]
+
+# The Ceph cluster monitoring host (usually the master)
+[ceph_exporter]
+
+# The MySQL host(s)
+[mysql]
+m01-07
+
+# The MySQL hosts to install metrics exporters on
+[mysql_exporter]
+m01-07
+
+# The Prometheus server host
+[prometheus]
+chi01
+
+# By default node metric exporters will be installed on all
+# hosts in all groups. Comment out host groups you don't want
+# to install the node exporters on.
+[node_exporters:children]
+ansible
+controller
+ceph
+mysql
+prometheus
+gnocchi
