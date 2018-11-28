@@ -1,7 +1,6 @@
 ---
 openstack_prometheus_exporter_auth_url: 'https://chi.uc.chameleoncloud.org:35357'
 openstack_prometheus_exporter_region_name: 'CHI@UC'
-openstack_prometheus_exporter_gnocchi_endpoint: 'https://chi.uc.chameleoncloud.org:8041/v1'
 openstack_prometheus_exporter_password: !vault |
           $ANSIBLE_VAULT;1.2;AES256;chi_uc
           33373466306435643261623132353565323761396663633138623735363566313662313336343063
