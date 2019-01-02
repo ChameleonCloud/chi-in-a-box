@@ -4,20 +4,39 @@
   gather_facts: no 
   tasks:
 
-  - name: Install wget
+  - name: Install screen
     yum:
-      name: wget
+      name: screen
       state: latest
+ 
+  - name: Download DSU RPM from Dell
+    get_url: 
+      url: http://linux.dell.com/repo/hardware/dsu/bootstrap.cgi
+      dest: /tmp/bootstrap.cgi
 
-  - name: Install Dell Repo
-    shell: wget -q -O - http://linux.dell.com/repo/hardware/dsu/bootstrap.cgi | bash
+  - name: Install DSU RPM
+    command: bash /tmp/bootstrap.cgi
 
   - name: Install DSU
     yum: 
       name: dell-system-update
       state: latest
 
-  - name: Run DSU
-    command: "dsu --non-interactive"
+  - name: Register screen session
+    find:
+      paths: '/var/run/screen/S-root/'
+      file_type: any
+      patterns: '*.stress'
+    register: screen_files
+
+  - name: Fail if existing screen session
+    fail:
+      msg: A screen session is already running.
+    when: screen_files.matched != 0
+
+  - name: Run DSU in Screen Session
     async: 45
     poll: 0
+    command: >
+      screen -S dsu -d -m
+      dsu --non-interactive
