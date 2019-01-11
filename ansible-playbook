@@ -2,12 +2,12 @@
 # This is just a really simple wrapper around ansible-playbook, which is the
 # most commonly used utility when provisioning. It uses the inventory set up
 # on the host (with ./ansible-inventory) and pre-sets a few variables.
-set -e -u -o pipefail
-
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 inventory_name="$(cat "$DIR/.ansible-inventory")"
 
-exec venv/bin/ansible-playbook \
+source venv/bin/activate
+ansible-playbook \
   --vault-id="${inventory_name}@vault_password" \
-  --inventory="$DIR/inventories/${inventory_name}" \
+  --inventory="$DIR/environments/${inventory_name}/inventory" \
+  --extra-vars=node_custom_config="$DIR/kolla/node_custom_config" \
   "$@"

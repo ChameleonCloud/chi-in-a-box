@@ -1,0 +1,42 @@
+from openstack_dashboard.settings import HORIZON_CONFIG
+from os import environ
+
+SITE_BRANDING = 'ChameleonCloud'
+
+# Override help menu to point to our docs.
+HORIZON_CONFIG['help_url'] = 'https://chameleoncloud.readthedocs.io/en/latest/technical/baremetal.html'
+
+# Used for Blazar dashboard, which needs to pull data from the MySQL database
+# directly at the moment.
+DATABASES = {
+    'default': {},
+    'blazar-CHI@TACC': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': environ.get('CHI_TACC_BLAZAR_DB_NAME'),
+        'HOST': environ.get('CHI_TACC_BLAZAR_DB_HOST'),
+        'PORT': environ.get('CHI_TACC_BLAZAR_DB_PORT'),
+        'USER': environ.get('CHI_TACC_BLAZAR_DB_USER'),
+        'PASSWORD': environ.get('CHI_TACC_BLAZAR_DB_PASSWORD'),
+    },
+    'blazar-CHI@UC': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': environ.get('CHI_UC_BLAZAR_DB_NAME'),
+        'HOST': environ.get('CHI_UC_BLAZAR_DB_HOST'),
+        'PORT': environ.get('CHI_UC_BLAZAR_DB_PORT'),
+        'USER': environ.get('CHI_UC_BLAZAR_DB_USER'),
+        'PASSWORD': environ.get('CHI_UC_BLAZAR_DB_PASSWORD'),
+    },
+}
+
+# Force default Chameleon theme.
+AVAILABLE_THEMES = [
+  ('chameleoncloud', 'ChameleonCloud', '/etc/openstack-dashboard/themes/chameleoncloud'),
+]
+DEFAULT_THEME = 'chameleoncloud'
+
+# Used by server instance page to create links from the instance overview
+# to the resource catalog.
+CHAMELEON_SITES = {
+    'CHI@TACC': 'tacc',
+    'CHI@UC': 'uc',
+}
