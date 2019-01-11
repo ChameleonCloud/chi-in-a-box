@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
+inventory_name="$(cat "$DIR/.ansible-inventory")"
+
+source venv/bin/activate
+kolla-ansible \
+  --vault-id="${inventory_name}@vault_password" \
+  --inventory="$DIR/environments/${inventory_name}/inventory" \
+  --passwords="$DIR/environments/${inventory_name}/passwords.yml" \
+  --configdir="$DIR/environments/${inventory_name}" \
+  --extra node_custom_config="$DIR/kolla/node_custom_config" \
+  "$@"

@@ -1,0 +1,10 @@
+---
+- name: Ensure Horizon configuration directory exists.
+  file:
+    name: "{{ node_custom_config }}/horizon"
+    state: directory
+
+- name: Copy Horizon configuration.
+  copy:
+    src: custom_local_settings
+    dest: "{{ node_custom_config }}/horizon/custom_local_settings"

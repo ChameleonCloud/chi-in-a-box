@@ -10,3 +10,5 @@
 vault_password
 # The virtualenv environment
 venv/
+# Kolla custom configuration
+kolla/
