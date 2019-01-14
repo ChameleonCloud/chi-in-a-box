@@ -28,8 +28,9 @@ DATABASES = {
     },
 }
 
-# Force default Chameleon theme.
+# Add default Chameleon theme.
 AVAILABLE_THEMES = [
+  ('default', 'Default', 'themes/default'),
   ('chameleoncloud', 'ChameleonCloud', '/etc/openstack-dashboard/themes/chameleoncloud'),
 ]
 DEFAULT_THEME = 'chameleoncloud'
