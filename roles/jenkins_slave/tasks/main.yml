@@ -21,4 +21,5 @@
 - name: Enable service at boot.
   service:
     name: "{{ jenkins_slave_service_name }}"
-    state: enabled
+    state: started
+    enabled: yes
