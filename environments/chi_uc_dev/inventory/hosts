@@ -18,6 +18,9 @@ admin02
 [frontends]
 admin02
 
+[jenkins_slave]
+admin02
+
 [jupyterhub]
 admin02
 
