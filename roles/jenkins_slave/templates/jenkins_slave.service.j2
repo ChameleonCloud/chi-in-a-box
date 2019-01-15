@@ -4,8 +4,7 @@ After=network.service
 
 [Service]
 Restart=always
-WorkingDirectory={{ jenkins_slave_workdir }}
-ExecStart=java -jar agent.jar \
+ExecStart=java -jar "{{ jenkins_slave_workdir }}/agent.jar" \
           -jnlpUrl "{{ jenkins_slave_master }}/computer/{{ jenkins_slave_name }}/slave-agent.jnlp" \
           -secret "{{ jenkins_slave_secret }}" \
           -workDir "{{ jenkins_slave_workdir }}"
