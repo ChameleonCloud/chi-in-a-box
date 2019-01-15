@@ -1,4 +1,5 @@
 ---
+jenkins_slave_name: ansible-uc-dev
 jenkins_slave_secret: !vault |
           $ANSIBLE_VAULT;1.2;AES256;chi_uc_dev
           61393538336537663136616637376665383038373036396533623333306561393935646562346236
