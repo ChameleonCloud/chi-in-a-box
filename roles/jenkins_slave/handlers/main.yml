@@ -1,0 +1,9 @@
+---
+- name: restart jenkins slave
+  service:
+    name: "{{ docker_registry_service_name }}"
+    state: restarted
+
+- name: refresh services
+  service:
+    daemon_reload: yes
