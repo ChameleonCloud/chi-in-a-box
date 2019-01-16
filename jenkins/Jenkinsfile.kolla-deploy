@@ -3,6 +3,10 @@ pipeline {
     label "${params.JENKINS_AGENT_LABEL}"
   }
 
+  environment {
+    ANSIBLE_DIR = '/etc/ansible'
+  }
+
   parameters {
     string(name: 'KOLLA_SERVICE_NAME', defaultValue: '',
            description: 'Name of Kolla service to deploy (e.g. "horizon")')
