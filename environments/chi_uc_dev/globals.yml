@@ -12,8 +12,8 @@ kolla_external_fqdn: "dev.uc.chameleoncloud.org"
 # kolla_enable_tls_external: "yes"
 # kolla_external_fqdn_cert: "{{ node_config_directory }}/certificates/haproxy.pem"
 
-network_interface: "eno1"
-neutron_external_interface: "eno2"
+network_interface: "em1"
+neutron_external_interface: "em2"
 
 openstack_region_name: "CHI_DEV_UC"
 multiple_regions_names:
