@@ -3,11 +3,12 @@
 # most commonly used utility when provisioning. It uses the inventory set up
 # on the host (with ./ansible-inventory) and pre-sets a few variables.
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
-inventory_name="$(cat "$DIR/.ansible-inventory")"
+ansible_dir="${ANSIBLE_DIR:-$DIR}"
+inventory_name="$(cat "$ansible_dir/.ansible-inventory")"
 
-source venv/bin/activate
+source "$DIR/venv/bin/activate"
 ansible-playbook \
-  --vault-id="${inventory_name}@vault_password" \
+  --vault-id="${inventory_name}@${ansible_dir}/vault_password" \
   --inventory="$DIR/environments/${inventory_name}/inventory" \
   --extra-vars=node_custom_config="$DIR/kolla/node_custom_config" \
   "$@"
