@@ -20,6 +20,10 @@ multiple_regions_names:
     - "{{ openstack_region_name }}"
     - "CHI_DEV"
 
+# External MariaDB config
+enable_mariadb: "no"
+use_preconfigured_databases: "yes"
+
 enable_blazar: "no"
 enable_chrony: "no"
 enable_cinder: "no"
@@ -34,7 +38,6 @@ enable_horizon_blazar: "yes"
 enable_horizon_ironic: "yes"
 enable_ironic: "no"
 enable_keystone: "no"
-enable_mariadb: "no"
 enable_memcached: "yes"
 enable_neutron: "no"
 enable_nova: "no"
