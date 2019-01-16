@@ -13,7 +13,7 @@ pipeline {
   stages {
     stage('deploy') {
       when {
-        not { equals params.KOLLA_SERVICE_NAME '' }
+        not { equals expected: '', actual: params.KOLLA_SERVICE_NAME }
       }
       steps {
         sh "./kolla-ansible pull --tags ${params.KOLLA_SERVICE_NAME}"
