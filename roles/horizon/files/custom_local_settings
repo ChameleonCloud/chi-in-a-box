@@ -35,6 +35,9 @@ AVAILABLE_THEMES = [
 ]
 DEFAULT_THEME = 'chameleoncloud'
 
+# Kolla uses 'internalURL'... we can ideally support this, but for now it is overridable.
+OPENSTACK_ENDPOINT_TYPE = 'publicURL'
+
 # Used by server instance page to create links from the instance overview
 # to the resource catalog.
 CHAMELEON_SITES = {
