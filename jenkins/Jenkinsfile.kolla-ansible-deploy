@@ -15,12 +15,17 @@ pipeline {
   }
 
   stages {
+    stage('setup') {
+      steps {
+        sh 'make venv'
+      }
+    }
+
     stage('deploy') {
       when {
         not { equals expected: '', actual: params.KOLLA_SERVICE_NAME }
       }
       steps {
-        sh "make venv"
         sh "./kolla-ansible pull --tags ${params.KOLLA_SERVICE_NAME}"
         sh "./kolla-ansible reconfigure --tags ${params.KOLLA_SERVICE_NAME}"
       }
