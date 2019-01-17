@@ -39,13 +39,4 @@ pipeline {
       }
     }
   }
-
-  post {
-    success {
-      build job: 'kolla-ansible-deploy', parameters: [
-        string(name: 'KOLLA_SERVICE_NAME', value: "${params.KOLLA_SERVICE_NAME}"),
-        string(name: 'JENKINS_AGENT_LABEL', value: "${params.JENKINS_AGENT_LABEL}")
-      ]
-    }
-  }
 }
