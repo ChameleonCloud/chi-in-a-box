@@ -1,6 +1,11 @@
 from openstack_dashboard.settings import HORIZON_CONFIG
 from os import environ
 
+# Kolla normally adds this for us if kolla_external_tls_enabled is true,
+# but since we (currently) aren't using the built-in HAProxy, we include it
+# manually. SSL termination is happening outside of here, via old httpd code.
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 SITE_BRANDING = 'ChameleonCloud'
 
 # Override help menu to point to our docs.
@@ -34,9 +39,6 @@ AVAILABLE_THEMES = [
   ('chameleoncloud', 'ChameleonCloud', '/etc/openstack-dashboard/themes/chameleoncloud'),
 ]
 DEFAULT_THEME = 'chameleoncloud'
-
-# Kolla uses 'internalURL'... we can ideally support this, but for now it is overridable.
-OPENSTACK_ENDPOINT_TYPE = 'publicURL'
 
 # Used by server instance page to create links from the instance overview
 # to the resource catalog.
