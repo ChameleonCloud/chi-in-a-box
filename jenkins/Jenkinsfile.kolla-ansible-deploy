@@ -21,6 +21,15 @@ pipeline {
       }
     }
 
+    stage('runtime-configs') {
+      when {
+        not { equals expected: '', actual: params.KOLLA_SERVICE_NAME }
+      }
+      steps {
+        sh "./ansible-playbook playbooks/${params.KOLLA_SERVICE_NAME}.yml"
+      }
+    }
+
     stage('deploy') {
       when {
         not { equals expected: '', actual: params.KOLLA_SERVICE_NAME }
