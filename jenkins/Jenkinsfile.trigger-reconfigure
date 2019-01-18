@@ -2,7 +2,7 @@ pipeline {
   agent any
 
   environment {
-    GITHUB_WEBHOOK_SECRET = credentials('947d879c-87a4-44a3-a8f4-9dd3698530c4')
+    // GITHUB_WEBHOOK_SECRET = credentials('947d879c-87a4-44a3-a8f4-9dd3698530c4')
   }
 
   triggers {
@@ -14,7 +14,7 @@ pipeline {
 
       causeString: 'Triggered on $ref',
 
-      token: env.GITHUB_WEBHOOK_SECRET,
+      // token: env.GITHUB_WEBHOOK_SECRET,
 
       printContributedVariables: true,
       printPostContent: true,
