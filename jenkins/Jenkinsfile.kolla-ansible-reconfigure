@@ -30,7 +30,7 @@ pipeline {
       printPostContent: true,
 
       regexpFilterText: '$ref',
-      regexpFilterExpression: 'refs/heads/master'
+      regexpFilterExpression: 'refs/heads/webhook-testing'
     )
   }
 
