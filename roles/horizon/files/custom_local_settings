@@ -9,7 +9,7 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SITE_BRANDING = 'ChameleonCloud'
 
 # Override help menu to point to our docs.
-HORIZON_CONFIG['help_url'] = 'https://google.com'
+HORIZON_CONFIG['help_url'] = 'https://chameleoncloud.readthedocs.io/en/latest/technical/baremetal.html'
 
 # Used for Blazar dashboard, which needs to pull data from the MySQL database
 # directly at the moment.
