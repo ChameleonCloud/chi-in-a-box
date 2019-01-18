@@ -1,10 +1,6 @@
 pipeline {
   agent any
 
-  // environment {
-  //   GITHUB_WEBHOOK_SECRET = credentials('947d879c-87a4-44a3-a8f4-9dd3698530c4')
-  // }
-
   triggers {
     GenericTrigger(
       genericVariables: [
@@ -14,7 +10,7 @@ pipeline {
 
       causeString: 'Triggered on $ref',
 
-      // token: env.GITHUB_WEBHOOK_SECRET,
+      token: JOB_NAME,
 
       printContributedVariables: true,
       printPostContent: true,
@@ -28,7 +24,7 @@ pipeline {
     stage('reconfigure-dev') {
       steps {
         script {
-          service_names = sh(returnStdout: true, script: "jenkins/extract_service.sh ${changed_files}")
+          service_names = sh(returnStdout: true, script: "jenkins/detect_kolla_changes.sh ${changed_files}")
         }
         trigger_kolla_ansible_reconfigure(service_names)
       }
