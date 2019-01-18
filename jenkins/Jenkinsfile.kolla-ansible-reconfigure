@@ -14,29 +14,59 @@ pipeline {
            description: 'The label of the Jenkins agent to execute the deploy on')
   }
 
+  triggers {
+    GenericTrigger(
+      genericVariables: [
+        [key: 'ref', value: '$.ref'],
+        [key: 'changed_files', value: '$.commits[*].["modified","added","removed"][*]']
+      ],
+
+      causeString: 'Triggered on $ref',
+
+      token: credentials('947d879c-87a4-44a3-a8f4-9dd3698530c4'),
+
+      printContributedVariables: true,
+      printPostContent: true,
+
+      regexpFilterText: '$ref',
+      regexpFilterExpression: 'refs/heads/master'
+    )
+  }
+
   stages {
     stage('setup') {
       steps {
         sh 'make venv'
+        script {
+          service_names = sh(returnStdout: true, script: "jenkins/extract_service.sh ${changed_files}")
+        }
       }
     }
 
     stage('runtime-configs') {
-      when {
-        not { equals expected: '', actual: params.KOLLA_SERVICE_NAME }
-      }
       steps {
-        sh "./ansible-playbook playbooks/${params.KOLLA_SERVICE_NAME}.yml"
+        runtime_configs_all(service_names)
       }
     }
 
     stage('reconfigure') {
-      when {
-        not { equals expected: '', actual: params.KOLLA_SERVICE_NAME }
-      }
       steps {
-        sh "./kolla-ansible reconfigure --tags=${params.KOLLA_SERVICE_NAME}"
+        reconfigure_all(service_names)
       }
     }
+  }
+}
+
+def runtime_configs_all(list) {
+  for (int i = 0; i < list.size(); i++) {
+    sh "echo 'Generating runtime configuration for ${list[i]}'"
+    sh "./ansible-playbook playbooks/${list[i]}.yml"
+  }
+}
+
+def reconfigure_all(list) {
+  for (int i = 0; i < list.size(); i++) {
+    sh "echo 'Reconfiguring ${list[i]}'"
+    sh "./kolla-ansible reconfigure --tags=${list[i]}"
   }
 }
