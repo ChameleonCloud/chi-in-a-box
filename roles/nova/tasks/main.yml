@@ -1,0 +1,10 @@
+---
+- name: Ensure Nova configuration directory exists.
+  file:
+    name: "{{ node_custom_config }}/nova"
+    state: directory
+
+- name: Copy Nova configuration.
+  copy:
+    src: policy.json
+    dest: "{{ node_custom_config }}/nova/policy.json"
