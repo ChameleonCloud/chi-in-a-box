@@ -11,7 +11,7 @@ admin02
 admin02
 
 [compute]
-admin02
+# No compute node; this is a baremetal-only cluster.
 
 [monitoring]
 admin02
