@@ -4,7 +4,11 @@
     name: "{{ node_custom_config }}/nova"
     state: directory
 
-- name: Copy Nova configuration.
-  copy:
-    src: policy.json
-    dest: "{{ node_custom_config }}/nova/policy.json"
+- name: Copy Nova configuration files.
+  block:
+    - copy:
+        src: policy.json
+        dest: "{{ node_custom_config }}/nova/policy.json"
+    - template:
+        src: nova.conf.j2
+        dest: "{{ node_custom_config }}/nova/nova.conf"

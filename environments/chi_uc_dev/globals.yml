@@ -51,7 +51,10 @@ enable_ironic: "no"
 enable_keystone: "no"
 enable_memcached: "yes"
 enable_neutron: "no"
-enable_nova: "yes"
 enable_openvswitch: "no"
 enable_rabbitmq: "no"
 enable_swift: "no"
+
+# Nova
+enable_nova: "yes"
+nova_compute_virt_type: "none"
