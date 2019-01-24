@@ -4,11 +4,13 @@
 # on the host (with ./ansible-inventory) and pre-sets a few variables.
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 ansible_dir="${ANSIBLE_DIR:-$DIR}"
-inventory_name="$(cat "$ansible_dir/.ansible-inventory")"
+environment_name="$(cat "$ansible_dir/.ansible-inventory")"
+environment_dir="${DIR}/environments/${environment_name}"
 
 source "$DIR/venv/bin/activate"
 ansible-playbook \
-  --vault-id="${inventory_name}@${ansible_dir}/vault_password" \
-  --inventory="$DIR/environments/${inventory_name}/inventory" \
+  --vault-id="${environment_name}@${ansible_dir}/vault_password" \
+  --inventory="${environment_dir}/inventory" \
+  --extra-vars="@${environment_dir}/globals.yml" \
   --extra-vars=node_custom_config="$DIR/kolla/node_custom_config" \
   "$@"
