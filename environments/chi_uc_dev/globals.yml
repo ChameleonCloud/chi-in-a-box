@@ -35,6 +35,12 @@ openstack_auth:
 enable_mariadb: "no"
 use_preconfigured_databases: "yes"
 
+# External TLS config
+enable_haproxy: "no"
+# Account for the fact that we're terminating TLS ourselves
+kolla_enable_tls_external: "no"
+public_protocol: "https"
+
 enable_blazar: "no"
 enable_chrony: "no"
 enable_cinder: "no"
@@ -42,7 +48,6 @@ enable_fluentd: "yes"
 enable_glance: "no"
 enable_gnocchi: "no"
 enable_grafana: "no"
-enable_haproxy: "no"
 enable_heat: "no"
 enable_horizon: "yes"
 enable_horizon_blazar: "yes"
