@@ -1,3 +1,14 @@
+[quota]
+max_age = 0
+until_refresh = 0
+reservation_expire = 86400
+# Remove quota limits for hosts; these are handled via Blazar
+instances = -1
+cores = -1
+ram = -1
+fixed_ips = -1
+
+# TODO: [jca 2018-01-24]
 # Backwards compatibility for Ocata - can remove
 # after upgrading past Queens.
 [placement]
