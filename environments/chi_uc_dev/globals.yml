@@ -60,6 +60,146 @@ enable_openvswitch: "no"
 enable_rabbitmq: "no"
 enable_swift: "no"
 
+# Neutron
+enable_neutron: "yes"
+chameleon_switch_dell_username: chamadm
+chameleon_switch_fx2_username: root
+# Enable notifications for Experiment Precis
+neutron_notification_topics:
+  - name: "notifications"
+    enabled: "yes"
+neutron_ml2_generic_switch_configs:
+  - name: Chameleon-Cloud
+    device_type: netmiko_dell_force10
+    ip: 10.140.80.52
+    username: "{{ chameleon_switch_dell_username }}"
+    password: "{{ chameleon_switch_dell_password }}"
+  - name: Chameleon-Compute
+    device_type: netmiko_dell_force10
+    ip: 10.140.80.53
+    username: "{{ chameleon_switch_dell_username }}"
+    password: "{{ chameleon_switch_dell_password }}"
+  - name: fx2-chassis-01-agg1
+    device_type: fnioa_netmiko_dell_force10
+    ip: 172.29.0.197
+    username: "{{ chameleon_switch_fx2_username }}"
+    password: "{{ chameleon_switch_fx2_password }}"
+  - name: fx2-chassis-02-agg1
+    device_type: fnioa_netmiko_dell_force10
+    ip: 172.29.0.199
+    username: "{{ chameleon_switch_fx2_username }}"
+    password: "{{ chameleon_switch_fx2_password }}"
+  - name: fx2-chassis-03-agg1
+    device_type: fnioa_netmiko_dell_force10
+    ip: 172.29.0.201
+    username: "{{ chameleon_switch_fx2_username }}"
+    password: "{{ chameleon_switch_fx2_password }}"
+  - name: fx2-chassis-04-agg1
+    device_type: fnioa_netmiko_dell_force10
+    ip: 172.29.0.203
+    username: "{{ chameleon_switch_fx2_username }}"
+    password: "{{ chameleon_switch_fx2_password }}"
+  # Just for production, kept here for later copying
+  # - name: chameleon-corsa1
+  #   device_type: corsa_dp2100
+  #   switchIP: 172.30.0.4
+  #   token: "{{ chameleon_switch_corsa1_token }}"
+  #   chameleon-corsa2: 37
+  #   controllerNamespace: of-mgt
+  #   defaultControllerIP: 172.30.0.101
+  #   defaultControllerPort: 6653
+  #   defaultVFCName: UNNAMED
+  #   defaultVFCRes: 2
+  #   provisioningControllerIP: 172.17.1.1
+  #   provisioningControllerPort: 6653
+  #   provisioningVFCType: l2-vpn
+  #   provisioningVLAN: 3111
+  #   uplink_ports: 33
+  #   VFCHost: True
+  #   VFCType: openflow
+  #   # Mappings of physical ports to OpenFlow port numbers
+  #   'P 1': 101
+  #   'P 2': 102
+  #   'P 3': 103
+  #   'P 4': 104
+  #   'P 5': 105
+  #   'P 6': 106
+  #   'P 7': 107
+  #   'P 8': 108
+  #   'P 9': 109
+  #   'P 10': 110
+  #   'P 11': 111
+  #   'P 12': 112
+  #   'P 13': 113
+  #   'P 14': 114
+  #   'P 15': 115
+  #   'P 16': 116
+  #   'P 17': 117
+  #   'P 18': 118
+  #   'P 19': 119
+  #   'P 20': 120
+  #   'P 21': 121
+  #   'P 22': 122
+  #   'P 23': 123
+  #   'P 24': 124
+  #   'P 25': 125
+  #   'P 26': 126
+  #   'P 27': 127
+  #   'P 28': 128
+  #   'P 29': 129
+  #   'P 30': 130
+  #   'P 31': 131
+  #   'P 32': 132
+  # - name: chameleon-corsa2
+  #   device_type: corsa_dp2100
+  #   switchIP: 172.30.0.5
+  #   token: "{{ chameleon_switch_corsa2_token }}"
+  #   controllerNamespace: of-mgt
+  #   defaultControllerIP: 172.30.0.102
+  #   defaultControllerPort: 6653
+  #   defaultVFCName: UNNAMED
+  #   defaultVFCRes: 2
+  #   provisioningControllerIP: 172.17.1.1
+  #   provisioningControllerPort: 6653
+  #   provisioningVFCType: l2-vpn
+  #   provisioningVLAN: 3111
+  #   uplink_ports: 37
+  #   VFCHost: False
+  #   VFCType: openflow
+  #   # Mappings of physical ports to OpenFlow port numbers
+  #   'P 1': 133
+  #   'P 2': 134
+  #   'P 3': 135
+  #   'P 4': 136
+  #   'P 5': 137
+  #   'P 6': 138
+  #   'P 7': 139
+  #   'P 8': 140
+  #   'P 9': 141
+  #   'P 10': 142
+  #   'P 11': 143
+  #   'P 12': 144
+  #   'P 13': 145
+  #   'P 14': 146
+  #   'P 15': 147
+  #   'P 16': 148
+  #   'P 17': 149
+  #   'P 18': 150
+  #   'P 19': 151
+  #   'P 20': 152
+  #   'P 21': 153
+  #   'P 22': 154
+  #   'P 23': 155
+  #   'P 24': 156
+  #   'P 25': 157
+  #   'P 26': 158
+  #   'P 27': 159
+  #   'P 28': 160
+  #   'P 29': 161
+  #   'P 30': 162
+  #   'P 31': 163
+  #   'P 32': 164
+
 # Nova
 enable_nova: "yes"
 enable_nova_serialconsole_proxy: "yes"
