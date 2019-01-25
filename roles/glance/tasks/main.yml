@@ -1,0 +1,14 @@
+---
+- name: Ensure Glance configuration directory exists.
+  file:
+    name: "{{ node_custom_config }}/glance"
+    state: directory
+
+- name: Copy Glance configuration files.
+  block:
+    - copy:
+        src: policy.json
+        dest: "{{ node_custom_config }}/glance/policy.json"
+    - template:
+        src: "glance.conf.j2"
+        dest: "{{ node_custom_config }}/glance.conf"
