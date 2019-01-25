@@ -10,7 +10,5 @@
         src: policy.json
         dest: "{{ node_custom_config }}/nova/policy.json"
     - template:
-        src: "{{ item }}.j2"
-        dest: "{{ node_custom_config }}/nova/{{ item }}"
-      loop:
-        - "nova-compute.conf"
+        src: "nova.conf.j2"
+        dest: "{{ node_custom_config }}/nova.conf"
