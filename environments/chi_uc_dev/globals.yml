@@ -53,7 +53,6 @@ enable_cinder: "no"
 enable_glance: "yes"
 enable_gnocchi: "no"
 enable_grafana: "no"
-enable_heat: "no"
 enable_swift: "no"
 
 # Glance
@@ -63,6 +62,9 @@ enable_swift: "no"
 glance_services:
   glance-registry:
     enabled: true
+    
+# Heat
+enable_heat: "yes"
 
 # Horizon
 enable_horizon: "yes"
