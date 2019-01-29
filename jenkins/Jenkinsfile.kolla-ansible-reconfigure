@@ -21,12 +21,6 @@ pipeline {
       }
     }
 
-    stage('runtime-configs') {
-      steps {
-        sh "./ansible-playbook playbooks/${params.KOLLA_SERVICE_NAME}.yml"
-      }
-    }
-
     stage('reconfigure') {
       steps {
         sh "./kolla-ansible reconfigure --tags=${params.KOLLA_SERVICE_NAME}"

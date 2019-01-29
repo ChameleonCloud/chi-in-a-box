@@ -1,4 +1,4 @@
 ---
 - hosts: deployment
   roles:
-    - nova
+    - glance
