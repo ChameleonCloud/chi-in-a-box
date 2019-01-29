@@ -41,22 +41,19 @@ enable_haproxy: "no"
 kolla_enable_tls_external: "no"
 public_protocol: "https"
 
-enable_blazar: "no"
+# Kolla sidecar/support containers
 enable_chrony: "yes"
-enable_cinder: "no"
 enable_fluentd: "yes"
+enable_memcached: "yes"
+# External RabbitMQ
+enable_rabbitmq: "no"
+
+enable_blazar: "no"
+enable_cinder: "no"
 enable_glance: "yes"
 enable_gnocchi: "no"
 enable_grafana: "no"
 enable_heat: "no"
-enable_horizon: "yes"
-enable_horizon_blazar: "yes"
-enable_horizon_ironic: "yes"
-enable_ironic: "no"
-enable_keystone: "yes"
-enable_memcached: "yes"
-enable_openvswitch: "no"
-enable_rabbitmq: "no"
 enable_swift: "no"
 
 # Glance
@@ -67,14 +64,31 @@ glance_services:
   glance-registry:
     enabled: true
 
+# Horizon
+enable_horizon: "yes"
+enable_horizon_blazar: "yes"
+
+# Ironic
+enable_ironic: "yes"
+
+# Keystone
+enable_keystone: "yes"
+
 # Neutron
 enable_neutron: "yes"
+enable_openvswitch: "yes"
+# TODO [jca 2019-01-29]: remove this when we can take advantage of this
+# component, which was introduced after Ocata.
+enable_ironic_neutron_agent: "no"
 chameleon_switch_dell_username: chamadm
 chameleon_switch_fx2_username: root
 # Enable notifications for Experiment Precis
 neutron_notification_topics:
   - name: "notifications"
     enabled: "yes"
+neutron_type_drivers: flat,vlan
+neutron_tenant_network_types: vlan
+neutron_network_vlan_ranges: physnet1:3000:3009,exogeni:3290:3299
 neutron_ml2_generic_switch_configs:
   - name: Chameleon-Cloud
     device_type: netmiko_dell_force10
