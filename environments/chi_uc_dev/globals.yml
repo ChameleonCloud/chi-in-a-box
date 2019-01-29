@@ -62,7 +62,7 @@ enable_swift: "no"
 glance_services:
   glance-registry:
     enabled: true
-    
+
 # Heat
 enable_heat: "yes"
 
@@ -71,7 +71,7 @@ enable_horizon: "yes"
 enable_horizon_blazar: "yes"
 enable_horizon_chameleon_websso: "yes"
 horizon_help_url: https://chameleoncloud.readthedocs.io/en/latest/technical/baremetal.html
-horizon_chameleon_websso_host: https://www.chameleoncloud.org/
+horizon_chameleon_websso_host: https://dev.chameleon.tacc.utexas.edu
 
 # Ironic
 enable_ironic: "yes"
