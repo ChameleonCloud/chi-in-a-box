@@ -1,0 +1,14 @@
+---
+- name: Ensure Heat configuration directory exists.
+  file:
+    name: "{{ node_custom_config }}/heat"
+    state: directory
+
+- name: Copy Heat configuration files.
+  block:
+    - copy:
+        src: policy.json
+        dest: "{{ node_custom_config }}/heat/policy.json"
+    - template:
+        src: "heat.conf.j2"
+        dest: "{{ node_custom_config }}/heat.conf"
