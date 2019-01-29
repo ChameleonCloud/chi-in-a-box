@@ -67,6 +67,9 @@ glance_services:
 # Horizon
 enable_horizon: "yes"
 enable_horizon_blazar: "yes"
+enable_horizon_chameleon_websso: "yes"
+horizon_help_url: https://chameleoncloud.readthedocs.io/en/latest/technical/baremetal.html
+horizon_chameleon_websso_host: https://www.chameleoncloud.org/
 
 # Ironic
 enable_ironic: "yes"

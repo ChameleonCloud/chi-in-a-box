@@ -1,0 +1,58 @@
+from openstack_dashboard.settings import HORIZON_CONFIG
+from os import environ
+
+# Kolla normally adds this for us if kolla_external_tls_enabled is true,
+# but since we (currently) aren't using the built-in HAProxy, we include it
+# manually. SSL termination is happening outside of here, via old httpd code.
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+SITE_BRANDING = 'ChameleonCloud'
+
+# Override help menu to point to our docs.
+HORIZON_CONFIG['help_url'] = '{{ horizon_help_url }}'
+
+# Used for Blazar dashboard, which needs to pull data from the MySQL database
+# directly at the moment.
+DATABASES = {
+  'default': {},
+  'blazar-CHI@TACC': {
+    'ENGINE': 'django.db.backends.mysql',
+    'NAME': environ.get('CHI_TACC_BLAZAR_DB_NAME'),
+    'HOST': environ.get('CHI_TACC_BLAZAR_DB_HOST'),
+    'PORT': environ.get('CHI_TACC_BLAZAR_DB_PORT'),
+    'USER': environ.get('CHI_TACC_BLAZAR_DB_USER'),
+    'PASSWORD': environ.get('CHI_TACC_BLAZAR_DB_PASSWORD'),
+  },
+  'blazar-CHI@UC': {
+    'ENGINE': 'django.db.backends.mysql',
+    'NAME': environ.get('CHI_UC_BLAZAR_DB_NAME'),
+    'HOST': environ.get('CHI_UC_BLAZAR_DB_HOST'),
+    'PORT': environ.get('CHI_UC_BLAZAR_DB_PORT'),
+    'USER': environ.get('CHI_UC_BLAZAR_DB_USER'),
+    'PASSWORD': environ.get('CHI_UC_BLAZAR_DB_PASSWORD'),
+  },
+}
+
+# Add default Chameleon theme.
+AVAILABLE_THEMES = [
+  ('default', 'Default', 'themes/default'),
+  ('chameleoncloud', 'ChameleonCloud', '/etc/openstack-dashboard/themes/chameleoncloud'),
+]
+DEFAULT_THEME = 'chameleoncloud'
+
+# Used by server instance page to create links from the instance overview
+# to the resource catalog.
+CHAMELEON_SITES = {
+  'CHI@TACC': 'tacc',
+  'CHI@UC': 'uc',
+}
+
+{% if enable_horizon_chameleon_websso %}
+# Single-sign on support
+WEBSSO_ENABLED = True
+AUTHENTICATION_URLS = ['openstack_dashboard.cc_web_sso_urls','openstack_auth.urls',]
+CHAMELEON_PORTAL_SSO_BASE_URL = '{{ horizon_chameleon_websso_host }}'
+CHAMELEON_PORTAL_SSO_LOGIN_PATH = '/sso/horizon/'
+CHAMELEON_PORTAL_SSO_LOGOUT_PATH = '/logout/'
+SSO_CALLBACK_HOST = '{{ kolla_external_fqdn }}'
+{% endif %}
