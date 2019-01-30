@@ -15,22 +15,16 @@ HORIZON_CONFIG['help_url'] = '{{ horizon_help_url }}'
 # directly at the moment.
 DATABASES = {
   'default': {},
-  'blazar-CHI@TACC': {
+{% for conf in horizon_blazar_databases %}
+  'blazar-{{ conf.region_name }}': {
     'ENGINE': 'django.db.backends.mysql',
-    'NAME': environ.get('CHI_TACC_BLAZAR_DB_NAME'),
-    'HOST': environ.get('CHI_TACC_BLAZAR_DB_HOST'),
-    'PORT': environ.get('CHI_TACC_BLAZAR_DB_PORT'),
-    'USER': environ.get('CHI_TACC_BLAZAR_DB_USER'),
-    'PASSWORD': environ.get('CHI_TACC_BLAZAR_DB_PASSWORD'),
+    'NAME': '{{ conf.database_name }}',
+    'HOST': '{{ conf.database_host }}',
+    'PORT': '{{ conf.database_port }}',
+    'USER': '{{ conf.database_user }}',
+    'PASSWORD': '{{ conf.database_password }}',
   },
-  'blazar-CHI@UC': {
-    'ENGINE': 'django.db.backends.mysql',
-    'NAME': environ.get('CHI_UC_BLAZAR_DB_NAME'),
-    'HOST': environ.get('CHI_UC_BLAZAR_DB_HOST'),
-    'PORT': environ.get('CHI_UC_BLAZAR_DB_PORT'),
-    'USER': environ.get('CHI_UC_BLAZAR_DB_USER'),
-    'PASSWORD': environ.get('CHI_UC_BLAZAR_DB_PASSWORD'),
-  },
+{% end %}
 }
 
 # Add default Chameleon theme.
@@ -47,7 +41,7 @@ CHAMELEON_SITES = {
   'CHI@UC': 'uc',
 }
 
-{% if enable_horizon_chameleon_websso %}
+{% if enable_horizon_chameleon_websso | bool %}
 # Single-sign on support
 WEBSSO_ENABLED = True
 AUTHENTICATION_URLS = ['openstack_dashboard.cc_web_sso_urls','openstack_auth.urls',]
