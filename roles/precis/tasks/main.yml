@@ -15,6 +15,8 @@
     - name: Create RabbitMQ listener queue.
       delegate_to: "{{ groups[precis_rabbitmq_inventory_group][0] }}"
       rabbitmq_queue:
+        login_user: "{{ rabbitmq_user }}"
+        login_password: "{{ rabbitmq_password }}"
         name: "{{ precis_rabbitmq_listener_queue }}"
         vhost: /
         durable: yes
@@ -23,10 +25,11 @@
     - name: Create RabbitMQ exchange bindings.
       delegate_to: "{{ groups[precis_rabbitmq_inventory_group][0] }}"
       rabbitmq_binding:
+        login_user: "{{ rabbitmq_user }}"
+        login_password: "{{ rabbitmq_password }}"
         name: "{{ item }}"
         destination: "{{ precis_rabbitmq_listener_queue }}"
         destination_type: queue
-        routing_key: "*.notification"
         state: present
       loop: "{{ precis_rabbitmq_listener_bindings }}"
   tags:
