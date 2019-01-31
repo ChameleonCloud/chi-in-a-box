@@ -30,6 +30,7 @@
         name: "{{ item }}"
         destination: "{{ precis_rabbitmq_listener_queue }}"
         destination_type: queue
+        routing_key: "notifications.*"
         state: present
       loop: "{{ precis_rabbitmq_listener_bindings }}"
   tags:
