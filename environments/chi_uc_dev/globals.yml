@@ -239,3 +239,10 @@ enable_nova_serialconsole_proxy: "yes"
 nova_compute_virt_type: "none"
 # We are not using any VNC consoles; the serialproxy is not considered a 'nova_console'
 nova_console: "none"
+# We override the endpoints to not include %(tenant_id)s placeholder.
+# Blazar in particular needs this to not be scoped to the tenant because when
+# it tries to perform actions on behalf of a user, it uses a different tenant
+# id (its own).
+nova_admin_endpoint: "{{ admin_protocol }}://{{ kolla_internal_fqdn }}:{{ nova_api_port }}/v2.1"
+nova_internal_endpoint: "{{ internal_protocol }}://{{ kolla_internal_fqdn }}:{{ nova_api_port }}/v2.1"
+nova_public_endpoint: "{{ public_protocol }}://{{ kolla_external_fqdn }}:{{ nova_api_port }}/v2.1"
