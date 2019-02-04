@@ -1,0 +1,28 @@
+pipeline {
+  agent {
+    label "${params.JENKINS_AGENT_LABEL}"
+  }
+
+  environment {
+    ANSIBLE_DIR = '/etc/ansible'
+  }
+
+  parameters {
+    string(name: 'JENKINS_AGENT_LABEL', defaultValue: '',
+           description: 'The label of the Jenkins agent to execute the deploy on')
+  }
+
+  stages {
+    stage('setup') {
+      steps {
+        sh 'make venv'
+      }
+    }
+
+    stage('deploy') {
+      steps {
+        sh "./ansible-playbook playbooks/precis.yml"
+      }
+    }
+  }
+}
