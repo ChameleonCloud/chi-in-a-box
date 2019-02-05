@@ -12,5 +12,6 @@ ansible-playbook \
   --vault-id="${environment_name}@${ansible_dir}/vault_password" \
   --inventory="${environment_dir}/inventory" \
   --extra-vars="@${environment_dir}/passwords.yml" \
+  --extra-vars="@${environment_dir}/globals.yml" \
   --extra-vars=node_custom_config="$DIR/kolla/node_custom_config" \
   "$@"

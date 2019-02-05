@@ -1,0 +1,5 @@
+vendordata_config_path: /etc/vendordata
+vendordata_service_name: chameleon-vendordata
+vendordata_service_docker_image: docker.chameleoncloud.org/chameleon-vendordata-service:latest
+nova_config_file: /etc/nova/nova.conf
+vendordata_config_file: "{{ vendordata_config_path }}/vendordata.conf"

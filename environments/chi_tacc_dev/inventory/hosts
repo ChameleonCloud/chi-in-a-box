@@ -3,7 +3,7 @@
 
 # The Ansible deployment host
 [ansible]
-staff
+dev
 
 # The primary OpenStack controller host
 [controller]
@@ -37,3 +37,7 @@ controller
 ceph
 mysql
 prometheus
+
+# Chameleon vendordata service
+[vendordata]
+dev

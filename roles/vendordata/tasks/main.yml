@@ -1,0 +1,38 @@
+---
+- name: Pull vendordata service container image.
+  docker_image:
+    name: "{{ vendordata_service_docker_image }}"
+    state: present
+    force: yes
+  tags:
+    - pull
+  
+- name: Configure vendordata services.
+  block:
+    - name: Create config directory.
+      file:
+        path: "{{ vendordata_config_path }}"
+        state: directory
+    - name: Create vendordata conf.
+      template:
+        src: "vendordata.conf.j2"
+        mode: 0640
+        dest: "{{ vendordata_config_path }}/vendordata.conf"
+        owner: "{{ nova_user }}"
+      notify:
+        - restart vendordata service
+    - name: Configure systemd service.
+      template:
+        src: "chameleon_vendordata.service.j2"
+        dest: "/etc/systemd/system/{{ vendordata_service_name }}.service"
+      notify:
+        - "reload systemd daemon"
+        - "restart vendordata service"
+  tags:
+    - configuration
+
+- name: Enable vendordata service on boot.
+  systemd:
+    service: "{{ vendordata_service_name }}"
+    state: started
+    enabled: yes

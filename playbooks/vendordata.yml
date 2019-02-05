@@ -1,0 +1,4 @@
+---
+- hosts: vendordata
+  roles:
+    - vendordata
