@@ -1,2 +1,2 @@
 ansible
-kolla-ansible~=7.0
+git+https://github.com/chameleoncloud/kolla-ansible@chameleoncloud/rocky
