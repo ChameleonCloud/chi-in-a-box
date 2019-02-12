@@ -1,7 +1,7 @@
 ---
-- name: Install docker-py dependency.
+- name: Install docker pip dependency.
   pip:
-    name: docker-py
+    name: docker
     virtualenv: "{{ pip_virtualenv }}"
 
 - name: Check current docker-compose version.
