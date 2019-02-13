@@ -25,11 +25,6 @@ multiple_regions_names:
 # Override Keystone endpoint to point to v3
 openstack_auth:
   auth_url: "{{ admin_protocol }}://{{ kolla_internal_fqdn }}:{{ keystone_admin_port }}/v3"
-  username: "{{ keystone_admin_user }}"
-  password: "{{ keystone_admin_password }}"
-  project_name: "{{ keystone_admin_project }}"
-  domain_name: "default"
-  user_domain_name: "default"
 
 # External MariaDB config
 enable_mariadb: "no"
