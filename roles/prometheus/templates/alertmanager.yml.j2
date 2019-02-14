@@ -45,7 +45,10 @@ inhibit_rules:
   equal: ['alertname', 'cluster', 'service']
 
 receivers:
-#  - name: dummy
+{% if 'DEV' in openstack_region_name %}
+- name: dummy
+{% else %}
 - name: 'slack'
   slack_configs:
   - channel: '#notifications'
+{% endif %}

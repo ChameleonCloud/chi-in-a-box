@@ -1,0 +1,10 @@
+groups:
+- name: mysql
+  rules:
+  - alert: MySQLReplicationErro
+    expr: mysql_slave_status_last_errno{hostname="fx2-01"} > 0
+    for: 30s
+    labels:
+      severity: critical
+    annotations:
+      summary: "There was an error replicating mysql master to slave."
