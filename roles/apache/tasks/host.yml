@@ -31,10 +31,10 @@
   notify:
     - reload apache
 
-- name: Create cron job to periodically renew certificate.
+- name: Create cron job to periodically renew certificates.
   cron:
-    name: "Renew SSL certificate for {{ apache_server_name }}"
+    name: "Renew SSL certificate for all domains."
     minute: 0
     hour: 5,2
-    job: "certbot renew -d {{ apache_server_name }}"
+    job: "certbot renew"
   when: apache_ssl_letsencrypt_enabled
