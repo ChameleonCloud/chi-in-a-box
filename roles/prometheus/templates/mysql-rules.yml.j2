@@ -1,9 +1,9 @@
 groups:
 - name: mysql
   rules:
-  - alert: MySQLReplicationErro
-    expr: mysql_slave_status_last_errno{hostname="fx2-01"} > 0
-    for: 30s
+  - alert: MySQLReplicationError
+    expr: mysql_slave_status_last_errno != 0
+    for: 5m
     labels:
       severity: critical
     annotations:
