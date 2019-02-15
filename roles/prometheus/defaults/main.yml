@@ -15,4 +15,4 @@ prometheus_alertmanager_users:
   - jason_a
 
 # This should be encrypted! It is a secret value.
-prometheus_alertmanager_slack_api_url: ''
+prometheus_alertmanager_slack_api_url: "{{ lookup('file', '/root/scripts/slack.json') | from_json }}"
