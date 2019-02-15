@@ -32,6 +32,7 @@ route:
   receiver: 'slack'
   # receiver: dummy
 
+
 # Inhibition rules allow to mute a set of alerts given that another alert is
 # firing.
 # We use this to mute any warning-level notifications if the same alert is
@@ -45,7 +46,7 @@ inhibit_rules:
   equal: ['alertname', 'cluster', 'service']
 
 receivers:
-#  - name: dummy
-- name: 'slack'
-  slack_configs:
-  - channel: '#notifications'
+  # - name: dummy
+  - name: 'slack'
+    slack_configs:
+    - channel: '#notifications'
