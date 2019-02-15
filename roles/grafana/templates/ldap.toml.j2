@@ -29,7 +29,19 @@ email = "mail"
 # which we don't want to do in most cases due to lack of support.
 member_of = "cn"
 
+# Chameleon org
 [[servers.group_mappings]]
 group_dn = "{{ grafana_auth_ldap_editor_group }}"
 org_role = "Editor"
 org_id = 1
+
+# Chameleon-Users org
+[[servers.group_mappings]]
+group_dn = "{{ grafana_auth_ldap_editor_group }}"
+org_role = "Editor"
+org_id = 2
+
+[[servers.group_mappings]]
+group_dn = "*"
+org_role = "Viewer"
+org_id = 2
