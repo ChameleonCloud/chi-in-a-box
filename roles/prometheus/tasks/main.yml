@@ -47,10 +47,10 @@
         dest: /etc/systemd/system/prometheus.service
       notify:
         - restart prometheus
-    - name: Configure alert rules.
+    - name: Configure mysql alert rules.
       template:
-        src: alert-rules.yml.j2
-        dest: "{{ prometheus_config_dir}}/alert-rules.yml"
+        src: mysql-rules.yml.j2
+        dest: "{{ prometheus_config_dir}}/mysql-rules.yml"
       notify:
         - restart prometheus
   tags:
