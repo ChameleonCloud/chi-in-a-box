@@ -22,10 +22,6 @@ multiple_regions_names:
     - "{{ openstack_region_name }}"
     - "CHI_DEV"
 
-# Override Keystone endpoint to point to v3
-openstack_auth:
-  auth_url: "{{ admin_protocol }}://{{ kolla_internal_fqdn }}:{{ keystone_admin_port }}/v3"
-
 # External MariaDB config
 enable_mariadb: "no"
 use_preconfigured_databases: "yes"
