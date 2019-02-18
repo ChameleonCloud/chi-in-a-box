@@ -24,7 +24,7 @@ from oslo_log import log as logging
 LOG = logging.getLogger(__name__)
 
 
-class CustomVendordata(base.VendorDataDriver):
+class CustomVendorData(base.VendorDataDriver):
     def __init__(self, *args, **kwargs):
         super(CustomVendordata, self).__init__(*args, **kwargs)
         data = {
