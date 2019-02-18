@@ -26,7 +26,7 @@ LOG = logging.getLogger(__name__)
 
 class CustomVendorData(base.VendorDataDriver):
     def __init__(self, *args, **kwargs):
-        super(CustomVendordata, self).__init__(*args, **kwargs)
+        super(CustomVendorData, self).__init__(*args, **kwargs)
         data = {
           "auth_url": "{{ keystone_public_url }}",
           "auth_url_v2": "{{ keystone_public_url }}/v2.0",
