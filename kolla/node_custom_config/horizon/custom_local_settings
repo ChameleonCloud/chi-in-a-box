@@ -15,26 +15,18 @@ HORIZON_CONFIG['help_url'] = '{{ horizon_help_url }}'
 # directly at the moment.
 DATABASES = {
   'default': {},
-  'blazar-{{ openstack_region_name }}': {
-    'ENGINE': 'django.db.backends.mysql',
-    'NAME': 'blazar',
-    'HOST': '{{ kolla_internal_fqdn }}',
-    'PORT': '{{ database_port }}',
-    'USER': 'blazar',
-    'PASSWORD': '{{ blazar_database_password }}',
-  },
-{% if horizon_blazar_databases is defined %}
-{% for conf in horizon_blazar_databases %}
+{% for conf in horizon_regions %}
+{% if conf.blazar_database_host is defined %}
   'blazar-{{ conf.region_name }}': {
     'ENGINE': 'django.db.backends.mysql',
-    'NAME': '{{ conf.database_name }}',
-    'HOST': '{{ conf.database_host }}',
-    'PORT': '{{ conf.database_port }}',
-    'USER': '{{ conf.database_user }}',
-    'PASSWORD': '{{ conf.database_password }}',
+    'NAME': '{{ conf.blazar_database_name }}',
+    'HOST': '{{ conf.blazar_database_host }}',
+    'PORT': '{{ conf.blazar_database_port }}',
+    'USER': '{{ conf.blazar_database_user }}',
+    'PASSWORD': '{{ conf.blazar_database_password }}',
   },
-{% endfor %}
 {% endif %}
+{% endfor %}
 }
 
 # Add default Chameleon theme.
@@ -47,12 +39,9 @@ DEFAULT_THEME = 'chameleoncloud'
 # Used by server instance page to create links from the instance overview
 # to the resource catalog.
 CHAMELEON_SITES = {
-  '{{ openstack_region_name }}': '{{ chameleon_resource_site }}',
-{% if horizon_blazar_databases is defined %}
-{% for conf in horizon_blazar_databases %}
-  '{{ conf.region_name }}': '{{ conf.chameleon_resource_site }}',
+{% for conf in horizon_regions %}
+  '{{ conf.region_name }}': '{{ conf.chameleon_site_name }}',
 {% endfor %}
-{% endif %}
 }
 
 {% if enable_horizon_chameleon_websso | bool %}

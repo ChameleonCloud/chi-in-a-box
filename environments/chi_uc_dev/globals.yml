@@ -18,11 +18,14 @@ kolla_external_vip_interface: "em2"
 
 # Multi-region configuration
 openstack_region_name: "CHI_DEV_UC"
-multiple_regions_names:
-    - "{{ openstack_region_name }}"
-    - "CHI_DEV"
 # Site name, similar to region but used for out-of-band inventory management
 chameleon_site_name: "uc"
+chi_tacc_openstack_region_name: "CHI_DEV"
+chi_tacc_chameleon_site_name: "tacc"
+chi_tacc_blazar_database_host: ""
+multiple_regions_names:
+    - "{{ openstack_region_name }}"
+    - "{{ chi_tacc_openstack_region_name }}"
 
 # External MariaDB config
 enable_mariadb: "no"
@@ -65,13 +68,21 @@ enable_horizon_blazar: "yes"
 enable_horizon_chameleon_websso: "yes"
 horizon_help_url: https://chameleoncloud.readthedocs.io/en/latest/technical/baremetal.html
 horizon_chameleon_websso_host: https://dev.chameleon.tacc.utexas.edu
-horizon_blazar_databases:
+horizon_regions:
   - region_name: "{{ openstack_region_name }}"
-    database_name: "{{ blazar_database_name }}"
-    database_host: "{{ kolla_internal_fqdn }}"
-    database_port: "{{ blazar_database_port }}"
-    database_user: "{{ blazar_database_user }}"
-    database_password: "{{ blazar_database_password }}"
+    chameleon_site_name: "{{ chameleon_site_name }}"
+    blazar_database_host: "{{ kolla_internal_fqdn }}"
+    blazar_database_name: "{{ blazar_database_name }}"
+    blazar_database_port: "{{ blazar_database_port }}"
+    blazar_database_user: "{{ blazar_database_user }}"
+    blazar_database_password: "{{ blazar_database_password }}"
+  - region_name: "{{ chi_tacc_openstack_region_name }}"
+    chameleon_site_name: "{{ chi_tacc_chameleon_site_name }}"
+    blazar_database_host: "{{ chi_tacc_blazar_database_host }}"
+    blazar_database_name: "{{ blazar_database_name }}"
+    blazar_database_port: "{{ blazar_database_port }}"
+    blazar_database_user: "{{ blazar_database_user }}"
+    blazar_database_password: "{{ chi_tacc_blazar_database_password }}"
 
 # Ironic
 enable_ironic: "yes"
@@ -111,27 +122,27 @@ neutron_ml2_generic_switch_configs:
     ip: 10.140.80.53
     username: "{{ chameleon_switch_dell_username }}"
     password: "{{ chameleon_switch_dell_password }}"
-  - name: fx2-chassis-01-agg1
-    device_type: fnioa_netmiko_dell_force10
-    ip: 172.29.0.197
-    username: "{{ chameleon_switch_fx2_username }}"
-    password: "{{ chameleon_switch_fx2_password }}"
-  - name: fx2-chassis-02-agg1
-    device_type: fnioa_netmiko_dell_force10
-    ip: 172.29.0.199
-    username: "{{ chameleon_switch_fx2_username }}"
-    password: "{{ chameleon_switch_fx2_password }}"
-  - name: fx2-chassis-03-agg1
-    device_type: fnioa_netmiko_dell_force10
-    ip: 172.29.0.201
-    username: "{{ chameleon_switch_fx2_username }}"
-    password: "{{ chameleon_switch_fx2_password }}"
-  - name: fx2-chassis-04-agg1
-    device_type: fnioa_netmiko_dell_force10
-    ip: 172.29.0.203
-    username: "{{ chameleon_switch_fx2_username }}"
-    password: "{{ chameleon_switch_fx2_password }}"
   # Just for production, kept here for later copying
+  # - name: fx2-chassis-01-agg1
+  #   device_type: fnioa_netmiko_dell_force10
+  #   ip: 172.29.0.197
+  #   username: "{{ chameleon_switch_fx2_username }}"
+  #   password: "{{ chameleon_switch_fx2_password }}"
+  # - name: fx2-chassis-02-agg1
+  #   device_type: fnioa_netmiko_dell_force10
+  #   ip: 172.29.0.199
+  #   username: "{{ chameleon_switch_fx2_username }}"
+  #   password: "{{ chameleon_switch_fx2_password }}"
+  # - name: fx2-chassis-03-agg1
+  #   device_type: fnioa_netmiko_dell_force10
+  #   ip: 172.29.0.201
+  #   username: "{{ chameleon_switch_fx2_username }}"
+  #   password: "{{ chameleon_switch_fx2_password }}"
+  # - name: fx2-chassis-04-agg1
+  #   device_type: fnioa_netmiko_dell_force10
+  #   ip: 172.29.0.203
+  #   username: "{{ chameleon_switch_fx2_username }}"
+  #   password: "{{ chameleon_switch_fx2_password }}"
   # - name: chameleon-corsa1
   #   device_type: corsa_dp2100
   #   switchIP: 172.30.0.4
