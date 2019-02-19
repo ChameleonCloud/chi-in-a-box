@@ -22,7 +22,7 @@ openstack_region_name: "CHI_DEV_UC"
 chameleon_site_name: "uc"
 chi_tacc_openstack_region_name: "CHI_DEV"
 chi_tacc_chameleon_site_name: "tacc"
-chi_tacc_blazar_database_host: ""
+chi_tacc_blazar_database_host: "129.114.97.177"
 multiple_regions_names:
     - "{{ openstack_region_name }}"
     - "{{ chi_tacc_openstack_region_name }}"
