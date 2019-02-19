@@ -727,7 +727,8 @@ admin02
 admin02
 
 # By default node metric exporters will be installed on all
-# hosts in all groups. Comment out host groups you don't want
+# hosts in all
+# Comment out host groups you don't want
 # to install the node exporters on.
 [node_exporter:children]
 baremetal
