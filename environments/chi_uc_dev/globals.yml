@@ -93,6 +93,7 @@ ironic_image_cache_size: 20480 # MB
 
 # Keystone
 enable_keystone: "yes"
+use_preconfigured_fernet: "yes"
 
 # Neutron
 enable_neutron: "yes"
