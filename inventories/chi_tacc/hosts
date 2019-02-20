@@ -30,6 +30,9 @@ m01-07
 [prometheus]
 chi01
 
+[openstack_exporter]
+chi01
+
 # By default node metric exporters will be installed on all
 # hosts in all groups. Comment out host groups you don't want
 # to install the node exporters on.
