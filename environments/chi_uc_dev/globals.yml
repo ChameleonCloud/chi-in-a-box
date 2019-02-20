@@ -1,0 +1,263 @@
+---
+docker_namespace: "kolla"
+docker_registry_username: "kolla"
+docker_registry: "docker.chameleoncloud.org"
+kolla_base_distro: "centos"
+kolla_install_type: "source"
+virtualenv: /etc/ansible/venv
+
+# Docker image tag to use for deployed containers
+openstack_release: "chameleoncloud-ocata"
+
+# Network configuration
+kolla_internal_vip_address: "10.140.80.97"
+kolla_external_vip_address: "192.5.87.3"
+kolla_external_fqdn: "dev.uc.chameleoncloud.org"
+network_interface: "br_em1"
+kolla_external_vip_interface: "br_ex"
+
+# Multi-region configuration
+openstack_region_name: "CHI_DEV_UC"
+# Site name, similar to region but used for out-of-band inventory management
+chameleon_site_name: "uc"
+chi_tacc_openstack_region_name: "CHI_DEV"
+chi_tacc_chameleon_site_name: "tacc"
+chi_tacc_blazar_database_host: "129.114.97.177"
+multiple_regions_names:
+    - "{{ openstack_region_name }}"
+    - "{{ chi_tacc_openstack_region_name }}"
+
+# External MariaDB config
+enable_mariadb: "no"
+use_preconfigured_databases: "yes"
+
+# External TLS config
+enable_haproxy: "no"
+# Account for the fact that we're terminating TLS ourselves
+kolla_enable_tls_external: "no"
+public_protocol: "https"
+
+# Kolla sidecar/support containers
+enable_chrony: "yes"
+enable_fluentd: "yes"
+enable_memcached: "yes"
+# External RabbitMQ
+enable_rabbitmq: "no"
+
+enable_blazar: "no"
+enable_cinder: "no"
+enable_glance: "yes"
+enable_gnocchi: "no"
+enable_grafana: "no"
+enable_swift: "no"
+
+# Glance
+# TODO [jca-2019-01-29]: remove this when we are on Rocky.
+# Override 'disabled' state of Glance Registry. This service was deprecated
+# but we still need to include it for Ocata.
+glance_services:
+  glance-registry:
+    enabled: true
+
+# Heat
+enable_heat: "yes"
+
+# Horizon
+enable_horizon: "yes"
+enable_horizon_blazar: "yes"
+enable_horizon_chameleon_websso: "yes"
+horizon_help_url: https://chameleoncloud.readthedocs.io/en/latest/technical/baremetal.html
+horizon_chameleon_websso_host: https://dev.chameleon.tacc.utexas.edu
+horizon_regions:
+  - region_name: "{{ openstack_region_name }}"
+    chameleon_site_name: "{{ chameleon_site_name }}"
+    blazar_database_host: "{{ kolla_internal_fqdn }}"
+    blazar_database_name: "{{ blazar_database_name }}"
+    blazar_database_port: "{{ blazar_database_port }}"
+    blazar_database_user: "{{ blazar_database_user }}"
+    blazar_database_password: "{{ blazar_database_password }}"
+  - region_name: "{{ chi_tacc_openstack_region_name }}"
+    chameleon_site_name: "{{ chi_tacc_chameleon_site_name }}"
+    blazar_database_host: "{{ chi_tacc_blazar_database_host }}"
+    blazar_database_name: "{{ blazar_database_name }}"
+    blazar_database_port: "{{ blazar_database_port }}"
+    blazar_database_user: "{{ blazar_database_user }}"
+    blazar_database_password: "{{ chi_tacc_blazar_database_password }}"
+
+# Ironic
+enable_ironic: "yes"
+ironic_provisioning_network: c60e0bc1-a64d-48c1-a508-c19df4aa4e81
+ironic_cleaning_network: "{{ ironic_provisioning_network }}"
+ironic_tftp_server: 10.51.0.254 # Should be on the provisioning network
+ironic_image_cache_size: 20480 # MB
+
+# Keystone
+enable_keystone: "yes"
+use_preconfigured_fernet: "yes"
+
+# Neutron
+enable_neutron: "yes"
+enable_openvswitch: "yes"
+# TODO [jca 2019-01-29]: remove this when we can take advantage of this
+# component, which was introduced after Ocata.
+enable_ironic_neutron_agent: "no"
+chameleon_switch_dell_username: chamadm
+chameleon_switch_fx2_username: root
+# Enable notifications for Experiment Precis
+neutron_notification_topics:
+  - name: "notifications"
+    enabled: "yes"
+neutron_type_drivers: flat,vlan
+neutron_tenant_network_types: vlan
+neutron_network_vlan_ranges: physnet1:3000:3009
+neutron_bridge_name: br-em1,br-ex
+neutron_external_interface: em1,em2
+neutron_ml2_generic_switch_configs:
+  - name: Chameleon-Cloud
+    device_type: netmiko_dell_force10
+    ip: 10.140.80.52
+    username: "{{ chameleon_switch_dell_username }}"
+    password: "{{ chameleon_switch_dell_password }}"
+  - name: Chameleon-Compute
+    device_type: netmiko_dell_force10
+    ip: 10.140.80.53
+    username: "{{ chameleon_switch_dell_username }}"
+    password: "{{ chameleon_switch_dell_password }}"
+  # Just for production, kept here for later copying
+  # - name: fx2-chassis-01-agg1
+  #   device_type: fnioa_netmiko_dell_force10
+  #   ip: 172.29.0.197
+  #   username: "{{ chameleon_switch_fx2_username }}"
+  #   password: "{{ chameleon_switch_fx2_password }}"
+  # - name: fx2-chassis-02-agg1
+  #   device_type: fnioa_netmiko_dell_force10
+  #   ip: 172.29.0.199
+  #   username: "{{ chameleon_switch_fx2_username }}"
+  #   password: "{{ chameleon_switch_fx2_password }}"
+  # - name: fx2-chassis-03-agg1
+  #   device_type: fnioa_netmiko_dell_force10
+  #   ip: 172.29.0.201
+  #   username: "{{ chameleon_switch_fx2_username }}"
+  #   password: "{{ chameleon_switch_fx2_password }}"
+  # - name: fx2-chassis-04-agg1
+  #   device_type: fnioa_netmiko_dell_force10
+  #   ip: 172.29.0.203
+  #   username: "{{ chameleon_switch_fx2_username }}"
+  #   password: "{{ chameleon_switch_fx2_password }}"
+  # - name: chameleon-corsa1
+  #   device_type: corsa_dp2100
+  #   switchIP: 172.30.0.4
+  #   token: "{{ chameleon_switch_corsa1_token }}"
+  #   chameleon-corsa2: 37
+  #   controllerNamespace: of-mgt
+  #   defaultControllerIP: 172.30.0.101
+  #   defaultControllerPort: 6653
+  #   defaultVFCName: UNNAMED
+  #   defaultVFCRes: 2
+  #   provisioningControllerIP: 172.17.1.1
+  #   provisioningControllerPort: 6653
+  #   provisioningVFCType: l2-vpn
+  #   provisioningVLAN: 3111
+  #   uplink_ports: 33
+  #   VFCHost: True
+  #   VFCType: openflow
+  #   # Mappings of physical ports to OpenFlow port numbers
+  #   'P 1': 101
+  #   'P 2': 102
+  #   'P 3': 103
+  #   'P 4': 104
+  #   'P 5': 105
+  #   'P 6': 106
+  #   'P 7': 107
+  #   'P 8': 108
+  #   'P 9': 109
+  #   'P 10': 110
+  #   'P 11': 111
+  #   'P 12': 112
+  #   'P 13': 113
+  #   'P 14': 114
+  #   'P 15': 115
+  #   'P 16': 116
+  #   'P 17': 117
+  #   'P 18': 118
+  #   'P 19': 119
+  #   'P 20': 120
+  #   'P 21': 121
+  #   'P 22': 122
+  #   'P 23': 123
+  #   'P 24': 124
+  #   'P 25': 125
+  #   'P 26': 126
+  #   'P 27': 127
+  #   'P 28': 128
+  #   'P 29': 129
+  #   'P 30': 130
+  #   'P 31': 131
+  #   'P 32': 132
+  # - name: chameleon-corsa2
+  #   device_type: corsa_dp2100
+  #   switchIP: 172.30.0.5
+  #   token: "{{ chameleon_switch_corsa2_token }}"
+  #   controllerNamespace: of-mgt
+  #   defaultControllerIP: 172.30.0.102
+  #   defaultControllerPort: 6653
+  #   defaultVFCName: UNNAMED
+  #   defaultVFCRes: 2
+  #   provisioningControllerIP: 172.17.1.1
+  #   provisioningControllerPort: 6653
+  #   provisioningVFCType: l2-vpn
+  #   provisioningVLAN: 3111
+  #   uplink_ports: 37
+  #   VFCHost: False
+  #   VFCType: openflow
+  #   # Mappings of physical ports to OpenFlow port numbers
+  #   'P 1': 133
+  #   'P 2': 134
+  #   'P 3': 135
+  #   'P 4': 136
+  #   'P 5': 137
+  #   'P 6': 138
+  #   'P 7': 139
+  #   'P 8': 140
+  #   'P 9': 141
+  #   'P 10': 142
+  #   'P 11': 143
+  #   'P 12': 144
+  #   'P 13': 145
+  #   'P 14': 146
+  #   'P 15': 147
+  #   'P 16': 148
+  #   'P 17': 149
+  #   'P 18': 150
+  #   'P 19': 151
+  #   'P 20': 152
+  #   'P 21': 153
+  #   'P 22': 154
+  #   'P 23': 155
+  #   'P 24': 156
+  #   'P 25': 157
+  #   'P 26': 158
+  #   'P 27': 159
+  #   'P 28': 160
+  #   'P 29': 161
+  #   'P 30': 162
+  #   'P 31': 163
+  #   'P 32': 164
+
+# Nova
+enable_nova: "yes"
+enable_nova_serialconsole_proxy: "yes"
+nova_compute_virt_type: "none"
+# We are not using any VNC consoles; the serialproxy is not considered a 'nova_console'
+nova_console: "none"
+# We override the endpoints to not include %(tenant_id)s placeholder.
+# Blazar in particular needs this to not be scoped to the tenant because when
+# it tries to perform actions on behalf of a user, it uses a different tenant
+# id (its own).
+nova_admin_endpoint: "{{ admin_protocol }}://{{ kolla_internal_fqdn }}:{{ nova_api_port }}/v2.1"
+nova_internal_endpoint: "{{ internal_protocol }}://{{ kolla_internal_fqdn }}:{{ nova_api_port }}/v2.1"
+nova_public_endpoint: "{{ public_protocol }}://{{ kolla_external_fqdn }}:{{ nova_api_port }}/v2.1"
+instance_metrics_writer_username: instance_metrics_writer
+
+# Rabbit admin
+rabbitmq_user: openstack

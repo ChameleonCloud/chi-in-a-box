@@ -1,0 +1,25 @@
+---
+- name: Create working directory.
+  file:
+    name: "{{ jenkins_slave_workdir }}"
+    state: directory
+
+- name: Download Jenkins slave agent.
+  get_url:
+    url: "{{ jenkins_slave_master }}/jnlpJars/agent.jar"
+    dest: "{{ jenkins_slave_workdir }}/agent.jar"
+    checksum: "sha256:{{ jenkins_slave_agent_checksum }}"
+
+- name: Configure Jenkins slave systemd service.
+  template:
+    src: jenkins_slave.service.j2
+    dest: "/usr/lib/systemd/system/{{ jenkins_slave_service_name }}.service"
+  notify:
+    - refresh services
+    - restart jenkins slave
+
+- name: Enable service at boot.
+  service:
+    name: "{{ jenkins_slave_service_name }}"
+    state: started
+    enabled: yes

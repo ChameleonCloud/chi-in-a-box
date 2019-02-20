@@ -1,0 +1,55 @@
+from openstack_dashboard.settings import HORIZON_CONFIG
+from os import environ
+
+# Kolla normally adds this for us if kolla_external_tls_enabled is true,
+# but since we (currently) aren't using the built-in HAProxy, we include it
+# manually. SSL termination is happening outside of here, via old httpd code.
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+SITE_BRANDING = 'ChameleonCloud'
+
+# Override help menu to point to our docs.
+HORIZON_CONFIG['help_url'] = '{{ horizon_help_url }}'
+
+# Used for Blazar dashboard, which needs to pull data from the MySQL database
+# directly at the moment.
+DATABASES = {
+  'default': {},
+{% for conf in horizon_regions %}
+{% if conf.blazar_database_host is defined %}
+  'blazar-{{ conf.region_name }}': {
+    'ENGINE': 'django.db.backends.mysql',
+    'NAME': '{{ conf.blazar_database_name }}',
+    'HOST': '{{ conf.blazar_database_host }}',
+    'PORT': '{{ conf.blazar_database_port }}',
+    'USER': '{{ conf.blazar_database_user }}',
+    'PASSWORD': '{{ conf.blazar_database_password }}',
+  },
+{% endif %}
+{% endfor %}
+}
+
+# Add default Chameleon theme.
+AVAILABLE_THEMES = [
+  ('default', 'Default', 'themes/default'),
+  ('chameleoncloud', 'ChameleonCloud', '/etc/openstack-dashboard/themes/chameleoncloud'),
+]
+DEFAULT_THEME = 'chameleoncloud'
+
+# Used by server instance page to create links from the instance overview
+# to the resource catalog.
+CHAMELEON_SITES = {
+{% for conf in horizon_regions %}
+  '{{ conf.region_name }}': '{{ conf.chameleon_site_name }}',
+{% endfor %}
+}
+
+{% if enable_horizon_chameleon_websso | bool %}
+# Single-sign on support
+WEBSSO_ENABLED = True
+AUTHENTICATION_URLS = ['openstack_dashboard.cc_web_sso_urls','openstack_auth.urls',]
+CHAMELEON_PORTAL_SSO_BASE_URL = '{{ horizon_chameleon_websso_host }}'
+CHAMELEON_PORTAL_SSO_LOGIN_PATH = '/sso/horizon/'
+CHAMELEON_PORTAL_SSO_LOGOUT_PATH = '/logout/'
+SSO_CALLBACK_HOST = '{{ kolla_external_fqdn }}'
+{% endif %}

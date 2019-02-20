@@ -1,0 +1,7 @@
+---
+- hosts: baremetal
+  tasks:
+    - name: Remove nscd package (conflicts with Kolla).
+      package:
+        name: ncsd
+        state: absent

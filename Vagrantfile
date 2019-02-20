@@ -34,7 +34,6 @@ Vagrant.configure('2') do |config|
       else
         ansible.inventory_path = inventory
       end
-      puts ansible.inventory_path
     end
   end
 end

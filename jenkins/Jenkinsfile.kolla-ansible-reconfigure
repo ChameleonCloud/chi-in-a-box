@@ -1,0 +1,30 @@
+pipeline {
+  agent {
+    label "${params.JENKINS_AGENT_LABEL}"
+  }
+
+  environment {
+    ANSIBLE_DIR = '/etc/ansible'
+  }
+
+  parameters {
+    string(name: 'KOLLA_SERVICE_NAME', defaultValue: '',
+           description: 'Name of Kolla service to reconfigure (e.g. "horizon")')
+    string(name: 'JENKINS_AGENT_LABEL', defaultValue: '',
+           description: 'The label of the Jenkins agent to execute the deploy on')
+  }
+
+  stages {
+    stage('setup') {
+      steps {
+        sh 'make venv'
+      }
+    }
+
+    stage('reconfigure') {
+      steps {
+        sh "./kolla-ansible reconfigure --tags=${params.KOLLA_SERVICE_NAME}"
+      }
+    }
+  }
+}

@@ -1,11 +1,9 @@
 #!/usr/bin/env bash
 # This is just a really simple wrapper around ansible-vault, which sets the
 # property vault ID.
-set -e -u -o pipefail
-
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
-inventory_name="$(cat "$DIR/.ansible-inventory")"
+ansible_dir="${ANSIBLE_DIR:-$DIR}"
+inventory_name="$(cat "$ansible_dir/.ansible-inventory")"
 
-exec venv/bin/ansible-vault \
-  --vault-id="${inventory_name}@vault_password" \
-  "$@"
+source "$DIR/venv/bin/activate"
+ansible-vault --vault-id="${inventory_name}@${ansible_dir}/vault_password" "$@"

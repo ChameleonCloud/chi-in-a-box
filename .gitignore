@@ -10,3 +10,7 @@
 vault_password
 # The virtualenv environment
 venv/
+# Kolla SSL certificates (dev only)
+kolla/certificates
+kolla/node_custom_config/certificates
+environments/chi_tacc_kolla/

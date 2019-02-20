@@ -7,9 +7,12 @@ CLEAN_TARGETS := $(PLAYBOOKS:%=%-clean)
 TAGS ?= all
 
 .PHONY: setup
-setup: venv
-	@ echo "Initializing Ansible inventory, if possible"
-	@ ./ansible-inventory
+setup: kolla/etc venv vault_password
+	@ echo "Current inventory (.ansible-inventory): $$(cat .ansible-inventory 2>/dev/null || echo 'none')"
+
+kolla/etc:
+	@ echo "Creating custom node configuration directory for Kolla"
+	@ mkdir -p "$@"
 
 venv: requirements.txt
 	@ echo "Initializing virtualenv"
@@ -17,6 +20,10 @@ venv: requirements.txt
 	@ echo "Installing base dependencies to virtualenv directory"
 	@ $@/bin/pip install -r requirements.txt
 	@ touch $@
+
+vault_password:
+	@ echo "Creating new Ansible Vault password"
+	@ openssl rand -base64 2048 > $@
 
 #
 # Development targets

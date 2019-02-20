@@ -1,0 +1,42 @@
+pipeline {
+  agent any
+
+  triggers {
+    GenericTrigger(
+      genericVariables: [
+        [key: 'ref', value: '$.ref'],
+        [key: 'changed_files', value: '$.commits[*].["modified","added","removed"][*]']
+      ],
+
+      causeString: 'Triggered on $ref',
+
+      token: JOB_NAME,
+
+      printContributedVariables: true,
+      printPostContent: true,
+
+      regexpFilterText: '$ref',
+      regexpFilterExpression: 'refs/heads/master'
+    )
+  }
+
+  stages {
+    stage('reconfigure-dev') {
+      steps {
+        script {
+          service_names = sh(returnStdout: true, script: "jenkins/detect_kolla_changes.sh ${changed_files}").split('\n')
+        }
+        trigger_kolla_ansible_reconfigure(service_names)
+      }
+    }
+  }
+}
+
+def trigger_kolla_ansible_reconfigure(list) {
+  for (int i = 0; i < list.size(); i++) {
+    build job: 'kolla-ansible-reconfigure', parameters: [
+      string(name: 'KOLLA_SERVICE_NAME', value: "${list[i]}"),
+      string(name: 'JENKINS_AGENT_LABEL', value: 'ansible-uc-dev')
+    ]
+  }
+}

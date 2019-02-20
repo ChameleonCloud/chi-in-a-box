@@ -1,0 +1,3 @@
+{
+  "os_compute_api:os-extended-server-attributes": "rule:admin_or_owner"
+}
