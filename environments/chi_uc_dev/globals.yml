@@ -51,6 +51,17 @@ enable_gnocchi: "no"
 enable_grafana: "no"
 enable_swift: "no"
 
+# Blazar
+enable_blazar: "yes"
+blazar_minutes_before_end_lease: 2880 # When to send lease notification email
+blazar_default_max_lease_duration: 604800 # 7 days
+blazar_usage_default_allocated: 20000.0
+blazar_usage_project_exemptions:
+  - Chameleon
+  - admin
+  - openstack
+  - maintenance
+
 # Glance
 # TODO [jca-2019-01-29]: remove this when we are on Rocky.
 # Override 'disabled' state of Glance Registry. This service was deprecated
@@ -90,6 +101,13 @@ ironic_provisioning_network: c60e0bc1-a64d-48c1-a508-c19df4aa4e81
 ironic_cleaning_network: "{{ ironic_provisioning_network }}"
 ironic_tftp_server: 10.51.0.254 # Should be on the provisioning network
 ironic_image_cache_size: 20480 # MB
+ironic_pxe_append_params: >
+  nofb nomodeset
+  vga=normal
+  console=tty0
+  console=ttyS0,9600
+  systemd.journald.forward_to_console=yes
+  rootpwd={{ ironic_pxe_root_password }}
 
 # Keystone
 enable_keystone: "yes"
