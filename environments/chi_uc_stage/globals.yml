@@ -39,7 +39,6 @@ enable_memcached: "yes"
 enable_rabbitmq: "no"
 
 enable_cinder: "no"
-enable_glance: "yes"
 enable_gnocchi: "no"
 enable_grafana: "no"
 enable_swift: "no"
@@ -56,6 +55,7 @@ blazar_usage_project_exemptions:
   - maintenance
 
 # Glance
+enable_glance: "yes"
 # TODO [jca-2019-01-29]: remove this when we are on Rocky.
 # Override 'disabled' state of Glance Registry. This service was deprecated
 # but we still need to include it for Ocata.
@@ -90,7 +90,7 @@ ironic_image_cache_size: 20480 # MB
 ironic_pxe_append_params: "nofb nomodeset vga=normal console=tty0 console=ttyS0,9600 systemd.journald.forward_to_console=yes rootpwd={{ ironic_pxe_root_password }}"
 
 # Keystone
-enable_keystone: "no"
+enable_keystone: "yes"
 
 # Neutron
 enable_neutron: "yes"
