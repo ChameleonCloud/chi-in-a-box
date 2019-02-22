@@ -1,4 +1,12 @@
 ---
+- hosts: node_exporters
+  roles:
+    - node_exporter
+
+- hosts: openstack_exporter
+  roles:
+   - openstack_exporter
+
 - hosts: prometheus
   roles:
     - prometheus

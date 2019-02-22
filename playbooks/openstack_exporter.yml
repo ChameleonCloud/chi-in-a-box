@@ -1,4 +1,0 @@
----
-- hosts: openstack_exporter
-  roles:
-   - openstack_exporter
