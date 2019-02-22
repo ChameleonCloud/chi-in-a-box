@@ -3,7 +3,7 @@
 
 # The Ansible deployment host
 [deployment]
-staff
+localhost ansible_connection=local pip_virtualenv=/etc/ansible/venv
 
 [monitoring]
 chameleon04
