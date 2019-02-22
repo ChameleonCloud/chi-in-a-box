@@ -12,54 +12,32 @@
 # TODO: this could really be better. We could download different versions side
 # by side and symlink the latest, which would probably help ansible figure out
 # when it actually needed to do work.
-- name: "Install node_exporter to {{ node_exporter_path }}"
+- name: "Install node_exporter to {{ service.bin_path }}"
   block:
     - name: Download node_exporter binary tarball.
       get_url:
-        url: "{{ node_exporter_url }}"
+        url: "{{ service.bin_url }}"
         dest: "/tmp/node_exporter.tar.gz"
     - name: Unarchive node_exporter binary tarball.
       unarchive:
         copy: no
         src: "/tmp/node_exporter.tar.gz"
-        dest: "{{ node_exporter_path }}"
+        dest: "{{ service.bin_path }}"
         extra_opts:
           - --strip-components=1
-        creates: "{{ node_exporter_path }}/node_exporter"
+        creates: "{{ service.bin_path }}/node_exporter"
       become: yes
       become_user: root
-      register: prometheus_node_exporter_updated
       notify:
         - restart node_exporter
 
-# I'm not sure this is even necessary...
+# I'm not sure this is even necessary. Node exporter could run without sudo perhaps.
 - name: Allow user to run node_exporter.
   lineinfile:
     dest: /etc/sudoers
     state: present
     regexp: "^node_exporter"
-    line: "node_exporter localhost={{ node_exporter_path }}/node_exporter"
+    line: "node_exporter localhost={{ service.bin_path }}/node_exporter"
     validate: "visudo -cf %s"
-  become: yes
-  become_user: root
-
-- name: Configure node_exporter systemd service.
-  template:
-    src: node_exporter.service.j2
-    dest: /etc/systemd/system/node_exporter.service
-  become: yes
-  become_user: root
-  tags:
-    - configuration
-  notify:
-    - restart node_exporter
-
-- name: Enable node_exporter on boot.
-  systemd:
-    name: node_exporter.service
-    # TODO: this is a thorny part of ansible and we shouldn't have to do this ourselves.
-    daemon_reload: yes
-    state: started
-    enabled: yes
   become: yes
   become_user: root

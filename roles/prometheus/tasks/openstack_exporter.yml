@@ -1,0 +1,6 @@
+---
+- name: Configure OpenStack exporter.
+  template:
+    src: openstack_exporter.env.j2
+    mode: 0600
+    dest: "{{ service.env_file }}"

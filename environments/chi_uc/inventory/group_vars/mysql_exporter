@@ -1,6 +1,5 @@
 ---
-mysql_prometheus_exporter_enable: yes
-mysql_prometheus_exporter_mysql_password: !vault |
+prometheus_mysql_exporter_mysql_password: !vault |
           $ANSIBLE_VAULT;1.2;AES256;chi_uc
           63336637393533346166336364613133393033363130323732386366353934616435303639363732
           3636373130303639666331643939633236356439386239610a303936373935663235383664396262

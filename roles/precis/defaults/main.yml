@@ -35,7 +35,7 @@ precis_event_listener_service_name: experiment-precis-event-listener
 
 precis_endpoint_docker_image: docker.chameleoncloud.org/experiment-precis/endpoint:latest
 precis_endpoint_service_name: experiment-precis-endpoint
-precis_endpoint_bind_interface: eth
+precis_endpoint_bind_interface: "{{ network_interface_internal }}"
 precis_endpoint_port: 8910
 
 precis_generator_docker_image: docker.chameleoncloud.org/experiment-precis/generator:latest

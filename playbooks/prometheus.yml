@@ -1,22 +1,13 @@
 ---
-- hosts: node_exporter
-  roles:
-    - node_exporter
-
-- hosts: openstack_exporter
-  roles:
-   - openstack_exporter
-
-- hosts: prometheus
+- hosts:
+    - prometheus
+    - prometheus-ceph-exporter
+    - prometheus-mysqld-exporter
+    - prometheus-node-exporter
+    - prometheus-openstack-exporter
   roles:
     - prometheus
   pre_tasks:
-    - name: Get network facts for all nodes.
-      setup:
-        gather_subset: network
-      delegate_to: "{{ item }}"
-      delegate_facts: True
-      loop: "{{ groups.all }}"
     - name: Set fact for internal host addresses.
       set_fact:
         ansible_internal_ipv4_addresses: >
@@ -28,61 +19,30 @@
              | selectattr('ipv4.address', 'match', '10.*')
              | map(attribute='ipv4.address')
              | list | last} | combine(ansible_internal_ipv4_addresses | default({})) }}
-      loop: "{{ groups.all | map('extract', hostvars) | list }}"
+      loop: "{{ ansible_play_hosts | map('extract', hostvars) | list }}"
       loop_control:
         label: "{{ item.inventory_hostname }}"
   tasks:
     - name: Set facts for gathering in frontend hosts.
       set_fact:
         prometheus_alertmanager_hostname: "{{ prometheus_alertmanager_hostname }}"
-        prometheus_alertmanager_port: "{{ prometheus_alertmanager_port }}"
+        prometheus_alertmanager_port: "{{ prometheus_services['alertmanager'].port }}"
         prometheus_alertmanager_users: "{{ prometheus_alertmanager_users }}"
       tags:
         - configuration
-  vars:
-    # [jca 2018-09-14]
-    # TODO: hard-coding these port numbers isn't great. But, it's pretty hard
-    # to get variables set on remote hosts available within a task like this.
-    # Probably the way forward is to move all the prometheus exporters into
-    # the prometheus role as separate tasks and then use the include_role/tasks_from
-    # to include them here. That way all the information needed for prometheus
-    # would at least be in one place.
-    prometheus_jobs:
-      - name: ceph
-        inventory_group: ceph_exporter
-        port: 9128
-      - name: node
-        inventory_group: node_exporter
-        port: 9100
-      - name: mysql
-        inventory_group: mysql_exporter
-        port: 9104
-      - name: openstack
-        inventory_group: openstack_exporter
-        port: 9103
 
 - hosts: frontends
   tasks:
     - name: Configure virtual host for Prometheus Alertmanager.
       block:
-        - name: Gather facts from Alertmanager host.
-          setup:
-          delegate_to: "{{ groups.prometheus[0] }}"
-          delegate_facts: True
-        - name: Precompute convenience facts needed for virtual host configuration.
-          set_fact:
-              prometheus_alertmanager_hostname: "{{ hostvars[groups.prometheus[0]].prometheus_alertmanager_hostname }}"
-              prometheus_alertmanager_port: "{{ hostvars[groups.prometheus[0]].prometheus_alertmanager_port }}"
-              prometheus_alertmanager_users: "{{ hostvars[groups.prometheus[0]].prometheus_alertmanager_users }}"
-              prometheus_internal_address: "{{ groups.prometheus[0] }}"
-          tags:
-            - configuration
+        - set_fact:
+            prometheus_alertmanager: "{{ hostvars[groups['prometheus-alertmanager'][0]] }}"
         - name: Configure virtual host.
           include_role:
             name: apache
             tasks_from: host
           vars:
-            apache_server_name: "{{ prometheus_alertmanager_hostname }}"
+            apache_server_name: "{{ prometheus_alertmanager.prometheus_alertmanager_hostname }}"
             apache_server_conf: |
               <Location "/">
                 Order deny,allow
@@ -95,13 +55,13 @@
                 AuthExternalProvideCache On
                 AuthnCacheProvideFor keystone-user
 
-                Require user {{ prometheus_alertmanager_users | join(' ') }}
+                Require user {{ prometheus_alertmanager.prometheus_alertmanager_users | join(' ') }}
 
                 # preserve Host header to avoid cross-origin problems
                 ProxyPreserveHost on
                 # proxy to Alertmanager
-                ProxyPass         http://{{ prometheus_internal_address }}:{{ prometheus_alertmanager_port }}/
-                ProxyPassReverse  http://{{ prometheus_internal_address }}:{{ prometheus_alertmanager_port }}/
+                ProxyPass         http://{{ groups.prometheus[0] }}:{{ prometheus_alertmanager.prometheus_alertmanager_port }}/
+                ProxyPassReverse  http://{{ groups.prometheus[0] }}:{{ prometheus_alertmanager.prometheus_alertmanager_port }}/
               </Location>
           tags:
             - configuration

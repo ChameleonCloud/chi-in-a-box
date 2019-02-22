@@ -1,5 +1,0 @@
----
-- name: restart ceph_exporter
-  service:
-    name: ceph_exporter
-    state: restarted

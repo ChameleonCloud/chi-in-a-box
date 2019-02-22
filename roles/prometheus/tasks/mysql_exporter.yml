@@ -1,0 +1,18 @@
+---
+- name: Create MySQL user.
+  local_action:
+    module: mysql_user
+    login_host: "{{ groups.mariadb[0] }}"
+    login_password: "{{ mysql_root_password }}"
+    name: "{{ prometheus_mysql_exporter_user }}"
+    # TODO: support changing this in some nicer way. This assumes that
+    # the user is always installing this on the same node as the MySQL server
+    # itself (uses Docker bridge0 default ip space).
+    host: 172.17.%
+    password: "{{ prometheus_mysql_exporter_password }}"
+    priv: "*.*:PROCESS,REPLICATION CLIENT,SELECT"
+
+- name: Configure MySQL exporter.
+  template:
+    src: mysql_exporter.my.cnf.j2
+    dest: "{{ service.config_dir }}/my.cnf"

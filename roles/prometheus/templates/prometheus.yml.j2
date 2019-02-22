@@ -1,3 +1,5 @@
+{% set alertmanager_service = prometheus_services['alertmanager'] %}
+{% set alertmanager_host = ansible_internal_ipv4_addresses[groups[alertmanager_service.group][0]] %}
 ---
 global:
   scrape_interval:     30s
@@ -7,23 +9,24 @@ global:
 alerting:
   alertmanagers:
   - static_configs:
-    - targets:
-      - {{ prometheus_alertmanager_hostname }}:{{ prometheus_alertmanager_port }}
+    - targets: ['{{ alertmanager_host }}:{{ alertmanager_service.port }}']
 
 # Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
 rule_files:
-  - "{{ prometheus_config_dir }}/*-rules.yml"
+  - '/etc/prometheus/*-rules.yml'
 
 scrape_configs:
-  - job_name: 'prometheus'
-    static_configs:
-    - targets: ['localhost:9090']
-{% for job in prometheus_jobs if groups[job.inventory_group] is defined %}
-  - job_name: '{{ job.name }}'
-    static_configs:
-{% for host in groups[job.inventory_group] %}
-      - targets: ['{{ ansible_internal_ipv4_addresses[host] }}:{{ job.port }}']
-        labels:
-          hostname: '{{ host }}'
+{% for name, service in prometheus_services.iteritems() %}
+{% if service.scrape_target | bool and groups[service.group] | length > 0 %}
+- job_name: '{{ name }}'
+{% if service.scrape_interval is defined %}
+  scrape_interval: {{ service.scrape_interval }}
+{% endif %}
+  static_configs:
+{% for host in groups[service.group] %}
+  - targets: ['{{ ansible_internal_ipv4_addresses[host] }}:{{ service.port }}']
+    labels:
+      hostname: '{{ host }}'
 {% endfor %}
+{% endif %}
 {% endfor %}

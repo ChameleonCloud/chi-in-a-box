@@ -1,10 +1,34 @@
 ---
+- name: reload systemd daemon
+  service:
+    daemon_reload: yes
+
 - name: restart prometheus
   service:
-    name: prometheus
+    name: prometheus_server
     state: restarted
 
 - name: restart alertmanager
   service:
-    name: alertmanager
+    name: prometheus_alertmanager
+    state: restarted
+
+- name: restart ceph exporter
+  service:
+    name: prometheus_ceph_exporter
+    state: restarted
+
+- name: restart mysql exporter
+  service:
+    name: prometheus_mysql_exporter
+    state: restarted
+
+- name: restart node exporter
+  service:
+    name: prometheus_node_exporter
+    state: restarted
+
+- name: restart openstack exporter
+  service:
+    name: prometheus_openstack_exporter
     state: restarted

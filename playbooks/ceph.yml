@@ -1,4 +1,0 @@
----
-- hosts: ceph
-  roles:
-    - ceph
