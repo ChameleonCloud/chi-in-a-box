@@ -2,44 +2,50 @@
 # Not sure what this is? https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html
 
 # The Ansible deployment host
-[ansible]
-master2
+[deployment]
+staff
+
+[monitoring]
+chameleon04
 
 # The primary OpenStack controller host
-[controller]
+[control]
 chi01
 
-#Gnochi_host
+[storage]
+
+[baremetal:children]
+control
+compute
+storage
+monitoring
+
 [gnocchi]
 
-# The Ceph cluster hosts
-[ceph]
+[ceph:children]
+storage
 
-# The Ceph cluster monitoring host (usually the master)
-[ceph_exporter]
+[ceph_exporter:children]
+storage
 
-# The MySQL host(s)
+[grafana:children]
+monitoring
+
 [mysql]
 m01-07
 
-# The MySQL hosts to install metrics exporters on
 [mysql_exporter]
 m01-07
 
-# The Prometheus server host
-[prometheus]
-chi01
+[prometheus:children]
+control
 
-[openstack_exporter]
-chi01
+[openstack_exporter:children]
+control
 
 # By default node metric exporters will be installed on all
 # hosts in all groups. Comment out host groups you don't want
 # to install the node exporters on.
 [node_exporters:children]
-ansible
-controller
-ceph
+baremetal
 mysql
-prometheus
-gnocchi
