@@ -6,11 +6,13 @@
 localhost ansible_connection=local pip_virtualenv=/etc/ansible/venv
 
 [monitoring]
-chameleon04
+chameleon04.tacc.utexas.edu
 
 # The primary OpenStack controller host
 [control]
 chi01
+
+[compute]
 
 [storage]
 
