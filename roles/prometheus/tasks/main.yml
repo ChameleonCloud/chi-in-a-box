@@ -10,26 +10,6 @@
 
 - name: Configure Prometheus.
   block:
-    - name: Get network facts for all nodes.
-      setup:
-        gather_subset: network
-      delegate_to: "{{ item }}"
-      delegate_facts: True
-      loop: "{{ groups.all }}"
-    - name: Set fact for internal host addresses.
-      set_fact:
-        ansible_internal_ipv4_addresses: >
-          {{ { item.inventory_hostname: item.ansible_interfaces
-             | map('regex_replace', '^', 'ansible_')
-             | map('replace', '-', '_')
-             | map('extract', item)
-             | selectattr('ipv4', 'defined')
-             | selectattr('ipv4.address', 'match', '10.*')
-             | map(attribute='ipv4.address')
-             | list | last} | combine(ansible_internal_ipv4_addresses | default({})) }}
-      loop: "{{ groups.all | map('extract', hostvars) | list }}"
-      loop_control:
-        label: "{{ item.inventory_hostname }}"
     - name: Create config directory.
       file:
         path: "{{ prometheus_config_dir }}"

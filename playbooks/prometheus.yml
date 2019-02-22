@@ -1,5 +1,5 @@
 ---
-- hosts: node_exporters
+- hosts: node_exporter
   roles:
     - node_exporter
 
@@ -10,6 +10,27 @@
 - hosts: prometheus
   roles:
     - prometheus
+  pre_tasks:
+    - name: Get network facts for all nodes.
+      setup:
+        gather_subset: network
+      delegate_to: "{{ item }}"
+      delegate_facts: True
+      loop: "{{ groups.all }}"
+    - name: Set fact for internal host addresses.
+      set_fact:
+        ansible_internal_ipv4_addresses: >
+          {{ { item.inventory_hostname: item.ansible_interfaces
+             | map('regex_replace', '^', 'ansible_')
+             | map('replace', '-', '_')
+             | map('extract', item)
+             | selectattr('ipv4', 'defined')
+             | selectattr('ipv4.address', 'match', '10.*')
+             | map(attribute='ipv4.address')
+             | list | last} | combine(ansible_internal_ipv4_addresses | default({})) }}
+      loop: "{{ groups.all | map('extract', hostvars) | list }}"
+      loop_control:
+        label: "{{ item.inventory_hostname }}"
   tasks:
     - name: Set facts for gathering in frontend hosts.
       set_fact:
@@ -19,7 +40,6 @@
       tags:
         - configuration
   vars:
-    prometheus_alertmanager_slack_api_url: "{{ slack_api_url | default('') }}"
     # [jca 2018-09-14]
     # TODO: hard-coding these port numbers isn't great. But, it's pretty hard
     # to get variables set on remote hosts available within a task like this.
