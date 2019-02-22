@@ -1,2 +1,11 @@
 ---
-placeholder:
+openstack_region_name: "CHI_DEV"
+openstack_keystone_auth_url: "https://dev.tacc.chameleoncloud.org:5000"
+chameleon_site_name: "tacc"
+
+admin_username: "admin"
+admin_project_name: "openstack"
+
+instance_metrics_writer_username: instance_metrics_writer
+
+nova_user: "nova"

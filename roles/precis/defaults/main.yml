@@ -29,6 +29,7 @@ precis_mysql_external_database_privileges:
   - neutron.*:SELECT
   - nova.*:SELECT
   - nova_api.*:SELECT
+  - gnocchi.*:SELECT
 
 precis_event_listener_docker_image: docker.chameleoncloud.org/experiment-precis/event-listener:latest
 precis_event_listener_service_name: experiment-precis-event-listener
