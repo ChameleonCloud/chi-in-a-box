@@ -8,7 +8,8 @@
   loop: "{{ prometheus_services_list }}"
   loop_control:
     label: "{{ item.image | default('skipped') }}"
-  when: item.image is defined
+  when: inventory_hostname in groups[item.group] and
+        item.image is defined
 
 - name: Create config directories.
   file:
@@ -17,7 +18,8 @@
   loop: "{{ prometheus_services_list }}"
   loop_control:
     label: "{{ item.config_dir | default('skipped') }}"
-  when: item.config_dir is defined
+  when: inventory_hostname in groups[item.group] and
+        item.config_dir is defined
 
 - include_tasks: alertmanager.yml
   vars:
@@ -53,8 +55,8 @@
   loop: "{{ prometheus_services_list }}"
   loop_control:
     label: "{{ item.service_name }}"
-  when: (item.custom_service is not defined or (not item.custom_service | bool)) and
-        inventory_hostname in groups[item.group]
+  when: inventory_hostname in groups[item.group] and
+        (item.custom_service is not defined or (not item.custom_service | bool))
 
 - name: Create custom services.
   template:
@@ -65,9 +67,9 @@
   loop: "{{ prometheus_services_list }}"
   loop_control:
     label: "{{ item.service_name }}"
-  when: item.custom_service is defined and
-        (item.custom_service | bool) and
-        inventory_hostname in groups[item.group]
+  when: inventory_hostname in groups[item.group] and
+        item.custom_service is defined and
+        (item.custom_service | bool)
 
 - name: Enable services.
   systemd:
