@@ -1,4 +1,0 @@
----
-ansible_become: yes
-ansible_become_user: root
-ceph_exporter: True
