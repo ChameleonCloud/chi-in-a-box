@@ -3,6 +3,14 @@
     - prometheus
     - prometheus-ceph-exporter
     - prometheus-mysqld-exporter
+    - prometheus-openstack-exporter
+  roles:
+    - docker
+
+- hosts:
+    - prometheus
+    - prometheus-ceph-exporter
+    - prometheus-mysqld-exporter
     - prometheus-node-exporter
     - prometheus-openstack-exporter
   roles:
@@ -22,6 +30,7 @@
       loop: "{{ ansible_play_hosts | map('extract', hostvars) | list }}"
       loop_control:
         label: "{{ item.inventory_hostname }}"
+      when: inventory_hostname in groups[prometheus_services['server'].group]
   tasks:
     - name: Set facts for gathering in frontend hosts.
       set_fact:
@@ -30,6 +39,7 @@
         prometheus_alertmanager_users: "{{ prometheus_alertmanager_users }}"
       tags:
         - configuration
+      when: inventory_hostname in groups[prometheus_services['alertmanager'].group]
 
 - hosts: frontends
   tasks:
