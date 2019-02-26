@@ -1,2 +1,12 @@
 ---
 rabbitmq_user: openstack
+
+switch_configs:
+  - name: chameleon-corsa1
+    device_type: corsa_dp2100
+    ip: 172.30.0.4
+    token: "{{ chameleon_switch_corsa1_token }}"
+  - name: chameleon-corsa2
+    device_type: corsa_dp2100
+    ip: 172.30.0.5
+    token: "{{ chameleon_switch_corsa2_token }}"

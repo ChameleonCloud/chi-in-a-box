@@ -1,0 +1,9 @@
+---
+- name: reload systemd
+  service:
+    daemon_reload: yes
+
+- name: restart metric collectors
+  service:
+    name: "{{ metric_collector_service_name }}@"
+    state: restarted
