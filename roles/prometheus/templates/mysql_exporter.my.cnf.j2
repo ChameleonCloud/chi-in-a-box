@@ -1,5 +1,5 @@
 [client]
-host = 127.0.0.1
+host = {{ groups.mariadb[0] }}
 port = 3306
 user = {{ prometheus_mysql_exporter_user }}
 password = {{ prometheus_mysql_exporter_password }}
