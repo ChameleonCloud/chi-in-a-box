@@ -1,7 +1,0 @@
----
-- name: restart node_exporter
-  service:
-    name: node_exporter
-    state: restarted
-  become: yes
-  become_user: root

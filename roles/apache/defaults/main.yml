@@ -1,8 +1,4 @@
 ---
-# When this is disabled, Ansible will not attempt to provision the Apache install.
-# However it can still generate files in the conf.d directory.
-apache_enabled: no
-
 apache_server_http_port: 80
 apache_server_https_port: 443
 apache_server_priority: 50

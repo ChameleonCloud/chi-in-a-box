@@ -1,18 +1,68 @@
-prometheus_docker_image: prom/prometheus:v2.3.2
-prometheus_docker_volume_name: prometheus-data
 prometheus_docker_network_name: prometheus
-prometheus_port: 9090
-prometheus_config_dir: /etc/prometheus
 
-prometheus_install_alertmanager: True
-prometheus_alertmanager_docker_image: prom/alertmanager:v0.15.2
-prometheus_alertmanager_docker_volume_name: alertmanager-data
-prometheus_alertmanager_port: 9093
-prometheus_alertmanager_config_dir: /etc/alertmanager
-prometheus_alertmanager_docker_network: alertmanager
+enable_prometheus_alertmanager: yes
+# This should be encrypted! It is a secret value.
+prometheus_alertmanager_slack_api_url: "{{ slack_api_url }}"
 prometheus_alertmanager_users:
   - jakecoll
   - jason_a
 
-# This should be encrypted! It is a secret value.
-prometheus_alertmanager_slack_api_url: "{{ slack_api_url }}"
+prometheus_mysql_exporter_user: mysqld-exporter
+
+prometheus_openstack_exporter_user: admin
+
+prometheus_services:
+  server:
+    service_name: prometheus_server
+    image: prom/prometheus:v2.3.2
+    group: prometheus
+    port: 9090
+    config_dir: /etc/prometheus
+    scrape_target: yes
+    volumes:
+      - "prometheus-data:/prometheus"
+      - "/etc/prometheus:/etc/prometheus"
+  alertmanager:
+    service_name: prometheus_alertmanager
+    image: prom/alertmanager:v0.15.2
+    group: prometheus-alertmanager
+    port: 9093
+    config_dir: /etc/alertmanager
+    scrape_target: no
+    volumes:
+      - "alertmanager-data:/alertmanager"
+      - "/etc/alertmanager:/etc/alertmanager"
+  ceph-exporter:
+    service_name: prometheus_ceph_exporter
+    image: digitalocean/ceph_exporter:2.0.0-luminous
+    group: prometheus-ceph-exporter
+    port: 9128
+    config_dir: /etc/ceph
+    scrape_target: yes
+    volumes:
+      - "/etc/ceph:/etc/ceph"
+  mysql-exporter:
+    service_name: prometheus_mysql_exporter
+    image: prom/mysqld-exporter:v0.11.0
+    group: prometheus-mysqld-exporter
+    port: 9104
+    config_dir: /etc/prometheus/mysqld-exporter
+    scrape_target: yes
+    volumes:
+      - "/etc/prometheus/mysqld-exporter/my.cnf:/root/.my.cnf"
+  node-exporter:
+    service_name: prometheus_node_exporter
+    group: prometheus-node-exporter
+    custom_service: yes
+    port: 9100
+    bin_path: /usr/sbin
+    bin_url: https://github.com/prometheus/node_exporter/releases/download/v0.16.0/node_exporter-0.16.0.linux-amd64.tar.gz
+    scrape_target: yes
+  openstack-exporter:
+    service_name: prometheus_openstack_exporter
+    image: docker.chameleoncloud.org/prometheus-openstack-exporter:latest
+    group: prometheus-openstack-exporter
+    port: 9103
+    config_dir: /etc/prometheus
+    env_file: /etc/prometheus/openstack_exporter.env
+    scrape_target: yes

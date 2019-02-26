@@ -1,9 +1,10 @@
+# {{ ansible_managed }}
 [Unit]
 Description=Prometheus Node Exporter
 
 [Service]
 Restart=always
-ExecStart={{ node_exporter_path }}/node_exporter
+ExecStart={{ item.bin_path }}/node_exporter --web.listen-address=:{{ item.port }}
 
 [Install]
 WantedBy=multi-user.target

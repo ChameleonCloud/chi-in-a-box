@@ -17,10 +17,10 @@ admin02
 admin02
 
 [storage]
-admin02
+# No storage node on dev currently
 
 [deployment]
-localhost       ansible_connection=local
+localhost ansible_connection=local
 
 [baremetal:children]
 control
@@ -161,7 +161,7 @@ control
 control
 
 [ceph:children]
-control
+storage
 
 [magnum:children]
 control
@@ -682,6 +682,12 @@ haproxy
 [prometheus-memcached-exporter:children]
 memcached
 
+[prometheus-openstack-exporter:children]
+control
+
+[prometheus-ceph-exporter:children]
+ceph-mgr
+
 [prometheus-cadvisor:children]
 monitoring
 control
@@ -696,12 +702,6 @@ monitoring
 # Legacy Ansible inventory
 ######################################
 
-# The Ceph cluster hosts
-[ceph]
-
-# The Ceph cluster monitoring host (usually the master)
-[ceph_exporter]
-
 [frontends]
 admin02
 
@@ -711,24 +711,6 @@ admin02
 [jupyterhub]
 admin02
 
-# The MySQL host(s)
-[mysql]
-admin02
-
-# The MySQL hosts to install metrics exporters on
-[mysql_exporter]
-admin02
-
-[openstack_exporter]
-admin02
-
 # Experiment precis service(s)
 [precis]
 admin02
-
-# By default node metric exporters will be installed on all
-# hosts in all
-# Comment out host groups you don't want
-# to install the node exporters on.
-[node_exporter:children]
-baremetal

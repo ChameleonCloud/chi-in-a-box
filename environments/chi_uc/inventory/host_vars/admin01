@@ -1,3 +1,4 @@
 ---
+ansible_connection: local
 network_interface_external: br_ex
 network_interface_internal: br_em1

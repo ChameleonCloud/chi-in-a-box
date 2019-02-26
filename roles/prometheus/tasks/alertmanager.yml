@@ -1,35 +1,5 @@
 ---
-- name: Pull Alertmanager image.
-  docker_image:
-    name: "{{ prometheus_alertmanager_docker_image }}"
-
-- name: Create Alertmanager configuration directory.
-  file:
-    path: "{{ prometheus_alertmanager_config_dir }}"
-    state: directory
-
 - name: Configure Alertmanager.
-  block:
-    - name: Configure Alertmanager.
-      template:
-        src: alertmanager.yml.j2
-        dest: "{{ prometheus_alertmanager_config_dir }}/alertmanager.yml"
-        # mode: "0600"
-      notify:
-        - restart alertmanager
-    - name: Configure Alertmanager systemd service (alertmanager.service).
-      template:
-        src: alertmanager.service.j2
-        dest: /etc/systemd/system/alertmanager.service
-      notify:
-        - restart alertmanager
-  tags:
-    - configuration
-
-- name: Enable Alertmanager service on boot.
-  systemd:
-    service: alertmanager.service
-    # TODO: this is a thorny part of ansible and we shouldn't have to do this ourselves.
-    daemon_reload: yes
-    state: started
-    enabled: yes
+  template:
+    src: alertmanager.yml.j2
+    dest: "{{ service.config_dir }}/alertmanager.yml"

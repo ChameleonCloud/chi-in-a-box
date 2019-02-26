@@ -1,0 +1,24 @@
+# {{ ansible_managed }}
+[Unit]
+After=docker.service
+
+[Service]
+Restart=always
+ExecStart=/bin/docker run --name={{ item.service_name }} \
+{% if item.volumes is defined %}
+{% for volume in item.volumes %}
+                          -v {{ volume }} \
+{% endfor %}
+{% endif %}
+{% if item.port is defined %}
+                          -p {{ item.port }}:{{ item.port }} \
+{% endif %}
+{% if item.env_file is defined %}
+                          --env-file {{ item.env_file }} \
+{% endif %}
+                          {{ item.image }}
+ExecStop=/bin/docker stop -t 2 {{ item.service_name }}
+ExecStopPost=/bin/docker rm -f {{ item.service_name }}
+
+[Install]
+WantedBy=multi-user.target

@@ -1,48 +1,82 @@
 ---
-- name: Pull Prometheus image.
+- set_fact:
+    prometheus_services_list: "{{ prometheus_services | dict2items | map(attribute='value') | list }}"
+
+- name: Pull Docker images.
   docker_image:
-    name: "{{ prometheus_docker_image }}"
+    name: "{{ item.image }}"
+  loop: "{{ prometheus_services_list }}"
+  loop_control:
+    label: "{{ item.image | default('skipped') }}"
+  when: inventory_hostname in groups[item.group] and
+        item.image is defined
 
-- name: Create Prometheus configuration directory.
+- name: Create config directories.
   file:
-    path: "{{ prometheus_config_dir }}"
+    path: "{{ item.config_dir }}"
     state: directory
-
-- name: Configure Prometheus.
-  block:
-    - name: Create config directory.
-      file:
-        path: "{{ prometheus_config_dir }}"
-        state: directory
-    - name: Configure Prometheus.
-      template:
-        src: prometheus.yml.j2
-        dest: "{{ prometheus_config_dir }}/prometheus.yml"
-        # mode: "0600"
-      notify:
-        - restart prometheus
-    - name: Configure Prometheus systemd service (prometheus.service).
-      template:
-        src: prometheus.service.j2
-        dest: /etc/systemd/system/prometheus.service
-      notify:
-        - restart prometheus
-    - name: Configure mysql alert rules.
-      template:
-        src: mysql-rules.yml.j2
-        dest: "{{ prometheus_config_dir}}/mysql-rules.yml"
-      notify:
-        - restart prometheus
-  tags:
-    - configuration
-
-- name: Enable Prometheus service on boot.
-  systemd:
-    service: prometheus.service
-    # TODO: this is a thorny part of ansible and we shouldn't have to do this ourselves.
-    daemon_reload: yes
-    state: started
-    enabled: yes
+  loop: "{{ prometheus_services_list }}"
+  loop_control:
+    label: "{{ item.config_dir | default('skipped') }}"
+  when: inventory_hostname in groups[item.group] and
+        item.config_dir is defined
 
 - include_tasks: alertmanager.yml
-  when: prometheus_install_alertmanager
+  vars:
+    service: "{{ prometheus_services['alertmanager'] }}"
+  when: inventory_hostname in groups[service.group]
+
+- include_tasks: mysql_exporter.yml
+  vars:
+    service: "{{ prometheus_services['mysql-exporter'] }}"
+  when: inventory_hostname in groups[service.group]
+
+- include_tasks: node_exporter.yml
+  vars:
+    service: "{{ prometheus_services['node-exporter'] }}"
+  when: inventory_hostname in groups[service.group]
+
+- include_tasks: openstack_exporter.yml
+  vars:
+    service: "{{ prometheus_services['openstack-exporter'] }}"
+  when: inventory_hostname in groups[service.group]
+
+- include_tasks: server.yml
+  vars:
+    service: "{{ prometheus_services['server'] }}"
+  when: inventory_hostname in groups[service.group]
+
+- name: Create Docker services.
+  template:
+    src: systemd.service.j2
+    dest: "/usr/lib/systemd/system/{{ item.service_name }}.service"
+  notify:
+    - reload systemd daemon
+  loop: "{{ prometheus_services_list }}"
+  loop_control:
+    label: "{{ item.service_name }}"
+  when: inventory_hostname in groups[item.group] and
+        (item.custom_service is not defined or (not item.custom_service | bool))
+
+- name: Create custom services.
+  template:
+    src: "{{ item.service_name }}.service.j2"
+    dest: "/usr/lib/systemd/system/{{ item.service_name }}.service"
+  notify:
+    - reload systemd daemon
+  loop: "{{ prometheus_services_list }}"
+  loop_control:
+    label: "{{ item.service_name }}"
+  when: inventory_hostname in groups[item.group] and
+        item.custom_service is defined and
+        (item.custom_service | bool)
+
+- name: Enable services.
+  systemd:
+    service: "{{ item.service_name }}"
+    state: started
+    enabled: yes
+  loop: "{{ prometheus_services_list }}"
+  loop_control:
+    label: "{{ item.service_name }}"
+  when: inventory_hostname in groups[item.group]
