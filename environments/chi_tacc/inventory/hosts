@@ -160,8 +160,8 @@ control
 [ironic:children]
 control
 
-[ceph]
-r730xd-1
+[ceph:children]
+control
 
 [magnum:children]
 control
