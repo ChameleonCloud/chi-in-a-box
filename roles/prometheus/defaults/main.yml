@@ -28,6 +28,8 @@ prometheus_services:
     group: prometheus-alertmanager
     port: 9093
     config_dir: /etc/alertmanager
+    service_args:
+      - "--web.external-url=https://{{ prometheus_alertmanager_hostname }}"
     scrape_target: no
     volumes:
       - "alertmanager-data:/alertmanager"
