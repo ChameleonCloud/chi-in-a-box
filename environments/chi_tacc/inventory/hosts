@@ -14,7 +14,7 @@ chi01 ansible_become=yes ansible_become_user=root
 # No compute node; this is a baremetal-only cluster.
 
 [monitoring]
-chameleon04.tacc.utexas.edu
+chameleon04.tacc.utexas.edu ansible_become=yes ansible_become_user=root
 
 [storage]
 m01-07 ansible_become=yes ansible_become_user=root
