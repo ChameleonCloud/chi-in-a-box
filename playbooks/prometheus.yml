@@ -30,7 +30,6 @@
       loop: "{{ ansible_play_hosts_all | map('extract', hostvars) | list }}"
       loop_control:
         label: "{{ item.inventory_hostname }}"
-      when: inventory_hostname in groups[prometheus_services['server'].group]
   tasks:
     - name: Set facts for gathering in frontend hosts.
       set_fact:

@@ -16,3 +16,5 @@
   template:
     src: mysql_exporter.my.cnf.j2
     dest: "{{ service.config_dir }}/my.cnf"
+  vars:
+    mysql_host: "{{ ansible_internal_ipv4_addresses[groups.mariadb[0]] }}"
