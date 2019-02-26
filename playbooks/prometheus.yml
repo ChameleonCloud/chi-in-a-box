@@ -26,7 +26,7 @@
              | selectattr('ipv4', 'defined')
              | selectattr('ipv4.address', 'match', '10.*')
              | map(attribute='ipv4.address')
-             | list | last} | combine(ansible_internal_ipv4_addresses | default({})) }}
+             | list | last | default('') } | combine(ansible_internal_ipv4_addresses | default({})) }}
       loop: "{{ ansible_play_hosts_all | map('extract', hostvars) | list }}"
       loop_control:
         label: "{{ item.inventory_hostname }}"
