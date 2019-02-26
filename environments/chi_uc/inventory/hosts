@@ -723,5 +723,8 @@ admin01
 [jupyterhub:children]
 control
 
+[metric_collector:children]
+control
+
 [precis:children]
 control

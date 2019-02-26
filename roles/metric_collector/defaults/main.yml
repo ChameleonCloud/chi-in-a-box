@@ -1,0 +1,7 @@
+---
+metric_collector_docker_image: docker.chameleoncloud.org/gnocchi-metric-collector:2a16787
+metric_collector_service_name: gnocchi_metric_collector
+metric_collector_keystone_user: gnocchi
+metric_collector_keystone_password:
+metric_collector_keystone_project: services
+metric_collector_config_path: /etc/metrics
