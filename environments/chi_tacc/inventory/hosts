@@ -5,10 +5,10 @@
 # These initial groups are the only groups required to be modified. The
 # additional groups are for more control of the environment.
 [control]
-chi01 become=yes become_user=root
+chi01 ansible_become=yes ansible_become_user=root
 
 [network]
-chi01
+chi01 ansible_become=yes ansible_become_user=root
 
 [compute]
 # No compute node; this is a baremetal-only cluster.
@@ -17,7 +17,7 @@ chi01
 chameleon04.tacc.utexas.edu
 
 [storage]
-m01-07 become=yes become_user=root
+m01-07 ansible_become=yes ansible_become_user=root
 
 [deployment]
 localhost ansible_connection=local pip_virtualenv=/etc/ansible/venv
