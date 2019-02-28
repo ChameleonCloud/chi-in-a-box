@@ -3,7 +3,7 @@
   local_action:
     module: mysql_user
     login_host: "{{ groups.mariadb[0] }}"
-    login_password: "{{ mysql_root_password }}"
+    login_password: "{{ database_password }}"
     name: "{{ prometheus_mysql_exporter_user }}"
     # TODO: support changing this in some nicer way. This assumes that
     # the user is always installing this on the same node as the MySQL server

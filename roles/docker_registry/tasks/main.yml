@@ -5,17 +5,13 @@
   tags:
     - pull
 
-# TODO: uncomment when we have a more stable way of running advanced
-# Ansible modules on the deployment host. Currently these modules require
-# other pip dependencies which can mess up a production environment.
-# - name: Create OpenStack user for Swift storage.
-#   local_action:
-#     module: os_user
-#     name: "{{ docker_registry_swift_username }}"
-#     password: "{{ docker_registry_swift_password }}"
-#     region_name: "{{ openstack_keystone_master_region }}"
-#   no_log: True
-#   when: docker_registry_swift_create_user
+- name: Create OpenStack user for Swift storage.
+  local_action:
+    module: os_user
+    name: "{{ docker_registry_swift_username }}"
+    password: "{{ docker_registry_swift_password }}"
+    region_name: "{{ openstack_keystone_master_region }}"
+  no_log: True
 
 - name: Configure Docker Registry.
   block:
