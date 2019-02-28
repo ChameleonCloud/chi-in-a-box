@@ -1,14 +1,8 @@
 ---
 - hosts: mysql
-  tasks:
-    - import_tasks: ../tasks/gather_addresses.yml
 
 - hosts: rabbitmq
-  tasks:
-    - import_tasks: ../tasks/gather_addresses.yml
 
 - hosts: precis
-  tasks:
-    - import_tasks: ../tasks/gather_addresses.yml
   roles:
     - precis

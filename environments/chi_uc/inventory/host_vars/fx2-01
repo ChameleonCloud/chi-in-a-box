@@ -1,2 +1,2 @@
 ---
-network_interface_internal: em1
+network_interface: em1
