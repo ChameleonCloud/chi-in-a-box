@@ -12,4 +12,5 @@ ansible-playbook \
   --vault-id="${environment_name}@${ansible_dir}/vault_password" \
   --inventory="${environment_dir}/inventory" \
   --extra-vars="@${environment_dir}/passwords.yml" \
+  --extra-vars="@${environment_dir}/globals.yml" \
   "$@"
