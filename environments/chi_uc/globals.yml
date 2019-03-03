@@ -31,6 +31,7 @@ kolla_external_fqdn: "chi.uc.chameleoncloud.org"
 openstack_region_name: "CHI@UC"
 # Site name, similar to region but used for out-of-band inventory management
 chameleon_site_name: "uc"
+openstack_keystone_auth_url: "https://{{ kolla_external_fqdn }}:5000/v3"
 # TACC
 chi_tacc_openstack_region_name: "CHI@TACC"
 chi_tacc_chameleon_site_name: "tacc"
