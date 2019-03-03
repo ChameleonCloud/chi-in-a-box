@@ -43,6 +43,10 @@ prometheus_services:
     scrape_target: yes
     volumes:
       - "/etc/ceph:/etc/ceph"
+  jupyterhub-exporter:
+    group: jupyterhub
+    port: 8000
+    scrape_target: yes
   mysql-exporter:
     service_name: prometheus_mysql_exporter
     image: prom/mysqld-exporter:v0.11.0

@@ -56,6 +56,7 @@
   loop_control:
     label: "{{ item.service_name }}"
   when: inventory_hostname in groups[item.group] and
+        item.service_name is defined and
         (item.custom_service is not defined or (not item.custom_service | bool))
 
 - name: Create custom services.
@@ -68,6 +69,7 @@
   loop_control:
     label: "{{ item.service_name }}"
   when: inventory_hostname in groups[item.group] and
+        item.service_name is defined and
         item.custom_service is defined and
         (item.custom_service | bool)
 
@@ -79,4 +81,5 @@
   loop: "{{ prometheus_services_list }}"
   loop_control:
     label: "{{ item.service_name }}"
-  when: inventory_hostname in groups[item.group]
+  when: inventory_hostname in groups[item.group] and
+        item.service_name is defined
