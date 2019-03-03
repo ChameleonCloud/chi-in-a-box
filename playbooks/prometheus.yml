@@ -10,6 +10,7 @@
 - hosts:
     - prometheus
     - prometheus-ceph-exporter
+    - prometheus-jupyterhub-exporter
     - prometheus-mysqld-exporter
     - prometheus-node-exporter
     - prometheus-openstack-exporter

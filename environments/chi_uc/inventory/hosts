@@ -707,6 +707,9 @@ storage
 [prometheus-alertmanager:children]
 monitoring
 
+[prometheus-jupyterhub-exporter:children]
+jupyterhub
+
 ######################################
 # Legacy Ansible inventory
 ######################################
