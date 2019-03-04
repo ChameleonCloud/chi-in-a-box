@@ -44,9 +44,7 @@ enable_memcached: "yes"
 # External RabbitMQ
 enable_rabbitmq: "no"
 
-enable_blazar: "no"
 enable_cinder: "no"
-enable_glance: "yes"
 enable_gnocchi: "no"
 enable_grafana: "no"
 enable_swift: "no"
@@ -62,6 +60,8 @@ blazar_usage_project_exemptions:
   - openstack
   - maintenance
 
+enable_glance: "yes"
+glance_file_datadir_volume: /var/lib/glance
 # Glance
 # TODO [jca-2019-01-29]: remove this when we are on Rocky.
 # Override 'disabled' state of Glance Registry. This service was deprecated
