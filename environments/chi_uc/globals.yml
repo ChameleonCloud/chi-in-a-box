@@ -95,11 +95,11 @@ enable_horizon_blazar: "yes"
 enable_horizon_ironic: "yes"
 enable_horizon_chameleon_websso: "yes"
 horizon_help_url: https://chameleoncloud.readthedocs.io/en/latest/technical/baremetal.html
-horizon_chameleon_websso_host: https://dev.chameleon.tacc.utexas.edu
+horizon_chameleon_websso_host: https://www.chameleoncloud.org
 horizon_regions:
   - region_name: "{{ openstack_region_name }}"
     chameleon_site_name: "{{ chameleon_site_name }}"
-    blazar_database_host: "{{ kolla_internal_fqdn }}"
+    blazar_database_host: "fx2-01"
     blazar_database_name: "{{ blazar_database_name }}"
     blazar_database_port: "{{ blazar_database_port }}"
     blazar_database_user: "{{ blazar_database_user }}"
