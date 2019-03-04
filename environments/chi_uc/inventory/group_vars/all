@@ -6,7 +6,7 @@ kolla_internal_fqdn:
 admin_protocol:
 internal_protocol:
 public_protocol:
-blazar_database_name:
-blazar_database_user:
-blazar_database_port:
+blazar_database_name: blazar
+blazar_database_user: blazar
+blazar_database_port: 3306
 nova_api_port:
