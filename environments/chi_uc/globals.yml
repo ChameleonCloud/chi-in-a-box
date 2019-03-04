@@ -79,6 +79,7 @@ blazar_usage_project_exemptions:
 
 # Glance
 enable_glance: "no"
+glance_file_datadir_volume: /var/lib/glance
 # TODO [jca-2019-01-29]: remove this when we are on Rocky.
 # Override 'disabled' state of Glance Registry. This service was deprecated
 # but we still need to include it for Ocata.
