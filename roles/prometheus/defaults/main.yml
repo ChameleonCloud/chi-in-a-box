@@ -34,6 +34,12 @@ prometheus_services:
     volumes:
       - "alertmanager-data:/alertmanager"
       - "/etc/alertmanager:/etc/alertmanager"
+  apache-exporter:
+    service_name: prometheus_apache_exporter
+    image: docker.chameleoncloud.org/apache_exporter:77c9bc9
+    group: prometheus-apache-exporter
+    port: 9117
+    scrape_target: yes
   ceph-exporter:
     service_name: prometheus_ceph_exporter
     image: digitalocean/ceph_exporter:2.0.0-luminous
