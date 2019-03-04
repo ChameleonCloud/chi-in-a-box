@@ -38,6 +38,7 @@ DEFAULT_THEME = 'chameleoncloud'
 
 # Used by server instance page to create links from the instance overview
 # to the resource catalog.
+CHAMELEON_PORTAL_API_BASE_URL = 'https://www.chameleoncloud.org'
 CHAMELEON_SITES = {
 {% for conf in horizon_regions %}
   '{{ conf.region_name }}': '{{ conf.chameleon_site_name }}',
