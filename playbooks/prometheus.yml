@@ -1,6 +1,7 @@
 ---
 - hosts:
     - prometheus
+    - prometheus-apache-exporter
     - prometheus-ceph-exporter
     - prometheus-mysqld-exporter
     - prometheus-openstack-exporter
@@ -9,6 +10,7 @@
 
 - hosts:
     - prometheus
+    - prometheus-apache-exporter
     - prometheus-ceph-exporter
     - prometheus-jupyterhub-exporter
     - prometheus-mysqld-exporter
