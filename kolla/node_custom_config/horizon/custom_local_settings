@@ -1,10 +1,12 @@
 from openstack_dashboard.settings import HORIZON_CONFIG
 from os import environ
 
-# Kolla normally adds this for us if kolla_external_tls_enabled is true,
-# but since we (currently) aren't using the built-in HAProxy, we include it
-# manually. SSL termination is happening outside of here, via old httpd code.
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+# Kolla-ansible defaults this to 'internalURL', which doesn't work when
+# we need to access another region from across the public internet. Need
+# to unfortunately default to 'public' interface for all endpoints as it is
+# not currently possible (?) to use a different value here depending on which
+# region is being used.
+OPENSTACK_ENDPOINT_TYPE = "publicURL"
 
 SITE_BRANDING = 'ChameleonCloud'
 
