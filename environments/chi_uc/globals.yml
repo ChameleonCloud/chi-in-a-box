@@ -36,8 +36,11 @@ openstack_keystone_auth_url: "https://{{ kolla_external_fqdn }}:5000/v3"
 chi_tacc_openstack_region_name: "CHI@TACC"
 chi_tacc_chameleon_site_name: "tacc"
 chi_tacc_blazar_database_host: "129.114.97.205"
+chi_tacc_keystone_auth_url: "https://chi.tacc.chameleoncloud.org:5000/v3"
 # We have Keystone's db replicated; ensure any writes to Keystone happen against master
 openstack_keystone_master_region: "{{ chi_tacc_openstack_region_name }}"
+openstack_auth:
+  auth_url: "{{ chi_tacc_keystone_auth_url }}"
 
 # External MariaDB config
 enable_mariadb: "no"
@@ -120,6 +123,7 @@ ironic_pxe_append_params: "nofb nomodeset vga=normal console=tty0 console=ttyS0,
 
 # Keystone
 enable_keystone: "no"
+keystone_admin_project: "openstack"
 
 # Neutron
 enable_neutron: "no"
