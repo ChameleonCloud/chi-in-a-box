@@ -75,7 +75,7 @@ blazar_usage_project_exemptions:
   - openstack
 
 # Glance
-enable_glance: "no"
+enable_glance: "yes"
 glance_file_datadir_volume: /var/lib/glance
 # TODO [jca-2019-01-29]: remove this when we are on Rocky.
 # Override 'disabled' state of Glance Registry. This service was deprecated
