@@ -38,9 +38,6 @@ chi_tacc_chameleon_site_name: "tacc"
 chi_tacc_blazar_database_host: "129.114.97.205"
 # We have Keystone's db replicated; ensure any writes to Keystone happen against master
 openstack_keystone_master_region: "{{ chi_tacc_openstack_region_name }}"
-multiple_regions_names:
-    - "{{ openstack_region_name }}"
-    - "{{ chi_tacc_openstack_region_name }}"
 
 # External MariaDB config
 enable_mariadb: "no"
