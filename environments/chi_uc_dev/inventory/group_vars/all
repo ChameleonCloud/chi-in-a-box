@@ -1,4 +1,16 @@
 ---
+# Set defaults for variables that are applied by default by Kolla. These are
+# just so that the globals.yml, which references these variables, can be
+# evaluated by Ansible even when it's not running something related to Kolla.
+kolla_internal_fqdn:
+admin_protocol:
+internal_protocol:
+public_protocol:
+blazar_database_name: blazar
+blazar_database_user: blazar
+blazar_database_port: 3306
+nova_api_port:
+
 ansible_python_interpreter: /etc/ansible/venv/bin/python
 pip_virtualenv: /etc/ansible/venv
 

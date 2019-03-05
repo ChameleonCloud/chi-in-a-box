@@ -6,7 +6,12 @@ from os import environ
 # to unfortunately default to 'public' interface for all endpoints as it is
 # not currently possible (?) to use a different value here depending on which
 # region is being used.
-OPENSTACK_ENDPOINT_TYPE = "publicURL"
+OPENSTACK_ENDPOINT_TYPE = 'publicURL'
+
+# Default user to specific region on login.
+DEFAULT_SERVICE_REGIONS = {
+  OPENSTACK_KEYSTONE_URL: '{{ openstack_region_name }}',
+}
 
 SITE_BRANDING = 'ChameleonCloud'
 
