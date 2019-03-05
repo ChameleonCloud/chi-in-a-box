@@ -120,7 +120,7 @@ control
 control
 
 [glance:children]
-control
+storage_phase1
 
 [nova:children]
 control
