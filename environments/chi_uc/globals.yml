@@ -37,8 +37,7 @@ chi_tacc_openstack_region_name: "CHI@TACC"
 chi_tacc_chameleon_site_name: "tacc"
 chi_tacc_blazar_database_host: "129.114.97.205"
 chi_tacc_keystone_auth_url: "https://chi.tacc.chameleoncloud.org:5000/v3"
-# We have Keystone's db replicated; ensure any writes to Keystone happen against master
-openstack_keystone_master_region: "{{ chi_tacc_openstack_region_name }}"
+# Keystone's DB is replicated; ensure any writes happen against master
 keystone_primary_region_name: "{{ chi_tacc_openstack_region_name }}"
 openstack_auth:
   auth_url: "{{ chi_tacc_keystone_auth_url }}"

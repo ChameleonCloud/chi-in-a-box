@@ -10,7 +10,7 @@
     module: os_user
     name: "{{ docker_registry_swift_username }}"
     password: "{{ docker_registry_swift_password }}"
-    region_name: "{{ openstack_keystone_master_region }}"
+    region_name: "{{ keystone_primary_region_name }}"
   no_log: True
 
 - name: Configure Docker Registry.
