@@ -46,6 +46,7 @@ openstack_auth:
 # External MariaDB config
 enable_mariadb: "no"
 use_preconfigured_databases: "yes"
+database_address: "fx2-01"
 
 # External TLS config
 enable_haproxy: "no"
