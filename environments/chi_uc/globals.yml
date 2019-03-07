@@ -89,7 +89,7 @@ glance_services:
     enabled: true
 
 # Heat
-enable_heat: "no"
+enable_heat: "yes"
 
 # Horizon
 enable_horizon: "yes"
