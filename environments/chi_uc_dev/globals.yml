@@ -33,9 +33,7 @@ use_preconfigured_databases: "yes"
 
 # External TLS config
 enable_haproxy: "no"
-# Account for the fact that we're terminating TLS ourselves
-kolla_enable_tls_external: "no"
-public_protocol: "https"
+kolla_enable_tls_external: "yes"
 
 # Kolla sidecar/support containers
 enable_chrony: "yes"
