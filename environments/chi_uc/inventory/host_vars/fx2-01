@@ -1,2 +1,3 @@
 ---
 network_interface: em1
+kolla_internal_vip_address: "10.140.80.185"
