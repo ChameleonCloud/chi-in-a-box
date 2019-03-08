@@ -720,3 +720,7 @@ admin02
 # Experiment precis service(s)
 [precis]
 admin02
+
+# Chameleon vendordata service
+[vendordata]
+admin02

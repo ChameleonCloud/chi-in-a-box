@@ -1,14 +1,14 @@
 [openstack]
-auth_url: {{ openstack_keystone_auth_url }}
+auth_url: {{ openstack_keystone_auth_uri }}
 
 [chameleon]
 cluster: chameleon
 grid: chameleoncloud
 site: {{ chameleon_site_name }}
 region: {{ openstack_region_name }}
-admin_username: {{ admin_username }}
-admin_password: {{ admin_password }}
-admin_project_name: {{ admin_project_name }}
+admin_username: {{ keystone_admin_username }}
+admin_password: {{ keystone_admin_password }}
+admin_project_name: {{ keystone_admin_project_name }}
 
 [instance_metrics_writer]
 username: {{ instance_metrics_writer_username }}

@@ -1,4 +1,5 @@
 ---
+docker_path: "/bin/docker"
 docker_namespace: "kolla"
 docker_registry_username: "kolla"
 docker_registry: "docker.chameleoncloud.org"
@@ -16,6 +17,7 @@ kolla_external_fqdn: "dev.uc.chameleoncloud.org"
 
 # Multi-region configuration
 openstack_region_name: "CHI_DEV_UC"
+openstack_keystone_auth_uri: "https://dev.uc.chameleoncloud.org:5000"
 # Site name, similar to region but used for out-of-band inventory management
 chameleon_site_name: "uc"
 # TACC
@@ -104,6 +106,8 @@ ironic_pxe_append_params: "nofb nomodeset vga=normal console=tty0 console=ttyS0,
 # Keystone
 enable_keystone: "yes"
 use_preconfigured_fernet: "yes"
+keystone_admin_username: "admin"
+keystone_admin_project_name: "openstack"
 
 # Neutron
 enable_neutron: "yes"
@@ -135,6 +139,7 @@ neutron_ml2_generic_switch_configs:
     password: "{{ chameleon_switch_dell_password }}"
 
 # Nova
+nova_keystone_user: "nova"
 enable_nova: "yes"
 enable_nova_serialconsole_proxy: "yes"
 nova_compute_virt_type: "none"

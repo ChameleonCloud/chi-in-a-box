@@ -18,7 +18,7 @@
         src: "vendordata.conf.j2"
         mode: 0640
         dest: "{{ vendordata_config_path }}/vendordata.conf"
-        owner: "{{ nova_user }}"
+        owner: "{{ nova_keystone_user }}"
       notify:
         - restart vendordata service
     - name: Configure systemd service.
