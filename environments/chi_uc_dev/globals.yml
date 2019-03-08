@@ -20,12 +20,15 @@ kolla_external_vip_interface: "br_ex"
 openstack_region_name: "CHI_DEV_UC"
 # Site name, similar to region but used for out-of-band inventory management
 chameleon_site_name: "uc"
+# TACC
 chi_tacc_openstack_region_name: "CHI_DEV"
 chi_tacc_chameleon_site_name: "tacc"
 chi_tacc_blazar_database_host: "129.114.97.177"
-multiple_regions_names:
-    - "{{ openstack_region_name }}"
-    - "{{ chi_tacc_openstack_region_name }}"
+chi_tacc_keystone_auth_url: "https://dev.tacc.chameleoncloud.org:5000/v3"
+# Keystone's DB is replicated; ensure any writes happen against master
+keystone_primary_region_name: "{{ chi_tacc_openstack_region_name }}"
+openstack_auth:
+  auth_url: "{{ chi_tacc_keystone_auth_url }}"
 
 # External MariaDB config
 enable_mariadb: "no"
