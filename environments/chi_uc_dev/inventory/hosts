@@ -698,6 +698,12 @@ storage
 [prometheus-alertmanager:children]
 monitoring
 
+[prometheus-apache-exporter:children]
+frontends
+
+[prometheus-jupyterhub-exporter:children]
+jupyterhub
+
 ######################################
 # Legacy Ansible inventory
 ######################################
