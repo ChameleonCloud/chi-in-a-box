@@ -1,11 +1,123 @@
 ---
-openstack_region_name: "CHI_DEV"
-openstack_keystone_auth_url: "https://dev.tacc.chameleoncloud.org:5000"
-chameleon_site_name: "tacc"
 
+# Basics
+docker_namespace: "kolla"
+docker_registry_username: "kolla"
+docker_registry: "docker.chameleoncloud.org"
+kolla_base_distro: "centos"
+kolla_install_type: "source"
+virtualenv: "/etc/ansible/venv"
+ansible_python_interpreter: "/etc/ansible/venv/bin/python"
+
+#TODO what?
 admin_username: "admin"
 admin_project_name: "openstack"
-
 instance_metrics_writer_username: instance_metrics_writer
 
+# Docker image tag to use for deployed containers
+openstack_release: "chameleoncloud-ocata"
+#openstack_logging_debug: "True"
+
+# Network configuration
+kolla_internal_vip_address: "10.20.111.240"
+kolla_external_vip_address: "129.114.97.177"
+kolla_external_fqdn: "dev.tacc.chameleoncloud.org"
+
+#TODO (hammock) move to host_vars?
+kolla_external_vip_interface: "em3"
+api_interface_address: "10.20.111.244"
+network_interface: "em1"
+
+# Site & Region configuration
+openstack_region_name: "CHI_DEV"
+#openstack_auth:
+#  auth_url: "https://dev.tacc.chameleoncloud.org:5000"
+chameleon_site_name: "tacc"
+openstack_interface: "public"
+
+# External MariaDB config
+enable_mariadb: "no"
+database_address: "10.20.111.244"
+use_preconfigured_databases: "yes"
+
+# Kolla sidecar/support containers
+enable_chrony: "no"
+enable_fluentd: "yes"
+enable_central_logging: "no"
+enable_memcached: "yes"
+
+# External RabbitMQ
+enable_rabbitmq: "no"
+
+# Blazar
+enable_blazar: "yes"
+blazar_minutes_before_end_lease: 2880 # When to send lease notification email
+blazar_default_max_lease_duration: 604800 # 7 days
+blazar_usage_default_allocated: 200000.0
+blazar_usage_project_exemptions:
+  - Chameleon
+  - admin
+  - openstack
+  - maintenance
+
+# Glance
+enable_glance: "yes"
+glance_file_datadir_volume: "/var/lib/glance"
+#glance_upgrading: False
+# TODO [jca-2019-01-29]: remove this when we are on Rocky.
+# Override 'disabled' state of Glance Registry. This service was deprecated
+# but we still need to include it for Ocata.
+glance_services:
+  glance-registry:
+    enabled: true
+
+# HAProxy
+enable_haproxy: "yes"
+kolla_enable_tls_external: "yes"
+kolla_external_fqdn_cert: "{{ node_custom_config }}/certificates/{{ kolla_external_fqdn }}.pem"
+kolla_external_fqdn_cacert: "{{ node_custom_config }}/certificates/{{ kolla_external_fqdn }}-interm.cer"
+keepalived_virtual_router_id: "52"
+
+# Horizon
+enable_horizon: "yes"
+enable_horizon_blazar: "yes"
+enable_horizon_ironic: "yes"
+horizon_keystone_url: "https://dev.tacc.chameleoncloud.org:5000"
+horizon_help_url: "https://chameleoncloud.readthedocs.io/en/latest/technical/baremetal.html"
+chameleon_resource_site: "tacc"
+chameleon_site_name: "tacc"
+enable_horizon_chameleon_websso: "yes"
+horizon_chameleon_websso_host: "https://dev.chameleon.tacc.utexas.edu"
+horizon_regions:
+  - region_name: "{{ openstack_region_name }}"
+    chameleon_site_name: "{{ chameleon_site_name }}"
+    blazar_database_host: "{{ kolla_internal_fqdn }}"
+    blazar_database_name: "blazar"
+    blazar_database_port: "3306"
+    blazar_database_user: "blazar"
+    blazar_database_password: "{{ blazar_database_password }}"
+
+
+# Ironic
+enable_ironic: "no"
+
+# Keystone
+enable_keystone: "yes"
+fernet_token_expiry: 172800 # Effectively disables fernet rotation cron job
+
+# Nova
+enable_nova: "no"
 nova_user: "nova"
+
+# Neutron
+enable_neutron: "no"
+enable_openvswitch: "no"
+
+enable_ironic_neutron_agent: "no"
+
+# Others
+enable_cinder: "no"
+enable_gnocchi: "no"
+enable_grafana: "no"
+enable_heat: "no"
+enable_swift: "no"
