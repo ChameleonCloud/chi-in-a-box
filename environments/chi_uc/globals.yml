@@ -77,6 +77,7 @@ blazar_usage_default_allocated: 20000.0
 blazar_usage_project_exemptions:
   - Chameleon
   - maintenance
+blazar_database_address: "{{ database_address }}:{{ database_port }}"
 
 # Glance
 enable_glance: "yes"
