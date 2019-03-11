@@ -5,13 +5,13 @@ After=docker.service
 
 [Service]
 Restart=always
-ExecStart=/bin/docker run --name %N \
-                          --net host \
-                          --mount 'type=bind,src={{ vendordata_config_file }},dst={{ vendordata_config_file }}' \
-                          --mount 'type=bind,src={{ nova_config_file }},dst={{ nova_config_file }}' \
-                          {{ vendordata_service_docker_image }}
-ExecStop=/bin/docker stop -t 2 %N
-ExecStopPost=/bin/docker rm -f %N
+ExecStart={{ docker_path }} run --name %N \
+                                --net host \
+                                -v '{{ vendordata_config_file }}:{{ vendordata_config_file }}' \
+                                -v '{{ nova_api_config_file }}:{{ vendordata_nova_config_file }}' \
+                                {{ vendordata_service_docker_image }}
+ExecStop={{ docker_path }} stop -t 2 %N
+ExecStopPost={{ docker_path }} rm -f %N
 
 [Install]
 WantedBy=multi-user.target

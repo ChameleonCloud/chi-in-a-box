@@ -30,10 +30,11 @@ network_interface: "em1"
 
 # Site & Region configuration
 openstack_region_name: "CHI_DEV"
-#openstack_auth:
-#  auth_url: "https://dev.tacc.chameleoncloud.org:5000"
+openstack_keystone_auth_uri: "https://dev.tacc.chameleoncloud.org:5000"
 chameleon_site_name: "tacc"
 openstack_interface: "public"
+keystone_admin_username: "admin"
+keystone_admin_project_name: "openstack"
 
 # External MariaDB config
 enable_mariadb: "no"
@@ -107,7 +108,7 @@ fernet_token_expiry: 172800 # Effectively disables fernet rotation cron job
 
 # Nova
 enable_nova: "no"
-nova_user: "nova"
+nova_keystone_user: "nova"
 
 # Neutron
 enable_neutron: "no"
