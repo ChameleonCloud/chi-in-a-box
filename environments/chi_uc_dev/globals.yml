@@ -32,7 +32,6 @@ openstack_auth:
 
 # External MariaDB config
 enable_mariadb: "no"
-use_preconfigured_databases: "yes"
 
 # External TLS config
 enable_haproxy: "yes"
@@ -106,8 +105,7 @@ ironic_pxe_append_params: "nofb nomodeset vga=normal console=tty0 console=ttyS0,
 # Keystone
 enable_keystone: "yes"
 use_preconfigured_fernet: "yes"
-keystone_admin_username: "admin"
-keystone_admin_project_name: "openstack"
+keystone_admin_project: "openstack"
 
 # Neutron
 enable_neutron: "yes"
