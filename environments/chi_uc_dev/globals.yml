@@ -33,10 +33,6 @@ openstack_auth:
 # External MariaDB config
 enable_mariadb: "no"
 
-# External TLS config
-enable_haproxy: "yes"
-kolla_enable_tls_external: "yes"
-
 # Kolla sidecar/support containers
 enable_chrony: "yes"
 enable_fluentd: "yes"
@@ -69,8 +65,13 @@ glance_services:
   glance-registry:
     enabled: true
 
+# HAProxy
+enable_haproxy: "yes"
+kolla_enable_tls_external: "yes"
+
 # Heat
 enable_heat: "yes"
+heat_tag: chameleoncloud-rocky
 
 # Horizon
 enable_horizon: "yes"
