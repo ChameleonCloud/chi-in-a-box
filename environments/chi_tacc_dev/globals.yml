@@ -100,7 +100,7 @@ horizon_regions:
 
 
 # Ironic
-enable_ironic: "no"
+enable_ironic: "yes"
 ironic_provisioning_network: 54cdc54f-8050-47c8-bb2c-7f810b8d512e
 ironic_cleaning_network: "{{ ironic_provisioning_network }}"
 ironic_image_cache_size: 20480 # MB
