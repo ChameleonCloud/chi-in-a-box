@@ -13,4 +13,4 @@
   template:
     src: openstack_exporter.yml.j2
     mode: 0600
-    dest: "{{ service.config_dir}}/openstack_exporter.yml"
+    dest: "{{ service.config_dir }}/openstack_exporter.yml"
