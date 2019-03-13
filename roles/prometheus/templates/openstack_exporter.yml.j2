@@ -1,9 +1,6 @@
 ---
 {% if openstack_exporter_corsa_switches | length > 0 %}
 switch_corsa:
-  resource_type: switch
-  # Batch size is roughly the number of ports across all switches
-  batch_size: {{ (openstack_exporter_corsa_switches | length) * 32 }}
   switches:
 {% for switch in openstack_exporter_corsa_switches %}
     - name: {{ switch.name }}

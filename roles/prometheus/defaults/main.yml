@@ -81,4 +81,4 @@ prometheus_services:
     env_file: /etc/prometheus/openstack_exporter.env
     scrape_target: yes
     volumes:
-      - "/etc/prometheus/openstack_exporter.yml:/usr/local/bin/exporte/config.yml"
+      - "/etc/prometheus/openstack_exporter.yml:/usr/local/bin/exporter/config.yml"
