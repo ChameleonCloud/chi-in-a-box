@@ -70,14 +70,15 @@ docker_registry_readonly_user: registry
 jenkins_slave_name: ansible-uc-prod
 
 # Blazar
-enable_blazar: "no"
+enable_blazar: "yes"
 blazar_minutes_before_end_lease: 2880 # When to send lease notification email
 blazar_default_max_lease_duration: 604800 # 7 days
+blazar_usage_db_host: chi.uc.chameleoncloud.org
 blazar_usage_default_allocated: 20000.0
 blazar_usage_project_exemptions:
   - Chameleon
   - maintenance
-  - openstack
+blazar_database_address: "{{ database_address }}:{{ database_port }}"
 
 # Glance
 enable_glance: "yes"
@@ -94,7 +95,6 @@ enable_heat: "yes"
 
 # Horizon
 enable_horizon: "yes"
-enable_horizon_blazar: "yes"
 enable_horizon_ironic: "yes"
 enable_horizon_chameleon_websso: "yes"
 horizon_help_url: https://chameleoncloud.readthedocs.io/en/latest/technical/baremetal.html

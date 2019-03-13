@@ -32,11 +32,6 @@ openstack_auth:
 
 # External MariaDB config
 enable_mariadb: "no"
-use_preconfigured_databases: "yes"
-
-# External TLS config
-enable_haproxy: "yes"
-kolla_enable_tls_external: "yes"
 
 # Kolla sidecar/support containers
 enable_chrony: "yes"
@@ -70,8 +65,13 @@ glance_services:
   glance-registry:
     enabled: true
 
+# HAProxy
+enable_haproxy: "yes"
+kolla_enable_tls_external: "yes"
+
 # Heat
 enable_heat: "yes"
+heat_tag: chameleoncloud-rocky
 
 # Horizon
 enable_horizon: "yes"
@@ -97,6 +97,7 @@ horizon_regions:
 
 # Ironic
 enable_ironic: "yes"
+ironic_tag: chameleoncloud-rocky
 ironic_provisioning_network: ironic-provisioning-network
 ironic_cleaning_network: "{{ ironic_provisioning_network }}"
 ironic_tftp_server: 10.51.0.254 # Should be on the provisioning network
@@ -106,12 +107,12 @@ ironic_pxe_append_params: "nofb nomodeset vga=normal console=tty0 console=ttyS0,
 # Keystone
 enable_keystone: "yes"
 use_preconfigured_fernet: "yes"
-keystone_admin_username: "admin"
-keystone_admin_project_name: "openstack"
+keystone_admin_project: "openstack"
 
 # Neutron
 enable_neutron: "yes"
 enable_openvswitch: "yes"
+neutron_tag: chameleoncloud-rocky
 # TODO [jca 2019-01-29]: remove this when we can take advantage of this
 # component, which was introduced after Ocata.
 enable_ironic_neutron_agent: "no"
@@ -139,9 +140,10 @@ neutron_ml2_generic_switch_configs:
     password: "{{ chameleon_switch_dell_password }}"
 
 # Nova
-nova_keystone_user: "nova"
 enable_nova: "yes"
+nova_tag: chameleoncloud-rocky
 enable_nova_serialconsole_proxy: "yes"
+nova_keystone_user: "nova"
 nova_compute_virt_type: "none"
 # We are not using any VNC consoles; the serialproxy is not considered a 'nova_console'
 nova_console: "none"
