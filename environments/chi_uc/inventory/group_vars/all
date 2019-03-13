@@ -10,3 +10,4 @@ blazar_database_name: blazar
 blazar_database_user: blazar
 blazar_database_port: 3306
 nova_api_port:
+database_port: 3306
