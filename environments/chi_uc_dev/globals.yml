@@ -32,6 +32,7 @@ openstack_auth:
 
 # External MariaDB config
 enable_mariadb: "no"
+database_address: "10.140.80.97"
 
 # Kolla sidecar/support containers
 enable_chrony: "yes"
