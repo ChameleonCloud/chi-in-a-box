@@ -12,7 +12,6 @@ ansible_python_interpreter: "/etc/ansible/venv/bin/python"
 #TODO what?
 admin_username: "admin"
 admin_project_name: "openstack"
-instance_metrics_writer_username: instance_metrics_writer
 
 # Docker image tag to use for deployed containers
 openstack_release: "chameleoncloud-ocata"
@@ -111,14 +110,50 @@ enable_keystone: "yes"
 fernet_token_expiry: 172800 # Effectively disables fernet rotation cron job
 
 # Nova
-enable_nova: "no"
+enable_nova: "yes"
+enable_nova_serialconsole_proxy: "yes"
+nova_compute_virt_type: "none"
+# We are not using any VNC consoles; the serialproxy is not considered a 'nova_console'
+nova_console: "none"
+# We override the endpoints to not include %(tenant_id)s placeholder.
+# Blazar in particular needs this to not be scoped to the tenant because when
+# it tries to perform actions on behalf of a user, it uses a different tenant
+# id (its own).
+nova_admin_endpoint: "{{ admin_protocol }}://{{ kolla_internal_fqdn }}:{{ nova_api_port }}/v2.1"       
+nova_internal_endpoint: "{{ internal_protocol }}://{{ kolla_internal_fqdn }}:{{ nova_api_port }}/v2.1" 
+nova_public_endpoint: "{{ public_protocol }}://{{ kolla_external_fqdn }}:{{ nova_api_port }}/v2.1"     
 nova_keystone_user: "nova"
+instance_metrics_writer_username: instance_metrics_writer
 
 # Neutron
-enable_neutron: "no"
-enable_openvswitch: "no"
+enable_neutron: "yes"
+enable_openvswitch: "yes"
+neutron_bridge_name: br-em2,br-ex
+neutron_external_interface: em2,p1p1
 
+# TODO [jca 2019-01-29]: remove this when we can take advantage of this
+# component, which was introduced after Ocata.
 enable_ironic_neutron_agent: "no"
+chameleon_switch_dell_username: chamadm
+chameleon_switch_fx2_username: root
+# Enable notifications for Experiment Precis
+neutron_notification_topics:
+  - name: "notifications"
+    enabled: "yes"
+neutron_type_drivers: flat,vlan
+neutron_tenant_network_types: vlan
+neutron_network_vlan_ranges: physnet1:300:349
+neutron_ml2_generic_switch_configs:
+  - name: roc-bc33-sw1
+    device_type: netmiko_dell_force10
+    ip: 172.26.102.82
+    username: "{{ chameleon_switch_dell_username }}"
+    password: "{{ chameleon_switch_dell_password }}"
+  - name: c07-f1s1
+    device_type: fnioa_netmiko_dell_force10
+    ip: 172.16.110.30
+    username: "{{ chameleon_switch_fx2_username }}"
+    password: "{{ chameleon_switch_fx2_password }}"
 
 # Others
 enable_cinder: "no"
