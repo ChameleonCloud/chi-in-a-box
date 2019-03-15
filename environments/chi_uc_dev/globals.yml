@@ -61,7 +61,7 @@ blazar_usage_project_exemptions:
 # Glance
 enable_glance: "yes"
 glance_file_datadir_volume: /var/lib/glance
-glace_tag: chameleoncloud-rocky
+glance_tag: chameleoncloud-rocky
 
 # HAProxy
 enable_haproxy: "yes"
