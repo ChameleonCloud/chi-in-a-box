@@ -41,9 +41,13 @@ enable_memcached: "yes"
 # External RabbitMQ
 enable_rabbitmq: "no"
 
+# Monitoring
+enable_central_logging: "yes"
+enable_grafana: "no"
+enable_prometheus: "no"
+
 enable_cinder: "no"
 enable_gnocchi: "no"
-enable_grafana: "no"
 enable_swift: "no"
 
 # Blazar
