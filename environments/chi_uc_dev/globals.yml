@@ -8,7 +8,7 @@ kolla_install_type: "source"
 virtualenv: /etc/ansible/venv
 
 # Docker image tag to use for deployed containers
-openstack_release: "chameleoncloud-ocata"
+openstack_release: "chameleoncloud-rocky"
 
 # Network configuration
 kolla_internal_vip_address: "10.140.81.3"
@@ -41,9 +41,13 @@ enable_memcached: "yes"
 # External RabbitMQ
 enable_rabbitmq: "no"
 
+# Monitoring
+enable_central_logging: "yes"
+enable_grafana: "no"
+enable_prometheus: "no"
+
 enable_cinder: "no"
 enable_gnocchi: "no"
-enable_grafana: "no"
 enable_swift: "no"
 
 # Blazar
@@ -61,7 +65,6 @@ blazar_usage_project_exemptions:
 # Glance
 enable_glance: "yes"
 glance_file_datadir_volume: /var/lib/glance
-glance_tag: chameleoncloud-rocky
 
 # HAProxy
 enable_haproxy: "yes"
@@ -69,11 +72,9 @@ kolla_enable_tls_external: "yes"
 
 # Heat
 enable_heat: "yes"
-heat_tag: chameleoncloud-rocky
 
 # Horizon
 enable_horizon: "yes"
-enable_horizon_blazar: "yes"
 enable_horizon_chameleon_websso: "yes"
 horizon_help_url: https://chameleoncloud.readthedocs.io/en/latest/technical/baremetal.html
 horizon_chameleon_websso_host: https://dev.chameleon.tacc.utexas.edu
@@ -95,7 +96,6 @@ horizon_regions:
 
 # Ironic
 enable_ironic: "yes"
-ironic_tag: chameleoncloud-rocky
 ironic_provisioning_network: ironic-provisioning-network
 ironic_cleaning_network: "{{ ironic_provisioning_network }}"
 ironic_tftp_server: 10.51.0.254 # Should be on the provisioning network
@@ -110,7 +110,6 @@ keystone_admin_project: "openstack"
 # Neutron
 enable_neutron: "yes"
 enable_openvswitch: "yes"
-neutron_tag: chameleoncloud-rocky
 # TODO [jca 2019-01-29]: remove this when we can take advantage of this
 # component, which was introduced after Ocata.
 enable_ironic_neutron_agent: "no"
@@ -139,7 +138,6 @@ neutron_ml2_generic_switch_configs:
 
 # Nova
 enable_nova: "yes"
-nova_tag: chameleoncloud-rocky
 enable_nova_serialconsole_proxy: "yes"
 nova_keystone_user: "nova"
 nova_compute_virt_type: "none"
