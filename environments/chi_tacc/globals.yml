@@ -153,16 +153,165 @@ neutron_type_drivers: flat,vlan
 neutron_tenant_network_types: vlan
 neutron_network_vlan_ranges: physnet4:1999:1999,physnet1:2000:2010,physnet1:2013:2020,physnet1:2023:2499,physnet3:3500:3500,physnet3:3504:3505,physnet3:3507:3508
 neutron_ml2_generic_switch_configs:
-#  - name: roc-bc33-sw1
+  - name: roc-be24-sw1 # m01
+    device_type: netmiko_dell_force10
+    ip: 172.26.102.28
+    username: "{{ chameleon_switch_dell_username }}"
+    password: "{{ chameleon_switch_dell_password }}"
+  - name: moonshot-sa # moonshot
+    device_type: netmiko_hp_comware
+    ip: 172.16.110.46
+    username: "{{ chameleon_switch_dell_username }}"
+    password: "{{ chameleon_switch_dell_password }}"
+  - name: roc-bc24-sw1 # c01
+    device_type: netmiko_dell_force10
+    ip: 172.26.102.98
+    username: "{{ chameleon_switch_dell_username }}"
+    password: "{{ chameleon_switch_dell_password }}"
+  - name: roc-be26-sw1 # c02
+    device_type: netmiko_dell_force10
+    ip: 172.26.102.87
+    username: "{{ chameleon_switch_dell_username }}"
+    password: "{{ chameleon_switch_dell_password }}"
+  - name: c02-f1s1 # c02-f1s1
+    device_type: fnioa_netmiko_dell_force10
+    ip: 172.16.110.10
+    username: "{{ chameleon_switch_fx2_username }}"
+    password: "{{ chameleon_switch_fx2_password }}"
+  - name: c02-f2s1 # c02-f2s1
+    device_type: fnioa_netmiko_dell_force10
+    ip: 172.16.110.12
+    username: "{{ chameleon_switch_fx2_username }}"
+    password: "{{ chameleon_switch_fx2_password }}"
+  - name: roc-bd26-sw1 # c03
+    device_type: netmiko_dell_force10
+    ip: 172.26.102.89
+    username: "{{ chameleon_switch_dell_username }}"
+    password: "{{ chameleon_switch_dell_password }}"
+  - name: c03-f1s1 # c03-f1s1
+    device_type: fnioa_netmiko_dell_force10
+    ip: 172.16.110.14
+    username: "{{ chameleon_switch_fx2_username }}"
+    password: "{{ chameleon_switch_fx2_password }}"
+  - name: c03-f2s1 # c03-f2s1
+    device_type: fnioa_netmiko_dell_force10
+    ip: 172.16.110.16
+    username: "{{ chameleon_switch_fx2_username }}"
+    password: "{{ chameleon_switch_fx2_password }}"
+  - name: roc-bc26-sw1 # c04
+    device_type: netmiko_dell_force10
+    ip: 172.26.102.91
+    username: "{{ chameleon_switch_dell_username }}"
+    password: "{{ chameleon_switch_dell_password }}"
+  - name: c04-f1s1 # c04-f1s1
+    device_type: fnioa_netmiko_dell_force10
+    ip: 172.16.110.18
+    username: "{{ chameleon_switch_fx2_username }}"
+    password: "{{ chameleon_switch_fx2_password }}"
+  - name: c04-f2s1 # c04-f2s1
+    device_type: fnioa_netmiko_dell_force10
+    ip: 172.16.110.20
+    username: "{{ chameleon_switch_fx2_username }}"
+    password: "{{ chameleon_switch_fx2_password }}"
+  - name: roc-be33-sw1 # c05
+    device_type: netmiko_dell_force10
+    ip: 172.26.102.83
+    username: "{{ chameleon_switch_dell_username }}"
+    password: "{{ chameleon_switch_dell_password }}"
+  - name: c05-f1s1 # c05-f1s1
+    device_type: fnioa_netmiko_dell_force10
+    ip: 172.16.110.22
+    username: "{{ chameleon_switch_fx2_username }}"
+    password: "{{ chameleon_switch_fx2_password }}"
+  - name: c05-f2s1 # c05-f2s1
+    device_type: fnioa_netmiko_dell_force10
+    ip: 172.16.110.24
+    username: "{{ chameleon_switch_fx2_username }}"
+    password: "{{ chameleon_switch_fx2_password }}"
+  - name: roc-bd33-sw1 # c06
+    device_type: netmiko_dell_force10
+    ip: 172.26.102.80
+    username: "{{ chameleon_switch_dell_username }}"
+    password: "{{ chameleon_switch_dell_password }}"
+  - name: c06-f1s1 # c06-f1s1
+    device_type: fnioa_netmiko_dell_force10
+    ip: 172.16.110.26
+    username: "{{ chameleon_switch_fx2_username }}"
+    password: "{{ chameleon_switch_fx2_password }}"
+  - name: c06-f2s1 # c06-f2s1
+    device_type: fnioa_netmiko_dell_force10
+    ip: 172.16.110.28
+    username: "{{ chameleon_switch_fx2_username }}"
+    password: "{{ chameleon_switch_fx2_password }}"
+  - name: roc-bc35-sw1 # c10
+    device_type: netmiko_dell_force10
+    ip: 172.26.102.86
+    username: "{{ chameleon_switch_dell_username }}"
+    password: "{{ chameleon_switch_dell_password }}"
+  - name: roc-bb35-sw1 # c11
+    device_type: netmiko_dell_force10
+    ip: 172.26.102.78
+    username: "{{ chameleon_switch_dell_username }}"
+    password: "{{ chameleon_switch_dell_password }}"
+## c07
+#  - name: roc-bc33-sw1]
 #    device_type: netmiko_dell_force10
 #    ip: 172.26.102.82
-#    username: "{{ chameleon_switch_dell_username }}"
-#    password: "{{ chameleon_switch_dell_password }}"
-#  - name: c07-f1s1
-#    device_type: fnioa_netmiko_dell_force10
-#    ip: 172.16.110.30
-#    username: "{{ chameleon_switch_fx2_username }}"
-#    password: "{{ chameleon_switch_fx2_password }}"
+# c12
+  - name: roc-ax35-sw1
+device_type = corsa_dp2100
+#switchIP = roc-ax35-sw1.net.tacc.utexas.edu
+switchIP = 172.26.102.111
+token = d924f408797b446bc854e597c4511173f25e47332c4f6bd86beb5605dc7e22bafe3080eea2bd9c724b3e4421b8cb246b2c1104bfa38a1c81d190104c62fcd4ad
+VFCType = openflow
+defaultControllerIP = 172.26.102.114
+defaultControllerPort = 6653
+defaultVFCRes = 1
+defaultVFCName = UNNAMED
+uplink_ports = 33
+provisioningControllerIP = 172.26.102.114
+provisioningControllerPort = 6653
+provisioningVLAN = 2000
+provisioningVFCType = l2-vpn
+controllerNamespace = of-mgt
+chameleon-corsa2 = 37
+VFCHost = True
+# Shared non-BYOC VFC
+sharedNonByocVFC = br63
+sharedNonByocVLAN = 2000:2499
+sharedNonByocProvider = physnet1
+P 1 = 101
+P 2 = 102
+P 3 = 103
+P 4 = 104
+P 5 = 105
+P 6 = 106
+P 7 = 107
+P 8 = 108
+P 9 = 109
+P 10 = 110
+P 11 = 111
+P 12 = 112
+P 13 = 113
+P 14 = 114
+P 15 = 115
+P 16 = 116
+P 17 = 117
+P 18 = 118
+P 19 = 119
+P 20 = 120
+P 21 = 121
+P 22 = 122
+P 23 = 123
+P 24 = 124
+P 25 = 125
+P 26 = 126
+P 27 = 127
+P 28 = 128
+P 29 = 129
+P 30 = 130
+P 31 = 131
+P 32 = 132
 
 # Others
 enable_cinder: "no"
