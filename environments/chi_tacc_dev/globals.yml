@@ -24,7 +24,8 @@ kolla_external_fqdn: "dev.tacc.chameleoncloud.org"
 
 #TODO (hammock) move to host_vars?
 kolla_external_vip_interface: "em3"
-api_interface_address: "10.20.111.244"
+#api_interface_address: "10.20.111.244"
+api_interface: "em1"
 network_interface: "em1"
 
 # Site & Region configuration
@@ -43,11 +44,14 @@ use_preconfigured_databases: "yes"
 # Kolla sidecar/support containers
 enable_chrony: "no"
 enable_fluentd: "yes"
-enable_central_logging: "no"
+enable_central_logging: "yes"
 enable_memcached: "yes"
 
 # External RabbitMQ
 enable_rabbitmq: "no"
+
+# External Redis
+redis_address: "10.20.111.244"
 
 # Blazar
 enable_blazar: "yes"
@@ -78,20 +82,21 @@ kolla_external_fqdn_cert: "{{ node_custom_config }}/certificates/{{ kolla_extern
 kolla_external_fqdn_cacert: "{{ node_custom_config }}/certificates/{{ kolla_external_fqdn }}-interm.cer"
 keepalived_virtual_router_id: "52"
 
+# Heat
+enable_heat: "yes"
+
 # Horizon
 enable_horizon: "yes"
 enable_horizon_blazar: "yes"
 enable_horizon_ironic: "yes"
 horizon_keystone_url: "https://dev.tacc.chameleoncloud.org:5000"
 horizon_help_url: "https://chameleoncloud.readthedocs.io/en/latest/technical/baremetal.html"
-chameleon_resource_site: "tacc"
-chameleon_site_name: "tacc"
 enable_horizon_chameleon_websso: "yes"
 horizon_chameleon_websso_host: "https://dev.chameleon.tacc.utexas.edu"
 horizon_regions:
   - region_name: "{{ openstack_region_name }}"
     chameleon_site_name: "{{ chameleon_site_name }}"
-    blazar_database_host: "{{ kolla_internal_fqdn }}"
+    blazar_database_host: "{{ database_address }}"
     blazar_database_name: "blazar"
     blazar_database_port: "3306"
     blazar_database_user: "blazar"
@@ -107,7 +112,7 @@ ironic_pxe_append_params: nofb nomodeset vga=normal console=tty0 console=ttyS0,9
 
 # Keystone
 enable_keystone: "yes"
-fernet_token_expiry: 172800 # Effectively disables fernet rotation cron job
+#fernet_token_expiry: 172800 # Effectively disables fernet rotation cron job
 
 # Nova
 enable_nova: "yes"
@@ -119,9 +124,9 @@ nova_console: "none"
 # Blazar in particular needs this to not be scoped to the tenant because when
 # it tries to perform actions on behalf of a user, it uses a different tenant
 # id (its own).
-nova_admin_endpoint: "{{ admin_protocol }}://{{ kolla_internal_fqdn }}:{{ nova_api_port }}/v2.1"       
-nova_internal_endpoint: "{{ internal_protocol }}://{{ kolla_internal_fqdn }}:{{ nova_api_port }}/v2.1" 
-nova_public_endpoint: "{{ public_protocol }}://{{ kolla_external_fqdn }}:{{ nova_api_port }}/v2.1"     
+nova_admin_endpoint: "{{ admin_protocol }}://{{ kolla_internal_fqdn }}:{{ nova_api_port }}/v2.1"
+nova_internal_endpoint: "{{ internal_protocol }}://{{ kolla_internal_fqdn }}:{{ nova_api_port }}/v2.1"
+nova_public_endpoint: "{{ public_protocol }}://{{ kolla_external_fqdn }}:{{ nova_api_port }}/v2.1"
 nova_keystone_user: "nova"
 instance_metrics_writer_username: instance_metrics_writer
 
@@ -159,5 +164,4 @@ neutron_ml2_generic_switch_configs:
 enable_cinder: "no"
 enable_gnocchi: "no"
 enable_grafana: "no"
-enable_heat: "yes"
 enable_swift: "no"
