@@ -8,7 +8,7 @@ kolla_install_type: "source"
 virtualenv: /etc/ansible/venv
 
 # Docker image tag to use for deployed containers
-openstack_release: "chameleoncloud-ocata"
+openstack_release: "chameleoncloud-rocky"
 
 # Network configuration
 kolla_internal_vip_address: "10.140.81.3"
@@ -24,7 +24,7 @@ chameleon_site_name: "uc"
 chi_tacc_openstack_region_name: "CHI_DEV"
 chi_tacc_chameleon_site_name: "tacc"
 chi_tacc_blazar_database_host: "129.114.97.177"
-chi_tacc_keystone_auth_url: "https://dev.tacc.chameleoncloud.org:5000/v3"
+chi_tacc_keystone_auth_url: "https://dev.tacc.chameleoncloud.org:5000"
 # Keystone's DB is replicated; ensure any writes happen against master
 keystone_primary_region_name: "{{ chi_tacc_openstack_region_name }}"
 openstack_auth:
@@ -32,6 +32,7 @@ openstack_auth:
 
 # External MariaDB config
 enable_mariadb: "no"
+database_address: "10.140.80.97"
 
 # Kolla sidecar/support containers
 enable_chrony: "yes"
@@ -40,9 +41,13 @@ enable_memcached: "yes"
 # External RabbitMQ
 enable_rabbitmq: "no"
 
+# Monitoring
+enable_central_logging: "yes"
+enable_grafana: "no"
+enable_prometheus: "no"
+
 enable_cinder: "no"
 enable_gnocchi: "no"
-enable_grafana: "no"
 enable_swift: "no"
 
 # Blazar
@@ -50,20 +55,16 @@ enable_blazar: "yes"
 blazar_minutes_before_end_lease: 2880 # When to send lease notification email
 blazar_default_max_lease_duration: 604800 # 7 days
 blazar_usage_default_allocated: 20000.0
+# Redis currently binds on public IP, use public FQDN
+blazar_usage_db_host: "{{ kolla_external_fqdn }}"
 blazar_usage_project_exemptions:
   - Chameleon
   - openstack
   - maintenance
 
+# Glance
 enable_glance: "yes"
 glance_file_datadir_volume: /var/lib/glance
-# Glance
-# TODO [jca-2019-01-29]: remove this when we are on Rocky.
-# Override 'disabled' state of Glance Registry. This service was deprecated
-# but we still need to include it for Ocata.
-glance_services:
-  glance-registry:
-    enabled: true
 
 # HAProxy
 enable_haproxy: "yes"
@@ -71,11 +72,9 @@ kolla_enable_tls_external: "yes"
 
 # Heat
 enable_heat: "yes"
-heat_tag: chameleoncloud-rocky
 
 # Horizon
 enable_horizon: "yes"
-enable_horizon_blazar: "yes"
 enable_horizon_chameleon_websso: "yes"
 horizon_help_url: https://chameleoncloud.readthedocs.io/en/latest/technical/baremetal.html
 horizon_chameleon_websso_host: https://dev.chameleon.tacc.utexas.edu
@@ -138,9 +137,9 @@ neutron_ml2_generic_switch_configs:
     password: "{{ chameleon_switch_dell_password }}"
 
 # Nova
-nova_keystone_user: "nova"
 enable_nova: "yes"
 enable_nova_serialconsole_proxy: "yes"
+nova_keystone_user: "nova"
 nova_compute_virt_type: "none"
 # We are not using any VNC consoles; the serialproxy is not considered a 'nova_console'
 nova_console: "none"
