@@ -262,7 +262,7 @@ neutron_ml2_generic_switch_configs:
     device_type: corsa_dp2100
     #switchIP = roc-ax35-sw1.net.tacc.utexas.edu
     switchIP: 172.26.102.111
-    token: {{ chameleon_switch_corsa2_token }}
+    token: "{{ chameleon_switch_corsa2_token }}"
     VFCType: openflow
     defaultControllerIP: 172.26.102.114
     defaultControllerPort: 6653
@@ -281,38 +281,38 @@ neutron_ml2_generic_switch_configs:
     sharedNonByocVLAN: 2000:2499
     sharedNonByocProvider: physnet1
     # Mappings of physical ports to OpenFlow port numbers
-    'P 1'  = 101
-    'P 2'  = 102
-    'P 3'  = 103
-    'P 4'  = 104
-    'P 5'  = 105
-    'P 6'  = 106
-    'P 7'  = 107
-    'P 8'  = 108
-    'P 9'  = 109
-    'P 10' = 110
-    'P 11' = 111
-    'P 12' = 112
-    'P 13' = 113
-    'P 14' = 114
-    'P 15' = 115
-    'P 16' = 116
-    'P 17' = 117
-    'P 18' = 118
-    'P 19' = 119
-    'P 20' = 120
-    'P 21' = 121
-    'P 22' = 122
-    'P 23' = 123
-    'P 24' = 124
-    'P 25' = 125
-    'P 26' = 126
-    'P 27' = 127
-    'P 28' = 128
-    'P 29' = 129
-    'P 30' = 130
-    'P 31' = 131
-    'P 32' = 132
+    'P 1' : 101
+    'P 2' : 102
+    'P 3' : 103
+    'P 4' : 104
+    'P 5' : 105
+    'P 6' : 106
+    'P 7' : 107
+    'P 8' : 108
+    'P 9' : 109
+    'P 10': 110
+    'P 11': 111
+    'P 12': 112
+    'P 13': 113
+    'P 14': 114
+    'P 15': 115
+    'P 16': 116
+    'P 17': 117
+    'P 18': 118
+    'P 19': 119
+    'P 20': 120
+    'P 21': 121
+    'P 22': 122
+    'P 23': 123
+    'P 24': 124
+    'P 25': 125
+    'P 26': 126
+    'P 27': 127
+    'P 28': 128
+    'P 29': 129
+    'P 30': 130
+    'P 31': 131
+    'P 32': 132
 
 # Others
 enable_cinder: "no"
