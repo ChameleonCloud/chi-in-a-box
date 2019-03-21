@@ -12,8 +12,10 @@
   10.140.80.97: admin02 # CHI@UC development controller
   10.140.80.98: admin01 # CHI@UC production controller
   10.140.80.99: admin03 # CHI@UC staging controller
-  10.140.80.185: fx2-01 (phase-1 storage)
   10.140.80.165-10.140.80.169: r730xd-{1..5} (phase-2 storage)
+  10.140.80.185: fx2-01 (phase-1 storage)
+  10.140.81.2: admin01 HA VIP
+  10.140.81.3: admin02 HA VIP
 
 # UC IPMI
 172.29.0.0/24
