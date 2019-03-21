@@ -6,5 +6,13 @@
 # on the host (with ./ansible-inventory) and pre-sets a few variables.
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 
+playbook="$1"
+shift
+
+# Copy the playbook to a new location relative to the Kolla-Ansible installation
+# to allow the group_vars/ in the playbook directory to take effect.
+injected_playbook="$DIR/venv/share/kolla-ansible/ansible/_injected.yml"
+cp "$playbook" "$injected_playbook"
+
 # Delegate to kolla-ansible wrapper script
-$DIR/kolla-ansible deploy --playbook "$1"
+$DIR/kolla-ansible deploy --playbook "$injected_playbook" "$@"
