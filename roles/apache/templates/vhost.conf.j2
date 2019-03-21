@@ -1,12 +1,12 @@
 # {{ ansible_managed }}
 # Virtual host for {{ apache_server_name }}
 
-<VirtualHost *:{{ apache_server_http_port }}>
+<VirtualHost {{ api_interface_address }}:{{ apache_server_http_port }}>
   ServerName {{ apache_server_name }}
   Redirect / https://{{ apache_server_name }}/
 </VirtualHost>
 
-<VirtualHost *:{{ apache_server_https_port }}>
+<VirtualHost {{ external_vip_address }}:{{ apache_server_https_port }}>
   ServerName {{ apache_server_name }}
 
   # Allow Keystone authentication to be used
