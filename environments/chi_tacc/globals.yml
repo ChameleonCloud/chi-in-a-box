@@ -53,6 +53,8 @@ enable_memcached: "yes"
 
 # External RabbitMQ
 enable_rabbitmq: "no"
+notify_transport_url: "rabbit://{{rabbitmq_user}}:{{ rabbitmq_password }}@10.20.111.249:{{ rabbitmq_port }}"
+rpc_transport_url: "{{ notify_transport_url }}"
 
 # External Redis
 redis_address: "10.20.111.249"
@@ -135,11 +137,11 @@ nova_keystone_user: "nova"
 instance_metrics_writer_username: instance_metrics_writer
 
 # Neutron
-enable_neutron: "no"
+enable_neutron: "yes"
 enable_openvswitch: "no"
 neutron_bridge_name: br-p5p2,br-ex,br-exogeni,br-scinet
 neutron_external_interface: p5p2,p5p1,br-p5p2,br-p5p2
-ovs_bridge_mappings: physnet1:br-p5p2,public:br-ex,exogeni:br-exogeni,scinet:br-scinet
+neutron_ovs_bridge_mappings: physnet1:br-p5p2,public:br-ex,exogeni:br-exogeni,scinet:br-scinet
 #ovs_port_mappings: br-p5p2:p5p2,br-ex,br-exogeni:br-exogeni,br-scinet:br-scinet
 
 # TODO [jca 2019-01-29]: remove this when we can take advantage of this
@@ -153,7 +155,7 @@ neutron_notification_topics:
     enabled: "yes"
 neutron_type_drivers: flat,vlan
 neutron_tenant_network_types: vlan
-neutron_network_vlan_ranges: physnet4:1999:1999,physnet1:2000:2010,physnet1:2013:2020,physnet1:2023:2499,physnet3:3500:3500,physnet3:3504:3505,physnet3:3507:3508
+neutron_network_vlan_ranges: scinet:1999:1999,physnet1:2000:2010,physnet1:2013:2020,physnet1:2023:2499,exogeni:3500:3500,exogeni:3504:3505,exogeni:3507:3508
 neutron_ml2_generic_switch_configs:
   - name: roc-be24-sw1 # m01
     device_type: netmiko_dell_force10
