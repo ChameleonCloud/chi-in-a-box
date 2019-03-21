@@ -118,7 +118,7 @@ horizon_regions:
     blazar_database_password: "{{ chi_tacc_blazar_database_password }}"
 
 # Ironic
-enable_ironic: "no"
+enable_ironic: "yes"
 ironic_provisioning_network: ironic-provisioning-network
 ironic_cleaning_network: "{{ ironic_provisioning_network }}"
 ironic_tftp_server: 10.51.0.254 # Should be on the provisioning network
@@ -130,7 +130,7 @@ enable_keystone: "no"
 keystone_admin_project: "openstack"
 
 # Neutron
-enable_neutron: "no"
+enable_neutron: "yes"
 enable_openvswitch: "{{ enable_neutron }}"
 # TODO [jca 2019-01-29]: remove this when we can take advantage of this
 # component, which was introduced after Ocata.
@@ -279,7 +279,7 @@ neutron_ml2_generic_switch_configs:
     'P 32': 164
 
 # Nova
-enable_nova: "no"
+enable_nova: "yes"
 enable_nova_serialconsole_proxy: "yes"
 nova_compute_virt_type: "none"
 # We are not using any VNC consoles; the serialproxy is not considered a 'nova_console'
