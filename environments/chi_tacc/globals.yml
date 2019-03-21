@@ -93,10 +93,10 @@ enable_heat: "no"
 enable_horizon: "yes"
 enable_horizon_blazar: "yes"
 enable_horizon_ironic: "yes"
-horizon_keystone_url: "https://dev.tacc.chameleoncloud.org:5000"
+horizon_keystone_url: "https://chi.tacc.chameleoncloud.org:5000"
 horizon_help_url: "https://chameleoncloud.readthedocs.io/en/latest/technical/baremetal.html"
 enable_horizon_chameleon_websso: "yes"
-horizon_chameleon_websso_host: "https://dev.chameleon.tacc.utexas.edu"
+horizon_chameleon_websso_host: "https://chameleoncloud.org"
 horizon_regions:
   - region_name: "{{ openstack_region_name }}"
     chameleon_site_name: "{{ chameleon_site_name }}"
@@ -138,7 +138,9 @@ instance_metrics_writer_username: instance_metrics_writer
 enable_neutron: "no"
 enable_openvswitch: "no"
 neutron_bridge_name: br-p5p2,br-ex,br-exogeni,br-scinet
-neutron_external_interface: p5p2,p1p1,p5p2,p5p2
+neutron_external_interface: p5p2,p5p1,br-p5p2,br-p5p2
+ovs_bridge_mappings: physnet1:br-p5p2,public:br-ex,exogeni:br-exogeni,scinet:br-scinet
+#ovs_port_mappings: br-p5p2:p5p2,br-ex,br-exogeni:br-exogeni,br-scinet:br-scinet
 
 # TODO [jca 2019-01-29]: remove this when we can take advantage of this
 # component, which was introduced after Ocata.
