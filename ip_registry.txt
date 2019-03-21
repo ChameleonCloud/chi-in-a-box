@@ -43,10 +43,11 @@
 # vlan: 3298
 192.5.87.0/24
   192.5.87.1: Gateway
-  192.5.87.2: CHI@UC production
-  192.5.87.3: CHI@UC development
+  192.5.87.2: CHI@UC production VIP
+  192.5.87.3: CHI@UC development VIP
   192.5.87.4: Phase-1 storage (fx2-01)
-  192.5.87.5: CHI@UC staging
+  192.5.87.5: CHI@UC staging VIP
+  192.5.87.6: CHI@UC production non-OpenStack services
   192.5.87.16-192.5.87.230: CHI@UC production floating IPs
   192.5.87.240-192.5.87.249: CHI@UC development floating IPs
   192.5.87.250-192.5.87.254: CHI@UC staging floating IPs
