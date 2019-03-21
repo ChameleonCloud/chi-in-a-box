@@ -60,9 +60,11 @@ rpc_transport_url: "{{ notify_transport_url }}"
 redis_address: "10.20.111.249"
 
 # Blazar
-enable_blazar: "no"
+enable_blazar: "yes"
+blazar_database_address: "{{ database_address }}"
 blazar_minutes_before_end_lease: 2880 # When to send lease notification email
 blazar_default_max_lease_duration: 604800 # 7 days
+blazar_usage_db_host: "chi.uc.chameleoncloud.org"
 blazar_usage_default_allocated: 200000.0
 blazar_usage_project_exemptions:
   - Chameleon
@@ -86,7 +88,7 @@ enable_haproxy: "yes"
 kolla_enable_tls_external: "yes"
 kolla_external_fqdn_cert: "{{ node_custom_config }}/certificates/{{ kolla_external_fqdn }}.pem"
 kolla_external_fqdn_cacert: "{{ node_custom_config }}/certificates/{{ kolla_external_fqdn }}-interm.cer"
-keepalived_virtual_router_id: "53"
+keepalived_virtual_router_id: "54"
 
 # Heat
 enable_heat: "no"
@@ -142,7 +144,6 @@ enable_openvswitch: "no"
 neutron_bridge_name: br-p5p2,br-ex,br-exogeni,br-scinet
 neutron_external_interface: p5p2,p5p1,br-p5p2,br-p5p2
 neutron_ovs_bridge_mappings: physnet1:br-p5p2,public:br-ex,exogeni:br-exogeni,scinet:br-scinet
-#ovs_port_mappings: br-p5p2:p5p2,br-ex,br-exogeni:br-exogeni,br-scinet:br-scinet
 
 # TODO [jca 2019-01-29]: remove this when we can take advantage of this
 # component, which was introduced after Ocata.
