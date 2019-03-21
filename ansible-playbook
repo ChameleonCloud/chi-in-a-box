@@ -1,16 +1,18 @@
 #!/usr/bin/env bash
+# DEPRECATED -- transition to kolla-ansible wrapper script
+#
 # This is just a really simple wrapper around ansible-playbook, which is the
 # most commonly used utility when provisioning. It uses the inventory set up
 # on the host (with ./ansible-inventory) and pre-sets a few variables.
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
-ansible_dir="${ANSIBLE_DIR:-$DIR}"
-environment_name="$(cat "$ansible_dir/.ansible-inventory")"
-environment_dir="${DIR}/environments/${environment_name}"
 
-source "$DIR/venv/bin/activate"
-ansible-playbook \
-  --vault-id="${environment_name}@${ansible_dir}/vault_password" \
-  --inventory="${environment_dir}/inventory" \
-  --extra-vars="@${environment_dir}/passwords.yml" \
-  --extra-vars="@${environment_dir}/globals.yml" \
-  "$@"
+playbook="$1"
+shift
+
+# Copy the playbook to a new location relative to the Kolla-Ansible installation
+# to allow the group_vars/ in the playbook directory to take effect.
+injected_playbook="$DIR/venv/share/kolla-ansible/ansible/_injected.yml"
+cp "$playbook" "$injected_playbook"
+
+# Delegate to kolla-ansible wrapper script
+$DIR/kolla-ansible deploy --playbook "$injected_playbook" "$@"

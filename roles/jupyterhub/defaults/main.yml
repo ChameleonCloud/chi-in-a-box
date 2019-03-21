@@ -5,7 +5,7 @@ jupyterhub_docker_image: docker.chameleoncloud.org/jupyterhub:ca6598a
 jupyterhub_docker_network: jupyterhub
 jupyterhub_docker_volume_name: jupyterhub-storage
 jupyterhub_hostname: jupyter.chameleoncloud.org
-jupyterhub_port: 8000
+jupyterhub_port: 8075 # Just needs to be something that doesn't conflict
 jupyterhub_service_name: jupyterhub
 jupyterhub_user: jupyterhub
 
