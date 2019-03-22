@@ -1,7 +1,7 @@
 # {{ ansible_managed }}
 # Virtual host for {{ apache_server_name }}
 
-<VirtualHost {{ api_interface_address }}:{{ apache_server_http_port }}>
+<VirtualHost {{ external_vip_address }}:{{ apache_server_http_port }}>
   ServerName {{ apache_server_name }}
   Redirect / https://{{ apache_server_name }}/
 </VirtualHost>
