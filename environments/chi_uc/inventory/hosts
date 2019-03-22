@@ -734,3 +734,6 @@ control
 
 [precis:children]
 control
+
+[vendordata:children]
+control
