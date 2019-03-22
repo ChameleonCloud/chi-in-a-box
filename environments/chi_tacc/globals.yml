@@ -91,7 +91,7 @@ kolla_external_fqdn_cacert: "{{ node_custom_config }}/certificates/{{ kolla_exte
 keepalived_virtual_router_id: "54"
 
 # Heat
-enable_heat: "no"
+enable_heat: "yes"
 
 # Horizon
 enable_horizon: "yes"
