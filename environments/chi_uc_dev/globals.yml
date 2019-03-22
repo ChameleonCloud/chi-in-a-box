@@ -1,5 +1,4 @@
 ---
-docker_path: "/bin/docker"
 docker_namespace: "kolla"
 docker_registry_username: "kolla"
 docker_registry: "docker.chameleoncloud.org"
