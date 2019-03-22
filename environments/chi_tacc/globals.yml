@@ -126,6 +126,7 @@ enable_keystone: "yes"
 enable_nova: "yes"
 enable_nova_serialconsole_proxy: "yes"
 nova_console_allowed_origins: "chi.uc.chameleoncloud.org"
+nova_serialconsole_port_range: "30000:40000"
 nova_compute_virt_type: "none"
 # We are not using any VNC consoles; the serialproxy is not considered a 'nova_console'
 nova_console: "none"
