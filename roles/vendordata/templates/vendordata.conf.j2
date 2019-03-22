@@ -1,5 +1,5 @@
 [openstack]
-auth_url: {{ openstack_keystone_auth_uri }}
+auth_url: {{ admin_protocol }}://{{ kolla_internal_fqdn }}:{{ keystone_admin_port }}
 
 [chameleon]
 cluster: chameleon
