@@ -73,7 +73,7 @@ blazar_usage_project_exemptions:
   - maintenance
 
 # Glance
-enable_glance: "no"
+enable_glance: "yes"
 glance_file_datadir_volume: "/var/lib/glance"
 #glance_upgrading: False
 # TODO [jca-2019-01-29]: remove this when we are on Rocky.
