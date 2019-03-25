@@ -1,0 +1,29 @@
+---
+- name: Download snmp exporter generator's mibs Makefile.
+  get_url:
+    url: "https://raw.githubusercontent.com/prometheus/snmp_exporter/master/generator/Makefile"
+    mode: 0600
+    dest: "{{ service.config_dir }}/Makefile"
+
+- name: Make mibs for snmp exporter generator.
+  make:
+    chdir: "{{ service.config_dir }}"
+    target: mibs
+
+- name: Set facts from global configuration.
+  set_fact:
+    snmp_exporter_switches: "{{ neutron_ml2_generic_switch_configs | selectattr('snmp_enabled') | list }}"
+
+- name: Configure snmp exporter's generators config file.
+  template:
+    src: snmp_generator.yml.j2
+    mode: 0600
+    dest: "{{ service.config_dir }}/generator.yml"
+
+- name: Generate config file for snmp exporter.
+  docker_container:
+    name: snmp_generator
+    image: "{{ service.generator_image }}"
+    command: generate
+    volumes:
+      - "{{ config_dir }}:/opt/"

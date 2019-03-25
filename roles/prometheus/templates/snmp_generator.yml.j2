@@ -1,0 +1,12 @@
+---
+{% if snmp_exporter_switches | length > 0 %}
+modules:
+{% for switch in snmp_exporter_switches %}
+  {{ switch.name }}:
+    walk:
+      - interfaces
+    version: 1
+    auth:
+      community: {{ switch.community_string }}
+{% endfor %}
+{% endif %}

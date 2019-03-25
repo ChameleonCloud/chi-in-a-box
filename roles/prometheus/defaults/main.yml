@@ -82,3 +82,13 @@ prometheus_services:
     scrape_target: yes
     volumes:
       - "/etc/prometheus/openstack_exporter.yml:/usr/local/bin/exporter/config.yml"
+  snmp-exporter:
+     service_name: prometheus_snmp_exporter
+     image: prom/snmp-exporter:v0.15.0
+     generator_image: prom/snmp-generator:master
+     group: prometheus-snmp-exporter
+     port: 9116
+     config_dir: /etc/prometheus/snmp-exporter
+     scrape_target: yes
+     volumes:
+       - "/etc/prometheus/snmp-exporter:/etc/snmp_exporter"

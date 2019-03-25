@@ -41,6 +41,11 @@
     service: "{{ prometheus_services['openstack-exporter'] }}"
   when: inventory_hostname in groups[service.group]
 
+- include_tasks: snmp_exporter.yml
+  vars:
+    service: "{{ prometheus_services['snmp-exporter'] }}"
+  when: inventory_hostname in groups[service.group]
+
 - include_tasks: server.yml
   vars:
     service: "{{ prometheus_services['server'] }}"

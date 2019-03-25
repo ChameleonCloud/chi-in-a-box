@@ -146,41 +146,55 @@ neutron_network_vlan_ranges: physnet1:3000:3009
 neutron_bridge_name: br-em1,br-ex
 neutron_external_interface: em1,em2
 neutron_ml2_generic_switch_configs:
+  - name: Juniper-Super-Spine
+    device_type: juniper_qfx10002_36q
+    ip: 10.140.80.54
+    snmp_enabled: True
+    community_string: "{{ juniper_switch_community_string }}"
   - name: Chameleon-Cloud
     device_type: netmiko_dell_force10
     ip: 10.140.80.52
     username: "{{ chameleon_switch_dell_username }}"
     password: "{{ chameleon_switch_dell_password }}"
+    snmp_enabled: True
+    community_string: "{{ dell_switch_community_string }}"
   - name: Chameleon-Compute
     device_type: netmiko_dell_force10
     ip: 10.140.80.53
     username: "{{ chameleon_switch_dell_username }}"
     password: "{{ chameleon_switch_dell_password }}"
+    snmp_enabled: True
+    community_string: "{{ dell_switch_community_string }}"
   # Just for production, kept here for later copying
   - name: fx2-chassis-01-agg1
     device_type: fnioa_netmiko_dell_force10
     ip: 172.29.0.197
     username: "{{ chameleon_switch_fx2_username }}"
     password: "{{ chameleon_switch_fx2_password }}"
+    snmp_enabled: False
   - name: fx2-chassis-02-agg1
     device_type: fnioa_netmiko_dell_force10
     ip: 172.29.0.199
     username: "{{ chameleon_switch_fx2_username }}"
     password: "{{ chameleon_switch_fx2_password }}"
+    snmp_enabled: False
   - name: fx2-chassis-03-agg1
     device_type: fnioa_netmiko_dell_force10
     ip: 172.29.0.201
     username: "{{ chameleon_switch_fx2_username }}"
     password: "{{ chameleon_switch_fx2_password }}"
+    snmp_enabled: False
   - name: fx2-chassis-04-agg1
     device_type: fnioa_netmiko_dell_force10
     ip: 172.29.0.203
     username: "{{ chameleon_switch_fx2_username }}"
     password: "{{ chameleon_switch_fx2_password }}"
+    snmp_enabled: False
   - name: chameleon-corsa1
     device_type: corsa_dp2100
     switchIP: 172.30.0.4
     token: "{{ chameleon_switch_corsa1_token }}"
+    snmp_enabled: False
     chameleon-corsa2: 37
     controllerNamespace: of-mgt
     defaultControllerIP: 172.30.0.101
@@ -231,6 +245,7 @@ neutron_ml2_generic_switch_configs:
     device_type: corsa_dp2100
     switchIP: 172.30.0.5
     token: "{{ chameleon_switch_corsa2_token }}"
+    snmp_enabled: False
     controllerNamespace: of-mgt
     defaultControllerIP: 172.30.0.102
     defaultControllerPort: 6653

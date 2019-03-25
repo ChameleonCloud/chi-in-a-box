@@ -685,6 +685,9 @@ memcached
 [prometheus-openstack-exporter:children]
 control
 
+[prometheus-snmp-exporter:children]
+control
+
 [prometheus-ceph-exporter:children]
 ceph-mgr
 
