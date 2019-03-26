@@ -32,3 +32,8 @@
   service:
     name: prometheus_openstack_exporter
     state: restarted
+
+- name: restart snmp exporter
+  service:
+    name: prometheus_snmp_exporter
+    state: restarted
