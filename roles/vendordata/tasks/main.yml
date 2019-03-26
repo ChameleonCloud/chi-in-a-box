@@ -4,9 +4,11 @@
     name: "{{ vendordata_service_docker_image }}"
     state: present
     force: yes
+  notify:
+    - restart vendordata service
   tags:
     - pull
-  
+
 - name: Configure vendordata services.
   block:
     - name: Create config directory.
@@ -26,8 +28,8 @@
         src: "chameleon_vendordata.service.j2"
         dest: "/etc/systemd/system/{{ vendordata_service_name }}.service"
       notify:
-        - "reload systemd daemon"
-        - "restart vendordata service"
+        - reload systemd daemon
+        - restart vendordata service
   tags:
     - configuration
 

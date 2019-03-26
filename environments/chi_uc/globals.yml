@@ -38,7 +38,9 @@ openstack_keystone_auth_url: "https://{{ kolla_external_fqdn }}:5000"
 chi_tacc_openstack_region_name: "CHI@TACC"
 chi_tacc_chameleon_site_name: "tacc"
 chi_tacc_blazar_database_host: "129.114.97.205"
-chi_tacc_keystone_auth_url: "https://chi.tacc.chameleoncloud.org:5000"
+chi_tacc_external_fqdn: "chi.tacc.chameleoncloud.org"
+chi_tacc_keystone_auth_url: "https://{{ chi_tacc_external_fqdn }}:5000"
+
 # Keystone's DB is replicated; ensure any writes happen against master
 keystone_primary_region_name: "{{ chi_tacc_openstack_region_name }}"
 openstack_auth:
@@ -142,9 +144,10 @@ neutron_notification_topics:
     enabled: "yes"
 neutron_type_drivers: flat,vlan
 neutron_tenant_network_types: vlan
-neutron_network_vlan_ranges: physnet1:3000:3009
-neutron_bridge_name: br-em1,br-ex
-neutron_external_interface: em1,em2
+neutron_bridge_name: br-em1,br-ex,br-exogeni
+neutron_external_interface: em1,em2,br-em1
+neutron_ovs_bridge_mappings: physnet1:br-em1,public:br-ex,exogeni:br-exogeni
+neutron_network_vlan_ranges: physnet1:3010:3288,exogeni:3290:3290,exogeni:3299:3299
 neutron_ml2_generic_switch_configs:
   - name: Juniper-Switch
     device_type: juniper_QFX10002_36Q
@@ -298,6 +301,7 @@ enable_nova_serialconsole_proxy: "yes"
 nova_compute_virt_type: "none"
 # We are not using any VNC consoles; the serialproxy is not considered a 'nova_console'
 nova_console: "none"
+nova_console_allowed_origins: "{{ chi_tacc_external_fqdn }}"
 # We override the endpoints to not include %(tenant_id)s placeholder.
 # Blazar in particular needs this to not be scoped to the tenant because when
 # it tries to perform actions on behalf of a user, it uses a different tenant

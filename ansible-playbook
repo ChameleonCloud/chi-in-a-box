@@ -9,11 +9,14 @@ DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 playbook="$1"
 shift
 
+ansible_path="$DIR/venv/share/kolla-ansible/ansible"
 # Copy the playbook to a new location relative to the Kolla-Ansible installation
 # to allow the group_vars/ in the playbook directory to take effect.
 injected_playbook="$ansible_path/_injected.yml"
 cp "$playbook" "$injected_playbook"
 
+# Move roles out of the way so they do not take precedence in case there
+# is a collision on role name.
 mv "$ansible_path/roles" "$ansible_path/_roles"
 cleanup() {
   mv "$ansible_path/_roles" "$ansible_path/roles"
