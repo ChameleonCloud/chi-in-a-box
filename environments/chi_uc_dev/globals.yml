@@ -89,6 +89,7 @@ enable_heat: "yes"
 enable_horizon: "yes"
 enable_horizon_chameleon_websso: "yes"
 horizon_help_url: https://chameleoncloud.readthedocs.io/en/latest/technical/baremetal.html
+horizon_redirect_root: /dashboard
 horizon_chameleon_websso_host: https://dev.chameleon.tacc.utexas.edu
 horizon_regions:
   - region_name: "{{ openstack_region_name }}"

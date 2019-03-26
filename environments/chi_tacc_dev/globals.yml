@@ -91,6 +91,7 @@ enable_horizon_blazar: "yes"
 enable_horizon_ironic: "yes"
 horizon_keystone_url: "https://dev.tacc.chameleoncloud.org:5000"
 horizon_help_url: "https://chameleoncloud.readthedocs.io/en/latest/technical/baremetal.html"
+horizon_redirect_root: /dashboard
 enable_horizon_chameleon_websso: "yes"
 horizon_chameleon_websso_host: "https://dev.chameleon.tacc.utexas.edu"
 horizon_regions:
