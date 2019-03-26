@@ -14,5 +14,11 @@ shift
 injected_playbook="$DIR/venv/share/kolla-ansible/ansible/_injected.yml"
 cp "$playbook" "$injected_playbook"
 
+mv "$ansible_path/roles" "$ansible_path/_roles"
+cleanup() {
+  mv "$ansible_path/_roles" "$ansible_path/roles"
+}
+trap cleanup EXIT
+
 # Delegate to kolla-ansible wrapper script
 $DIR/kolla-ansible deploy --playbook "$injected_playbook" "$@"

@@ -26,4 +26,4 @@
     image: "{{ service.generator_image }}"
     command: generate
     volumes:
-      - "{{ config_dir }}:/opt/"
+      - "{{ service.config_dir }}:/opt/"
