@@ -19,6 +19,8 @@
     src: snmp_generator.yml.j2
     mode: 0600
     dest: "{{ service.config_dir }}/generator.yml"
+  register: snmp_exporter_generator_config
+  when: snmp_exporter_switches | length > 0
 
 - name: Generate config file for snmp exporter.
   docker_container:
@@ -27,3 +29,4 @@
     command: generate
     volumes:
       - "{{ service.config_dir }}:/opt/"
+  when: snmp_exporter_generator_config.changed

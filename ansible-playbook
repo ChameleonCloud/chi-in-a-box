@@ -11,7 +11,7 @@ shift
 
 # Copy the playbook to a new location relative to the Kolla-Ansible installation
 # to allow the group_vars/ in the playbook directory to take effect.
-injected_playbook="$DIR/venv/share/kolla-ansible/ansible/_injected.yml"
+injected_playbook="$ansible_path/_injected.yml"
 cp "$playbook" "$injected_playbook"
 
 mv "$ansible_path/roles" "$ansible_path/_roles"
