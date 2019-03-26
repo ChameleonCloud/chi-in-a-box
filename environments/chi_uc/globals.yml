@@ -146,8 +146,8 @@ neutron_network_vlan_ranges: physnet1:3000:3009
 neutron_bridge_name: br-em1,br-ex
 neutron_external_interface: em1,em2
 neutron_ml2_generic_switch_configs:
-  - name: Juniper-Super-Spine
-    device_type: juniper_qfx10002_36q
+  - name: Juniper-Switch
+    device_type: juniper_QFX10002_36Q
     ip: 10.140.80.54
     snmp_enabled: True
     community_string: "{{ juniper_switch_community_string }}"
