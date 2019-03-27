@@ -137,6 +137,7 @@ neutron_tenant_network_types: vlan
 neutron_network_vlan_ranges: physnet1:3000:3009
 neutron_bridge_name: br-em1,br-ex
 neutron_external_interface: em1,em2
+neutron_ovs_bridge_mappings: physnet1:br-em1,physnet2:br-ex
 neutron_ml2_generic_switch_configs:
   - name: Chameleon-Cloud
     device_type: netmiko_dell_force10
