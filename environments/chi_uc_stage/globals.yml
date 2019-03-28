@@ -85,7 +85,6 @@ horizon_regions:
 enable_ironic: "yes"
 ironic_provisioning_network: ironic-provisioning-network
 ironic_cleaning_network: "{{ ironic_provisioning_network }}"
-ironic_tftp_server: 10.20.30.254 # Should be on the provisioning network
 ironic_image_cache_size: 20480 # MB
 ironic_pxe_append_params: "nofb nomodeset vga=normal console=tty0 console=ttyS0,9600 systemd.journald.forward_to_console=yes rootpwd={{ ironic_pxe_root_password }}"
 
