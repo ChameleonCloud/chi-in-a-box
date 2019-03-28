@@ -10,6 +10,8 @@
     label: "{{ item.image | default('skipped') }}"
   when: inventory_hostname in groups[item.group] and
         item.image is defined
+  notify:
+    - "{{ item.restart_handler }}"
 
 - name: Create config directories.
   file:
@@ -63,6 +65,8 @@
   when: inventory_hostname in groups[item.group] and
         item.service_name is defined and
         (item.custom_service is not defined or (not item.custom_service | bool))
+  notify:
+    - "{{ item.restart_handler }}"
 
 - name: Create custom services.
   template:
@@ -77,6 +81,8 @@
         item.service_name is defined and
         item.custom_service is defined and
         (item.custom_service | bool)
+  notify:
+    - "{{ item.restart_handler }}"
 
 - name: Enable services.
   systemd:

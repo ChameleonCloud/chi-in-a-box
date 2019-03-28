@@ -16,6 +16,7 @@ prometheus_services:
     service_name: prometheus_server
     image: prom/prometheus:v2.3.2
     group: prometheus
+    restart_handler: restart prometheus
     port: 9090
     config_dir: /etc/prometheus
     scrape_target: yes
@@ -26,6 +27,7 @@ prometheus_services:
     service_name: prometheus_alertmanager
     image: prom/alertmanager:v0.15.2
     group: prometheus-alertmanager
+    restart_handler: restart alertmanager
     port: 9093
     config_dir: /etc/alertmanager
     service_args:
@@ -38,6 +40,7 @@ prometheus_services:
     service_name: prometheus_apache_exporter
     image: docker.chameleoncloud.org/apache_exporter:77c9bc9
     group: prometheus-apache-exporter
+    restart_handler: restart apache exporter
     port: 9117
     service_args:
       - "-scrape_uri http://{{ ansible_internal_ipv4_addresses[inventory_hostname] }}/server-status?auto"
@@ -46,6 +49,7 @@ prometheus_services:
     service_name: prometheus_ceph_exporter
     image: digitalocean/ceph_exporter:2.0.0-luminous
     group: prometheus-ceph-exporter
+    restart_handler: restart ceph exporter
     port: 9128
     config_dir: /etc/ceph
     scrape_target: yes
@@ -59,6 +63,7 @@ prometheus_services:
     service_name: prometheus_mysql_exporter
     image: prom/mysqld-exporter:v0.11.0
     group: prometheus-mysqld-exporter
+    restart_handler: restart mysql exporter
     port: 9104
     config_dir: /etc/prometheus/mysqld-exporter
     scrape_target: yes
@@ -67,6 +72,7 @@ prometheus_services:
   node-exporter:
     service_name: prometheus_node_exporter
     group: prometheus-node-exporter
+    restart_handler: restart node exporter
     custom_service: yes
     port: 9100
     bin_path: /usr/sbin
@@ -76,6 +82,7 @@ prometheus_services:
     service_name: prometheus_openstack_exporter
     image: docker.chameleoncloud.org/prometheus-openstack-exporter:latest
     group: prometheus-openstack-exporter
+    restart_handler: restart openstack exporter
     port: 9103
     config_dir: /etc/prometheus
     env_file: /etc/prometheus/openstack_exporter.env
@@ -87,6 +94,7 @@ prometheus_services:
      image: prom/snmp-exporter:v0.15.0
      generator_image: prom/snmp-generator:master
      group: prometheus-snmp-exporter
+     restart_handler: restart snmp exporter
      port: 9116
      config_dir: /etc/prometheus/snmp-exporter
      scrape_target: yes

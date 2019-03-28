@@ -29,7 +29,7 @@
       become: yes
       become_user: root
       notify:
-        - restart node_exporter
+        - restart node exporter
 
 # I'm not sure this is even necessary. Node exporter could run without sudo perhaps.
 - name: Allow user to run node_exporter.

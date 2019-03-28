@@ -30,3 +30,5 @@
     volumes:
       - "{{ service.config_dir }}:/opt/"
   when: snmp_exporter_generator_config.changed
+  notify:
+    - restart snmp exporter

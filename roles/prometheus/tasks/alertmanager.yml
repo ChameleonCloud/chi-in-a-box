@@ -3,3 +3,5 @@
   template:
     src: alertmanager.yml.j2
     dest: "{{ service.config_dir }}/alertmanager.yml"
+  notify:
+    - restart alertmanager

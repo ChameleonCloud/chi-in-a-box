@@ -4,6 +4,8 @@
     src: openstack_exporter.env.j2
     mode: 0600
     dest: "{{ service.env_file }}"
+  notify:
+    - restart openstack exporter
 
 - name: Set facts from global configuration.
   set_fact:
@@ -14,3 +16,5 @@
     src: openstack_exporter.yml.j2
     mode: 0600
     dest: "{{ service.config_dir }}/openstack_exporter.yml"
+  notify:
+    - restart openstack exporter
