@@ -53,7 +53,7 @@ prometheus_services:
       - "/etc/ceph:/etc/ceph"
   jupyterhub-exporter:
     group: jupyterhub
-    port: 8000
+    port: 8075
     scrape_target: yes
   mysql-exporter:
     service_name: prometheus_mysql_exporter
