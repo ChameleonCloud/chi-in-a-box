@@ -4,7 +4,8 @@ groups:
 
   - alert: IronicLowImageCacheSpace
     expr: |
-      node_filesystem_avail_bytes{hostname="admin01",mountpoint="/var"}
+      min(node_filesystem_avail_bytes{mountpoint=~"/var(/lib(/(docker|ironic))?)?"})
+      by (hostname)
       <
       (1024 * 1024 * 1024 * 15)
     for: 5m
