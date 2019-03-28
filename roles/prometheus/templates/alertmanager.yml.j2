@@ -28,4 +28,4 @@ receivers:
     slack_configs:
     - channel: '#notifications'
       send_resolved: true
-      text: '{{ template "slack.chameleon.text" . }}'
+      text: {% raw %}'{{ template "slack.chameleon.text" . }}'{% endraw %}
