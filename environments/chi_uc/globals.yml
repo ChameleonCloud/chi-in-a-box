@@ -84,6 +84,7 @@ blazar_usage_project_exemptions:
   - Chameleon
   - maintenance
 blazar_database_address: "{{ database_address }}:{{ database_port }}"
+blazar_floatingip_billrate: 0.0
 
 # Glance
 enable_glance: "yes"
