@@ -2,7 +2,10 @@
 - template:
     src: prometheus.yml.j2
     dest: "{{ service.config_dir }}/prometheus.yml"
-    
+
 - copy:
-    src: mysql-rules.yml
-    dest: "{{ service.config_dir }}/mysql-rules.yml"
+    src: "{{ item }}"
+    dest: "{{ service.config_dir }}/{{ item }}"
+  loop:
+    - control-rules.yml
+    - mysql-rules.yml

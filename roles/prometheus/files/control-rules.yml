@@ -1,0 +1,12 @@
+groups:
+- name: control_node
+  rules:
+
+  - alert: IronicLowImageCacheSpace
+    expr: node_filesystem_avail_bytes{hostname="admin01",mountpoint="/var"} < 16106127360
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Low Ironic cache space on {{ $labels.hostname }}"
+      description: "Ironic process on {{ $labels.hostname }} has less than 15GB of space to use for image cache."
