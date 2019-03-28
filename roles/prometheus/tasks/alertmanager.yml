@@ -1,4 +1,16 @@
 ---
+- name: Create config directories.
+  file:
+    path: "{{ service.config_dir }}/templates"
+    state: directory
+
+- name: Configure custom templates.
+  copy:
+    src: slack.tmpl
+    dest: "{{ service.config_dir }}/templates/slack.tmpl"
+  notify:
+    - restart alertmanager
+
 - name: Configure Alertmanager.
   template:
     src: alertmanager.yml.j2
