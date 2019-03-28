@@ -9,6 +9,7 @@ ansible_python_interpreter: "{{ virtualenv }}/bin/python"
 
 # Docker image tag to use for deployed containers
 openstack_release: "chameleoncloud-ocata"
+blazar_tag: "chameleoncloud-rocky"
 
 # Network configuration
 kolla_internal_vip_address: "10.140.80.99"

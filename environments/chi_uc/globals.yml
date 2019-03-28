@@ -10,6 +10,7 @@ ansible_python_interpreter: "{{ virtualenv }}/bin/python"
 
 # Docker image tag to use for deployed containers
 openstack_release: "chameleoncloud-ocata"
+blazar_tag: "chameleoncloud-rocky"
 
 # TODO: merge this inforation with the neutron_ml2_generic_switch_configs
 switch_configs:
