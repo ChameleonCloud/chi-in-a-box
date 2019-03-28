@@ -209,6 +209,9 @@ neutron_ml2_generic_switch_configs:
     provisioningControllerPort: 6653
     provisioningVFCType: l2-vpn
     provisioningVLAN: 3111
+    sharedNonByocProvider: physnet1
+    sharedNonByocVFC: br63
+    sharedNonByocVLAN: 3010:3288
     uplink_ports: 33
     VFCHost: True
     VFCType: openflow
@@ -259,6 +262,9 @@ neutron_ml2_generic_switch_configs:
     provisioningControllerPort: 6653
     provisioningVFCType: l2-vpn
     provisioningVLAN: 3111
+    sharedNonByocProvider: physnet1
+    sharedNonByocVFC: br63
+    sharedNonByocVLAN: 3010:3288
     uplink_ports: 37
     VFCHost: False
     VFCType: openflow
