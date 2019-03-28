@@ -12,7 +12,7 @@
 
 - name: Set facts from global configuration.
   set_fact:
-    snmp_exporter_switches: "{{ switch_configs | selectattr('snmp') | list }}"
+    snmp_exporter_switches: "{{ switch_configs | selectattr('snmp', 'defined') | list }}"
 
 - name: Configure snmp exporter's generators config file.
   template:
