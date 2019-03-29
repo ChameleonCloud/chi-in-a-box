@@ -91,7 +91,6 @@ jenkins_slave_name: ansible-uc-prod
 
 # Blazar
 enable_blazar: "yes"
-blazar_tag: chameleoncloud-rocky
 blazar_minutes_before_end_lease: 2880 # When to send lease notification email
 blazar_default_max_lease_duration: 604800 # 7 days
 blazar_usage_db_host: "{{ kolla_external_fqdn }}"
