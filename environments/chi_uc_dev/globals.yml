@@ -83,6 +83,7 @@ blazar_usage_project_exemptions:
   - Chameleon
   - openstack
   - maintenance
+blazar_floatingip_billrate: 0.0
 
 # Glance
 enable_glance: "yes"

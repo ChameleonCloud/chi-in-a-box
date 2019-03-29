@@ -1,5 +1,8 @@
 {% set alertmanager_service = prometheus_services['alertmanager'] %}
 {% set alertmanager_host = ansible_internal_ipv4_addresses[groups[alertmanager_service.group][0]] %}
+{% set snmp_exporter_service = prometheus_services['snmp-exporter'] %}
+{% set snmp_exporter_host = ansible_internal_ipv4_addresses[groups[snmp_exporter_service.group][0]] %}
+{% set snmp_exporter_switches = switch_configs | selectattr('snmp', 'defined') | list %}
 ---
 global:
   scrape_interval:     30s
@@ -30,3 +33,24 @@ scrape_configs:
 {% endfor %}
 {% endif %}
 {% endfor %}
+- job_name: 'snmp'
+  static_configs:
+  - targets:
+    {% for switch in snmp_exporter_switches %}
+    - '{{ switch.ip }}'
+    {% endfor %}
+    labels:
+      hostname: '{{ groups[snmp_exporter_service.group].0 }}'
+  metrics_path: /snmp
+  params:
+    module:
+    {% for switch in snmp_exporter_switches %}
+    - '{{ switch.name | lower | replace('-', '_') }}'
+    {% endfor %}
+  relabel_configs:
+    - source_labels: [__address__]
+      target_label: __param_target
+    - source_labels: [__param_target]
+      target_label: instance
+    - target_label: __address__
+      replacement: '{{ snmp_exporter_host }}:{{ snmp_exporter_service.port }}'
