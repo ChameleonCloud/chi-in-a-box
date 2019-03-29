@@ -16,6 +16,7 @@ admin_project_name: "openstack"
 
 # Docker image tag to use for deployed containers
 openstack_release: "chameleoncloud-ocata"
+blazar_tag: "chameleoncloud-rocky"
 #openstack_logging_debug: "True"
 
 # Network configuration
@@ -71,6 +72,7 @@ blazar_usage_project_exemptions:
   - admin
   - openstack
   - maintenance
+blazar_floatingip_billrate: 0.0
 
 # Glance
 enable_glance: "yes"

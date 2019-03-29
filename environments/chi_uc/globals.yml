@@ -10,6 +10,7 @@ ansible_python_interpreter: "{{ virtualenv }}/bin/python"
 
 # Docker image tag to use for deployed containers
 openstack_release: "chameleoncloud-ocata"
+blazar_tag: "chameleoncloud-rocky"
 
 # TODO: merge this inforation with the neutron_ml2_generic_switch_configs
 switch_configs:
@@ -99,6 +100,7 @@ blazar_usage_project_exemptions:
   - Chameleon
   - maintenance
 blazar_database_address: "{{ database_address }}:{{ database_port }}"
+blazar_floatingip_billrate: 0.0
 
 # Glance
 enable_glance: "yes"
