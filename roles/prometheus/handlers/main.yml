@@ -37,3 +37,8 @@
   service:
     name: prometheus_snmp_exporter
     state: restarted
+
+- name: restart apache exporter
+  service:
+    name: prometheus_apache_exporter
+    state: restarted

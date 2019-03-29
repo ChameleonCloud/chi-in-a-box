@@ -97,6 +97,6 @@ prometheus_services:
      restart_handler: restart snmp exporter
      port: 9116
      config_dir: /etc/prometheus/snmp-exporter
-     scrape_target: yes
+     scrape_target: no
      volumes:
        - "/etc/prometheus/snmp-exporter:/etc/snmp_exporter"
