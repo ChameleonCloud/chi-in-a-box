@@ -33,20 +33,17 @@ scrape_configs:
 {% endfor %}
 {% endif %}
 {% endfor %}
-- job_name: 'snmp'
+{% for switch in snmp_exporter_switches %}
+- job_name: '{{ switch.name }}'
   static_configs:
   - targets:
-{% for switch in snmp_exporter_switches %}
       - '{{ switch.ip }}'
-{% endfor %}
     labels:
       hostname: '{{ groups[snmp_exporter_service.group].0 }}'
   metrics_path: /snmp
   params:
     module:
-{% for switch in snmp_exporter_switches %}
-      - '{{ switch.name | lower | replace('-', '_') }}'
-{% endfor %}
+      - '{{ switch.device_type }}'
   relabel_configs:
     - source_labels: [__address__]
       target_label: __param_target
@@ -54,3 +51,5 @@ scrape_configs:
       target_label: instance
     - target_label: __address__
       replacement: '{{ snmp_exporter_host }}:{{ snmp_exporter_service.port }}'
+{% endfor %}
+

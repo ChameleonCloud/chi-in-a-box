@@ -1,10 +1,14 @@
 ---
 modules:
+{% set device_types = [] %}
 {% for switch in snmp_exporter_switches %}
-  {{ switch.name }}:
+  {% if switch.device_type not in device_types %}
+  {{ device_types.append(switch.device_type) }}
+  {{ switch.device_type }}:
     walk:
       - interfaces
     version: 1
     auth:
       community: {{ switch.snmp.community_string }}
+  {% endif %}
 {% endfor %}
