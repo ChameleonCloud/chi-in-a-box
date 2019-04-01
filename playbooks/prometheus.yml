@@ -22,14 +22,7 @@
     - name: Set fact for internal host addresses.
       set_fact:
         ansible_internal_ipv4_addresses: >
-          {{ { item.inventory_hostname: item.ansible_interfaces
-             | map('regex_replace', '^', 'ansible_')
-             | map('replace', '-', '_')
-             | map('extract', item)
-             | selectattr('ipv4', 'defined')
-             | selectattr('ipv4.address', 'match', '10.*')
-             | map(attribute='ipv4.address')
-             | list | last | default('') } | combine(ansible_internal_ipv4_addresses | default({})) }}
+          {{ { item.inventory_hostname: item['ansible_' + item.network_interface].ipv4.address } | combine(ansible_internal_ipv4_addresses | default({})) }}
       loop: "{{ ansible_play_hosts_all | map('extract', hostvars) | list }}"
       loop_control:
         label: "{{ item.inventory_hostname }}"
