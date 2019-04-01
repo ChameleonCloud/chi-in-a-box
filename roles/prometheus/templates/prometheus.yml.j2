@@ -35,6 +35,8 @@ scrape_configs:
 {% endfor %}
 {% for switch in snmp_exporter_switches %}
 - job_name: '{{ switch.name }}'
+  scrape_interval: 2m
+  scrape_timeout: 2m
   static_configs:
   - targets:
       - '{{ switch.ip }}'
