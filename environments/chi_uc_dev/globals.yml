@@ -92,6 +92,9 @@ glance_file_datadir_volume: /var/lib/glance
 # HAProxy
 enable_haproxy: "yes"
 kolla_enable_tls_external: "yes"
+# Set this to different value (default = 51) to avoid conflicts with
+# other environments on same subnet (prod)
+keepalived_virtual_router_id: "52"
 
 # Heat
 enable_heat: "yes"
