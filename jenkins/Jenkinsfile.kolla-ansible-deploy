@@ -3,10 +3,6 @@ pipeline {
     label "${params.JENKINS_AGENT_LABEL}"
   }
 
-  environment {
-    ANSIBLE_DIR = '/etc/ansible'
-  }
-
   parameters {
     string(name: 'KOLLA_SERVICE_NAME', defaultValue: '',
            description: 'Name of Kolla service to deploy (e.g. "horizon")')
@@ -25,10 +21,57 @@ pipeline {
       when {
         not { equals expected: '', actual: params.KOLLA_SERVICE_NAME }
       }
+      environment {
+        ANSIBLE_DIR = '/etc/ansible'
+      }
       steps {
+        script {
+          slackThread = startSlackThread('notifications')
+        }
         sh "./kolla-ansible pull --tags ${params.KOLLA_SERVICE_NAME}"
-        sh "./kolla-ansible reconfigure --tags ${params.KOLLA_SERVICE_NAME}"
+        sh "./kolla-ansible upgrade --tags ${params.KOLLA_SERVICE_NAME}"
       }
     }
   }
+
+  post {
+    failure {
+      slackSend(
+        channel: slackThread.threadId,
+        message: ":red_circle: Failed! Please see the build log for more details.",
+        replyBroadcast: true
+      )
+    }
+
+    success {
+      slackSend(
+        channel: slackThread.threadId,
+        message: ":large_blue_circle: Deploy completed! :chandler_dance:"
+      )
+    }
+  }
+}
+
+def startSlackThread(String channel) {
+  slackSend(
+    channel: channel,
+    attachments: [
+      [
+        text: "Starting deploy of ${params.KOLLA_SERVICE_NAME}",
+        fallback: "Starting deploy of ${params.KOLLA_SERVICE_NAME}: <${env.BUILD_URL}|#${env.BUILD_ID}> (${params.JENKINS_AGENT_LABEL})",
+        fields: [
+          [
+            title: "Build",
+            value: "<${env.RUN_DISPLAY_URL}|#${env.BUILD_ID}>",
+            short: true
+          ],
+          [
+            title: "Environment",
+            value: "${params.JENKINS_AGENT_LABEL}",
+            short: true
+          ]
+        ]
+      ]
+    ]
+  )
 }

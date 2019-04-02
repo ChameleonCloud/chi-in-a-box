@@ -3,9 +3,7 @@ pipeline {
     label "${params.JENKINS_AGENT_LABEL}"
   }
 
-  environment {
-    ANSIBLE_DIR = '/etc/ansible'
-  }
+
 
   parameters {
     string(name: 'KOLLA_SERVICE_NAME', defaultValue: '',
@@ -22,6 +20,10 @@ pipeline {
     }
 
     stage('reconfigure') {
+      environment {
+        ANSIBLE_DIR = '/etc/ansible'
+      }
+      
       steps {
         sh "./kolla-ansible reconfigure --tags=${params.KOLLA_SERVICE_NAME}"
       }
