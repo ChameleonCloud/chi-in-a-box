@@ -39,6 +39,7 @@ pipeline {
       slackSend(
         channel: slackThread.threadId,
         message: ":red_circle: Failed! Please see the build log for more details.",
+        color: "danger",
         replyBroadcast: true
       )
     }
@@ -46,7 +47,8 @@ pipeline {
     success {
       slackSend(
         channel: slackThread.threadId,
-        message: ":large_blue_circle: Deploy completed! :chandler_dance:"
+        message: ":large_blue_circle: Deploy completed! :chandler_dance:",
+        color: "good"
       )
     }
   }
