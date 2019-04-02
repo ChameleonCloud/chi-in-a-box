@@ -66,7 +66,7 @@ blazar_database_address: "{{ database_address }}"
 blazar_minutes_before_end_lease: 2880 # When to send lease notification email
 blazar_default_max_lease_duration: 604800 # 7 days
 blazar_usage_db_host: "chi.uc.chameleoncloud.org"
-blazar_usage_default_allocated: 200000.0
+blazar_usage_default_allocated: 20000.0
 blazar_usage_project_exemptions:
   - Chameleon
   - admin
@@ -118,7 +118,7 @@ horizon_regions:
 enable_ironic: "yes"
 ironic_provisioning_network: 9922ad29-efce-488b-af6a-a77958a96869
 ironic_cleaning_network: "{{ ironic_provisioning_network }}"
-ironic_image_cache_size: 300000 # MB
+ironic_image_cache_size: 400000 # MB
 ironic_pxe_append_params: nofb nomodeset vga=normal console=tty0 console=ttyS0,9600 systemd. journald.forward_to_console=yes
 
 # Keystone
@@ -145,7 +145,7 @@ instance_metrics_writer_username: instance_metrics_writer
 
 # Neutron
 enable_neutron: "yes"
-enable_openvswitch: "no"
+enable_openvswitch: "yes"
 neutron_bridge_name: br-p5p2,br-ex,br-exogeni,br-scinet
 neutron_external_interface: p5p2,p5p1,br-p5p2,br-p5p2
 neutron_ovs_bridge_mappings: physnet1:br-p5p2,public:br-ex,exogeni:br-exogeni,scinet:br-scinet
