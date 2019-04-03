@@ -23,10 +23,46 @@ pipeline {
       environment {
         ANSIBLE_DIR = '/etc/ansible'
       }
-      
+
       steps {
+        script {
+          slackThread = startSlackThread('notifications')
+        }
         sh "./kolla-ansible reconfigure --tags=${params.KOLLA_SERVICE_NAME}"
       }
     }
   }
+
+  post {
+    failure {
+      slackSend(
+        channel: slackThread.threadId,
+        message: ":red_circle: Failed! Please see the build log for more details.",
+        color: "danger",
+        replyBroadcast: true
+      )
+    }
+
+    success {
+      slackSend(
+        channel: slackThread.threadId,
+        message: ":large_blue_circle: Completed! :chandler_dance:",
+        color: "good"
+      )
+    }
+  }
+}
+
+def startSlackThread(String channel) {
+  slackSend(
+    channel: channel,
+    attachments: [
+      [
+        pretext: "**Updating runtime configuration** of **${params.KOLLA_SERVICE_NAME}** (${params.JENKINS_AGENT_LABEL}).",
+        title: "View job",
+        title_link: "${env.RUN_DISPLAY_URL}",
+        fallback: "**Updating runtime configuration** of **${params.KOLLA_SERVICE_NAME}** (${params.JENKINS_AGENT_LABEL}): <${env.RUN_DISPLAY_URL}|#${env.BUILD_ID}>"
+      ]
+    ]
+  )
 }
