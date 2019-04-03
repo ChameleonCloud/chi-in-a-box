@@ -47,7 +47,7 @@ pipeline {
     success {
       slackSend(
         channel: slackThread.threadId,
-        message: ":large_blue_circle: Deploy completed! :chandler_dance:",
+        message: ":large_blue_circle: Completed! :chandler_dance:",
         color: "good"
       )
     }
@@ -59,20 +59,10 @@ def startSlackThread(String channel) {
     channel: channel,
     attachments: [
       [
-        text: "Starting deploy of ${params.KOLLA_SERVICE_NAME}",
-        fallback: "Starting deploy of ${params.KOLLA_SERVICE_NAME}: <${env.BUILD_URL}|#${env.BUILD_ID}> (${params.JENKINS_AGENT_LABEL})",
-        fields: [
-          [
-            title: "Build",
-            value: "<${env.RUN_DISPLAY_URL}|#${env.BUILD_ID}>",
-            short: true
-          ],
-          [
-            title: "Environment",
-            value: "${params.JENKINS_AGENT_LABEL}",
-            short: true
-          ]
-        ]
+        pretext: "**Deployment** of **${params.KOLLA_SERVICE_NAME}** (${params.JENKINS_AGENT_LABEL}) starting.",
+        title: "View job",
+        title_link: "${env.RUN_DISPLAY_URL}",
+        fallback: "**Deployment** of **${params.KOLLA_SERVICE_NAME}** (${params.JENKINS_AGENT_LABEL}) starting: <${env.RUN_DISPLAY_URL}|#${env.BUILD_ID}>"
       ]
     ]
   )
