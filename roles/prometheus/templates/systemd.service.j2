@@ -5,6 +5,11 @@ After=docker.service
 [Service]
 Restart=always
 ExecStart=/bin/docker run --name={{ item.service_name }} \
+{% if item.extra_docker_args is defined %}
+{% for docker_arg in item.extra_docker_args %}
+                          {{ docker_arg }} \
+{% endfor %}
+{% endif %}
 {% if item.volumes is defined %}
 {% for volume in item.volumes %}
                           -v {{ volume }} \
