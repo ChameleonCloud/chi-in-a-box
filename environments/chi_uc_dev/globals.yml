@@ -158,12 +158,14 @@ neutron_ml2_generic_switch_configs:
     username: "{{ chameleon_switch_dell_username }}"
     password: "{{ chameleon_switch_dell_password }}"
     persist_changes: False
+    fast_cli: True
   - name: Chameleon-Compute
     device_type: netmiko_dell_force10
     ip: 10.140.80.53
     username: "{{ chameleon_switch_dell_username }}"
     password: "{{ chameleon_switch_dell_password }}"
     persist_changes: False
+    fast_cli: True
 
 # Nova
 enable_nova: "yes"
