@@ -58,10 +58,10 @@ def startSlackThread(String channel) {
     channel: channel,
     attachments: [
       [
-        pretext: "**Updating runtime configuration** of **${params.KOLLA_SERVICE_NAME}** (${params.JENKINS_AGENT_LABEL}).",
+        pretext: "*Updating runtime configuration* of *${params.KOLLA_SERVICE_NAME}* (${params.JENKINS_AGENT_LABEL}).",
         title: "View job",
         title_link: "${env.RUN_DISPLAY_URL}",
-        fallback: "**Updating runtime configuration** of **${params.KOLLA_SERVICE_NAME}** (${params.JENKINS_AGENT_LABEL}): <${env.RUN_DISPLAY_URL}|#${env.BUILD_ID}>"
+        fallback: "*Updating runtime configuration* of *${params.KOLLA_SERVICE_NAME}* (${params.JENKINS_AGENT_LABEL}): <${env.RUN_DISPLAY_URL}|#${env.BUILD_ID}>"
       ]
     ]
   )

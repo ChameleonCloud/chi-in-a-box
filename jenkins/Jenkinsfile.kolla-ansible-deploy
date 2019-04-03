@@ -59,10 +59,10 @@ def startSlackThread(String channel) {
     channel: channel,
     attachments: [
       [
-        pretext: "**Deployment** of **${params.KOLLA_SERVICE_NAME}** (${params.JENKINS_AGENT_LABEL}) starting.",
+        pretext: "*Deployment* of *${params.KOLLA_SERVICE_NAME}* (${params.JENKINS_AGENT_LABEL}) starting.",
         title: "View job",
         title_link: "${env.RUN_DISPLAY_URL}",
-        fallback: "**Deployment** of **${params.KOLLA_SERVICE_NAME}** (${params.JENKINS_AGENT_LABEL}) starting: <${env.RUN_DISPLAY_URL}|#${env.BUILD_ID}>"
+        fallback: "*Deployment* of *${params.KOLLA_SERVICE_NAME}* (${params.JENKINS_AGENT_LABEL}) starting: <${env.RUN_DISPLAY_URL}|#${env.BUILD_ID}>"
       ]
     ]
   )
