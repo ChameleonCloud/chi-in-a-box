@@ -41,6 +41,15 @@ jenkins_slave_name: ansible-tacc-prod
 jenkins_slave_secret: # TODO
 prometheus_alertmanager_hostname: alert.tacc.chameleoncloud.org
 
+# CHI@UC
+# TACC
+chi_uc_openstack_region_name: "CHI@UC"
+chi_uc_chameleon_site_name: "uc"
+chi_uc_blazar_database_host: "192.5.87.4"
+#chi_uc_external_fqdn: "chi.tacc.chameleoncloud.org"
+#chi_uc_keystone_auth_url: "https://{{ chi_tacc_external_fqdn }}:5000"
+
+
 # External MariaDB config
 enable_mariadb: "no"
 database_address: "10.20.111.249"
@@ -112,6 +121,13 @@ horizon_regions:
     blazar_database_port: "3306"
     blazar_database_user: "blazar"
     blazar_database_password: "{{ blazar_database_password }}"
+  - region_name: "CHI@UC"
+    chameleon_site_name: "uc"
+    blazar_database_host: "192.5.87.4"
+    blazar_database_name: "blazar"
+    blazar_database_port: "3306"
+    blazar_database_user: "blazar"
+    blazar_database_password: "{{ chi_uc_blazar_database_password }}"
 
 
 # Ironic
