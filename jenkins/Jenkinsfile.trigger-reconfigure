@@ -5,7 +5,8 @@ pipeline {
     GenericTrigger(
       genericVariables: [
         [key: 'ref', value: '$.ref'],
-        [key: 'changed_files', value: '$.commits[*].["modified","added","removed"][*]']
+        [key: 'changed_files', value: '$.commits[*].["modified","added","removed"][*]'],
+        [key: 'subjects', values: '$.commits[*].message']
       ],
 
       causeString: 'Triggered on $ref',
@@ -24,7 +25,10 @@ pipeline {
     stage('reconfigure-dev') {
       steps {
         script {
-          service_names = sh(returnStdout: true, script: "jenkins/detect_kolla_changes.sh ${changed_files}").split('\n')
+          service_names = sh(
+            returnStdout: true,
+            script: "jenkins/detect_kolla_changes.sh ${changed_files} ${subjects}"
+          ).split('\n')
         }
         trigger_kolla_ansible_reconfigure(service_names)
       }

@@ -8,6 +8,7 @@
 
 kolla_services=(
   blazar
+  cinder
   glance
   heat
   horizon
