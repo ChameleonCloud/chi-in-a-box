@@ -6,7 +6,7 @@ pipeline {
       genericVariables: [
         [key: 'ref', value: '$.ref'],
         [key: 'changed_files', value: '$.commits[*].["modified","added","removed"][*]'],
-        [key: 'subjects', values: '$.commits[*].message']
+        [key: 'subjects', value: '$.commits[*].message']
       ],
 
       causeString: 'Triggered on $ref',
@@ -14,7 +14,6 @@ pipeline {
       token: JOB_NAME,
 
       printContributedVariables: true,
-      printPostContent: true,
 
       regexpFilterText: '$ref',
       regexpFilterExpression: 'refs/heads/master'
