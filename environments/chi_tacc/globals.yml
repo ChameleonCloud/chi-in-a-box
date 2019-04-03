@@ -161,7 +161,7 @@ neutron_notification_topics:
     enabled: "yes"
 neutron_type_drivers: flat,vlan
 neutron_tenant_network_types: vlan
-neutron_network_vlan_ranges: scinet:1999:1999,physnet1:2000:2010,physnet1:2013:2020,physnet1:2023:2499,exogeni:3500:3500,exogeni:3504:3505,exogeni:3507:3508
+neutron_network_vlan_ranges: scinet:1999:1999,physnet1:2000:2010,physnet1:2013:2020,physnet1:2023:2439,exogeni:3500:3500,exogeni:3505:3505,exogeni:3507:3508
 neutron_ml2_generic_switch_configs:
   - name: roc-be24-sw1 # m01
     device_type: netmiko_dell_force10
