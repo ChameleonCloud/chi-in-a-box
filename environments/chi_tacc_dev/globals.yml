@@ -114,7 +114,7 @@ ironic_pxe_append_params: nofb nomodeset vga=normal console=tty0 console=ttyS0,9
 
 # Keystone
 enable_keystone: "yes"
-#fernet_token_expiry: 172800 # Effectively disables fernet rotation cron job
+fernet_token_expiry: 604800 # 1 week
 
 # Nova
 enable_nova: "yes"

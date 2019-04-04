@@ -147,6 +147,7 @@ ironic_pxe_append_params: "nofb nomodeset vga=normal console=tty0 console=ttyS0,
 # Keystone
 enable_keystone: "yes"
 keystone_admin_project: "openstack"
+fernet_token_expiry: 604800 # 1 week
 
 # Neutron
 enable_neutron: "yes"
