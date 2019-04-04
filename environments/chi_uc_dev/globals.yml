@@ -133,8 +133,6 @@ enable_keystone: "yes"
 use_preconfigured_fernet: "yes"
 keystone_admin_project: "openstack"
 fernet_token_expiry: 604800 # 1 week
-#fernet_token_expiry: 172800 # Effectively disables fernet rotation cron job
-
 
 # Neutron
 enable_neutron: "yes"
