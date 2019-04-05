@@ -16,5 +16,10 @@
     "blazar:oshosts:get": "rule:admin_or_owner",
     "blazar:oshosts:create": "rule:admin_api",
     "blazar:oshosts:delete": "rule:admin_api",
-    "blazar:oshosts:update": "rule:admin_api"
+    "blazar:oshosts:update": "rule:admin_api",
+
+    "blazar:networks:create": "rule:admin_or_owner",
+    "blazar:networks:delete": "rule:admin_or_owner",
+    "blazar:networks:get": "rule:admin_or_owner",
+    "blazar:networks:update": "rule:admin_or_owner"
 }
