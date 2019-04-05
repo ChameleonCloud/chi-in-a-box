@@ -56,13 +56,6 @@ pipeline {
 def startSlackThread(String channel) {
   slackSend(
     channel: channel,
-    attachments: [
-      [
-        pretext: "*Updating runtime configuration* of *${params.KOLLA_SERVICE_NAME}* (${params.JENKINS_AGENT_LABEL}).",
-        title: "View job",
-        title_link: "${env.RUN_DISPLAY_URL}",
-        fallback: "*Updating runtime configuration* of *${params.KOLLA_SERVICE_NAME}* (${params.JENKINS_AGENT_LABEL}): <${env.RUN_DISPLAY_URL}|#${env.BUILD_ID}>"
-      ]
-    ]
+    message: "*Updating runtime configuration* of *${params.KOLLA_SERVICE_NAME}* (${params.JENKINS_AGENT_LABEL}). <${env.RUN_DISPLAY_URL}|View job>"
   )
 }
