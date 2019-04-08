@@ -3,7 +3,7 @@ global:
   slack_api_url: {{ prometheus_alertmanager_slack_api_url }}
 
 templates:
-- '/etc/alertmanager/template/*.tmpl'
+- '/etc/alertmanager/templates/*.tmpl'
 
 route:
   group_by: ['alertname', 'hostname']
