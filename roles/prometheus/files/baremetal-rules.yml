@@ -1,0 +1,11 @@
+groups:
+- name: baremetal
+  rules:
+  - alert: NovaIronicInstanceLaunchFailure
+    expr: increase(launch_failure[15m]) > 0
+    for: 1m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Instance failures occured for {{ $labels.project_name }}."
+      description: "The number of instance launch failures increased in the last 15 minutes for project with id: {{ $labels.project_id }}."
