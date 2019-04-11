@@ -1,4 +1,0 @@
----
-ansible_connection: local
-network_interface: br_em1
-kolla_external_vip_interface: br_ex
