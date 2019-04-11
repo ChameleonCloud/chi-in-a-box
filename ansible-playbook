@@ -1,27 +1,15 @@
 #!/usr/bin/env bash
-# DEPRECATED -- transition to kolla-ansible wrapper script
-#
-# This is just a really simple wrapper around ansible-playbook, which is the
-# most commonly used utility when provisioning. It uses the inventory set up
-# on the host (with ./ansible-inventory) and pre-sets a few variables.
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
-
 playbook="$1"
 shift
 
-ansible_path="$DIR/venv/share/kolla-ansible/ansible"
-# Copy the playbook to a new location relative to the Kolla-Ansible installation
-# to allow the group_vars/ in the playbook directory to take effect.
-injected_playbook="$ansible_path/_injected.yml"
-cp "$playbook" "$injected_playbook"
+declare -a cmd=("$DIR/cc-ansible" --playbook "$playbook" "$@")
 
-# Move roles out of the way so they do not take precedence in case there
-# is a collision on role name.
-mv "$ansible_path/roles" "$ansible_path/_roles"
-cleanup() {
-  mv "$ansible_path/_roles" "$ansible_path/roles"
-}
-trap cleanup EXIT
+echo "WARNING: This command is deprecated! Please use the updated invocation:"
+echo "  $(basename ${cmd[0]}) ${cmd[@]:1}"
+echo
+echo "As a punishment you now have to wait a couple seconds."
+echo
+sleep 3
 
-# Delegate to kolla-ansible wrapper script
-$DIR/kolla-ansible deploy --playbook "$injected_playbook" "$@"
+"${cmd[@]}"
