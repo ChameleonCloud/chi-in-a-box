@@ -135,7 +135,7 @@ horizon_regions:
 
 # Ironic
 enable_ironic: "yes"
-ironic_provisioning_network: ironic-provisioning-network
+ironic_provisioning_network: ironic-provisioning
 ironic_cleaning_network: "{{ ironic_provisioning_network }}"
 ironic_image_cache_size: 180000 # MB
 ironic_pxe_append_params: "nofb nomodeset vga=normal console=tty0 console=ttyS0,9600 systemd.journald.forward_to_console=yes rootpwd={{ ironic_pxe_root_password }}"
