@@ -1,7 +1,7 @@
 groups:
 - name: mysql
   rules:
-  
+
   - alert: MySQLReplicationError
     expr: mysql_slave_status_last_errno != 0
     for: 5m
@@ -10,3 +10,4 @@ groups:
     annotations:
       summary: "Slave replication to {{ $labels.hostname }} failed"
       description: "The MySQL master at {{ $labels.master_host }} failed to replicate to slave {{ $labels.hostname }} with error code {{ $value }}."
+      runbook: "https://github.com/ChameleonCloud/ansible-playbooks/wiki#mysqlreplicationerror"
