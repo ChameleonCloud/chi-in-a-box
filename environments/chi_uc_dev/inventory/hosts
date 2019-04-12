@@ -17,7 +17,7 @@ admin02
 admin02
 
 [storage]
-# No storage node on dev currently
+admin02
 
 [deployment]
 localhost ansible_connection=local
@@ -338,7 +338,7 @@ storage
 cinder
 
 [cinder-volume:children]
-storage
+cinder
 
 # Cloudkitty
 [cloudkitty-api:children]
@@ -361,7 +361,9 @@ storage
 ironic
 
 [tgtd:children]
+compute
 storage
+ironic
 
 # Karbor
 [karbor-api:children]

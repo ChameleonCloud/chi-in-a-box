@@ -68,9 +68,13 @@ enable_central_logging: "yes"
 enable_grafana: "no"
 enable_prometheus: "no"
 
-enable_cinder: "no"
 enable_gnocchi: "no"
 enable_swift: "no"
+
+# Cinder
+enable_cinder: "yes"
+cinder_backend_ceph: "yes"
+cinder_keystone_user: "cinder"
 
 # Blazar
 enable_blazar: "yes"
@@ -123,6 +127,7 @@ horizon_regions:
 
 # Ironic
 enable_ironic: "yes"
+enable_ironic_ipxe: "yes"
 ironic_provisioning_network: ironic-provisioning-network
 ironic_cleaning_network: "{{ ironic_provisioning_network }}"
 ironic_image_cache_size: 20480 # MB
@@ -291,3 +296,9 @@ instance_metrics_writer_username: instance_metrics_writer
 
 # Rabbit admin
 rabbitmq_user: openstack
+
+# Ceph
+enable_ceph: "yes"
+enable_ceph_rgw: "yes"
+ceph_osd_store_type: "bluestore"
+ceph_cluster_fsid: "a5c2d87f-67d7-4c3e-8b8f-8cfeaa88d646"
