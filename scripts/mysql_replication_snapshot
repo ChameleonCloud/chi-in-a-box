@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+set -e -u -o pipefail
+
+while [[ $# -gt 0 ]]; do
+key="$1"
+case $key in
+  --host)
+  mysql_host="$2"
+  shift
+  shift
+  ;;
+  *)
+  shift
+  ;;
+esac
+done
+
+if [[ -z "${mysql_host:-}" ]]; then
+  cat <<USAGE
+Usage: $0 --host <host>
+
+Takes a snapshot of the Keystone database on a given MySQL host and
+records the binlog position so that a slave database can be set up
+for replication.
+USAGE
+  exit 1
+fi
+
+snapshot_file="mysql_keystone_master-$(date +'%Y%m%d%H%M').sql"
+
+remote() {
+  ssh -o LogLevel=error "$mysql_host" "$@"
+}
+
+echo "Locking tables"
+remote mysql <<SQL
+--- Ensure all writes flushed and lock tables
+use keystone;
+flush privileges;
+flush tables with read lock;
+-- Get current binlog position
+show master status;
+SQL
+
+echo "Dumping table contents to $snapshot_file"
+remote mysqldump keystone \
+  --ignore-table keystone.trust \
+  --ignore-table keystone.trust_role \
+  --ignore-table keystone.revocation_event \
+  > "$snapshot_file"
+
+echo "Unlocking tables"
+remote mysql <<SQL
+--- Allow writes again
+unlock tables;
+SQL

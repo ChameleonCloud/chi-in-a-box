@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+set -e -u -o pipefail
+
+snapshot_file="${1:-}"
+binlog_file="${2:-}"
+binlog_pos="${3:-}"
+
+if [[ ! -f "$snapshot_file" || -z "$binlog_file" || -z "$binlog_pos" ]]; then
+  cat <<USAGE
+Usage: $(basename $0) <snapshot_file> <binlog_file> <binlog_position>
+
+Restores slave replication by bringing the replicated database in sync
+with the tables on the master server, then restarting replication from
+the given binlog file and position captured at time of snapshot.
+
+Example: $(basename $0) mysql_snapshot.sql mariadb-bin.0000001 123456
+
+USAGE
+  exit 1
+fi
+
+echo "Stopping slave"
+mysql <<SQL
+stop slave;
+SQL
+
+tmpfile="$(mktemp)"
+backup_file="$HOME/keystone-backup-$(date +'%Y%m%d%H%M').sql"
+echo "Backing up database to $backup_file"
+mysqldump keystone > "$backup_file"
+echo "Snapshotting non-replicated tables to $tmpfile"
+mysqldump keystone trust trust_role revocation_event > "$tmpfile"
+
+read -p "About to drop the slave database. You sure you're ready? [y/N]: " -n 1 -r
+echo
+if [[ $REPLY =~ ^[Yy]$ ]]; then
+  echo "Dropping and recreating slave database"
+  mysql <<SQL
+--- Fire the torpedos
+drop database keystone;
+create database keystone;
+SQL
+  echo "Restoring tables from master snapshot"
+  mysql keystone < "$snapshot_file"
+  echo "Restoring non-replicated tables"
+  mysql keystone < "$tmpfile"
+  echo "Reconfiguring replication"
+  mysql <<SQL
+change master to master_log_file="$binlog_file", master_log_pos=$binlog_pos;
+start slave;
+show slave status;
+SQL
+
+  echo "Cleaning up temp files"
+  rm -f "$tmpfile"
+fi
