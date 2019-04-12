@@ -14,3 +14,26 @@ groups:
     annotations:
       summary: "Low Ironic cache space on {{ $labels.hostname }}"
       description: "Ironic process on {{ $labels.hostname }} has less than 15GB of space to use for image cache."
+
+  - alert: NetworkBridgeDown
+    expr: |
+      max_over_time(node_network_transmit_packets_total{device=~"br.*"}[1h])
+      unless node_network_transmit_packets_total
+    labels:
+      severity: critical
+    annotations:
+      summary: "Bridge {{ $labels.device }} is no longer reporting metrics"
+      description: "The network bridge {{ $labels.device }} on {{ $labels.hostname }} could be down."
+
+  - alert: NetworkBridgeLowTraffic
+    expr: |
+      rate(node_network_transmit_packets_total{device=~"br.*"}[5m])
+      /
+      rate(node_network_transmit_packets_total{device=~"br.*"}[5m] offset 1d)
+      < 0.1
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Bridge {{ $labels.device }} has lower than normal packet activity."
+      description: "The network bridge {{ $labels.device }} on {{ $labels.hostname }} has 90% less traffic than normal and could be down."
