@@ -19,6 +19,16 @@ USAGE
   exit 1
 fi
 
+read_snapshot() {
+  local snapshot="$1"
+
+  if [[ "$snapshot" == *".gz" ]]; then
+    zcat "$snapshot"
+  else
+    cat "$snapshot"
+  fi
+}
+
 echo "Stopping slave"
 mysql <<SQL
 stop slave;
@@ -41,9 +51,9 @@ drop database keystone;
 create database keystone;
 SQL
   echo "Restoring tables from master snapshot"
-  mysql keystone < "$snapshot_file"
+  read_snapshot "$snapshot_file" | mysql keystone
   echo "Restoring non-replicated tables"
-  mysql keystone < "$tmpfile"
+  read_snapshot "$tmpfile" | mysql keystone
   echo "Reconfiguring replication"
   mysql <<SQL
 change master to master_log_file="$binlog_file", master_log_pos=$binlog_pos;
@@ -53,4 +63,5 @@ SQL
 
   echo "Cleaning up temp files"
   rm -f "$tmpfile"
+  echo "Done."
 fi

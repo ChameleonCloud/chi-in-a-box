@@ -26,7 +26,7 @@ USAGE
   exit 1
 fi
 
-snapshot_file="mysql_keystone_master-$(date +'%Y%m%d%H%M').sql"
+snapshot_file="mysql_keystone_master-$(date +'%Y%m%d%H%M').sql.gz"
 
 remote() {
   ssh -o LogLevel=error "$mysql_host" "$@"
@@ -47,7 +47,7 @@ remote mysqldump keystone \
   --ignore-table keystone.trust \
   --ignore-table keystone.trust_role \
   --ignore-table keystone.revocation_event \
-  > "$snapshot_file"
+  | gzip >"$snapshot_file"
 
 echo "Unlocking tables"
 remote mysql <<SQL
