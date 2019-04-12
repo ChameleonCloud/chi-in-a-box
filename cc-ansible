@@ -4,6 +4,11 @@ DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 source "$DIR/venv/bin/activate"
 
 declare -a POSARGS=()
+declare -a TRAPS=()
+cleanup() {
+  for exit_trap in ${TRAPS[@]}; do "$exit_trap"; done
+}
+trap cleanup EXIT
 
 while [[ $# -gt 0 ]]; do
   key="$1"
@@ -29,7 +34,7 @@ while [[ $# -gt 0 ]]; do
       command=help
       ;;
     *)
-      POSARGS+=$key
+      POSARGS+=($key)
       ;;
   esac
 
@@ -58,7 +63,7 @@ edit_passwords() {
   _edit_passwords_cleanup() {
     rm -f "$tmpfile"
   }
-  trap _edit_passwords_cleanup EXIT
+  TRAPS+=(_edit_passwords_cleanup)
 
   echo "Decrypting passwords..."
   ansible-vault \
@@ -124,14 +129,30 @@ if [[ -n "${CC_ANSIBLE_PLAYBOOK:-}" ]]; then
   # Move roles out of the way so they do not have precedence in case there
   # is a collision on role name.
   mv "$ansible_path/roles" "$ansible_path/_roles"
-  cleanup() {
+  _playbook_override_cleanup() {
     rm -f "$playbook_file"
     mv "$ansible_path/_roles" "$ansible_path/roles"
   }
-  trap cleanup EXIT
+  TRAPS+=(_playbook_override_cleanup)
   # Prepare an invocation of Kolla-Ansible targeting this playbook
   POSARGS+=(deploy --playbook "$playbook_file")
 fi
+
+lockfile="$CC_ANSIBLE_SITE/.lock"
+if [[ -f "$lockfile" ]]; then
+  cat <<ERRMSG
+ERROR: Lockfile $lockfile exists! Another process may be updating this site.
+Wait until the other process finishes, or optionally stop the running process
+in order to continue.
+ERRMSG
+  exit 1
+fi
+
+touch "$lockfile"
+_lock_cleanup() {
+  rm -f "$lockfile"
+}
+TRAPS+=(_lock_cleanup)
 
 kolla-ansible \
   --configdir="$CC_ANSIBLE_SITE" \
