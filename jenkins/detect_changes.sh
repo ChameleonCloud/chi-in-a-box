@@ -19,13 +19,14 @@ kolla_services=(
   nova
 )
 
-echo "$(for s in ${kolla_services[@]}; do
+matched_kolla_services="$(for s in ${kolla_services[@]}; do
   for l in $@; do
     if [[ "$l" == *"$s"* ]]; then
       echo -e "kolla\t$s"
     fi
   done
 done | sort | uniq)"
+[[ -n "$matched_kolla_services" ]] && echo "$matched_kolla_services"
 
 playbooks=(
   docker_registry
@@ -37,10 +38,11 @@ playbooks=(
   vendordata
 )
 
-echo "$(for s in ${playbooks[@]}; do
+matched_playbooks="$(for s in ${playbooks[@]}; do
   for l in $@; do
     if [[ "$l" == *"$s"* ]]; then
       echo -e "playbook\t$s"
     fi
   done
 done | sort | uniq)"
+[[ -n "$matched_playbooks" ]] && echo "$matched_playbooks"
