@@ -39,12 +39,12 @@ def trigger_reconfigure_jobs(list, agent_label) {
   for (int i = 0; i < list.size(); i++) {
     (change_type, change_value) = list[i].split()
     if (change_type == "kolla") {
-      build job: 'kolla-ansible-reconfigure', parameters: [
+      build job: 'kolla-ansible-reconfigure', wait: false, parameters: [
         string(name: 'KOLLA_SERVICE_NAME', value: change_value),
         string(name: 'JENKINS_AGENT_LABEL', value: agent_label)
       ]
     } else if (change_type == "playbook") {
-      build job: 'ansible-playbook', parameters: [
+      build job: 'ansible-playbook', wait: false, parameters: [
         string(name: 'PLAYBOOK_NAME', value: change_value),
         string(name: 'JENKINS_AGENT_LABEL', value: agent_label)
       ]
