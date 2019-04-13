@@ -36,9 +36,11 @@ groups:
 
   - alert: NodeNetworkBridgeLowTraffic
     expr: |
-      rate(node_network_transmit_packets_total{device=~"br.*"}[5m]) == 0
+      rate(node_network_transmit_packets_total{device=~"br.*"}[5m])
+        == 0
       and
-      rate(node_network_transmit_packets_total{device=~"br.*"}[5m] offset 1d) > 0
+      rate(node_network_transmit_packets_total{device=~"br.*"}[5m] offset 1d)
+        > 0
     for: 10m
     labels:
       severity: warning
