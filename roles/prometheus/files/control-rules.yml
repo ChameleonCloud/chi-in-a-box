@@ -15,6 +15,15 @@ groups:
       summary: "Low Ironic cache space on {{ $labels.hostname }}"
       description: "Ironic process on {{ $labels.hostname }} has less than 15GB of space to use for image cache."
 
+  - alert: NodeExporterDown
+    expr: up == 0
+    for: 15m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Exporter job {{ $labels.job }} is down"
+      description: "The exporter job {{ $labels.job }} on {{ $labels.hostname }} is no longer returning metrics."
+
   - alert: NodeNetworkBridgeDown
     expr: |
       max_over_time(node_network_transmit_packets_total{device=~"br.*"}[1h])
@@ -27,13 +36,12 @@ groups:
 
   - alert: NodeNetworkBridgeLowTraffic
     expr: |
-      rate(node_network_transmit_packets_total{device=~"br.*"}[5m])
-      /
-      rate(node_network_transmit_packets_total{device=~"br.*"}[5m] offset 1d)
-      < 0.1
+      rate(node_network_transmit_packets_total{device=~"br.*"}[5m]) == 0
+      and
+      rate(node_network_transmit_packets_total{device=~"br.*"}[5m] offset 1d) > 0
     for: 10m
     labels:
-      severity: critical
+      severity: warning
     annotations:
       summary: "Bridge {{ $labels.device }} has lower than normal packet activity."
-      description: "The network bridge {{ $labels.device }} on {{ $labels.hostname }} has 90% less traffic than normal and could be down."
+      description: "The network bridge {{ $labels.device }} on {{ $labels.hostname }} had no traffic for the last 10 minutes."
