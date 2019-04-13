@@ -4,8 +4,8 @@ pipeline {
   }
 
   parameters {
-    string(name: 'KOLLA_SERVICE_NAME', defaultValue: '',
-           description: 'Name of Kolla service to reconfigure (e.g. "horizon")')
+    string(name: 'PLAYBOOK_NAME', defaultValue: '',
+           description: 'Name of playbook to run (e.g. "docker_registry")')
     string(name: 'JENKINS_AGENT_LABEL', defaultValue: '',
            description: 'The label of the Jenkins agent to execute the deploy on')
   }
@@ -17,7 +17,7 @@ pipeline {
       }
     }
 
-    stage('reconfigure') {
+    stage('run-playbook') {
       environment {
         ANSIBLE_DIR = '/etc/ansible'
       }
@@ -26,7 +26,7 @@ pipeline {
         script {
           slackThread = startSlackThread('notifications')
         }
-        sh "./kolla-ansible reconfigure --tags=${params.KOLLA_SERVICE_NAME}"
+        sh "./ansible-playbook playbooks/${params.PLAYBOOK_NAME}.yml"
       }
     }
   }
@@ -54,6 +54,6 @@ pipeline {
 def startSlackThread(String channel) {
   slackSend(
     channel: channel,
-    message: "*Updating runtime configuration* of *${params.KOLLA_SERVICE_NAME}* (${params.JENKINS_AGENT_LABEL}). <${env.RUN_DISPLAY_URL}|View job>"
+    message: "*Running playbook* for *${params.PLAYBOOK_NAME}* (${params.JENKINS_AGENT_LABEL}). <${env.RUN_DISPLAY_URL}|View job>"
   )
 }

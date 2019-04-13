@@ -1,0 +1,53 @@
+pipeline {
+  agent any
+
+  triggers {
+    GenericTrigger(
+      genericVariables: [
+        [key: 'ref', value: '$.ref'],
+        [key: 'changed_files', value: '$.commits[*].["modified","added","removed"][*]'],
+        [key: 'subjects', value: '$.commits[*].message']
+      ],
+
+      causeString: 'Triggered on $ref',
+
+      token: JOB_NAME,
+
+      printContributedVariables: true,
+
+      regexpFilterText: '$ref',
+      regexpFilterExpression: 'refs/heads/master'
+    )
+  }
+
+  stages {
+    stage('reconfigure-dev') {
+      steps {
+        script {
+          changes = sh(
+            returnStdout: true,
+            script: "jenkins/detect_changes.sh ${changed_files} ${subjects}"
+          ).split('\n')
+        }
+        trigger_reconfigure_jobs(changes, 'ansible-uc-dev')
+      }
+    }
+  }
+}
+
+def trigger_reconfigure_jobs(list, agent_label) {
+  for (int i = 0; i < list.size(); i++) {
+    (change_type, change_value) = list[i].split()
+    if (change_type == "kolla") {
+      build job: 'kolla-ansible-reconfigure', parameters: [
+        string(name: 'KOLLA_SERVICE_NAME', value: change_value),
+        string(name: 'JENKINS_AGENT_LABEL', value: agent_label)
+      ]
+    } else if (change_type == "playbook") {
+      build job: 'ansible-playbook', parameters: [
+        string(name: 'PLAYBOOK_NAME', value: change_value),
+        string(name: 'JENKINS_AGENT_LABEL', value: agent_label)
+      ]
+    }
+  }
+}
