@@ -47,3 +47,12 @@ groups:
     annotations:
       summary: "Bridge {{ $labels.device }} has lower than normal packet activity."
       description: "The network bridge {{ $labels.device }} on {{ $labels.hostname }} had no traffic for the last 10 minutes."
+
+  - alert: OpenStackAPIDown
+    expr: openstack_check_api == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: "OpenStack {{ $labels.service }} service is down."
+      description: "The {{ $labels.service }} on {{ $labels.hostname }} is not responding."
