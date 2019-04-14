@@ -10,14 +10,17 @@ chi01
 [network]
 chi01
 
+[database]
+m01-07
+
 [compute]
 # No compute node; this is a baremetal-only cluster.
 
 [monitoring]
-#chameleon04.tacc.utexas.edu ansible_become=yes ansible_become_user=root
+chameleon04.tacc.utexas.edu
 
 [storage]
-#m01-07 ansible_become=yes ansible_become_user=root
+# s01-01
 
 [deployment]
 localhost ansible_connection=local pip_virtualenv=/etc/ansible/venv
@@ -26,6 +29,7 @@ localhost ansible_connection=local pip_virtualenv=/etc/ansible/venv
 control
 network
 compute
+database
 storage
 monitoring
 
@@ -55,7 +59,7 @@ compute
 monitoring
 
 [prometheus:children]
-monitoring
+control
 
 [kafka:children]
 control
@@ -90,10 +94,10 @@ network
 #ansible_winrm_server_cert_validation=ignore
 
 [mariadb:children]
-storage
+database
 
 [rabbitmq:children]
-control
+database
 
 [outward-rabbitmq:children]
 control
@@ -687,6 +691,14 @@ control
 
 [prometheus-ceph-exporter:children]
 ceph-mgr
+
+[prometheus-snmp-exporter:children]
+control
+
+[prometheus-apache-exporter:children]
+
+[prometheus-jupyterhub-exporter:children]
+# No JupyterHub
 
 [prometheus-cadvisor:children]
 monitoring
