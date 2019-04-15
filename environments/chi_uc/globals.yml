@@ -9,10 +9,10 @@ pip_virtualenv: "{{ virtualenv }}"
 ansible_python_interpreter: "{{ virtualenv }}/bin/python"
 
 # Docker image tag to use for deployed containers
-openstack_release: "chameleoncloud-ocata"
-blazar_tag: "chameleoncloud-rocky"
-glance_tag: "chameleoncloud-rocky"
-heat_tag: "chameleoncloud-rocky"
+openstack_release: "chameleoncloud-rocky"
+# Keep shared services at Ocata until coordinated rollout
+horizon_tag: "chameleoncloud-ocata"
+keystone_tag: "chameleoncloud-ocata"
 
 # TODO: merge this inforation with the neutron_ml2_generic_switch_configs
 switch_configs:
@@ -169,31 +169,43 @@ neutron_ml2_generic_switch_configs:
     ip: 10.140.80.52
     username: "{{ chameleon_switch_dell_username }}"
     password: "{{ chameleon_switch_dell_password }}"
+    persist_changes: False
+    fast_cli: True
   - name: Chameleon-Compute
     device_type: netmiko_dell_force10
     ip: 10.140.80.53
     username: "{{ chameleon_switch_dell_username }}"
     password: "{{ chameleon_switch_dell_password }}"
+    persist_changes: False
+    fast_cli: True
   - name: fx2-chassis-01-agg1
-    device_type: fnioa_netmiko_dell_force10
+    device_type: netmiko_dell_fnioa
     ip: 172.29.0.197
     username: "{{ chameleon_switch_fx2_username }}"
     password: "{{ chameleon_switch_fx2_password }}"
+    persist_changes: False
+    fast_cli: True
   - name: fx2-chassis-02-agg1
-    device_type: fnioa_netmiko_dell_force10
+    device_type: netmiko_dell_fnioa
     ip: 172.29.0.199
     username: "{{ chameleon_switch_fx2_username }}"
     password: "{{ chameleon_switch_fx2_password }}"
+    persist_changes: False
+    fast_cli: True
   - name: fx2-chassis-03-agg1
-    device_type: fnioa_netmiko_dell_force10
+    device_type: netmiko_dell_fnioa
     ip: 172.29.0.201
     username: "{{ chameleon_switch_fx2_username }}"
     password: "{{ chameleon_switch_fx2_password }}"
+    persist_changes: False
+    fast_cli: True
   - name: fx2-chassis-04-agg1
-    device_type: fnioa_netmiko_dell_force10
+    device_type: netmiko_dell_fnioa
     ip: 172.29.0.203
     username: "{{ chameleon_switch_fx2_username }}"
     password: "{{ chameleon_switch_fx2_password }}"
+    persist_changes: False
+    fast_cli: True
   - name: chameleon-corsa1
     device_type: corsa_dp2100
     switchIP: 172.30.0.4
