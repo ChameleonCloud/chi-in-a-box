@@ -32,8 +32,10 @@ receivers:
   slack_configs:
   - channel: '#notifications'
     send_resolved: true
-    text: {% raw %}'{{ template "slack.chameleon.text" . }}'{% endraw %}
-    color: {% raw %}'{{ template "slack.chameleon.color" . }}'{% endraw %}
+    text: {% raw %}'{{ template "slack.chameleon.text" . }}'
+{% endraw %}
+    color: {% raw %}'{{ template "slack.chameleon.color" . }}'
+{% endraw %}
 # The "FYI" receiver is for alerts that cannot automatically resolve; this is
 # good for things like, something is going wrong that you should look into.
 # Instance launch failure rate is an example of this; if instance launch
@@ -43,5 +45,7 @@ receivers:
   slack_configs:
   - channel: '#notifications'
     send_resolved: false
-    text: {% raw %}'{{ template "slack.chameleon.text" . }}'{% endraw %}
-    color: {% raw %}'{{ template "slack.chameleon.color" . }}'{% endraw %}
+    text: {% raw %}'{{ template "slack.chameleon.text" . }}'
+{% endraw %}
+    color: {% raw %}'{{ template "slack.chameleon.color" . }}'
+{% endraw %}
