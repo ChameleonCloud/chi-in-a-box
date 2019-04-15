@@ -6,11 +6,15 @@ templates:
 - '/etc/alertmanager/templates/*.tmpl'
 
 route:
+  receiver: 'default'
   group_by: ['alertname', 'hostname']
   group_wait: 30s
   group_interval: 5m
   repeat_interval: 3h
-  receiver: 'default'
+  routes:
+  - receiver: 'fyi'
+    match:
+      can_resolve: no
 
 # Inhibition rules allow to mute a set of alerts given that another alert is
 # firing.
@@ -24,8 +28,20 @@ inhibit_rules:
   equal: ['alertname', 'hostname']
 
 receivers:
-  - name: 'default'
-    slack_configs:
-    - channel: '#notifications'
-      send_resolved: true
-      text: {% raw %}'{{ template "slack.chameleon.text" . }}'{% endraw %}
+- name: 'default'
+  slack_configs:
+  - channel: '#notifications'
+    send_resolved: true
+    text: {% raw %}'{{ template "slack.chameleon.text" . }}'{% endraw %}
+    color: {% raw %}'{{ template "slack.chameleon.color" . }}'{% endraw %}
+# The "FYI" receiver is for alerts that cannot automatically resolve; this is
+# good for things like, something is going wrong that you should look into.
+# Instance launch failure rate is an example of this; if instance launch
+# failures go down it is likely the user just stopped, so we shouldn't consider
+# it really resolved.
+- name: 'fyi'
+  slack_configs:
+  - channel: '#notifications'
+    send_resolved: false
+    text: {% raw %}'{{ template "slack.chameleon.text" . }}'{% endraw %}
+    color: {% raw %}'{{ template "slack.chameleon.color" . }}'{% endraw %}

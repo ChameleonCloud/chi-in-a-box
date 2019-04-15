@@ -2,3 +2,7 @@
 {{ .CommonAnnotations.description }}
 {{ if .CommonAnnotations.runbook }}<{{ .CommonAnnotations.runbook }}|:notebook: Runbook>{{ else }}<https://github.com/ChameleonCloud/ansible-playbooks/wiki|:exclamation:*NO RUNBOOK*:exclamation:>{{ end }}
 {{ end }}
+
+{{ define "slack.chameleon.color" }}
+{{ if eq .Status "firing" }}{{ if eq .CommonAnnotations.severity "warning" }}warning{{ else }}danger{{ end }}{{ else }}good{{ end }}
+{{ end }}

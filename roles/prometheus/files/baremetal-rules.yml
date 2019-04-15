@@ -6,6 +6,7 @@ groups:
     for: 1m
     labels:
       severity: warning
+      can_resolve: no
     annotations:
       summary: "Instance failures occured for {{ $labels.project_name }}."
       description: "The number of instance launch failures increased in the last 15 minutes for project with id: {{ $labels.project_id }}."
