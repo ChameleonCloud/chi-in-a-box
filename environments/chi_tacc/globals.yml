@@ -24,11 +24,6 @@ kolla_internal_vip_address: "10.20.111.241"
 kolla_external_vip_address: "129.114.97.101"
 kolla_external_fqdn: "chi.tacc.chameleoncloud.org"
 
-#TODO (hammock) move to host_vars?
-kolla_external_vip_interface: "em2"
-api_interface: "em1"
-network_interface: "em1"
-
 # Site & Region configuration
 openstack_region_name: "CHI@TACC"
 openstack_keystone_auth_uri: "https://chi.tacc.chameleoncloud.org:5000"
@@ -41,14 +36,40 @@ jenkins_slave_name: ansible-tacc-prod
 jenkins_slave_secret: # TODO
 prometheus_alertmanager_hostname: alert.tacc.chameleoncloud.org
 
+# TODO: set up SNMP community string for these switches
+switch_configs:
+  - name: roc-be24-sw1 # m01
+    device_type: netmiko_dell_force10
+    ip: 172.26.102.28
+  - name: roc-bc24-sw1 # c01
+    device_type: netmiko_dell_force10
+    ip: 172.26.102.98
+  - name: roc-be26-sw1 # c02
+    device_type: netmiko_dell_force10
+    ip: 172.26.102.87
+  - name: roc-bd26-sw1 # c03
+    device_type: netmiko_dell_force10
+    ip: 172.26.102.89
+  - name: roc-bc26-sw1 # c04
+    device_type: netmiko_dell_force10
+    ip: 172.26.102.91
+  - name: roc-be33-sw1 # c05
+    device_type: netmiko_dell_force10
+    ip: 172.26.102.83
+  - name: roc-bd33-sw1 # c06
+    device_type: netmiko_dell_force10
+    ip: 172.26.102.80
+  - name: roc-bc35-sw1 # c10
+    device_type: netmiko_dell_force10
+    ip: 172.26.102.86
+  - name: roc-bb35-sw1 # c11
+    device_type: netmiko_dell_force10
+    ip: 172.26.102.78
+
 # CHI@UC
-# TACC
 chi_uc_openstack_region_name: "CHI@UC"
 chi_uc_chameleon_site_name: "uc"
 chi_uc_blazar_database_host: "192.5.87.4"
-#chi_uc_external_fqdn: "chi.tacc.chameleoncloud.org"
-#chi_uc_keystone_auth_url: "https://{{ chi_tacc_external_fqdn }}:5000"
-
 
 # External MariaDB config
 enable_mariadb: "no"

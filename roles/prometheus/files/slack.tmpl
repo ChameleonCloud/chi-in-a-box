@@ -1,1 +1,4 @@
-{{ define "slack.chameleon.text" }}{{ .CommonAnnotations.description }}{{ end }}
+{{ define "slack.chameleon.text" }}
+{{ .CommonAnnotations.description }}
+{{ if .CommonAnnotations.runbook }}<{{ .CommonAnnotations.runbook }}|:notebook: Runbook>{{ else }}<https://github.com/ChameleonCloud/ansible-playbooks/wiki|:exclamation:*NO RUNBOOK*:exclamation:>{{ end }}
+{{ end }}

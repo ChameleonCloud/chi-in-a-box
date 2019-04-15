@@ -691,7 +691,7 @@ control
 control
 
 [prometheus-ceph-exporter:children]
-ceph-mgr
+# None
 
 [prometheus-cadvisor:children]
 monitoring
@@ -720,7 +720,7 @@ admin02
 admin02
 
 [jupyterhub]
-admin02
+# None
 
 # Experiment precis service(s)
 [precis]

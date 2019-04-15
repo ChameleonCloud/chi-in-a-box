@@ -18,7 +18,7 @@ precis_rabbitmq_listener_bindings:
 precis_rabbitmq_rpc_queue: experiment_precis_service_queue
 
 # precis_mysql_host: ''
-precis_mysql_inventory_group: mysql
+precis_mysql_inventory_group: mariadb
 precis_mysql_database: experiment_precis
 precis_mysql_user: exp_precis
 # precis_mysql_password: ''
