@@ -21,8 +21,8 @@ groups:
     labels:
       severity: warning
     annotations:
-      summary: "Exporter job {{ $labels.job }} is down"
-      description: "The exporter job {{ $labels.job }} on {{ $labels.hostname }} is no longer returning metrics."
+      summary: "Exporter job *{{ $labels.job }}* is down"
+      description: "The exporter job *{{ $labels.job }}* on {{ $labels.hostname }} is no longer returning metrics."
 
   - alert: NodeNetworkBridgeDown
     expr: |
@@ -31,8 +31,8 @@ groups:
     labels:
       severity: critical
     annotations:
-      summary: "Bridge {{ $labels.device }} is no longer reporting metrics"
-      description: "The network bridge {{ $labels.device }} on {{ $labels.hostname }} could be down."
+      summary: "Bridge *{{ $labels.device }}* is no longer reporting metrics"
+      description: "The network bridge *{{ $labels.device }}* on {{ $labels.hostname }} could be down."
 
   - alert: NodeNetworkBridgeLowTraffic
     expr: |
@@ -41,12 +41,12 @@ groups:
       and
       rate(node_network_transmit_packets_total{device=~"br.*"}[5m] offset 1d)
         > 0
-    for: 10m
+    for: 30m
     labels:
       severity: warning
     annotations:
-      summary: "Bridge {{ $labels.device }} has lower than normal packet activity."
-      description: "The network bridge {{ $labels.device }} on {{ $labels.hostname }} had no traffic for the last 10 minutes."
+      summary: "Bridge *{{ $labels.device }}* has lower than normal packet activity"
+      description: "The network bridge *{{ $labels.device }}* on {{ $labels.hostname }} had no traffic for the last 30 minutes."
 
   - alert: OpenStackAPIDown
     expr: openstack_check_api == 0
@@ -54,5 +54,5 @@ groups:
     labels:
       severity: critical
     annotations:
-      summary: "OpenStack {{ $labels.service }} service is down."
-      description: "The {{ $labels.service }} on {{ $labels.hostname }} is not responding."
+      summary: "OpenStack {{ $labels.service | title }} service is down"
+      description: "The *{{ $labels.service | title }}* service on {{ $labels.hostname }} is not responding."
