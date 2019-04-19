@@ -54,6 +54,8 @@ ERRMSG
   exit 1
 fi
 
+CC_ANSIBLE_VAULT_PASSWORD="${CC_ANSIBLE_VAULT_PASSWORD:-$CC_ANSIBLE_SITE/vault_password}"
+
 #
 # Subcommands
 #
@@ -67,7 +69,7 @@ edit_passwords() {
 
   echo "Decrypting passwords..."
   ansible-vault \
-    --vault-password-file="$CC_ANSIBLE_SITE/vault_password" \
+    --vault-password-file="$CC_ANSIBLE_VAULT_PASSWORD" \
     view "$CC_ANSIBLE_SITE/passwords.yml" >"$tmpfile"
   ${EDITOR:-vi} "$tmpfile"
   local ret=$?
@@ -76,7 +78,7 @@ edit_passwords() {
   kolla-genpwd --passwords "$tmpfile"
   echo "Encrypting passwords..."
   ansible-vault \
-    --vault-password-file="$CC_ANSIBLE_SITE/vault_password" \
+    --vault-password-file="$CC_ANSIBLE_VAULT_PASSWORD" \
     encrypt "$tmpfile"
   cp "$tmpfile" "$CC_ANSIBLE_SITE/passwords.yml"
 }
@@ -157,7 +159,7 @@ TRAPS+=(_lock_cleanup)
 kolla-ansible \
   --configdir="$CC_ANSIBLE_SITE" \
   --inventory="$CC_ANSIBLE_SITE/inventory" \
-  --key="$CC_ANSIBLE_SITE/vault_password" \
+  --key="$CC_ANSIBLE_VAULT_PASSWORD" \
   --passwords="$CC_ANSIBLE_SITE/passwords.yml" \
   --extra node_custom_config="$DIR/kolla/node_custom_config" \
   "${POSARGS[@]}"

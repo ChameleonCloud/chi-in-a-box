@@ -13,6 +13,10 @@ pipeline {
   stages {
     stage('setup') {
       steps {
+        dir('site-configs') {
+          git(credentialsId: 'github-deloy-key-site-configs',
+              url: 'git@github.com:ChameleonCloud/site-configs.git')
+        }
         sh 'make venv'
       }
     }
@@ -21,9 +25,13 @@ pipeline {
       when {
         not { equals expected: '', actual: params.KOLLA_SERVICE_NAME }
       }
+      
       environment {
-        ANSIBLE_DIR = '/etc/ansible'
+        // CC_ANSIBLE_SITE_NAME is defined via Jenkins agent node properties.
+        // CC_ANSIBLE_VAULT_PASSWORD is also expected to be defined.
+        CC_ANSIBLE_SITE = "site-configs/${env.CC_ANSIBLE_SITE_NAME}"
       }
+
       steps {
         script {
           slackThread = startSlackThread('notifications')
