@@ -82,7 +82,7 @@ prometheus_services:
     scrape_target: yes
   openstack-exporter:
     service_name: prometheus_openstack_exporter
-    image: docker.chameleoncloud.org/prometheus-openstack-exporter:latest
+    image: docker.chameleoncloud.org/chameleoncloud/prometheus-openstack-exporter:latest
     group: prometheus-openstack-exporter
     restart_handler: restart openstack exporter
     port: 9103
