@@ -9,6 +9,7 @@
     src: "{{ item }}"
     dest: "{{ service.config_dir }}/{{ item }}"
   loop:
+    - baremetal-rules.yml
     - control-rules.yml
     - mysql-rules.yml
   notify:
