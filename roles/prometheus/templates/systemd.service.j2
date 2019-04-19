@@ -5,6 +5,7 @@ After=docker.service
 [Service]
 Restart=always
 ExecStart=/bin/docker run --name={{ item.service_name }} \
+                          --net={{ prometheus_docker_network_name }} \
 {% if item.extra_docker_args is defined %}
 {% for docker_arg in item.extra_docker_args %}
                           {{ docker_arg }} \
