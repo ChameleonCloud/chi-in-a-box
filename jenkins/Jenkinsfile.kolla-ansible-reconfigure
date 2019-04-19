@@ -26,7 +26,7 @@ pipeline {
         script {
           slackThread = startSlackThread('notifications')
         }
-        sh "./kolla-ansible reconfigure --tags=${params.KOLLA_SERVICE_NAME}"
+        sh "./cc-ansible reconfigure --tags=${params.KOLLA_SERVICE_NAME}"
       }
     }
   }

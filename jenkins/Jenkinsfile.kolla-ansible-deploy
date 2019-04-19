@@ -28,8 +28,8 @@ pipeline {
         script {
           slackThread = startSlackThread('notifications')
         }
-        sh "./kolla-ansible pull --tags ${params.KOLLA_SERVICE_NAME}"
-        sh "./kolla-ansible upgrade --tags ${params.KOLLA_SERVICE_NAME}"
+        sh "./cc-ansible pull --tags ${params.KOLLA_SERVICE_NAME}"
+        sh "./cc-ansible upgrade --tags ${params.KOLLA_SERVICE_NAME}"
       }
     }
   }
