@@ -1,0 +1,163 @@
+#!/usr/bin/env bash
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
+
+source "$DIR/venv/bin/activate"
+
+declare -a POSARGS=()
+declare -a TRAPS=()
+cleanup() {
+  for exit_trap in ${TRAPS[@]}; do "$exit_trap"; done
+}
+trap cleanup EXIT
+
+while [[ $# -gt 0 ]]; do
+  key="$1"
+
+  case $key in
+    -p|--playbook)
+      CC_ANSIBLE_PLAYBOOK="$2"
+      shift # Past arg
+      ;;
+    -s|--site)
+      CC_ANSIBLE_SITE="$2"
+      shift # Past arg
+      ;;
+    --check)
+      # Add proper flag support for --check as an option for dry-runs
+      export EXTRA_OPTS="${EXTRA_OPTS:-} --check"
+      ;;
+    edit_passwords|help)
+      # Special subcommand!
+      command="$key"
+      ;;
+    -h|--help)
+      command=help
+      ;;
+    *)
+      POSARGS+=($key)
+      ;;
+  esac
+
+  shift
+done
+
+if [[ -z "${CC_ANSIBLE_SITE:-}" ]]; then
+  cat <<ERRMSG
+Error: no site specified! Please specify which site to execute under with either
+the --site <dir> flag or by setting the CC_ANSIBLE_SITE environment variable.
+
+Example:
+  cc-ansible --site /etc/sites/production
+
+  CC_ANSIBLE_SITE=/etc/sites/production $(basename $0)
+ERRMSG
+  exit 1
+fi
+
+#
+# Subcommands
+#
+
+edit_passwords() {
+  local tmpfile="$(mktemp)"
+  _edit_passwords_cleanup() {
+    rm -f "$tmpfile"
+  }
+  TRAPS+=(_edit_passwords_cleanup)
+
+  echo "Decrypting passwords..."
+  ansible-vault \
+    --vault-password-file="$CC_ANSIBLE_SITE/vault_password" \
+    view "$CC_ANSIBLE_SITE/passwords.yml" >"$tmpfile"
+  ${EDITOR:-vi} "$tmpfile"
+  local ret=$?
+  if [[ $ret -gt 0 ]]; then exit $ret; fi
+  echo "Generating placeholder passwords for any missing values..."
+  kolla-genpwd --passwords "$tmpfile"
+  echo "Encrypting passwords..."
+  ansible-vault \
+    --vault-password-file="$CC_ANSIBLE_SITE/vault_password" \
+    encrypt "$tmpfile"
+  cp "$tmpfile" "$CC_ANSIBLE_SITE/passwords.yml"
+}
+
+help() {
+  cat <<USAGE
+Usage: cc-ansible [-s|--site SITE]
+                  [subcommand|--playbook PLAYBOOK]
+                  ARGS
+
+Subcommands:
+  edit_passwords: Update an encrypted passwords file for the given environment.
+                  Opens an interactive editor and saves the results back out as
+                  en encrypted file.
+
+Examples:
+  # Run the 'deploy' step for Kolla-Ansible in a 'production' site
+  cc-ansible -s /path/to/sites/production deploy
+
+  # Run the 'upgrade' step for only Ironic tags
+  cc-ansible upgrade --tags ironic
+
+  # Run an external playbook
+  cc-ansible --playbook path/to/playbook.yml
+
+  # Update the passwords file for the environment
+  cc-ansible edit_passwords
+USAGE
+  exit 1
+}
+
+# Handle subcommands
+if [[ -n $command ]]; then
+  $command "$@"
+  exit $?
+fi
+
+if [[ -n "${CC_ANSIBLE_PLAYBOOK:-}" ]]; then
+  echo "**********************************************************************"
+  echo "* Playbook override detected! This playbook will be executed within  *"
+  echo "* Kolla-Ansible's playbook context.                                  *"
+  echo "**********************************************************************"
+  echo
+
+  ansible_path="$DIR/venv/share/kolla-ansible/ansible"
+  playbook_file="$ansible_path/$(basename $CC_ANSIBLE_PLAYBOOK)"
+  # Copy the playbook to a new location relative to the Kolla-Ansible installation
+  # to allow the group_vars/ in the playbook directory to take effect.
+  cp "$(realpath $CC_ANSIBLE_PLAYBOOK)" "$playbook_file"
+  # Move roles out of the way so they do not have precedence in case there
+  # is a collision on role name.
+  mv "$ansible_path/roles" "$ansible_path/_roles"
+  _playbook_override_cleanup() {
+    rm -f "$playbook_file"
+    mv "$ansible_path/_roles" "$ansible_path/roles"
+  }
+  TRAPS+=(_playbook_override_cleanup)
+  # Prepare an invocation of Kolla-Ansible targeting this playbook
+  POSARGS+=(deploy --playbook "$playbook_file")
+fi
+
+lockfile="$CC_ANSIBLE_SITE/.lock"
+if [[ -f "$lockfile" ]]; then
+  cat <<ERRMSG
+ERROR: Lockfile $lockfile exists! Another process may be updating this site.
+Wait until the other process finishes, or optionally stop the running process
+in order to continue.
+ERRMSG
+  exit 1
+fi
+
+touch "$lockfile"
+_lock_cleanup() {
+  rm -f "$lockfile"
+}
+TRAPS+=(_lock_cleanup)
+
+kolla-ansible \
+  --configdir="$CC_ANSIBLE_SITE" \
+  --inventory="$CC_ANSIBLE_SITE/inventory" \
+  --key="$CC_ANSIBLE_SITE/vault_password" \
+  --passwords="$CC_ANSIBLE_SITE/passwords.yml" \
+  --extra node_custom_config="$DIR/kolla/node_custom_config" \
+  "${POSARGS[@]}"
