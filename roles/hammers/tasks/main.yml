@@ -1,0 +1,52 @@
+---
+- set_fact:
+    hammers_list: "{{ hammers | dict2items | map(attribute='value') | list }}"
+
+- name: Pull Docker image.
+  docker_image:
+    name: "{{ hammers_docker_image }}"
+
+- name: Create config directory.
+  file:
+    path: "{{ hammers_config_path }}"
+    state: directory
+
+- name: Configure Hammers docker bash wrapper
+  template:
+    src: cc-hammer.j2
+    mode: a+x
+    dest: /usr/bin/cc-hammer
+
+- name: Configure slack webhook file
+  template:
+    src: slack.json.j2
+    mode: 0600
+    dest: "{{ hammers_config_path }}/slack.json"
+
+- name: Create MySQL user
+  local_action:
+    module: mysql_user
+    login_host: "{{ groups.mariadb[0] }}"
+    login_password: "{{ database_password }}"
+    name: "{{ hammers_mysql_user }}"
+    host: 172.%
+    password: "{{ hammers_mysql_password }}"
+    priv: "*.*:SELECT,UPDATE,DELETE"
+
+- name: Configure Hammers my.cnf
+  template:
+    src: my.cnf.j2
+    dest: "{{ hammers_config_path }}/my.cnf"
+  vars:
+    mysql_host: "{{ ansible_internal_ipv4_addresses[groups.mariadb[0]] }}"
+
+- name: Add hammer cron jobs.
+  cron:
+    name: "{{ item.hammer_name }}"
+    minute: "{{ item.cron_times.minute | default('*') }}"
+    hour: "{{ item.cron_times.hour | default('*') }}"
+    day: "{{ item.cron_times.day | default('*') }}"
+    month: "{{ item.cron_times.month | default('*') }}"
+    weekday: "{{ item.cron_times.weekday | default('*') }}"
+    job: "{{ item.cmd }} {{ item.extra_args | default([]) | join(' ') }}"
+  loop: "{{ hammers_list }}"
