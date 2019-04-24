@@ -62,6 +62,9 @@
 - name: Create Docker network.
   docker_network:
     name: "{{ precis_docker_network }}"
+    ipam_options:
+      subnet: "{{ precis_docker_network_subnet }}"
+    state: present
   when: precis_docker_network != "host"
 
 - name: Configure precis services.
