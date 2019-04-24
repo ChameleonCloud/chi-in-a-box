@@ -6,6 +6,8 @@
   docker_network:
     name: "{{ prometheus_docker_network_name }}"
     driver: bridge
+    ipam_options:
+      subnet: "{{ prometheus_docker_network_subnet }}"
     state: present
 
 - name: Pull Docker images.
