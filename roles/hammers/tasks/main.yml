@@ -5,6 +5,7 @@
 - name: Pull Docker image.
   docker_image:
     name: "{{ hammers_docker_image }}"
+    force: yes
 
 - name: Create config directory.
   file:
@@ -15,7 +16,13 @@
   template:
     src: cc-hammer.j2
     mode: a+x
-    dest: /usr/bin/cc-hammer
+    dest: /usr/local/sbin/cc-hammer
+
+- name: Configure Hammers env file
+  template:
+    src: hammers.env.j2
+    mode: 0600
+    dest: "{{ hammers_config_path }}"
 
 - name: Configure slack webhook file
   template:
@@ -48,5 +55,5 @@
     day: "{{ item.cron_times.day | default('*') }}"
     month: "{{ item.cron_times.month | default('*') }}"
     weekday: "{{ item.cron_times.weekday | default('*') }}"
-    job: "{{ item.cmd }} {{ item.extra_args | default([]) | join(' ') }}"
+    job: "{{ item.cmd }}"
   loop: "{{ hammers_list }}"

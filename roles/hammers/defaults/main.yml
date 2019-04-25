@@ -7,62 +7,47 @@ hammers_mysql_user: cc_hammers
 hammers:
   neutron_reaper_ip:
     hammer_name: hammers-neutronreaper-ip
-    cmd: neutron-reaper
-    extra_args:
-      - delete
-      - ip
-      - 14
+    cmd: "neutron-reaper delete ip 14 --dbversion ocata"
     cron_times:
       minute: 20
       hour: 5
   conflict_macs:
     hammer_name: hammers-conflictmacs
-    cmd: conflict-macs
-    extra_args:
-      - delete
+    cmd: "conflict-macs delete"
     cron_times:
       minute: 30
       hour: 5
   undead_instances:
     hammer_name: hammers-undeadinstances
-    cmd: undead-instances
-    extra_args:
-      - delete
+    cmd: "undead-instances delete"
     cron_times:
       minute: 35
       hour: 5
   dirty_ports:
     hammer_name: hammers-dirtyports
-    cmd: diryt-ports
-    extra_args:
-      - clean
-      - --multiport
+    cmd: "diryt-ports clean --multiport"
     cron_times:
       minute: 15
   ironic_error_resetter:
     hammer_name: hammers-ironicerrorresetter
-    cmd: ironic-error-resetter
-    extra_args:
-      - reset
+    cmd: "ironic-error-resetter reset"
     cron_times:
       minute: "*/15"
   orphan_resource_providers:
     hammer_name: hammers-orphanresourceproviders
-    cmd: orphan-resource-providers
-    extra_args:
-     - update
+    cmd: "orphan-resource-providers update"
     cron_times:
       minute: 45
       hour: 5
   reservation_usage_notification:
     hammer_name: hammers-reservationusagenotfication
-    cmd: reservation-usage-notification
+    cmd: "reservation-usage-notification"
     cron_times:
       minute: 0
       hour: 10
   orphans_detector:
     hammer_name: hammers-orphansdetector
-    cmd: orphans-detector
+    cmd: "orphans-detector"
     cron_times:
       minute: 45
       hour: 5
