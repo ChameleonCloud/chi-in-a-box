@@ -1,0 +1,10 @@
+groups:
+- name: cron.rules
+  rules:
+  - alert: CronJobNoRecentSuccess
+    expr: time() - cron_last_success{} by (job) > 3600 * 24
+    labels:
+      severity: critical
+    annotations:
+      summary: "{{ $labels.job }} cron job has not succeeded in more than 24 hours."
+      description: "{{ $labels.job }} last succeeded {{ humanizeDuration $value }} ago and is likely failing."
