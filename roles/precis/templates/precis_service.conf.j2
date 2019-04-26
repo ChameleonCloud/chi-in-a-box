@@ -17,4 +17,4 @@ mysql_user: {{ precis_mysql_user }}
 mysql_pass: {{ precis_mysql_password }}
 
 [serviceaccount]
-auth_url: {{ openstack_keystone_auth_url }}
+auth_url: {{ keystone_public_url }}/v3
