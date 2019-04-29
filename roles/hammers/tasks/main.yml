@@ -22,7 +22,7 @@
   template:
     src: hammers.env.j2
     mode: 0600
-    dest: "{{ hammers_config_path }}"
+    dest: "{{ hammers_env_file }}"
 
 - name: Configure slack webhook file
   template:
@@ -36,7 +36,7 @@
     login_host: "{{ groups.mariadb[0] }}"
     login_password: "{{ database_password }}"
     name: "{{ hammers_mysql_user }}"
-    host: 172.%
+    host: "%"
     password: "{{ hammers_mysql_password }}"
     priv: "*.*:SELECT,UPDATE,DELETE"
 
@@ -45,7 +45,7 @@
     src: my.cnf.j2
     dest: "{{ hammers_config_path }}/my.cnf"
   vars:
-    mysql_host: "{{ ansible_internal_ipv4_addresses[groups.mariadb[0]] }}"
+    mysql_host: "{{ hammers_mysql_host }}"
 
 - name: Add hammer cron jobs.
   cron:
@@ -55,5 +55,5 @@
     day: "{{ item.cron_times.day | default('*') }}"
     month: "{{ item.cron_times.month | default('*') }}"
     weekday: "{{ item.cron_times.weekday | default('*') }}"
-    job: "{{ item.cmd }}"
+    job: "cc-hammer {{ item.cmd }}"
   loop: "{{ hammers_list }}"

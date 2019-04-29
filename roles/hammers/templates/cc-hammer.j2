@@ -9,4 +9,4 @@ docker run \
   -v "/etc/hammers/slack.json:/etc/hammers/slack.json" \
   -v "/etc/hammers/my.cnf:/root/.my.cnf" \
   {{ hammers_docker_image }} $@ \
-  --slack $slack --osrc /etc/hammers/adminrc 2>&1 | $log -t $log_tag
+  --slack $slack 2>&1 | $log -t $log_tag

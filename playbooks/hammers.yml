@@ -2,11 +2,3 @@
 - hosts: hammers
   roles:
     - hammers
-  pre_tasks:
-    - name: Set fact for internal host addresses.
-      set_fact:
-        ansible_internal_ipv4_addresses: >
-          {{ { item.inventory_hostname: item['ansible_' + item.network_interface].ipv4.address } | combine(ansible_internal_ipv4_addresses | default({})) }}
-      loop: "{{ ansible_play_hosts_all | map('extract', hostvars) | list }}"
-      loop_control:
-        label: "{{ item.inventory_hostname }}"
