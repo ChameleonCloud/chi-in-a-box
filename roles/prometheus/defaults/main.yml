@@ -93,13 +93,21 @@ prometheus_services:
     volumes:
       - "/etc/prometheus/openstack_exporter.yml:/usr/local/bin/exporter/config.yml"
   snmp-exporter:
-     service_name: prometheus_snmp_exporter
-     image: prom/snmp-exporter:v0.15.0
-     generator_image: prom/snmp-generator:master
-     group: prometheus-snmp-exporter
-     restart_handler: restart snmp exporter
-     port: 9116
-     config_dir: /etc/prometheus/snmp-exporter
-     scrape_target: no
-     volumes:
-       - "/etc/prometheus/snmp-exporter:/etc/snmp_exporter"
+    service_name: prometheus_snmp_exporter
+    image: prom/snmp-exporter:v0.15.0
+    generator_image: prom/snmp-generator:master
+    group: prometheus-snmp-exporter
+    restart_handler: restart snmp exporter
+    port: 9116
+    config_dir: /etc/prometheus/snmp-exporter
+    scrape_target: no
+    volumes:
+     - "/etc/prometheus/snmp-exporter:/etc/snmp_exporter"
+  push-gateway:
+    service_name: prometheus_pushgateway
+    image: prom/pushgateway:v0.8.0
+    group: prometheus-push-gateway
+    restart_handler: restart pushgateway
+    port: 9091
+    config_dir: /etc/prometheus
+    scrape_target: yes

@@ -42,3 +42,8 @@
   service:
     name: prometheus_apache_exporter
     state: restarted
+
+- name: restart pushgateway
+  service:
+    name: prometheus_pushgateway
+    state: restarted
