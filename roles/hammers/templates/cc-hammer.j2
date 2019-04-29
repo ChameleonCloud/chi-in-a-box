@@ -4,9 +4,8 @@ slack="{{ hammers_config_path }}/slack.json"
 log="/usr/bin/logger"
 log_tag="hammers-"$1
 
-docker run -it \
-  -e "{{ hammers_env_file }}" \
-  -v "/root/adminrc:/etc/hammers/adminrc" \
+docker run \
+  --env-file "{{ hammers_env_file }}" \
   -v "/etc/hammers/slack.json:/etc/hammers/slack.json" \
   -v "/etc/hammers/my.cnf:/root/.my.cnf" \
   {{ hammers_docker_image }} $@ \
