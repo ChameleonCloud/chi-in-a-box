@@ -5,6 +5,7 @@
     - prometheus-ceph-exporter
     - prometheus-mysqld-exporter
     - prometheus-openstack-exporter
+    - prometheus-push-gateway
   roles:
     - docker
 
@@ -16,6 +17,7 @@
     - prometheus-mysqld-exporter
     - prometheus-node-exporter
     - prometheus-openstack-exporter
+    - prometheus-push-gateway
   roles:
     - prometheus
   pre_tasks:
