@@ -51,3 +51,9 @@ hammers:
     cron_times:
       minute: 45
       hour: 5
+  lease_stacking:
+    hammer_name: hammers-leasestacking
+    cmd: "lease-stack-reaper delete"
+    cron_times:
+      minute: 40
+      hour: 5
