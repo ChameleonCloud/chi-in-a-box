@@ -18,6 +18,14 @@ SITE_BRANDING = 'ChameleonCloud'
 # Override help menu to point to our docs.
 HORIZON_CONFIG['help_url'] = '{{ horizon_help_url }}'
 
+{% if enable_blazar | bool %}
+# Blazar-specific settings
+{% if blazar_floatingip_reservation_network_id is defined %}
+OPENSTACK_BLAZAR_FLOATINGIP_RESERVATION = {
+  # Allow reserving floating IPs on this network
+  'network_id': '{{ blazar_floatingip_reservation_network_id }}',
+}
+{% endif %}
 # Used for Blazar dashboard, which needs to pull data from the MySQL database
 # directly at the moment.
 DATABASES = {
@@ -35,6 +43,7 @@ DATABASES = {
 {% endif %}
 {% endfor %}
 }
+{% endif %}
 
 # Add default Chameleon theme.
 AVAILABLE_THEMES = [
