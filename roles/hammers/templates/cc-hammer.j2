@@ -5,6 +5,7 @@ log="/usr/bin/logger"
 log_tag="hammers-"$1
 
 docker run \
+  --net=host \
   --env-file "{{ hammers_env_file }}" \
   -v "/etc/hammers/slack.json:/etc/hammers/slack.json" \
   -v "/etc/hammers/my.cnf:/root/.my.cnf" \
