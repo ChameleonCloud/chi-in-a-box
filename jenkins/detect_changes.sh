@@ -46,3 +46,5 @@ matched_playbooks="$(for s in ${playbooks[@]}; do
   done
 done | sort | uniq)"
 [[ -n "$matched_playbooks" ]] && echo "$matched_playbooks"
+
+exit 0
