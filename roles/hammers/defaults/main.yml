@@ -25,7 +25,7 @@ hammers:
       hour: 5
   dirty_ports:
     hammer_name: hammers-dirtyports
-    cmd: "diryt-ports clean --multiport"
+    cmd: "dirty-ports clean --multiport"
     cron_times:
       minute: 15
   ironic_error_resetter:
