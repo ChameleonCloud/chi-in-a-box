@@ -26,7 +26,7 @@ while [[ $# -gt 0 ]]; do
       # Add proper flag support for --check as an option for dry-runs
       export EXTRA_OPTS="${EXTRA_OPTS:-} --check"
       ;;
-    edit_passwords|help)
+    decrypt_passwords|edit_passwords|help)
       # Special subcommand!
       command="$key"
       ;;
@@ -81,6 +81,11 @@ edit_passwords() {
     --vault-password-file="$CC_ANSIBLE_VAULT_PASSWORD" \
     encrypt "$tmpfile"
   cp "$tmpfile" "$CC_ANSIBLE_SITE/passwords.yml"
+}
+
+decrypt_passwords() {
+  ansible-vault --vault-password-file="$CC_ANSIBLE_VAULT_PASSWORD" \
+    view "$CC_ANSIBLE_SITE/passwords.yml"
 }
 
 help() {
