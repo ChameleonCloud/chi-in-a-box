@@ -56,3 +56,4 @@ groups:
     annotations:
       summary: "OpenStack {{ $labels.service | title }} service is down"
       description: "The *{{ $labels.service | title }}* service on {{ $labels.hostname }} is not responding."
+      runbook: https://github.com/ChameleonCloud/ansible-playbooks/wiki#openstackapidown
