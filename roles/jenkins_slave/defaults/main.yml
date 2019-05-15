@@ -1,5 +1,5 @@
 ---
 jenkins_slave_master: https://jenkins.chameleoncloud.org
-jenkins_slave_agent_checksum: 6cac94965872a429aa34deda09ddc2f16bbecae3d411f8802686f963ada068f3
+jenkins_slave_agent_checksum: ac4787840e26385bb40bbe937270918b2f68f05e5abd9eacc8320178fa898c2b
 jenkins_slave_workdir: /var/jenkins
 jenkins_slave_service_name: jenkins_slave
