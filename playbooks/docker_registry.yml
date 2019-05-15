@@ -63,5 +63,8 @@
                   Require user {{ docker_registry_push_users | join(' ') }}
                 </Limit>
               </Location>
+      when:
+        - groups['docker_registry'] is defined
+        - groups['docker_registry'] | length > 0
       tags:
         - configuration
