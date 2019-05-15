@@ -13,7 +13,7 @@
         virtualenv: "{{ pip_virtualenv }}"
       loop:
         # For mysql_user module
-        - mysqlclient
+        - MySQL-python
         # For os_user module
         - openstacksdk
         - shade
