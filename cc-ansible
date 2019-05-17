@@ -161,10 +161,18 @@ _lock_cleanup() {
 }
 TRAPS+=(_lock_cleanup)
 
-kolla-ansible \
-  --configdir="$CC_ANSIBLE_SITE" \
-  --inventory="$CC_ANSIBLE_SITE/inventory" \
-  --key="$CC_ANSIBLE_VAULT_PASSWORD" \
-  --passwords="$CC_ANSIBLE_SITE/passwords.yml" \
-  --extra node_custom_config="$DIR/kolla/node_custom_config" \
-  "${POSARGS[@]}"
+declare -a kolla_args=()
+kolla_args+=(--configdir="$CC_ANSIBLE_SITE")
+kolla_args+=(--inventory="$CC_ANSIBLE_SITE/inventory")
+kolla_args+=(--key="$CC_ANSIBLE_VAULT_PASSWORD")
+kolla_args+=(--passwords="$CC_ANSIBLE_SITE/passwords.yml")
+kolla_args+=(--extra node_custom_config="$DIR/kolla/node_custom_config")
+# Override python interpreter to point to virtualenv (but only if we're
+# not performing the bootstrap, which is responsible for setting up the
+# virtualenv in the first place!)
+if [[ "${POSARGS[@]}" != *"bootstrap-servers"* ]]; then
+  kolla_args+=(--extra ansible_python_interpreter="{{virtualenv}}/bin/python")
+fi
+kolla_args+=("${POSARGS[@]}")
+
+kolla-ansible "${kolla_args[@]}"
