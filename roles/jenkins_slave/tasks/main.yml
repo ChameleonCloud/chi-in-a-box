@@ -1,4 +1,8 @@
 ---
+- name: Install package dependencies.
+  package:
+    name: java
+
 - name: Create working directory.
   file:
     name: "{{ jenkins_slave_workdir }}"
