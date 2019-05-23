@@ -22,21 +22,27 @@
       file:
         name: "{{ jupyterhub_config_path }}"
         state: directory
-    - name: Create JupyterHub service environment configurations.
+    - name: Create JupyterHub service environment configuration.
       template:
-        src: "{{ item }}.j2"
-        dest: "{{ jupyterhub_config_path }}/{{ item }}"
+        src: "jupyterhub.env.j2"
+        dest: "{{ jupyterhub_config_path }}/jupyterhub.env"
         mode: "0640"
-      loop:
-        - jupyterhub-db.env
-        - jupyterhub.env
+      notify:
+        - restart jupyterhub
     - name: Configure JupyterHub systemd service.
       template:
         src: jupyterhub.service.j2
         dest: "/etc/systemd/system/{{ jupyterhub_service_name }}.service"
       notify:
         - restart jupyterhub
-    - name: Configure JupyterHub database systemd service.
+    - name: Create database service environment configuration.
+      template:
+        src: "jupyterhub-db.env.j2"
+        dest: "{{ jupyterhub_config_path }}/jupyterhub-db.env"
+        mode: "0640"
+      notify:
+        - restart jupyterhub db
+    - name: Configure database systemd service.
       template:
         src: jupyterhub-db.service.j2
         dest: "/etc/systemd/system/{{ jupyterhub_db_service_name }}.service"
