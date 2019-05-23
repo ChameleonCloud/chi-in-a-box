@@ -42,5 +42,7 @@
                 ProxyPass         http://{{ jupyterhub_internal_address }}:{{ jupyterhub_port }}/
                 ProxyPassReverse  http://{{ jupyterhub_internal_address }}:{{ jupyterhub_port }}/
               </Location>
+      when:
+        - groups.jupyterhub | length > 0
       tags:
         - configuration
