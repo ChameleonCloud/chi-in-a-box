@@ -1,0 +1,5 @@
+---
+chameleon_usage_docker_image: docker.chameleoncloud.org/chameleon_usage:latest
+chameleon_usage_config_dir: /etc/chameleon_usage
+chameleon_usage_mysql_user: cc_usage
+

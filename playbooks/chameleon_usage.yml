@@ -1,0 +1,4 @@
+---
+- hosts: chameleon_usage
+  roles:
+    - chameleon_usage
