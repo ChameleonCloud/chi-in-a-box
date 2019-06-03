@@ -1,13 +1,11 @@
-# File that contains what region/site we're targeting.
-.ansible-inventory
 # Ansible caches facts here
 .facts/
-# Vagrant caches its state here
-.vagrant/
 # When ansible fails, retry files are left in the playbooks directory
 *.retry
 # The vault passwords are stored here by convention
 vault_password
+# Ansible Galaxy roles
+roles/galaxy.ansible.com/
 # The virtualenv environment
 venv/
 # Kolla SSL certificates (dev only)
