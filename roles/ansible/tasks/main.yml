@@ -17,3 +17,5 @@
         # For os_user module
         - openstacksdk
         - shade
+        # For ipaddr filter
+        - netaddr
