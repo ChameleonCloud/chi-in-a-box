@@ -17,7 +17,7 @@ ExecStart=/bin/docker run --name={{ item.service_name }} \
 {% endfor %}
 {% endif %}
 {% if item.port is defined %}
-                          -p {{ item.port }}:{{ item.port }} \
+                          -p {{ bind_address }}:{{ item.port }}:{{ item.port }} \
 {% endif %}
 {% if item.env_file is defined %}
                           --env-file {{ item.env_file }} \

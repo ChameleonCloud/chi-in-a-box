@@ -66,6 +66,8 @@
   template:
     src: systemd.service.j2
     dest: "/usr/lib/systemd/system/{{ item.service_name }}.service"
+  vars:
+    bind_address: "{{ lookup('vars', 'ansible_' + network_interface).ipv4.address }}"
   notify:
     - reload systemd daemon
     - "{{ item.restart_handler }}"
