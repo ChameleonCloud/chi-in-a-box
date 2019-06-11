@@ -33,8 +33,6 @@ prometheus_services:
     config_dir: /etc/alertmanager
     service_args:
       - "--web.external-url=https://{{ prometheus_alertmanager_hostname }}"
-    extra_docker_args:
-      - "--net=host"
     scrape_target: no
     volumes:
       - "alertmanager-data:/alertmanager"
