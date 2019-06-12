@@ -21,6 +21,8 @@ prometheus_services:
     port: 9090
     config_dir: /etc/prometheus
     scrape_target: yes
+    service_args:
+      - "--web.enable-lifecycle"
     volumes:
       - "prometheus-data:/prometheus"
       - "/etc/prometheus:/etc/prometheus"
