@@ -167,7 +167,7 @@ kolla_args+=(--inventory="$CC_ANSIBLE_SITE/inventory")
 kolla_args+=(--key="$CC_ANSIBLE_VAULT_PASSWORD")
 kolla_args+=(--passwords="$CC_ANSIBLE_SITE/passwords.yml")
 kolla_args+=(--extra node_custom_config="$DIR/kolla/node_custom_config")
-kolla_args+=(--extra post_deploy_custom_play="$DIR/playbooks/post_deploy.yml")
+kolla_args+=(--extra post_deploy_extra_play="$DIR/playbooks/post_deploy.yml")
 kolla_args+=(--extra cc_ansible_site_dir="$CC_ANSIBLE_SITE")
 # Override python interpreter to point to virtualenv (but only if we're
 # not performing the bootstrap, which is responsible for setting up the
