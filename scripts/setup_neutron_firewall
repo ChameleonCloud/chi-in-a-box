@@ -7,6 +7,7 @@ export OS_AUTH_TYPE=token
 unset OS_USERNAME
 unset OS_USER_DOMAIN_NAME
 unset OS_PASSWORD
+unset OS_CLOUD
 
 log() {
   echo "$@" >&2
@@ -46,26 +47,31 @@ create_firewall_rule "default deny ipv4" --action deny --protocol any
 create_firewall_rule "default deny ipv6" --action deny --protocol any --ip-version 6
 
 create_firewall_policy() {
-  local name="$1"
+  local name="chameleon default ingress"
   shift
   local policy_id=$(openstack firewall group policy show "$name" -f value -c ID 2>/dev/null)
   log "Setting up firewall policy '$name'"
   if [[ -z "$policy_id" ]]; then
-    policy_id=$(openstack firewall group policy create "$name" -f value -c ID)
+    policy_id=$(openstack firewall group policy create -f value -c ID \
+      --description "Reasonably-secure policy allowing only critical services" \
+      "$name")
   fi
   openstack firewall group policy set "$policy_id" --share --no-firewall-rule \
     $(for r in ${rules[@]}; do echo --firewall-rule "$r"; done) >/dev/null
   echo "$policy_id"
 }
 
-policy_id=$(create_firewall_policy "chameleon default ingress")
+policy_id=$(create_firewall_policy)
 
 create_firewall_group() {
-  local name="$1"
+  local name="sharednet"
   shift
   log "Setting up firewall group '$name'"
   openstack firewall group show "$name" 2>&1 >/dev/null \
-   || openstack firewall group create --ingress-firewall-policy "$policy_id" "$name"
+   || openstack firewall group create --name "$name" \
+        --description "Applies default policy to shared networks" \
+        --ingress-firewall-policy "$policy_id" \
+        --egress-firewall-policy 'default egress'
 }
 
-create_firewall_group "chameleon default"
+create_firewall_group
