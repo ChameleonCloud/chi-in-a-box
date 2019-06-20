@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+
+# Get a token to enable faster authentication
+token=$(openstack token issue -f value -c id)
+export OS_TOKEN=$token
+export OS_AUTH_TYPE=token
+unset OS_USERNAME
+unset OS_USER_DOMAIN_NAME
+unset OS_PASSWORD
+
+log() {
+  echo "$@" >&2
+}
+
+declare -a rules=()
+
+create_firewall_rule() {
+  local name="$1"
+  shift
+  local rule_id=$(openstack firewall group rule show "$name" -f value -c ID 2>/dev/null)
+  log "Setting up firewall rule '$name'"
+  if [[ -z "$rule_id" ]]; then
+    rule_id=$(openstack firewall group rule create --name "$name" --share "$@" -f value -c ID)
+  else
+    openstack firewall group rule set --share "$@" "$rule_id"
+  fi
+  rules+=("$rule_id")
+}
+
+create_firewall_rule "allow SSH ipv4" --action allow --protocol tcp --destination-port 22
+create_firewall_rule "allow SSH ipv6" --action allow --protocol tcp --destination-port 22 --ip-version 6
+create_firewall_rule "allow HTTP ipv4" --action allow --protocol tcp --destination-port 80
+create_firewall_rule "allow HTTP ipv6" --action allow --protocol tcp --destination-port 80 --ip-version 6
+create_firewall_rule "allow HTTPS ipv4" --action allow --protocol tcp --destination-port 443
+create_firewall_rule "allow HTTPS ipv6" --action allow --protocol tcp --destination-port 443 --ip-version 6
+
+create_firewall_rule "allow ICMP ipv4" --action allow --protocol icmp
+create_firewall_rule "allow ICMP ipv6" --action allow --protocol icmp --ip-version 6
+
+create_firewall_rule "allow from RFC1918 10/8 ipv4" --action allow --protocol any --source-ip-address 10.0.0.0/8
+create_firewall_rule "allow from RFC1918 172.16/12 ipv4" --action allow --protocol any --source-ip-address 172.16.0.0/12
+create_firewall_rule "allow from RFC1918 192.168/16 ipv4" --action allow --protocol any --source-ip-address 192.168.0.0/16
+create_firewall_rule "allow from RFC4193 fd00::/8 ipv6" --action allow --protocol any --source-ip-address fd00::/8 --ip-version 6
+
+create_firewall_rule "default deny ipv4" --action deny --protocol any
+create_firewall_rule "default deny ipv6" --action deny --protocol any --ip-version 6
+
+create_firewall_policy() {
+  local name="$1"
+  shift
+  local policy_id=$(openstack firewall group policy show "$name" -f value -c ID 2>/dev/null)
+  log "Setting up firewall policy '$name'"
+  if [[ -z "$policy_id" ]]; then
+    policy_id=$(openstack firewall group policy create "$name" -f value -c ID)
+  fi
+  openstack firewall group policy set "$policy_id" --share --no-firewall-rule \
+    $(for r in ${rules[@]}; do echo --firewall-rule "$r"; done) >/dev/null
+  echo "$policy_id"
+}
+
+policy_id=$(create_firewall_policy "chameleon default ingress")
+
+create_firewall_group() {
+  local name="$1"
+  shift
+  log "Setting up firewall group '$name'"
+  openstack firewall group show "$name" 2>&1 >/dev/null \
+   || openstack firewall group create --ingress-firewall-policy "$policy_id" "$name"
+}
+
+create_firewall_group "chameleon default"
