@@ -114,7 +114,8 @@
       provider_segmentation_id: "{{ ironic_provisioning_network_vlan }}"
       provider_physical_network: physnet1
       state: present
-    when: enable_ironic | bool
+    when: enable_ironic | bool and
+          ironic_provisioning_network_vlan is defined
   - name: Create provisioning subnet.
     local_action:
       module: os_subnet
@@ -126,7 +127,8 @@
       host_routes:
       - destination: "{{ kolla_internal_vip_address }}/32"
         nexthop: "{{ ironic_provisioning_network_gateway }}"
-    when: enable_ironic | bool
+    when: enable_ironic | bool and
+          ironic_provisioning_network_cidr is defined
 
   # Blazar-related configuration
   - name: Create freepool aggregate.
