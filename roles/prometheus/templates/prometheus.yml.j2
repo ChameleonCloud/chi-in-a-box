@@ -16,7 +16,7 @@ alerting:
 
 # Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
 rule_files:
-  - '/etc/prometheus/*-rules.yml'
+  - '/etc/prometheus/rules/*.yml'
 
 scrape_configs:
 {% for name, service in prometheus_services.iteritems() %}
@@ -54,4 +54,3 @@ scrape_configs:
     - target_label: __address__
       replacement: '{{ snmp_exporter_host }}:{{ snmp_exporter_service.port }}'
 {% endfor %}
-

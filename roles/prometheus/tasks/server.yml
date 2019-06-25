@@ -7,7 +7,7 @@
 
 - copy:
     src: "{{ item }}"
-    dest: "{{ service.config_dir }}/{{ item }}"
+    dest: "{{ service.config_dir }}/rules/{{ item }}"
   loop:
     - baremetal-rules.yml
     - control-rules.yml

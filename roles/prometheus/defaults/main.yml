@@ -15,7 +15,7 @@ prometheus_openstack_exporter_user: admin
 prometheus_services:
   server:
     service_name: prometheus_server
-    image: prom/prometheus:v2.3.2
+    image: prom/prometheus:v2.10.0
     group: prometheus
     restart_handler: restart prometheus
     port: 9090
@@ -25,7 +25,8 @@ prometheus_services:
       - "--web.enable-lifecycle"
     volumes:
       - "prometheus-data:/prometheus"
-      - "/etc/prometheus:/etc/prometheus"
+      - "/etc/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml"
+      - "/etc/prometheus/rules:/etc/prometheus/rules"
   alertmanager:
     service_name: prometheus_alertmanager
     image: prom/alertmanager:v0.15.2
