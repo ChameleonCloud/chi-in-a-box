@@ -23,7 +23,7 @@ ExecStart=/bin/docker run --name={{ item.service_name }} \
                           --env-file {{ item.env_file }} \
 {% endif %}
                           {{ item.image }} \
-                          {{ item.service_args | default([]) | join('\n                          \\') }}
+                          {{ item.service_args | default([]) | join(' \\\n                          ') }}
 ExecStop=/bin/docker stop -t 2 {{ item.service_name }}
 ExecStopPost=/bin/docker rm -f {{ item.service_name }}
 
