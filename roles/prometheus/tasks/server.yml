@@ -5,6 +5,10 @@
   notify:
     - restart prometheus
 
+- file:
+    name: "{{ service.config_dir }}/rules"
+    state: directory
+
 - copy:
     src: "{{ item }}"
     dest: "{{ service.config_dir }}/rules/{{ item }}"
