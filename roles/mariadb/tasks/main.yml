@@ -1,0 +1,16 @@
+---
+- name: Configure mariadb backup script file
+  template:
+    src: mariadb.j2
+    mode: a+x
+    dest: "{{ mariadb_backup_cron_script }}"
+
+- name: Add mariadb backup cron jobs.
+  cron:
+    name: "{{ mariadb_backup_cron_name }}"
+    minute: "{{ mariadb_backup_cron_minute }}"
+    hour: "{{ mariadb_backup_cron_hour }}"
+    day: "{{ mariadb_backup_cron_day }}"
+    month: "{{ mariadb_backup_cron_month }}"
+    weekday: "{{ mariadb_backup_cron_weekday }}"
+    job: "{{ mariadb_backup_cron_script }}"

@@ -1,0 +1,11 @@
+#!/bin/bash
+
+cd "{{ glance_backup_origin_dir }}" && \
+  find . -maxdepth 1 -type f | xargs -n 100 \
+  swift --os-storage-url "{{ glance_backup_swift_endpoint }}" \
+  --os_auth_token "{{ glance_backup_auth_token }}" \
+  upload "{{ glance_backup_container_name }}" \
+  --changed \
+  --segment-size "{{ glance_backup_segment_size }}" \
+  2>&1 | /usr/bin/logger -t "{{ glance_backup_log_key }}"
+

@@ -1,0 +1,17 @@
+---
+- name: Configure gnocchi backup script file
+  template:
+    src: gnocchi.j2
+    mode: a+x
+    dest: /usr/local/sbin/gnocchi
+
+- name: Add gnocchi backup cron jobs
+  cron:
+    name: "{{ gnocchi_backup_cron_name }}"
+    minute: "{{ gnocchi_backup_cron_minute }}"
+    hour: "{{ gnocchi_backup_cron_hour }}"
+    day: "{{ gnocchi_backup_cron_day }}"
+    month: "{{ gnocchi_backup_cron_month }}"
+    weekday: "{{ gnocchi_backup_cron_weekday }}"
+    job: "{{ gnocchi_backup_cron_script }}"
+

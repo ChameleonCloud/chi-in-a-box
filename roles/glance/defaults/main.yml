@@ -1,0 +1,6 @@
+---
+# defaults file for glance
+
+glance_backup_container_name: glance_backup
+glance_backup_segment_size: 4831838208
+glance_backup_cron_name: glance-backup

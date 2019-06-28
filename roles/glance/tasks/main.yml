@@ -1,0 +1,17 @@
+---
+- name: Configure glance backup script file
+  template:
+    src: glance.j2
+    mode: a+x
+    dest: /usr/local/sbin/glance
+
+- name: Add glance backup cron jobs.
+  cron:
+    name: "{{ glance_backup_cron_name }}"
+    minute: "{{ glance_backup_cron_minute }}"
+    hour: "{{ glance_backup_cron_hour }}"
+    day: "{{ glance_backup_cron_day }}"
+    month: "{{ glance_backup_cron_month }}"
+    weekday: "{{ glance_backup_cron_weekday }}"
+    job: "{{ glance_backup_cron_script }}"
+
