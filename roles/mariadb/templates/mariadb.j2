@@ -50,8 +50,8 @@ if [ $? -eq 0 ] ; then
     touch /tmp/mysqlbackup_success
 fi
 
-
-"{{ mariadb_backup_rsync_command }}"
+rsync -vrlptz ${DIR} "{{ mariadb_backup_destination_host }}":"{{ mariadb_backup_destination_dir }}"
+2>&1 | /usr/bin/logger -t "{{ mariadb_backup_log_key }}"
 
 # Remove temporary file
 rm -f $TMPFILE
