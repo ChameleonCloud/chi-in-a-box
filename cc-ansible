@@ -158,7 +158,7 @@ if [[ "$CHECK_UPDATES" == "yes" || "$FORCE_UPDATES" == "yes" ]]; then
   kolla_ansible_submodule_status="$(git submodule status kolla/kolla-ansible)"
   case "${kolla_ansible_submodule_status:0:1}" in
     -|+)
-      git submodule init --update kolla/kolla-ansible
+      git submodule update --init kolla/kolla-ansible
       (cd kolla/kolla-ansible; python setup.py install)
       ;;
     *)
