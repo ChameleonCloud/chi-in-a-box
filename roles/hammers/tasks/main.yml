@@ -33,7 +33,7 @@
 - name: Create MySQL user
   local_action:
     module: mysql_user
-    login_host: "{{ groups.mariadb[0] }}"
+    login_host: "{{ database_address }}"
     login_password: "{{ database_password }}"
     name: "{{ hammers_mysql_user }}"
     host: "%"
