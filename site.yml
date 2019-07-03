@@ -1,4 +1,0 @@
-# Include all playbooks automatically
-- include: "{{ item }}"
-  with_fileglob:
-    - playbooks/*.yml
