@@ -1,8 +1,17 @@
 #!/usr/bin/env bash
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 
+FORCE_UPDATES=no
+if [[ ! -d "$DIR/venv" ]]; then
+  echo "Creating virtualenv at $DIR/venv ..."
+  virtualenv --system-site-packages "$DIR/venv"
+  "$DIR/venv/bin/pip" install --upgrade pip
+  FORCE_UPDATES=yes
+fi
+
 source "$DIR/venv/bin/activate"
 
+CHECK_UPDATES=yes
 declare -a POSARGS=()
 declare -a TRAPS=()
 cleanup() {
@@ -32,6 +41,9 @@ while [[ $# -gt 0 ]]; do
       ;;
     -h|--help)
       command=help
+      ;;
+    --no-update)
+      CHECK_UPDATES=no
       ;;
     *)
       POSARGS+=($key)
@@ -119,6 +131,43 @@ USAGE
 if [[ -n $command ]]; then
   $command "$@"
   exit $?
+fi
+
+# Automatically update dependencies
+if [[ "$CHECK_UPDATES" == "yes" || "$FORCE_UPDATES" == "yes" ]]; then
+  # Update base pip packages
+  pip_requirements="$DIR/requirements.txt"
+  pip_requirements_chksum="$DIR/requirements.txt.sha256"
+  if [[ "$FORCE_UPDATES" == "yes" || ! -f "$pip_requirements_chksum" ]] || \
+        ! sha256sum --quiet --check "$pip_requirements_chksum"; then
+    pip install -r "$pip_requirements"
+    sha256sum "$pip_requirements" > "$pip_requirements_chksum"
+  fi
+
+  # Update Ansible Galaxy roles
+  galaxy_role_path="$DIR/roles/galaxy.ansible.com"
+  galaxy_role_requirements="$DIR/requirements.yml"
+  galaxy_role_requirements_chksum="$DIR/requirements.yml.sha256"
+  if [[ "$FORCE_UPDATES" == "yes" || ! -f "$galaxy_role_requirements_chksum" ]] || \
+        ! sha256sum --quiet --check "$galaxy_role_requirements_chksum"; then
+    ansible-galaxy install -p "$galaxy_role_path" -r "$galaxy_role_requirements"
+    sha256sum "$galaxy_role_requirements" > "$galaxy_role_requirements_chksum"
+  fi
+
+  # Update vendored Kolla-Ansible
+  kolla_ansible_submodule_status="$(git submodule status kolla/kolla-ansible)"
+  case "${kolla_ansible_submodule_status:0:1}" in
+    -|+)
+      git submodule init --update kolla/kolla-ansible
+      (cd kolla/kolla-ansible; python setup.py install)
+      ;;
+    *)
+      ;;
+  esac
+  # Handle case of venv being recreated though submodule is up to date.
+  if ! pip freeze | grep -q kolla-ansible; then
+    (cd kolla/kolla-ansible; python setup.py install)
+  fi
 fi
 
 if [[ -n "${CC_ANSIBLE_PLAYBOOK:-}" ]]; then
