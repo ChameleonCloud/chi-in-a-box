@@ -59,7 +59,7 @@ hammers:
       hour: 5
   clean_old_aggregates:
     hammer_name: hammers-cleanoldaggregates
-    cmd: "clean-old-agrgegates"
+    cmd: "clean-old-aggregates"
     cron_times:
       minute: 0
       hour: 1
