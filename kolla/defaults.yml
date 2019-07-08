@@ -1,0 +1,140 @@
+---
+openstack_release: rocky
+
+docker_namespace: kolla
+docker_registry_username: kolla
+docker_registry: docker.chameleoncloud.org
+kolla_base_distro: centos
+kolla_install_type: source
+
+virtualenv: /etc/ansible/venv
+
+# External MariaDB config
+enable_mariadb: no
+# When external MariaDB is used, database_address must be the non-VIP address
+# on the database node.
+#database_address:
+
+# Kolla sidecar/support containers
+enable_chrony: yes
+enable_fluentd: yes
+enable_memcached: yes
+
+# Blazar
+enable_blazar: yes
+# When to send lease notification email
+blazar_minutes_before_end_lease: 2880
+blazar_default_max_lease_duration: 604800
+blazar_usage_default_allocated: 20000.0
+# Redis currently binds on public IP, use public FQDN
+blazar_usage_db_host: "{{ kolla_external_fqdn }}"
+blazar_usage_project_exemptions:
+  - Chameleon
+  - openstack
+  - maintenance
+blazar_floatingip_billrate: 0.0
+# TODO: support looking up network with this name and fetching ID
+# blazar_floatingip_reservation_network: public
+
+# Cinder
+enable_cinder: no
+
+# Glance
+enable_glance: yes
+glance_file_datadir_volume: /var/lib/glance
+
+# Gnocchi
+enable_gnocchi: yes
+
+# Hammers
+hammers_openstack_user: admin
+hammers_openstack_project_name: openstack
+
+# HAProxy
+enable_haproxy: yes
+kolla_enable_tls_external: yes
+
+# Heat
+enable_heat: yes
+
+# Horizon
+enable_horizon: yes
+enable_horizon_chameleon_websso: yes
+horizon_help_url: https://chameleoncloud.readthedocs.io/en/latest/technical/baremetal.html
+horizon_redirect_root: /dashboard
+horizon_chameleon_websso_host: https://www.chameleoncloud.org
+horizon_regions:
+  - region_name: "{{ openstack_region_name }}"
+    chameleon_site_name: "{{ chameleon_site_name }}"
+    blazar_database_host: "{{ kolla_internal_fqdn }}"
+    blazar_database_name: "{{ blazar_database_name }}"
+    blazar_database_port: "{{ blazar_database_port }}"
+    blazar_database_user: "{{ blazar_database_user }}"
+    blazar_database_password: "{{ blazar_database_password }}"
+  # - region_name: "{{ chi_tacc_openstack_region_name }}"
+  #   chameleon_site_name: "{{ chi_tacc_chameleon_site_name }}"
+  #   blazar_database_host: "{{ chi_tacc_blazar_database_host }}"
+  #   blazar_database_name: "{{ blazar_database_name }}"
+  #   blazar_database_port: "{{ blazar_database_port }}"
+  #   blazar_database_user: "{{ blazar_database_user }}"
+  #   blazar_database_password: "{{ chi_tacc_blazar_database_password }}"
+
+# Ironic
+enable_ironic: yes
+enable_ironic_ipxe: yes
+ironic_provisioning_network: ironic-provisioning-network
+ironic_cleaning_network: "{{ ironic_provisioning_network }}"
+ironic_image_cache_size: 20480 # MB
+ironic_pxe_append_params: "nofb nomodeset vga=normal console=tty0 console=ttyS0,9600 systemd.journald.forward_to_console=yes rootpwd={{ ironic_pxe_root_password }}"
+
+# Keystone
+enable_keystone: yes
+use_preconfigured_fernet: yes
+keystone_admin_project: openstack
+fernet_token_expiry: 604800 # 1 week
+
+# Neutron
+enable_neutron: yes
+enable_openvswitch: yes
+enable_neutron_fwaas: yes
+neutron_fwaas_version: v2
+# Enable notifications for Experiment Precis
+neutron_notification_topics:
+  - name: notifications
+    enabled: yes
+neutron_type_drivers: flat,vlan
+neutron_tenant_network_types: vlan
+# VLANs 3005-3009 are reservable via Blazar
+neutron_network_vlan_ranges: physnet1:3000:3005
+neutron_bridge_name: br-em1,br-ex
+neutron_external_interface: em1,em2
+neutron_ovs_bridge_mappings: physnet1:br-em1,physnet2:br-ex
+
+# Nova
+enable_nova: yes
+enable_nova_serialconsole_proxy: yes
+nova_compute_virt_type: none
+# We are not using any VNC consoles; the serialproxy is not considered a 'nova_console'
+nova_console: none
+
+# Prometheus
+# This is Kolla-Ansible's Prometheus
+enable_prometheus: no
+# prometheus_alertmanager_hostname: alert.uc.chameleoncloud.org
+
+# Swift
+enable_swift: no
+
+# Monitoring
+# TODO: install ES curator
+enable_central_logging: yes
+es_heap_size: 8G
+es_enable_painless_regex: no
+enable_grafana: no
+
+# External RabbitMQ
+enable_rabbitmq: no
+rabbitmq_user: openstack
+
+# External Ceph
+enable_ceph: no
