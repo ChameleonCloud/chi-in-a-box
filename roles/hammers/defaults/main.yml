@@ -1,8 +1,9 @@
 ---
 hammers_config_path: /etc/hammers
-hammers_docker_image: docker.chameleoncloud.org/hammers:latest
+hammers_docker_image: "{{ docker_registry }}/hammers:latest"
 hammers_env_file: /etc/hammers/hammers.env
 hammers_mysql_user: cc_hammers
+hammers_mysql_host: "{{ database_address }}"
 
 hammers:
   neutron_reaper_ip:
