@@ -2,7 +2,7 @@
 - name: Configure mariadb backup script file
   template:
     src: mariadb.j2
-    mode: a+x
+    mode: 0700
     dest: "{{ mariadb_backup_cron_script }}"
 
 - name: Add mariadb backup cron jobs.

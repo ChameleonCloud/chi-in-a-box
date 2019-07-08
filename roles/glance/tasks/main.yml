@@ -2,8 +2,8 @@
 - name: Configure glance backup script file
   template:
     src: glance.j2
-    mode: a+x
-    dest: /usr/local/sbin/glance
+    mode: 0700
+    dest: /usr/local/sbin/glance-backup
 
 - name: Add glance backup cron jobs.
   cron:

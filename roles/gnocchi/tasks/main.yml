@@ -2,8 +2,8 @@
 - name: Configure gnocchi backup script file
   template:
     src: gnocchi.j2
-    mode: a+x
-    dest: /usr/local/sbin/gnocchi
+    mode: 0700
+    dest: /usr/local/sbin/gnocchi-backup
 
 - name: Add gnocchi backup cron jobs
   cron:
