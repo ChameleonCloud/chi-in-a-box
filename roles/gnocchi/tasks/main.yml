@@ -1,4 +1,18 @@
----
+--
+name: Generate auth token for Glance backup
+  os_auth:
+    auth:
+      username: "{{ glance_backup_username }}"
+      password: "{{ glance_backup_keystone_password }}"
+      project_name: "{{ glance_backup_project }}"
+      domain_name: "default"
+      user_domain_name: "default"
+  register: glance_backup_auth
+
+- name: Set fact for Glance auth token
+  set_fact:
+    glance_backup_auth_token: "{{ glance_backup_auth.auth_token }}"
+
 - name: Configure gnocchi backup script file
   template:
     src: gnocchi.j2
