@@ -1,17 +1,17 @@
 --
-name: Generate auth token for Glance backup
+name: Generate SWIFT auth token for Gnocchi backup
   os_auth:
     auth:
-      username: "{{ glance_backup_username }}"
-      password: "{{ glance_backup_keystone_password }}"
-      project_name: "{{ glance_backup_project }}"
+      username: "{{ keystone_admin_username }}"
+      password: "{{ keystone_admin_password }}"
+      project_name: "{{ keystone_admin_project_name }}"
       domain_name: "default"
       user_domain_name: "default"
-  register: glance_backup_auth
+  register: gnocchi_backup_auth
 
-- name: Set fact for Glance auth token
+- name: Set fact for SWIFT auth token
   set_fact:
-    glance_backup_auth_token: "{{ glance_backup_auth.auth_token }}"
+    gnocchi_backup_auth_token: "{{ gnocchi_backup_auth.auth_token }}"
 
 - name: Configure gnocchi backup script file
   template:
