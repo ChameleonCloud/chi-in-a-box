@@ -1,12 +1,7 @@
 ---
 - name: Generate SWIFT auth token for Glance backup
   os_auth:
-    auth:
-      username: "{{ keystone_admin_username }}"
-      password: "{{ keystone_admin_password }}"
-      project_name: "{{ keystone_admin_project_name }}"
-      domain_name: "default"
-      user_domain_name: "default"
+    auth: "{{ openstack_auth }}"
   register: glance_backup_auth
 
 - name: Set fact for SWIFT auth token
