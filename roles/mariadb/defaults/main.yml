@@ -1,0 +1,7 @@
+---
+# defaults file for mariadb
+
+mariadb_backup_max_packet: 1M
+mariadb_backup_file_age: 29
+mariadb_backup_cron_name: mariadb-backup
+mariadb_backup_file: mariadb-backup

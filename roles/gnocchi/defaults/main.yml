@@ -1,0 +1,8 @@
+---
+# defaults file for gnocchi
+
+gnocchi_backup_name: gnocchi_backup
+gnocchi_backup_file_prefix: gnocchi_backup_
+gnocchi_backup_container: gnocchi_backup
+gnocchi_backup_cron_name: gnocchi-backup
+

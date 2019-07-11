@@ -1,0 +1,31 @@
+---
+- name: Generate SWIFT auth token for Glance backup
+  os_auth:
+    auth:
+      username: "{{ keystone_admin_username }}"
+      password: "{{ keystone_admin_password }}"
+      project_name: "{{ keystone_admin_project_name }}"
+      domain_name: "default"
+      user_domain_name: "default"
+  register: glance_backup_auth
+
+- name: Set fact for SWIFT auth token
+  set_fact:
+    glance_backup_auth_token: "{{ glance_backup_auth.auth_token }}"
+
+- name: Configure glance backup script file
+  template:
+    src: glance.j2
+    mode: 0700
+    dest: /usr/local/sbin/glance-backup
+
+- name: Add glance backup cron jobs.
+  cron:
+    name: "{{ glance_backup_cron_name }}"
+    minute: "{{ glance_backup_cron_minute }}"
+    hour: "{{ glance_backup_cron_hour }}"
+    day: "{{ glance_backup_cron_day }}"
+    month: "{{ glance_backup_cron_month }}"
+    weekday: "{{ glance_backup_cron_weekday }}"
+    job: "{{ glance_backup_cron_script }}"
+

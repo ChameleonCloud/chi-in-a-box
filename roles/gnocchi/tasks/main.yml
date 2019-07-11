@@ -1,0 +1,31 @@
+--
+name: Generate SWIFT auth token for Gnocchi backup
+  os_auth:
+    auth:
+      username: "{{ keystone_admin_username }}"
+      password: "{{ keystone_admin_password }}"
+      project_name: "{{ keystone_admin_project_name }}"
+      domain_name: "default"
+      user_domain_name: "default"
+  register: gnocchi_backup_auth
+
+- name: Set fact for SWIFT auth token
+  set_fact:
+    gnocchi_backup_auth_token: "{{ gnocchi_backup_auth.auth_token }}"
+
+- name: Configure gnocchi backup script file
+  template:
+    src: gnocchi.j2
+    mode: 0700
+    dest: /usr/local/sbin/gnocchi-backup
+
+- name: Add gnocchi backup cron jobs
+  cron:
+    name: "{{ gnocchi_backup_cron_name }}"
+    minute: "{{ gnocchi_backup_cron_minute }}"
+    hour: "{{ gnocchi_backup_cron_hour }}"
+    day: "{{ gnocchi_backup_cron_day }}"
+    month: "{{ gnocchi_backup_cron_month }}"
+    weekday: "{{ gnocchi_backup_cron_weekday }}"
+    job: "{{ gnocchi_backup_cron_script }}"
+
