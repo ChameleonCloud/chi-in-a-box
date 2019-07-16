@@ -30,8 +30,8 @@ blazar_usage_default_allocated: 20000.0
 blazar_usage_db_host: "{{ kolla_external_fqdn }}"
 blazar_usage_project_exemptions:
   - Chameleon
-  - openstack
   - maintenance
+  - "{{ keystone_admin_project }}"
 blazar_floatingip_billrate: 0.0
 # TODO: support looking up network with this name and fetching ID
 # blazar_floatingip_reservation_network: public
@@ -41,14 +41,13 @@ enable_cinder: no
 
 # Glance
 enable_glance: yes
-glance_file_datadir_volume: /var/lib/glance
 
 # Gnocchi
 enable_gnocchi: yes
 
 # Hammers
 hammers_openstack_user: admin
-hammers_openstack_project_name: openstack
+hammers_openstack_project_name: "{{ keystone_admin_project }}"
 
 # HAProxy
 enable_haproxy: yes
@@ -104,11 +103,6 @@ neutron_notification_topics:
     enabled: yes
 neutron_type_drivers: flat,vlan
 neutron_tenant_network_types: vlan
-# VLANs 3005-3009 are reservable via Blazar
-neutron_network_vlan_ranges: physnet1:3000:3005
-neutron_bridge_name: br-em1,br-ex
-neutron_external_interface: em1,em2
-neutron_ovs_bridge_mappings: physnet1:br-em1,physnet2:br-ex
 
 # Nova
 enable_nova: yes
@@ -118,9 +112,7 @@ nova_compute_virt_type: none
 nova_console: none
 
 # Prometheus
-# This is Kolla-Ansible's Prometheus
 enable_prometheus: no
-# prometheus_alertmanager_hostname: alert.uc.chameleoncloud.org
 
 # Swift
 enable_swift: no
@@ -134,7 +126,6 @@ enable_grafana: no
 
 # External RabbitMQ
 enable_rabbitmq: no
-rabbitmq_user: openstack
 
 # External Ceph
 enable_ceph: no
