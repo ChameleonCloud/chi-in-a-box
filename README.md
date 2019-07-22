@@ -15,13 +15,7 @@ The deployment tooling expects a path to a site configuration via a `--site <pat
 
 ### Deployment node setup
 
-To set up a virtualenv and install the Ansible python module(s) and Galaxy roles, first run the `setup` make task:
-
-```bash
-make setup
-```
-
-The next step is to provision the Ansible deployment node (which should be localhost, effectively) with Ansible. It's Ansible all the way down! This will install any other python modules and packages which are necessary for the operation of the Ansible tasks. It's the expectation that as new modules are introduced to this repo, their dependencies are properly bootstrapped by the `ansible` role. Use the `cc-ansible` tool for this.
+The first step is to provision the Ansible deployment node (which should be localhost, effectively) with Ansible. It's Ansible all the way down! This will install any other python modules and packages which are necessary for the operation of the Ansible tasks. It's the expectation that as new modules are introduced to this repo, their dependencies are properly bootstrapped by the `ansible` role. Use the `cc-ansible` tool for this.
 
 ```bash
 export CC_ANSIBLE_SITE=/path/to/site/config
@@ -53,6 +47,33 @@ Much of the deployment is ultimately controlled by Kolla-Ansible. To invoke, you
 ./cc-ansible pull
 # Upgrade Nova and Ironic
 ./cc-ansible upgrade --tags nova,ironic
+```
+
+### Post-deployment
+
+There is a `post-deploy` script you can run to finish things up. This will install compatible versions of all OpenStack clients for your deployment and set up some OpenStack entities needed to do bare metal provisioning.
+
+```bash
+./cc-ansible post-deploy
+```
+
+Finally, consider adding the following to your .bashrc or similar:
+
+```bash
+# Pre-set site so you don't have to type it each time
+export CC_ANSIBLE_SITE=/opt/config/<your_site>
+
+# Source OpenStack client environment automatically
+if [ -f "$CC_ANSIBLE_SITE/admin-openrc.sh" ]; then
+  source "$CC_ANSIBLE_SITE/admin-openrc.sh"
+fi
+
+# Source virtualenv to have access to OpenStack clients installed
+# in virtualenv (assumes this repo is installed at /etc/ansible)
+if [ -f /etc/ansible/venv/bin/activate ]; then
+  export VIRTUAL_ENV_DISABLE_PROMPT=1
+  source /etc/ansible/venv/bin/activate
+fi
 ```
 
 ## Configuration secrets
