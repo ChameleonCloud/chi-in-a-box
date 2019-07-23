@@ -2,17 +2,6 @@
 
 Ansible playbooks for deploying Chameleon operations systems
 
-## Deployment
-
-Each Chameleon site is deployed separately. This allows each site to customize the deploy to their specific concerns. This repo includes tooling that expects site configurations to exist elsewhere on the host OS. At minimum a site configuration must have the form:
-
-- `./inventory/`: the Ansible inventory; this should include at minimum a `hosts` file, but any valid Ansible inventory works here
-- `./globals.yml`: a list of global variables to set on all Ansible plays
-- `./passwords.yml`: an Ansible-Vault-encoded set of variables that should be secret (like passwords)
-- `./vault_password`: the Ansible-Vault password used for encrypting secrets
-
-The deployment tooling expects a path to a site configuration via a `--site <path>` flag. This can also be set via the `CC_ANSIBLE_SITE` environment variable.
-
 ### Deployment node setup
 
 The first step is to provision the Ansible deployment node (which should be localhost, effectively) with Ansible. It's Ansible all the way down! This will install any other python modules and packages which are necessary for the operation of the Ansible tasks. It's the expectation that as new modules are introduced to this repo, their dependencies are properly bootstrapped by the `ansible` role. Use the `cc-ansible` tool for this.

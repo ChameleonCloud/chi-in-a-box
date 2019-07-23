@@ -10,7 +10,7 @@
           address: "{{ ironic_provisioning_network_gateway }}"
           netmask: "{{ ironic_provisioning_network_cidr | ipaddr('netmask') }}"
     when: enable_ironic | bool and
-          ironic_provisioning_network_cidr is defined
+          ironic_provisioning_network_vlan is defined
   - name: Set facts for Corsa interfaces.
     block:
     - set_fact:

@@ -9,16 +9,11 @@ kolla_install_type: source
 
 virtualenv: /etc/ansible/venv
 
-# External MariaDB config
-enable_mariadb: no
-# When external MariaDB is used, database_address must be the non-VIP address
-# on the database node.
-#database_address:
-
-# Kolla sidecar/support containers
+enable_mariadb: yes
 enable_chrony: yes
 enable_fluentd: yes
 enable_memcached: yes
+enable_rabbitmq: yes
 
 # Blazar
 enable_blazar: yes
@@ -70,18 +65,13 @@ horizon_regions:
     blazar_database_port: "{{ blazar_database_port }}"
     blazar_database_user: "{{ blazar_database_user }}"
     blazar_database_password: "{{ blazar_database_password }}"
-  # - region_name: "{{ chi_tacc_openstack_region_name }}"
-  #   chameleon_site_name: "{{ chi_tacc_chameleon_site_name }}"
-  #   blazar_database_host: "{{ chi_tacc_blazar_database_host }}"
-  #   blazar_database_name: "{{ blazar_database_name }}"
-  #   blazar_database_port: "{{ blazar_database_port }}"
-  #   blazar_database_user: "{{ blazar_database_user }}"
-  #   blazar_database_password: "{{ chi_tacc_blazar_database_password }}"
 
 # Ironic
 enable_ironic: yes
 enable_ironic_ipxe: yes
 ironic_provisioning_network: ironic-provisioning-network
+ironic_provisioning_network_cidr: 10.51.0.0/24
+ironic_provisioning_network_gateway: "{{ ironic_provisioning_network_cidr | ipaddr('next_usable') }}"
 ironic_cleaning_network: "{{ ironic_provisioning_network }}"
 ironic_image_cache_size: 20480 # MB
 ironic_pxe_append_params: "nofb nomodeset vga=normal console=tty0 console=ttyS0,9600 systemd.journald.forward_to_console=yes rootpwd={{ ironic_pxe_root_password }}"
@@ -123,9 +113,6 @@ enable_central_logging: yes
 es_heap_size: 8G
 es_enable_painless_regex: no
 enable_grafana: no
-
-# External RabbitMQ
-enable_rabbitmq: no
 
 # External Ceph
 enable_ceph: no

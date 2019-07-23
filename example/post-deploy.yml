@@ -1,0 +1,10 @@
+---
+- hosts: control
+  tasks:
+  - debug:
+      msg: |
+        Placeholder post-deploy task! These tasks can optionally install/manage
+        additional firewall rules or set up other things that you need in order
+        to implement CHI-in-a-Box on your environment.
+
+        This task is automatically run during post-deploy.
