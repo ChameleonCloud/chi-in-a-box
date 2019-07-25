@@ -34,6 +34,8 @@ create_firewall_rule "allow HTTP ipv4" --action allow --protocol tcp --destinati
 create_firewall_rule "allow HTTP ipv6" --action allow --protocol tcp --destination-port 80 --ip-version 6
 create_firewall_rule "allow HTTPS ipv4" --action allow --protocol tcp --destination-port 443
 create_firewall_rule "allow HTTPS ipv6" --action allow --protocol tcp --destination-port 443 --ip-version 6
+create_firewall_rule "allow OpenFlow ipv4" --action allow --protocol tcp --destination-port 6653
+create_firewall_rule "allow OpenFlow ipv6" --action allow --protocol tcp --destination-port 6653 --ip-version 6
 
 create_firewall_rule "allow ICMP ipv4" --action allow --protocol icmp
 create_firewall_rule "allow ICMP ipv6" --action allow --protocol icmp --ip-version 6
