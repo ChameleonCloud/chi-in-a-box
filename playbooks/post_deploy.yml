@@ -65,6 +65,7 @@
         url: "https://tarballs.openstack.org/ironic-python-agent/coreos/files/coreos_production_pxe_image-oem-stable-{{ openstack_release }}.cpio.gz"
   - name: Check state of Glance images.
     os_image_facts:
+      cloud: "{{ cloud }}"
     when: enable_ironic | bool
   - name: Download source Glance images.
     get_url:
@@ -77,6 +78,7 @@
          (openstack_image | selectattr('name', 'match', item.name)) | list | length < 1
   - name: Create Glance images.
     os_image:
+      cloud: "{{ cloud }}"
       state: present
       name: "{{ item.name }}"
       is_public: yes
@@ -90,6 +92,7 @@
     when: enable_ironic | bool
   - name: Create baremetal flavor.
     os_nova_flavor:
+      cloud: "{{ cloud }}"
       state: present
       name: baremetal
       interface: admin
@@ -102,11 +105,12 @@
       # Needs to be greater than largest expected disk image, yet smaller than
       # actual node capacity; we guess a low value.
       disk: 20
-      ram: 0
-      vcpus: 0
+      ram: 1
+      vcpus: 1
     when: enable_ironic | bool
   - name: Create provisioning network.
     local_action:
+      cloud: "{{ cloud }}"
       module: os_network
       name: "{{ ironic_provisioning_network }}"
       region_name: "{{ openstack_region_name }}"
@@ -118,6 +122,7 @@
           ironic_provisioning_network_vlan is defined
   - name: Create provisioning subnet.
     local_action:
+      cloud: "{{ cloud }}"
       module: os_subnet
       network_name: "{{ ironic_provisioning_network }}"
       name: "{{ ironic_provisioning_network }}-subnet"
@@ -133,6 +138,7 @@
   # Blazar-related configuration
   - name: Create freepool aggregate.
     os_nova_host_aggregate:
+      cloud: "{{ cloud }}"
       state: present
       name: freepool
     when: enable_blazar | bool

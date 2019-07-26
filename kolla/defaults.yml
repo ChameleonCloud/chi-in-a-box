@@ -1,5 +1,6 @@
 ---
 openstack_release: rocky
+cloud: "envvars"
 
 docker_namespace: kolla
 docker_registry_username: kolla
