@@ -2,22 +2,22 @@
 
 ![chi-in-a-box](./chi-in-a-box.png)
 
-CHI-in-a-box is a packaging of the implementation of the core services that together constitute the Chameleon testbed for experimental Computer Science research. These services allow Chameleon users to discover information about Chameleon resources, allocate those resources for present and future use, configure them in various ways, and monitor various types of metrics.
+CHI-in-a-box is a packaging of the implementation of the core services that together constitute the [Chameleon testbed](https://www.chameleoncloud.org/) for experimental Computer Science research. These services allow Chameleon users to discover information about Chameleon resources, allocate those resources for present and future use, configure them in various ways, and monitor various types of metrics.
 
 ### Currently included with CHI-in-a-Box:
 
 - Custom OpenStack deployment optimized for bare metal reservations and provisioning, including the following OpenStack services by default:
   - Ironic
   - Nova (with custom vendordata service for automatic experiment metrics collection)
-  - Neutron (and Neutron FWaaS)
+  - Neutron (and Neutron [FWaaS](https://docs.openstack.org/neutron/latest/admin/fwaas.html))
   - Glance
   - Gnocchi
   - Keystone
   - Heat
-- Experiment Precis
-- JupyterHub with Keystone integration
+- [Experiment Precis](https://chameleoncloud.readthedocs.io/en/latest/technical/ep.html)
+- [JupyterHub](https://jupyterhub.readthedocs.io/en/stable/) with Keystone integration
 - HA-ready setup using HAProxy/keepalived for redundancy (requires multi-node deployment)
-- Prometheus monitoring and custom operational alerts
+- [Prometheus](https://prometheus.io/) monitoring and custom operational alerts
 - Centralized searchable system logs
 - Automated backups of important data (Glance images, Gnocchi metrics, MySQL databases)
 
