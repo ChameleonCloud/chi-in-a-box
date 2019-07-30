@@ -1,6 +1,8 @@
-# ansible-playbooks
+# chi-in-a-box
 
-Ansible playbooks for deploying Chameleon operations systems
+![chi-in-a-box](./chi-in-a-box.png)
+
+Ansible playbooks for deploying Chameleon operations systems.
 
 ### Deployment node setup
 
