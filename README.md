@@ -28,4 +28,4 @@ CHI-in-a-box is a packaging of the implementation of the core services that toge
 
 ## Getting started
 
-Please refer to the repo [Wiki](wiki) for detailed information on what CHI-in-a-Box is, how it might enable science at your institution, how it works, and how to get started.
+Please refer to the repo [Wiki](https://github.com/ChameleonCloud/ansible-playbooks/wiki) for detailed information on what CHI-in-a-Box is, how it might enable science at your institution, how it works, and how to get started.
