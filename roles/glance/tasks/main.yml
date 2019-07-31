@@ -2,17 +2,22 @@
 - name: Generate SWIFT auth token for Glance backup
   os_auth:
     auth: "{{ openstack_auth }}"
-  register: glance_backup_auth
 
 - name: Set fact for SWIFT auth token
   set_fact:
-    glance_backup_auth_token: "{{ glance_backup_auth.auth_token }}"
+    glance_backup_auth_token: "{{ ansible_facts.auth_token }}"
 
 - name: Configure glance backup script file
   template:
     src: glance.j2
     mode: 0700
     dest: /usr/local/sbin/glance-backup
+
+- name: Configure glance prometheus notification script file
+  template:
+    src: notification.j2
+    mode: 0700
+    dest: "{{ glance_backup_notification }}"
 
 - name: Add glance backup cron jobs.
   cron:
@@ -22,5 +27,5 @@
     day: "{{ glance_backup_cron_day }}"
     month: "{{ glance_backup_cron_month }}"
     weekday: "{{ glance_backup_cron_weekday }}"
-    job: "{{ glance_backup_cron_script }}"
+    job: "{{ glance_backup_cron_script }} && {{ glance_backup_notification }} glance_backup"
 

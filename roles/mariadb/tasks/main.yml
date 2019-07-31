@@ -4,6 +4,20 @@
     src: mariadb.j2
     mode: 0700
     dest: "{{ mariadb_backup_cron_script }}"
+  when: inventory_hostname_short == "m01-07"
+
+- name: Configure mariadb backup script file without rsync for dev
+  template:
+    src: mariadbdev.j2
+    mode: 0700
+    dest: "{{ mariadb_backup_cron_script }}"
+  when: inventory_hostname_short == "dev"
+
+- name: Configure mariadb prometheus notification script file
+  template:
+    src: notification.j2
+    mode: 0700
+    dest: "{{ mariadb_backup_notification }}"
 
 - name: Add mariadb backup cron jobs.
   cron:
@@ -13,4 +27,4 @@
     day: "{{ mariadb_backup_cron_day }}"
     month: "{{ mariadb_backup_cron_month }}"
     weekday: "{{ mariadb_backup_cron_weekday }}"
-    job: "{{ mariadb_backup_cron_script }}"
+    job: "{{ mariadb_backup_cron_script }} && {{ mariadb_backup_notification }} mariadb-backup"

@@ -1,17 +1,23 @@
 - name: Generate SWIFT auth token for Gnocchi backup
-  os_auth:
+  local_action:
+    module: os_auth
     auth: "{{ openstack_auth }}"
-  register: gnocchi_backup_auth
 
 - name: Set fact for SWIFT auth token
   set_fact:
-    gnocchi_backup_auth_token: "{{ gnocchi_backup_auth.auth_token }}"
+    gnocchi_backup_auth_token: "{{ ansible_facts.auth_token }}"
 
 - name: Configure gnocchi backup script file
   template:
     src: gnocchi.j2
     mode: 0700
     dest: /usr/local/sbin/gnocchi-backup
+
+- name: Configure gnocchi prometheus notification script file
+  template:
+    src: notification.j2
+    mode: 0700
+    dest: "{{ gnocchi_backup_notification }}"
 
 - name: Add gnocchi backup cron jobs
   cron:
@@ -21,5 +27,5 @@
     day: "{{ gnocchi_backup_cron_day }}"
     month: "{{ gnocchi_backup_cron_month }}"
     weekday: "{{ gnocchi_backup_cron_weekday }}"
-    job: "{{ gnocchi_backup_cron_script }}"
+    job: "{{ gnocchi_backup_cron_script }} && {{ gnocchi_backup_notification }} gnocchi_backup"
 

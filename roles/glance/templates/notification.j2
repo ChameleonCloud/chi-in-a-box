@@ -1,0 +1,1 @@
+echo "cron_last_success{name=\"$1\"} $(date +%s)" | curl --data-binary @- "{{ prometheus_server_url }}":9091/metrics/job/cron

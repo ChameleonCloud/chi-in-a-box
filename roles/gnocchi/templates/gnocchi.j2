@@ -8,7 +8,7 @@ export SWIFT_PREAUTHTOKEN="{{ gnocchi_backup_auth_token }}" && \
   --volsize 1000 \
   --asynchronous-upload \
   --no-encryption \
-  "{{ gnocchi_backup_origin_dir }}" \ 
+  "{{ gnocchi_backup_origin_dir }}" \
   swift://"{{ gnocchi_backup_container }}" && \
   duplicity remove-older-than 3D \
   --force \
