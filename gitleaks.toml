@@ -1,0 +1,14 @@
+title = "chi-in-a-box Gitleaks config"
+
+[[regexes]]
+description = "Ansible secrets"
+regex = '''\w+(password|secret)\w*:\s*(['\"][^\{'\"])?\w+'''
+
+[[regexes]]
+description = "RSA"
+regex = '''-----BEGIN RSA PRIVATE KEY-----'''
+
+[whitelist]
+files = [
+  "^(cc-ansible|gitleaks.toml|README.md)"
+]

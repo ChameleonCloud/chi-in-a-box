@@ -1,77 +1,31 @@
-# ansible-playbooks
+# chi-in-a-box
 
-Ansible playbooks for deploying Chameleon operations systems
+![chi-in-a-box](./chi-in-a-box.png)
 
-### Deployment node setup
+CHI-in-a-box is a packaging of the implementation of the core services that together constitute the [Chameleon testbed](https://www.chameleoncloud.org/) for experimental Computer Science research. These services allow Chameleon users to discover information about Chameleon resources, allocate those resources for present and future use, configure them in various ways, and monitor various types of metrics.
 
-The first step is to provision the Ansible deployment node (which should be localhost, effectively) with Ansible. It's Ansible all the way down! This will install any other python modules and packages which are necessary for the operation of the Ansible tasks. It's the expectation that as new modules are introduced to this repo, their dependencies are properly bootstrapped by the `ansible` role. Use the `cc-ansible` tool for this.
+### Currently included with CHI-in-a-Box:
 
-```bash
-export CC_ANSIBLE_SITE=/path/to/site/config
-./cc-ansible --playbook playbooks/ansible.yml
-# Or, in one command:
-./cc-ansible --site /path/to/site/config --playbook playbooks/ansible.yml
-```
+- Custom OpenStack deployment optimized for bare metal reservations and provisioning, including the following OpenStack services by default:
+  - Ironic
+  - Nova (with custom vendordata service for automatic experiment metrics collection)
+  - Neutron (and Neutron [FWaaS](https://docs.openstack.org/neutron/latest/admin/fwaas.html))
+  - Glance
+  - Gnocchi
+  - Keystone
+  - Heat
+- [Experiment Precis](https://chameleoncloud.readthedocs.io/en/latest/technical/ep.html)
+- [JupyterHub](https://jupyterhub.readthedocs.io/en/stable/) with Keystone integration
+- HA-ready setup using HAProxy/keepalived for redundancy (requires multi-node deployment)
+- [Prometheus](https://prometheus.io/) monitoring and custom operational alerts
+- Centralized searchable system logs
+- Automated backups of important data (Glance images, Gnocchi metrics, MySQL databases)
 
-### Applying playbooks
+### Currently _not_ included:
 
-Playbooks are set up to target a host group with the same name. This means the `grafana` playbook will target the `grafana` host group etc. To run a playbook, you can use the `./cc-ansible` wrapper script, which just sets up two important parameters for you: the Ansible Vault configuration, and the inventory path.
+- User/project management: user database integration with Keystone can be accomplished in a number of ways. It is left up to the implementor of the independent testbed how to set this up. Chameleon Associate sites will be directly integrated with the existing Chameleon user management portal by Chameleon operators.
+- Usage enforcement: while Chameleon comes with usage reporting, the enforcement of usage based on allocations is something that is provided only at best-effort by CHI-in-a-Box. There is no permanent storage of allocations in CHI-in-a-Box, neither is there allocation management or the ability to renew or review allocation requests.
 
-```bash
-# Run the 'grafana' playbook (deploys/updates grafana)
-./cc-ansible --playbook playbooks/grafana.yml
-# Run only the tasks tagged 'configuration' in the 'grafana' playbook
-# (Any arguments normally passed to ansible-playbook can be passed here.)
-./cc-ansible --playbook playbooks/grafana.yml --tags configuration
-```
+## Getting started
 
-### Running Kolla-Ansible playbooks
-
-Much of the deployment is ultimately controlled by Kolla-Ansible. To invoke, you can use the `./cc-ansible` tool much like you could use `kolla-ansible`:
-
-```bash
-# Deploy the Neutron components
-./cc-ansible deploy --tags neutron
-# Pull latest images for all components
-./cc-ansible pull
-# Upgrade Nova and Ironic
-./cc-ansible upgrade --tags nova,ironic
-```
-
-### Post-deployment
-
-There is a `post-deploy` script you can run to finish things up. This will install compatible versions of all OpenStack clients for your deployment and set up some OpenStack entities needed to do bare metal provisioning.
-
-```bash
-./cc-ansible post-deploy
-```
-
-Finally, consider adding the following to your .bashrc or similar:
-
-```bash
-# Pre-set site so you don't have to type it each time
-export CC_ANSIBLE_SITE=/opt/config/<your_site>
-
-# Source OpenStack client environment automatically
-if [ -f "$CC_ANSIBLE_SITE/admin-openrc.sh" ]; then
-  source "$CC_ANSIBLE_SITE/admin-openrc.sh"
-fi
-
-# Source virtualenv to have access to OpenStack clients installed
-# in virtualenv (assumes this repo is installed at /etc/ansible)
-if [ -f /etc/ansible/venv/bin/activate ]; then
-  export VIRTUAL_ENV_DISABLE_PROMPT=1
-  source /etc/ansible/venv/bin/activate
-fi
-```
-
-## Configuration secrets
-
-Secrets like database and user passwords or sensitive API keys should be encrypted with [Ansible Vault](https://docs.ansible.com/ansible/latest/user_guide/vault.html) in a `passwords.yml` file located in the site configuration. This is encrypted with a symmetrical cipher key (`vault_password`). This key should **never be stored in source control**. You can edit or view the encrypted contents with the `./cc-ansible` tool:
-
-```bash
-# Opens an interactive editor for editing passwords
-./cc-ansible edit_passwords
-# Prints unencrypted passwords to stdout
-./cc-ansible decrypt_passwords
-```
+Please refer to the repo [Wiki](https://github.com/ChameleonCloud/ansible-playbooks/wiki) for detailed information on what CHI-in-a-Box is, how it might enable science at your institution, how it works, and how to get started.
