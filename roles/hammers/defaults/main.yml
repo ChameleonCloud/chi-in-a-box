@@ -6,9 +6,9 @@ hammers_mysql_user: cc_hammers
 hammers_mysql_host: "{{ database_address }}"
 
 hammers:
-  neutron_reaper_ip:
-    hammer_name: hammers-neutronreaper-ip
-    cmd: "neutron-reaper delete ip 14 --dbversion ocata"
+  floating_ip_reaper:
+    hammer_name: hammers-floatingipreaper
+    cmd: "floatingip-reaper --grace-days 7"
     cron_times:
       minute: 20
       hour: 5
