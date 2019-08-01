@@ -44,6 +44,7 @@ enable_gnocchi: yes
 # Hammers
 hammers_openstack_user: admin
 hammers_openstack_project_name: "{{ keystone_admin_project }}"
+hammers_openstack_project_id: 570aad8999f7499db99eae22fe9b29bb
 
 # HAProxy
 enable_haproxy: yes
