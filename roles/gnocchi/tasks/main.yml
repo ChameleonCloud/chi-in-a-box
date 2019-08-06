@@ -27,5 +27,5 @@
     day: "{{ gnocchi_backup_cron_day }}"
     month: "{{ gnocchi_backup_cron_month }}"
     weekday: "{{ gnocchi_backup_cron_weekday }}"
-    job: "{{ gnocchi_backup_cron_script }} && {{ gnocchi_backup_notification }} gnocchi_backup"
+    job: '{{ gnocchi_backup_cron_script }} && {{ gnocchi_backup_notification }} "gnocchi_backup"'
 

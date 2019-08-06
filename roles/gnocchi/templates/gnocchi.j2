@@ -1,8 +1,16 @@
 #!/bin/bash
 
+if [[ $(ps -aux | grep -v grep | grep "duplicity" | grep "gnocchi_backup") ]]; then
+    exit 1
+elif [[ "$(date +%a)" = "Sat" ]]; then
+    backuptype=full
+else
+    backuptype=incremental
+fi
+
 export SWIFT_PREAUTHTOKEN="{{ gnocchi_backup_auth_token }}" && \
   export SWIFT_PREAUTHURL="{{ gnocchi_backup_swift_endpoint }}" && \
-  duplicity full --archive-dir="{{ gnocchi_backup_archive_dir }}" \
+  duplicity $backuptype --archive-dir="{{ gnocchi_backup_archive_dir }}" \
   --name="{{ gnocchi_backup_name }}" \
   --file-prefix="{{ gnocchi_backup_file_prefix }}" \
   --volsize 1000 \
@@ -10,7 +18,7 @@ export SWIFT_PREAUTHTOKEN="{{ gnocchi_backup_auth_token }}" && \
   --no-encryption \
   "{{ gnocchi_backup_origin_dir }}" \
   swift://"{{ gnocchi_backup_container }}" && \
-  duplicity remove-older-than 3D \
+  duplicity remove-older-than "{{ gnocchi_backup_retention }}" \
   --force \
   --file-prefix="{{gnocchi_backup_file_prefix }}" \
   swift://"{{ gnocchi_backup_container }}" \

@@ -27,4 +27,4 @@
     day: "{{ mariadb_backup_cron_day }}"
     month: "{{ mariadb_backup_cron_month }}"
     weekday: "{{ mariadb_backup_cron_weekday }}"
-    job: "{{ mariadb_backup_cron_script }} && {{ mariadb_backup_notification }} mariadb-backup"
+    job: '{{ mariadb_backup_cron_script }} && {{ mariadb_backup_notification }} "mariadb-backup"'

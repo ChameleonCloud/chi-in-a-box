@@ -27,5 +27,5 @@
     day: "{{ glance_backup_cron_day }}"
     month: "{{ glance_backup_cron_month }}"
     weekday: "{{ glance_backup_cron_weekday }}"
-    job: "{{ glance_backup_cron_script }} && {{ glance_backup_notification }} glance_backup"
+    job: '{{ glance_backup_cron_script }} && {{ glance_backup_notification }} "glance_backup"'
 
