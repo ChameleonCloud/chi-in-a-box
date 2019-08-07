@@ -10,7 +10,6 @@ groups:
     annotations:
       summary: "The MySQL server at {{ $labels.hostname }} cannot be reached"
       description: "The MySQL exporter can not contact the MySQL server on {{ $labels.hostname }}. The MySQL server may not be running."
-      runbook: "https://github.com/chameleoncloud/ansible-playbooks/wiki#mysqlhostdown"
 
   - alert: MySQLReplicationError
     expr: mysql_slave_status_last_errno != 0 or mysql_slave_status_slave_sql_running != 1
@@ -20,4 +19,4 @@ groups:
     annotations:
       summary: "Slave replication to {{ $labels.hostname }} not running"
       description: "The MySQL master at {{ $labels.master_host }} failed to replicate to slave {{ $labels.hostname }}."
-      runbook: "https://github.com/ChameleonCloud/ansible-playbooks/wiki#mysqlreplicationerror"
+      runbook: https://github.com/ChameleonCloud/chi-in-a-box/wiki/%5BRunbook%5D-MySQLReplicationError
