@@ -8,8 +8,14 @@ else
     backuptype=incremental
 fi
 
-export SWIFT_PREAUTHTOKEN="{{ gnocchi_backup_auth_token }}" && \
-  export SWIFT_PREAUTHURL="{{ gnocchi_backup_swift_endpoint }}" && \
+export SWIFT_AUTHURL="{{ gnocchi_backup_keystone_endpoint }}" && \
+  export SWIFT_USERNAME="{{ gnocchi_backup_username }}" && \
+  export SWIFT_PASSWORD="{{ gnocchi_backup_password }}" && \
+  export SWIFT_REGION_NAME="{{ gnocchi_backup_region_name }}" && \
+  export SWIFT_USER_DOMAIN_NAME="{{ gnocchi_backup_user_domain }}" && \
+  export SWIFT_PROJECT_DOMAIN_NAME="{{ gnocchi_backup_project_domain }}" && \
+  export SWIFT_TENANTNAME="{{ gnocchi_backup_tenant }}" && \
+  export SWIFT_AUTHVERSION="{{ gnocchi_backup_auth_version }}" && \
   duplicity $backuptype --archive-dir="{{ gnocchi_backup_archive_dir }}" \
   --name="{{ gnocchi_backup_name }}" \
   --file-prefix="{{ gnocchi_backup_file_prefix }}" \

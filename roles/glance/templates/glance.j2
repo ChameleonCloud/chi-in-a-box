@@ -2,8 +2,13 @@
 
 cd "{{ glance_backup_origin_dir }}" && \
   find . -maxdepth 1 -type f | xargs -n 100 \
-  swift --os-storage-url "{{ glance_backup_swift_endpoint }}" \
-  --os_auth_token "{{ glance_backup_auth_token }}" \
+  swift --os-identity-api-version="{{ glance_backup_auth_version }}" \
+  --os-storage-url="{{ glance_backup_keystone_endpoint }}" \
+  --os-username="{{ glance_backup_username }}" \
+  --os-password="{{ glance_backup_password }}" \
+  --os-tenant-name"{{ glance_backup_tenant }}" \
+  --os-user-domain-id="{{ glance_backup_user_domain }}" \
+  --os-project-domain-id="{{ glance_backup_project_domain }}" \
   upload "{{ glance_backup_container_name }}" \
   --changed \
   --segment-size "{{ glance_backup_segment_size }}" \
