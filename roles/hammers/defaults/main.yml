@@ -64,3 +64,8 @@ hammers:
     cron_times:
       minute: 0
       hour: 1
+  unutilized_leases:
+      hammer_name: hammers-unutilizedleases
+      cmd: "unutilized-lease-reaper delete"
+      cron_times:
+          minute: 5
