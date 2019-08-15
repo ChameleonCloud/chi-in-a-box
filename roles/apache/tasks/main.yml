@@ -54,5 +54,5 @@
     name: "Renew SSL certificate for all domains."
     minute: 0
     hour: 5,2
-    job: "certbot renew"
+    job: /bin/certbot renew
   when: apache_ssl_letsencrypt_enabled
