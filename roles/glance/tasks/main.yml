@@ -1,11 +1,11 @@
 ---
-- name: Generate SWIFT auth token for Glance backup
-  os_auth:
-    auth: "{{ openstack_auth }}"
+#- name: Generate SWIFT auth token for Glance backup
+#  os_auth:
+#   auth: "{{ openstack_auth }}"
 
-- name: Set fact for SWIFT auth token
-  set_fact:
-    glance_backup_auth_token: "{{ ansible_facts.auth_token }}"
+#- name: Set fact for SWIFT auth token
+#  set_fact:
+#    glance_backup_auth_token: "{{ ansible_facts.auth_token }}"
 
 - name: Configure glance backup script file
   template:
