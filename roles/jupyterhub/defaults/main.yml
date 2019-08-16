@@ -1,7 +1,7 @@
 ---
 jupyterhub_config_path: /etc/jupyterhub
 jupyterhub_crypt_key: ''
-jupyterhub_docker_image: docker.chameleoncloud.org/jupyterhub:414997d
+jupyterhub_docker_image: docker.chameleoncloud.org/jupyterhub:2289827
 jupyterhub_docker_network: jupyterhub
 jupyterhub_docker_network_subnet: 172.18.20.0/24
 jupyterhub_docker_volume_name: jupyterhub-storage
@@ -18,5 +18,5 @@ jupyterhub_db_user: jupyterhub
 jupyterhub_db_password: ''
 jupyterhub_db_db: jupyterhub
 
-jupyterhub_notebook_docker_image: docker.chameleoncloud.org/jupyterhub-user:4e7b6e3
+jupyterhub_notebook_docker_image: docker.chameleoncloud.org/jupyterhub-user:e086119
 jupyterhub_notebook_workdir: /work
