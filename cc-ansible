@@ -127,12 +127,6 @@ USAGE
   exit 1
 }
 
-# Handle subcommands
-if [[ -n $command ]]; then
-  $command "$@"
-  exit $?
-fi
-
 # Automatically update dependencies
 if [[ "$CHECK_UPDATES" == "yes" || "$FORCE_UPDATES" == "yes" ]]; then
   # Update base pip packages
@@ -159,15 +153,21 @@ if [[ "$CHECK_UPDATES" == "yes" || "$FORCE_UPDATES" == "yes" ]]; then
   case "${kolla_ansible_submodule_status:0:1}" in
     -|+)
       git submodule update --init kolla/kolla-ansible
-      (cd kolla/kolla-ansible; python setup.py install)
+      (cd kolla/kolla-ansible; python setup.py install; pip install -r requirements.txt)
       ;;
     *)
       ;;
   esac
   # Handle case of venv being recreated though submodule is up to date.
   if ! pip freeze | grep -q kolla-ansible; then
-    (cd kolla/kolla-ansible; python setup.py install)
+    (cd kolla/kolla-ansible; python setup.py install; pip install -r requirements.txt)
   fi
+fi
+
+# Handle subcommands
+if [[ -n $command ]]; then
+  $command "$@"
+  exit $?
 fi
 
 if [[ -n "${CC_ANSIBLE_PLAYBOOK:-}" ]]; then
