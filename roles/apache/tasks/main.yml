@@ -33,6 +33,7 @@
       python -c 'import random; import time; time.sleep(random.random() * 3600)'
         && certbot renew
         | /usr/bin/logger -t certbot
+  when: apache_ssl_letsencrypt_enabled
 
 - debug:
     msg: |
@@ -48,11 +49,3 @@
     daemon_reload: yes
     state: started
     enabled: yes
-
-- name: Create cron job to periodically renew certificates.
-  cron:
-    name: "Renew SSL certificate for all domains."
-    minute: 0
-    hour: 5,2
-    job: /bin/certbot renew
-  when: apache_ssl_letsencrypt_enabled
