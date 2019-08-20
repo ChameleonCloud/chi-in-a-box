@@ -2,7 +2,7 @@
 
 cd "{{ glance_backup_origin_dir }}" && \
   find . -maxdepth 1 -type f | xargs -n 100 \
-  swift --auth-version="{{ keystone_authversion }}" \
+  swift --auth-version=3 \
   --os-region-name="{{ openstack_region_name }}" \
   --os-auth-url="{{ glance_backup_keystone_endpoint }}" \
   --os-username="{{ glance_backup_username }}" \
@@ -14,4 +14,3 @@ cd "{{ glance_backup_origin_dir }}" && \
   --changed \
   --segment-size "{{ glance_backup_segment_size }}" \
   2>&1 | /usr/bin/logger -t "{{ glance_backup_log_key }}"
-
