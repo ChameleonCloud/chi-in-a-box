@@ -11,22 +11,40 @@
 #
 # Requires 'authnz_external' enabled in Apache.
 #
+
+if [ "$USER" == "token" ]; then
+  identity_params=$(cat <<JSON
+{
+  "methods": ["token"],
+  "token": {
+    "id": "$PASS"
+  }
+}
+JSON
+)
+else
+  identity_params=$(cat <<JSON
+{
+  "methods": ["password"],
+  "password": {
+    "user": {
+      "name": "$USER",
+      "domain": { "id": "default" },
+      "password": "$PASS"
+    }
+  }
+}
+JSON
+)
+fi
+
 curl -sSf \
   -H "Content-Type: application/json" \
   --data-binary @- \
   "{{ apache_keystone_auth_url }}/auth/tokens" >/dev/null <<JSON
 {
   "auth": {
-    "identity": {
-      "methods": ["password"],
-      "password": {
-        "user": {
-          "name": "$USER",
-          "domain": { "id": "default" },
-          "password": "$PASS"
-        }
-      }
-    }
+    "identity": $identity_params
   }
 }
 JSON
