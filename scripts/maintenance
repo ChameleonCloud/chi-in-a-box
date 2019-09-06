@@ -1,0 +1,144 @@
+#!/usr/bin/env bash
+#
+# Maintenance helper script. This is used primarily to start and end large-scale
+# maintenance of the infrastructure e.g. in the event of network or power
+# maintenance at the host institution. Gracefully shutting down all services
+# properly can be nontrivial, in particular the order of things, so this script
+# provides a 'start' and 'end' invocation to begin or end such a maintenance
+# period nicely.
+#
+set -e -u -o pipefail
+
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
+pushd $(realpath $DIR/..) >/dev/null
+
+usage() {
+  cat <<EOF
+Usage: maintenance <op> [--db-host <host>] [--rabbit-host <host>] [--redis-host <host>]
+
+Operations:
+  start: begins a maintenance of the entire system. Shuts down all services
+         gracefully and prepares system for a power cycle.
+  end:   ends a maintenance; should be run after a power cycle. Restarts all
+         services.
+
+Options:
+  --db-host: the address of the MariaDB host (default=localhost)
+  --rabbit-host: the address of the RabbitMQ host (default=localhost)
+  --redis-host: the address of the Redis host (default=localhost)
+EOF
+  exit 1
+}
+
+POSARGS=()
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --db-host)
+      DB_HOST="$2"
+      shift
+      shift
+      ;;
+    --rabbit-host)
+      RABBITMQ_HOST="$2"
+      shift
+      shift
+      ;;
+    --redis-host)
+      REDIS_HOST="$2"
+      shift
+      shift
+      ;;
+    -h|--help)
+      usage
+      ;;
+    *)
+      POSARGS+=("$1")
+      shift
+      ;;
+  esac
+done
+
+db_host() {
+  if [[ -n "$DB_HOST" ]]; then
+    ssh "$DB_HOST" "$@"
+  else
+    "$@"
+  fi
+}
+
+rabbit_host() {
+  if [[ -n "$RABBITMQ_HOST" ]]; then
+    ssh "$RABBITMQ_HOST" "$@"
+  else
+    "$@"
+  fi
+}
+
+redis_host() {
+  if [[ -n "$REDIS_HOST" ]]; then
+    ssh "$REDIS_HOST" "$@"
+  else
+    "$@"
+  fi
+}
+
+case "${POSARGS[0]}" in
+  start)
+    echo "Stopping core infrastructure containers"
+    ./cc-ansible stop
+
+    # OVS is running in a container with rules set via the Neutron OVS agent.
+    # Because it is often the case that Neutron is controlling the same
+    # interface used to manage the node, this can mean that all remote
+    # connectivity can be lost. Restarting the OVS containers and the agent
+    # is simpler than trying to reconfigure all of the interfaces to not
+    # be OVS bridges. When the node reboots it should automatically restart
+    # these containers (default Docker behavior when daemon is restarted).
+    echo "Bringing back containers necessary for networking"
+    echo "(Note: connectivity will briefly drop here as flows are restored)"
+    docker restart \
+      openvswitch_db \
+      openvswitch_vswitchd \
+      neutron_openvswitch_agent >/dev/null
+
+    echo "Stopping custom infrastructure"
+    systemctl stop 'experiment-precis-*'
+    systemctl stop chameleon-vendordata
+
+    echo "Stopping databases"
+    db_host systemctl stop mariadb
+    redis_host systemctl stop redis
+    rabbit_host systemctl stop rabbitmq-server
+
+    echo "Done. You should be able to issue a system reboot or shutdown now."
+    ;;
+  end)
+    echo "Starting core networking services"
+    # It might happen that RabbitMQ is not running somehow; it is required
+    # to run in order for the OVS agent to register its flows (yes.) For some
+    # reason there is an RPC invocation happening w/in the agent for this part.
+    rabbit_host systemctl restart rabbitmq-server
+    docker restart \
+      openvswitch_db \
+      openvswitch_vswitchd \
+      neutron_openvswitch_agent >/dev/null
+
+    echo "Starting databases"
+    db_host systemctl restart mariadb
+    redis_host systemctl restart redis
+
+    echo "Starting core infrastructure containers"
+    ./cc-ansible reconfigure
+
+    echo "Starting custom infrastructure"
+    systemctl restart 'experiment-precis-*'
+    systemctl restart chameleon-vendordata
+    ./cc-ansible --playbook playbooks/prometheus.yml
+
+    echo "Done. Check Docker container statuses for possible startup errors."
+    ;;
+  *)
+    echo "Unknown operation! Valid operations are: start, end"
+    exit 1
+    ;;
+esac
