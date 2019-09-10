@@ -15,6 +15,7 @@ docker_registry_push_users:
   - jakecoll
   - jason_a
   - priteau
+  - rochaa
   - zzhen
   - kolla
 
