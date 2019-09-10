@@ -31,6 +31,9 @@ blazar_usage_project_exemptions:
 blazar_floatingip_billrate: 0.0
 # TODO: support looking up network with this name and fetching ID
 # blazar_floatingip_reservation_network: public
+blazar_database_name: blazar
+blazar_database_user: blazar
+blazar_database_port: "{{ database_port }}"
 
 # Cinder
 enable_cinder: no
@@ -80,8 +83,16 @@ ironic_pxe_append_params: "nofb nomodeset vga=normal console=tty0 console=ttyS0,
 # Keystone
 enable_keystone: yes
 use_preconfigured_fernet: yes
-keystone_admin_project: openstack
 fernet_token_expiry: 604800 # 1 week
+keystone_admin_project: openstack
+# The following are needed for defaults for the Glance/Gnocchi backup roles
+# (site-configs derive from these)
+keystone_admin_username: admin
+keystone_admin_project_name: "{{ keystone_admin_project }}"
+keystone_user_domain: default
+keystone_project_domain: default
+keystone_authversion: 3
+openstack_keystone_auth_url: "{{ internal_protocol }}://{{ kolla_internal_fqdn }}:{{ keystone_public_port }}"
 
 # Neutron
 enable_neutron: yes
