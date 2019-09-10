@@ -226,7 +226,7 @@ kolla_args+=(--extra cc_ansible_site_dir="$CC_ANSIBLE_SITE")
 # not performing the bootstrap, which is responsible for setting up the
 # virtualenv in the first place!)
 if [[ "${POSARGS[@]}" != *"bootstrap-servers"* ]]; then
-  kolla_args+=(--extra ansible_python_interpreter="{{virtualenv}}/bin/python")
+  kolla_args+=(--extra ansible_python_interpreter="$DIR/venv/bin/python")
 fi
 kolla_args+=("${POSARGS[@]}")
 
