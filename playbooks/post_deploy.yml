@@ -34,7 +34,7 @@
     iptables:
       table: nat
       chain: POSTROUTING
-      source: "{{ item.nat_ip }}"
+      source: "{{ item.nat_address }}"
       out_interface: "{{ kolla_external_vip_interface | replace('_', '-') }}"
       jump: MASQUERADE
       comment: "NAT for {{ item.name }}"
