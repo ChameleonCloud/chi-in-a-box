@@ -237,7 +237,14 @@ kolla_args+=(--extra cc_ansible_site_dir="$CC_ANSIBLE_SITE")
 # not performing the bootstrap, which is responsible for setting up the
 # virtualenv in the first place!)
 if [[ "${POSARGS[@]}" != *"bootstrap-servers"* ]]; then
-  kolla_args+=(--extra ansible_python_interpreter="$DIR/venv/bin/python")
+  # Run a quick ad-hoc command to figure out the derived value of the
+  # 'virtualenv' variable, as it can differ by site.
+  virtualenv=$(ansible localhost --one-line -m debug -a 'var=virtualenv' \
+    --extra-vars="@$DIR/kolla/defaults.yml" \
+    --extra-vars="@$CC_ANSIBLE_SITE/globals.yml" 2>/dev/null \
+    | sed 's/^.*=> //' \
+    | jq -r .virtualenv)
+  kolla_args+=(--extra ansible_python_interpreter="$virtualenv/bin/python")
 fi
 kolla_args+=("${POSARGS[@]}")
 
