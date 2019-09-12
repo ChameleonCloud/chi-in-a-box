@@ -162,6 +162,17 @@ if [[ "$CHECK_UPDATES" == "yes" || "$FORCE_UPDATES" == "yes" ]]; then
   if ! pip freeze | grep -q kolla-ansible; then
     (cd kolla/kolla-ansible; python setup.py install; pip install -r requirements.txt)
   fi
+
+  # Update Mitogen
+  MITOGEN_VERSION=0.2.8
+  MITOGEN_TARBALL=/tmp/mitogen.tar.gz
+  MITOGEN_INSTALL_DIR="$DIR/venv/lib/mitogen-$MITOGEN_VERSION"
+  if [[ ! -d "$MITOGEN_INSTALL_DIR" ]]; then
+    curl -L -o "$MITOGEN_TARBALL" "https://github.com/dw/mitogen/archive/v$MITOGEN_VERSION.tar.gz" \
+      && tar -xf "$MITOGEN_TARBALL" -C "$(dirname $MITOGEN_INSTALL_DIR)" \
+      && rm -f "$MITOGEN_TARBALL"
+  fi
+  ln -sf "$MITOGEN_INSTALL_DIR" "$DIR/venv/lib/mitogen-latest"
 fi
 
 # Handle subcommands
