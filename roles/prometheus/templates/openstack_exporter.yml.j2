@@ -5,7 +5,7 @@ switch_corsa:
 {% for switch in openstack_exporter_corsa_switches %}
     - name: {{ switch.name }}
       address: https://{{ switch.address }}
-      token: {{ switch.token }}
+      token: {{ switch.auth.token }}
       ssl_verify: False
 {% endfor %}
 {% else %}
