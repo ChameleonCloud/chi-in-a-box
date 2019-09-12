@@ -17,8 +17,8 @@ switch_corsa:
   switches:
 {% for switch in metric_collector_corsa_switches %}
     - name: {{ switch.name }}
-      address: https://{{ switch.ip }}
-      token: {{ switch.token }}
+      address: https://{{ switch.address }}
+      token: {{ switch.auth.token }}
       ssl_verify: False
 {% endfor %}
 {% endif %}

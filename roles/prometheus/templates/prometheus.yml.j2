@@ -39,7 +39,7 @@ scrape_configs:
   scrape_timeout: 2m
   static_configs:
   - targets:
-      - '{{ switch.ip }}'
+      - '{{ switch.address }}'
     labels:
       hostname: '{{ groups[snmp_exporter_service.group].0 }}'
   metrics_path: /snmp
