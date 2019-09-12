@@ -30,6 +30,7 @@
   - name: Set fact for Corsa switches.
     set_fact:
       corsa_switches: "{{ switch_configs | selectattr('device_type', 'match', '^corsa') | list }}"
+    when: switch_configs is defined
   - name: Allow NAT for Corsa switches.
     iptables:
       table: nat
@@ -40,7 +41,7 @@
       comment: "NAT for {{ item.name }}"
     become: yes
     loop: "{{ corsa_switches }}"
-    when: corsa_switches | length > 0
+    when: corsa_switches is defined and corsa_switches | length > 0
 
 # Call site-specific playbook
 - import_playbook: "{{ cc_ansible_site_dir }}/post_deploy.yml"
