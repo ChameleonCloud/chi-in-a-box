@@ -73,6 +73,14 @@ horizon_regions:
 
 # Ironic
 enable_ironic: yes
+# TODO: [jca 2019-09-13]
+# Ironic neutron agent is known to cause problems with the NGS plugin we
+# use to set up and tear down networks on the switches. Specifically, it will
+# prevent the delete hooks from running on the Corsas, which means the VFCs
+# for a given network are not torn down properly.
+# But, we should figure out _why_ this is, as it doesn't seem like something
+# that should interfere, and likely the culprit is in NGS somehow.
+enable_ironic_neutron_agent: no
 ironic_provisioning_network: ironic-provisioning
 ironic_provisioning_network_cidr: 10.51.0.0/24
 ironic_provisioning_network_gateway: "{{ ironic_provisioning_network_cidr | ipaddr('next_usable') }}"
