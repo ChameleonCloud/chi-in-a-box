@@ -8,6 +8,7 @@
         docker_registry_hostname: "{{ docker_registry_hostname }}"
         docker_registry_port: "{{ docker_registry_port }}"
         docker_registry_push_users: "{{ docker_registry_push_users }}"
+        docker_registry_readonly_user: "{{ docker_registry_readonly_user }}"
       tags:
         - configuration
 
@@ -24,6 +25,7 @@
             docker_registry_hostname: "{{ hostvars[groups.docker_registry[0]].docker_registry_hostname }}"
             docker_registry_port: "{{ hostvars[groups.docker_registry[0]].docker_registry_port }}"
             docker_registry_push_users: "{{ hostvars[groups.docker_registry[0]].docker_registry_push_users }}"
+            docker_registry_readonly_user: "{{ hostvars[groups.docker_registry[0]].docker_registry_readonly_user }}"
             docker_registry_internal_address: "{{ groups.docker_registry[0] }}"
         - name: Create password for readonly user.
           htpasswd:
