@@ -28,6 +28,7 @@ groups:
     expr: |
       max_over_time(node_network_transmit_packets_total{device=~"br.*"}[1h])
       unless node_network_transmit_packets_total
+    for: 5m
     labels:
       severity: critical
     annotations:
