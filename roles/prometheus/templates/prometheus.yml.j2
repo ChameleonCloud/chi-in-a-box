@@ -54,3 +54,20 @@ scrape_configs:
     - target_label: __address__
       replacement: '{{ snmp_exporter_host }}:{{ snmp_exporter_service.port }}'
 {% endfor %}
+- job_name: 'node'
+  static_configs:
+    - targets:
+{% for host in groups['storage_monitoring'] %}
+        - "{{ hostvars[host].ansible_default_ipv4.address }}:9283"
+{% endfor %}
+      labels:
+        cluster: "{{ chameleon_site_name }}"
+- job_name: 'ceph'
+  honor_labels: true
+  static_configs:
+    - targets:
+{% for host in groups['storage_monitoring'] %}
+        - "{{ hostvars[host].ansible_default_ipv4.address }}:9100"
+{% endfor %}
+      labels:
+        instance: "ceph"

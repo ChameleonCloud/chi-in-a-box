@@ -44,16 +44,6 @@ prometheus_services:
     volumes:
       - "alertmanager-data:/alertmanager"
       - "/etc/alertmanager:/etc/alertmanager"
-  ceph-exporter:
-    service_name: prometheus_ceph_exporter
-    image: digitalocean/ceph_exporter:2.0.0-luminous
-    group: prometheus-ceph-exporter
-    restart_handler: restart ceph exporter
-    port: 9128
-    config_dir: /etc/ceph
-    scrape_target: yes
-    volumes:
-      - "/etc/ceph:/etc/ceph"
   jupyterhub-exporter:
     group: jupyterhub
     port: 8075
