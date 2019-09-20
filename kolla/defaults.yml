@@ -122,6 +122,7 @@ nova_public_endpoint: "{{ public_protocol }}://{{ kolla_external_fqdn }}:{{ nova
 
 # Prometheus
 enable_prometheus: no
+prometheus_bind_address: "{{ lookup('vars', 'ansible_' + network_interface).ipv4.address }}"
 
 # Swift
 enable_swift: no
