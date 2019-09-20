@@ -54,6 +54,7 @@ scrape_configs:
     - target_label: __address__
       replacement: '{{ snmp_exporter_host }}:{{ snmp_exporter_service.port }}'
 {% endfor %}
+{% if groups['storage_monitoring'] is defined %}
 - job_name: 'node'
   static_configs:
     - targets:
@@ -71,3 +72,4 @@ scrape_configs:
 {% endfor %}
       labels:
         instance: "ceph"
+{% endif %}
