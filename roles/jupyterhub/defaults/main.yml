@@ -18,5 +18,5 @@ jupyterhub_db_user: jupyterhub
 jupyterhub_db_password: ''
 jupyterhub_db_db: jupyterhub
 
-jupyterhub_notebook_docker_image: docker.chameleoncloud.org/jupyterhub-user:8c2836d
+jupyterhub_notebook_docker_image: docker.chameleoncloud.org/jupyterhub-user:d2eadeb
 jupyterhub_notebook_workdir: /work
