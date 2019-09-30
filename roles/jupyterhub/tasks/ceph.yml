@@ -1,4 +1,9 @@
 ---
+- name: Create Ceph configuration directory.
+  file:
+    path: /etc/ceph
+    state: directory
+
 - name: Copy global Ceph configuration.
   block:
     - slurp:
@@ -15,12 +20,13 @@
       register: ceph_client_keyring
       delegate_to: "{{ groups.ceph[0] }}"
     - copy:
-        content: "{{ ceph_client_keyring.output }}"
+        content: "{{ ceph_client_keyring.stdout }}"
         dest: "/etc/ceph/ceph.{{ jupyterhub_ceph_client }}.keyring"
 
 - name: Install Docker RBD volume plugin.
-  command: <
+  command: >
     docker plugin install "{{ jupyterhub_ceph_docker_volume_driver }}" \
+      --grant-all-permissions \
       --alias="{{ jupyterhub_ceph_docker_volume_driver }}" \
       LOG_LEVEL=1 \
       RBD_CONF_POOL="{{ jupyterhub_ceph_pool }}" \
