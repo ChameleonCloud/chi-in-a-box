@@ -1,9 +1,13 @@
 ---
 - name: Copy global Ceph configuration.
-  synchronize:
-    src: /etc/ceph/ceph.conf
-    dest: /etc/ceph/ceph.conf
-  delegate_to: "{{ groups.ceph[0] }}"
+  block:
+    - slurp:
+        src: /etc/ceph/ceph.conf
+      delegate_to: "{{ groups.ceph[0] }}"
+      register: ceph_conf
+    - copy:
+        content: "{{ ceph_conf['content'] | b64decode }}"
+        dest: /etc/ceph/ceph.conf
 
 - name: Copy Ceph client keyring.
   block:
