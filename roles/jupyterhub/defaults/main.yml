@@ -10,6 +10,12 @@ jupyterhub_port: 8075 # Just needs to be something that doesn't conflict
 jupyterhub_service_name: jupyterhub
 jupyterhub_user: jupyterhub
 
+jupyterhub_enable_ceph: no
+jupyterhub_ceph_cluster: ceph
+jupyterhub_ceph_client: client.jupyter
+jupyterhub_ceph_pool: jupyter-volumes
+jupyterhub_ceph_docker_volume_driver: wetopi/rbd
+
 jupyterhub_db_service_name: jupyterhub-db
 jupyterhub_db_docker_image: mariadb:10.2
 jupyterhub_db_docker_volume_name: jupyterhub-db-storage

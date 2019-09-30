@@ -1,0 +1,24 @@
+---
+- name: Copy global Ceph configuration.
+  synchronize:
+    src: /etc/ceph/ceph.conf
+    dest: /etc/ceph/ceph.conf
+  delegate_to: "{{ groups.ceph[0] }}"
+
+- name: Copy Ceph client keyring.
+  block:
+    - command: "ceph auth get {{ jupyterhub_ceph_client }}"
+      register: ceph_client_keyring
+      delegate_to: "{{ groups.ceph[0] }}"
+    - copy:
+        content: "{{ ceph_client_keyring.output }}"
+        dest: "/etc/ceph/ceph.{{ jupyterhub_ceph_client }}.keyring"
+
+- name: Install Docker RBD volume plugin.
+  command: <
+    docker plugin install "{{ jupyterhub_ceph_docker_volume_driver }}" \
+      --alias="{{ jupyterhub_ceph_docker_volume_driver }}" \
+      LOG_LEVEL=1 \
+      RBD_CONF_POOL="{{ jupyterhub_ceph_pool }}" \
+      RBD_CONF_CLUSTER="{{ jupyterhub_ceph_cluster }}" \
+      RBD_CONF_KEYRING_USER="{{ jupyterhub_ceph_client }}"
