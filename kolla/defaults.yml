@@ -136,3 +136,6 @@ enable_grafana: no
 
 # External Ceph
 enable_ceph: no
+
+# Chameleon usage
+enable_usage_appliance_report: no
