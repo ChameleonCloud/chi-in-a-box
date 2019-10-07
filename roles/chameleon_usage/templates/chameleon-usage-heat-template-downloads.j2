@@ -1,0 +1,8 @@
+#! /bin/sh
+
+docker run --rm --net=host \
+    -v "{{ ga_reporting_private_key_json_location }}:/etc/google-service-account-private-key.json" \
+    -v "{{ chameleon_usage_config_dir }}/my.cnf:/etc/mysql/my.cnf" \
+    {{ chameleon_usage_docker_image }} \
+    heat_template_downloads --google-key-file-location /etc/google-service-account-private-key.json \
+    --google-profile-id {{google_analytics_view_id}} --mysql-conf /etc/mysql/my.cnf 2>&1
