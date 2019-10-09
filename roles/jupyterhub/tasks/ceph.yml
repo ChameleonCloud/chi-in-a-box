@@ -19,6 +19,7 @@
     - command: "ceph auth get {{ jupyterhub_ceph_client }}"
       register: ceph_client_keyring
       delegate_to: "{{ groups.ceph[0] }}"
+      changed_when: False
     - copy:
         content: "{{ ceph_client_keyring.stdout }}"
         dest: "/etc/ceph/ceph.{{ jupyterhub_ceph_client }}.keyring"
@@ -30,6 +31,7 @@
         docker plugin ls --format '{{ '{{' }} .Name {{ '}}' }}' \
           --filter enabled=true --filter capability=volumedriver
       register: docker_plugin_list
+      changed_when: False
     - name: Installing plugin.
       command: >
         docker plugin install "{{ jupyterhub_ceph_docker_volume_driver }}" \
