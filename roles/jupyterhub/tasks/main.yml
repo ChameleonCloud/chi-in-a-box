@@ -51,6 +51,9 @@
   tags:
     - configuration
 
+- include_tasks: ceph.yml
+  when: jupyterhub_enable_ceph | bool
+
 - name: Enable JupyterHub services on boot.
   systemd:
     service: "{{ item }}"
