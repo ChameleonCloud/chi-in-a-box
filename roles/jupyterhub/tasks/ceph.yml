@@ -27,7 +27,7 @@
   command: >
     docker plugin install "{{ jupyterhub_ceph_docker_volume_driver }}" \
       --grant-all-permissions \
-      --alias="{{ jupyterhub_ceph_docker_volume_driver }}" \
+      --alias="{{ jupyterhub_ceph_docker_volume_driver_alias }}" \
       LOG_LEVEL=1 \
       RBD_CONF_POOL="{{ jupyterhub_ceph_pool }}" \
       RBD_CONF_CLUSTER="{{ jupyterhub_ceph_cluster }}" \
