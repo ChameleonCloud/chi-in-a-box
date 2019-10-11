@@ -23,7 +23,7 @@
     - 'blazar_backup\_%.*:CREATE,DROP,SELECT,INSERT'
     - 'keystone_backup\_%.*:CREATE,DROP,SELECT,INSERT'
     - 'nova_backup\_%.*:CREATE,DROP,SELECT,INSERT'
-    - 'ironic_backup\%_.*:CREATE,DROP,SELECT,INSERT'
+    - 'ironic_backup\_%.*:CREATE,DROP,SELECT,INSERT'
     - 'chameleon_usage.*:CREATE,SELECT,INSERT,UPDATE,DELETE'
     
 - name: Configure my.cnf
