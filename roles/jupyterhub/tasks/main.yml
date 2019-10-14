@@ -13,8 +13,8 @@
 - name: Create Docker network.
   docker_network:
     name: "{{ jupyterhub_docker_network }}"
-    ipam_options:
-      subnet: "{{ jupyterhub_docker_network_subnet }}"
+    ipam_config:
+      - subnet: "{{ jupyterhub_docker_network_subnet }}"
 
 - name: Configure JupyterHub.
   block:

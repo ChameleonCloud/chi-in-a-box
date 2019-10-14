@@ -11,11 +11,22 @@
     name: "{{ docker_registry_swift_username }}"
     password: "{{ docker_registry_swift_password }}"
     region_name: "{{ keystone_primary_region_name }}"
+    auth: "{{ openstack_auth }}"
+    # NOTE(jca 2019-10-14):
+    # Need to explicitly set this to empty to avoid
+    # buggy auto-detect region attempts by this module
+    cloud: ""
   no_log: True
   vars:
     # Ensure when we run this on the ansible host, we use the Virtualenv
     # (which should already be set up.)
     ansible_python_interpreter: "{{ ansible_python_interpreter }}"
+
+- name: Create Docker network.
+  docker_network:
+    name: "{{ docker_registry_docker_network }}"
+    ipam_config:
+      - subnet: "{{ docker_registry_docker_network_subnet }}"
 
 - name: Configure Docker Registry.
   block:
@@ -23,12 +34,25 @@
       file:
         path: "{{ docker_registry_config_path }}"
         state: directory
-    - name: Create Docker Registry config.
+    - name: Create Docker Registry production config.
       template:
         src: config.yml.j2
-        dest: "{{ docker_registry_config_path }}/config.yml"
+        dest: "{{ docker_registry_config_path }}/config.prod.yml"
+        mode: '0640'
       notify:
         - restart docker registry
+    - name: Create Docker Registry maintenance config.
+      template:
+        src: config.yml.j2
+        dest: "{{ docker_registry_config_path }}/config.maintenance.yml"
+        mode: '0640'
+      vars:
+        maintenance: yes
+    - name: Create symbolic link for production config.
+      file:
+        src: "config.prod.yml"
+        dest: "{{ docker_registry_config_path }}/config.yml"
+        state: link
     - name: Configure Docker Registry systemd service.
       template:
         src: docker_registry.service.j2
@@ -45,3 +69,21 @@
     daemon_reload: yes
     state: started
     enabled: yes
+
+- name: Install garbage collection script.
+  template:
+    src: docker-registry-gc.sh.j2
+    dest: /usr/local/sbin/docker-registry-gc
+    mode: '0750'
+
+- name: Install cron job to automatically call garbage collection.
+  cron:
+    # Every tuesday at 5:00am - put it in the middle of the week
+    # so issues can be caught during week.
+    name: Docker registry periodic GC
+    minute: '0'
+    hour: '5'
+    day: '*'
+    month: '*'
+    weekday: '2'
+    job: /usr/local/sbin/docker-registry-gc | logger -t docker-registry-gc
