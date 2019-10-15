@@ -15,10 +15,17 @@ storage:
     region: {{ docker_registry_swift_region }}
     container: {{ docker_registry_swift_containername }}
     endpointtype: {{ docker_registry_swift_endpointtype }}
+  delete:
+    enabled: true
+{% if maintenance is defined and maintenance | bool %}
+  maintenance:
+    readonly:
+      enabled: true
+{% endif %}
 http:
   addr: :5000
   debug:
-    addr: localhost:5001
+    addr: :5001
   headers:
     X-Content-Type-Options: [nosniff]
 health:

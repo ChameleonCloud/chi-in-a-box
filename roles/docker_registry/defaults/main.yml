@@ -5,7 +5,8 @@ docker_registry_hostname: docker.chameleoncloud.org
 docker_registry_port: 5000
 docker_registry_debug_port: 5001
 docker_registry_service_name: docker_registry
-
+docker_registry_docker_network: registry
+docker_registry_docker_network_subnet: 172.18.5.0/29
 docker_registry_readonly_user: registry
 docker_registry_readonly_password: ''
 
