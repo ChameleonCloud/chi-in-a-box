@@ -35,7 +35,7 @@ while [[ $# -gt 0 ]]; do
       # Add proper flag support for --check as an option for dry-runs
       export EXTRA_OPTS="${EXTRA_OPTS:-} --check"
       ;;
-    decrypt_passwords|edit_passwords|help)
+    decrypt_passwords|edit_passwords|help|init)
       # Special subcommand!
       command="$key"
       ;;
@@ -53,24 +53,44 @@ while [[ $# -gt 0 ]]; do
   shift
 done
 
-if [[ -z "${CC_ANSIBLE_SITE:-}" ]]; then
-  cat <<ERRMSG
-Error: no site specified! Please specify which site to execute under with either
-the --site <dir> flag or by setting the CC_ANSIBLE_SITE environment variable.
-
-Example:
-  cc-ansible --site /etc/sites/production
-
-  CC_ANSIBLE_SITE=/etc/sites/production $(basename $0)
-ERRMSG
-  exit 1
-fi
-
-CC_ANSIBLE_VAULT_PASSWORD="${CC_ANSIBLE_VAULT_PASSWORD:-$CC_ANSIBLE_SITE/vault_password}"
-
 #
 # Subcommands
 #
+
+init() {
+  local site_config="${CC_ANSIBLE_SITE:-$DIR/site-config}"
+  
+  if [[ -d "$site_config" ]]; then
+    echo "Site config already exists at $site_config! Aborting."
+    return -1
+  fi
+
+  # Copy files from example
+  mkdir -p "$site_config"
+  cp -a "$DIR/site-config.example/" "$site_config"
+
+  # Do some simple hostname guessing
+  this_host=$(hostname -s)
+  sed -i.bak "s/<host>/$this_host/g" "$site_config/hosts" \
+    && rm -f "$site_config/hosts.bak"
+  mv "$site_config/host_vars/<host>" "$site_config/host_vars/$this_host"
+
+  # Generate vault password
+  openssl rand -base64 2048 >"$site_config/vault_password" \
+    && chmod 400 "$site_config/vault_password"
+
+  # Generate passwords
+  kolla-genpwd --passwords "$site_config/passwords.yml"
+  ansible-vault --vault-password-file "$site_config/vault_password" \
+    encrypt "$site_config/passwords.yml"
+
+  echo "The beginnings of your site configuration were installed to $site_config."
+  echo "To use this site configuration automatically for future commands, you can"
+  echo "set an environment variable:"
+  echo
+  echo -e "\texport CC_ANSIBLE_SITE=$site_config"
+  echo
+}
 
 edit_passwords() {
   local tmpfile="$(mktemp)"
@@ -126,6 +146,26 @@ Examples:
 USAGE
   exit 1
 }
+
+if [[ "${command:-}" == "init" ]]; then
+  init
+  exit $?
+fi
+
+if [[ -z "${CC_ANSIBLE_SITE:-}" ]]; then
+  cat <<ERRMSG
+Error: no site specified! Please specify which site to execute under with either
+the --site <dir> flag or by setting the CC_ANSIBLE_SITE environment variable.
+
+Example:
+  cc-ansible --site /etc/sites/production
+
+  CC_ANSIBLE_SITE=/etc/sites/production $(basename $0)
+ERRMSG
+  exit 1
+fi
+
+CC_ANSIBLE_VAULT_PASSWORD="${CC_ANSIBLE_VAULT_PASSWORD:-$CC_ANSIBLE_SITE/vault_password}"
 
 # Automatically update dependencies
 if [[ "$CHECK_UPDATES" == "yes" || "$FORCE_UPDATES" == "yes" ]]; then

@@ -4,6 +4,8 @@
 *.retry
 # Checksums for dependencies
 *.sha256
+# The default site-config is generated here
+site-config/
 # The vault passwords are stored here by convention
 vault_password
 # Ansible Galaxy roles

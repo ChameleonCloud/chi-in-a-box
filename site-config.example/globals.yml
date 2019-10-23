@@ -35,6 +35,9 @@ switch_configs:
       persist_changes: False
       fast_cli: True
 
-blazar_floatingip_reservation_network_id: 687976bc-e93f-4c47-ac21-fbd341313a54
+# If you are allowing users to reserve public IPs,
+# this should correspond to the Neutron ID of your
+# public (gateway) network.
+#blazar_floatingip_reservation_network_id: 687976bc-e93f-4c47-ac21-fbd341313a54
 
 prometheus_alertmanager_hostname: alert.dev.uc.chameleoncloud.org
