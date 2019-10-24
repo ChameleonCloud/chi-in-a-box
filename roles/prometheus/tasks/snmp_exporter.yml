@@ -9,6 +9,8 @@
   make:
     chdir: "{{ service.config_dir }}"
     target: mibs
+  # This is a phony target, so it will always register a change.
+  changed_when: False
 
 - name: Set facts from global configuration.
   set_fact:

@@ -1,7 +1,7 @@
 {% set alertmanager_service = prometheus_services['alertmanager'] %}
-{% set alertmanager_host = ansible_internal_ipv4_addresses[groups[alertmanager_service.group][0]] %}
+{% set alertmanager_vars = hostvars[groups[alertmanager_service.group][0]] %}
 {% set snmp_exporter_service = prometheus_services['snmp-exporter'] %}
-{% set snmp_exporter_host = ansible_internal_ipv4_addresses[groups[snmp_exporter_service.group][0]] %}
+{% set snmp_exporter_vars = hostvars[groups[snmp_exporter_service.group][0]] %}
 {% set snmp_exporter_switches = switch_configs | selectattr('snmp', 'defined') | list %}
 ---
 global:
@@ -12,7 +12,7 @@ global:
 alerting:
   alertmanagers:
   - static_configs:
-    - targets: ['{{ alertmanager_host }}:{{ alertmanager_service.port }}']
+    - targets: ['{{ alertmanager_vars['ansible_' + alertmanager_vars['network_interface']]['ipv4']['address'] }}:{{ alertmanager_service.port }}']
 
 # Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
 rule_files:
@@ -27,7 +27,7 @@ scrape_configs:
 {% endif %}
   static_configs:
 {% for host in groups[service.group] %}
-  - targets: ['{{ ansible_internal_ipv4_addresses[host] }}:{{ service.port }}']
+  - targets: ['{{ hostvars[host]['ansible_' + hostvars[host]['network_interface']]['ipv4']['address'] }}:{{ service.port }}']
     labels:
       hostname: '{{ host }}'
 {% endfor %}
@@ -52,7 +52,7 @@ scrape_configs:
     - source_labels: [__param_target]
       target_label: instance
     - target_label: __address__
-      replacement: '{{ snmp_exporter_host }}:{{ snmp_exporter_service.port }}'
+      replacement: '{{ snmp_exporter_vars['ansible_' + snmp_exporter_vars['network_interface']]['ipv4']['address'] }}:{{ snmp_exporter_service.port }}'
 {% endfor %}
 {% if groups['storage_monitoring'] is defined %}
 - job_name: 'node'
