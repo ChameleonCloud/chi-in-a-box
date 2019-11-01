@@ -17,7 +17,6 @@ pipeline {
           git(credentialsId: 'github-deloy-key-site-configs',
               url: 'git@github.com:ChameleonCloud/site-configs.git')
         }
-        sh 'make venv'
       }
     }
 
