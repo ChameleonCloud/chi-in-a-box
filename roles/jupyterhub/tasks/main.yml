@@ -3,7 +3,7 @@
   docker_image:
     source: pull
     name: "{{ item }}"
-    force: yes
+    force_source: yes
   loop:
     - "{{ jupyterhub_docker_image }}"
     - "{{ jupyterhub_db_docker_image }}"

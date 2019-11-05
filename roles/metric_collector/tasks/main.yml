@@ -3,7 +3,7 @@
   docker_image:
     source: pull
     name: "{{ metric_collector_docker_image }}"
-    force: yes
+    force_source: yes
   tags:
     - pull
 

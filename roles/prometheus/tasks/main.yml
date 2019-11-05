@@ -14,7 +14,7 @@
   docker_image:
     source: pull
     name: "{{ item.image }}"
-    force: yes
+    force_source: yes
   loop: "{{ prometheus_services_list }}"
   loop_control:
     label: "{{ item.image | default('skipped') }}"

@@ -4,7 +4,7 @@
     source: pull
     name: "{{ vendordata_service_docker_image }}"
     state: present
-    force: yes
+    force_source: yes
   notify:
     - restart vendordata service
   tags:

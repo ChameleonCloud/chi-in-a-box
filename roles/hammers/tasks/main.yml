@@ -6,7 +6,7 @@
   docker_image:
     source: pull
     name: "{{ hammers_docker_image }}"
-    force: yes
+    force_source: yes
 
 - name: Create config directory.
   file:

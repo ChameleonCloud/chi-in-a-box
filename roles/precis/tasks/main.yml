@@ -52,7 +52,7 @@
     source: pull
     name: "{{ item }}"
     state: present
-    force: yes
+    force_source: yes
   loop:
     - "{{ precis_event_listener_docker_image }}"
     - "{{ precis_endpoint_docker_image }}"
