@@ -19,17 +19,51 @@
   roles:
     - prometheus
   tasks:
-    - name: Set facts for gathering in frontend hosts.
-      set_fact:
-        prometheus_alertmanager_hostname: "{{ prometheus_alertmanager_hostname }}"
+    - set_fact:
         prometheus_alertmanager_port: "{{ prometheus_services['alertmanager'].port }}"
         prometheus_alertmanager_users: "{{ prometheus_alertmanager_users }}"
-      tags:
-        - configuration
       when: inventory_hostname in groups[prometheus_services['alertmanager'].group]
+    - set_fact:
+        prometheus_server_port: "{{ prometheus_services['server'].port }}"
+        prometheus_server_users: "{{ prometheus_server_users }}"
+      when: inventory_hostname in groups[prometheus_services['server'].group]
 
 - hosts: frontends
   tasks:
+    - name: Configure virtual host for Prometheus server.
+      block:
+        - set_fact:
+            prometheus_server: "{{ hostvars[groups['prometheus'][0]] }}"
+        - name: Configure virtual host.
+          include_role:
+            name: apache
+            tasks_from: host
+          vars:
+            apache_server_alias: prometheus_server
+            apache_server_name: "{{ prometheus_server_hostname }}"
+            apache_server_https_port: 9090
+            apache_server_http_port: null
+            apache_server_conf: |
+              <Location "/">
+                Order deny,allow
+                Allow from all
+
+                AuthType Basic
+                AuthName "Prometheus authentication"
+                AuthBasicProvider socache external
+                AuthExternal keystone-user
+                AuthExternalProvideCache On
+                AuthnCacheProvideFor keystone-user
+
+                Require user {{ prometheus_server.prometheus_server_users | join(' ') }}
+
+                # preserve Host header to avoid cross-origin problems
+                ProxyPreserveHost on
+                # proxy to Alertmanager
+                ProxyPass         http://{{ groups['prometheus'][0] }}:{{ prometheus_server.prometheus_server_port }}/
+                ProxyPassReverse  http://{{ groups['prometheus'][0] }}:{{ prometheus_server.prometheus_server_port }}/
+              </Location>
+          when: prometheus_server_hostname is defined
     - name: Configure virtual host for Prometheus Alertmanager.
       block:
         - set_fact:
@@ -39,7 +73,8 @@
             name: apache
             tasks_from: host
           vars:
-            apache_server_name: "{{ prometheus_alertmanager.prometheus_alertmanager_hostname }}"
+            apache_server_alias: prometheus_alertmanager
+            apache_server_name: "{{ prometheus_alertmanager_hostname }}"
             apache_server_conf: |
               <Location "/">
                 Order deny,allow
@@ -57,8 +92,7 @@
                 # preserve Host header to avoid cross-origin problems
                 ProxyPreserveHost on
                 # proxy to Alertmanager
-                ProxyPass         http://{{ groups.prometheus[0] }}:{{ prometheus_alertmanager.prometheus_alertmanager_port }}/
-                ProxyPassReverse  http://{{ groups.prometheus[0] }}:{{ prometheus_alertmanager.prometheus_alertmanager_port }}/
+                ProxyPass         http://{{ groups['prometheus-alertmanager'][0] }}:{{ prometheus_alertmanager.prometheus_alertmanager_port }}/
+                ProxyPassReverse  http://{{ groups['prometheus-alertmanager'][0] }}:{{ prometheus_alertmanager.prometheus_alertmanager_port }}/
               </Location>
-          tags:
-            - configuration
+          when: prometheus_alertmanager_hostname is defined

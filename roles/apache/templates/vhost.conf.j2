@@ -1,10 +1,12 @@
 # {{ ansible_managed }}
 # Virtual host for {{ apache_server_name }}
 
+{% if apache_server_http_port is not none %}
 <VirtualHost {{ external_vip_address }}:{{ apache_server_http_port }}>
   ServerName {{ apache_server_name }}
   Redirect / https://{{ apache_server_name }}/
 </VirtualHost>
+{% endif %}
 
 <VirtualHost {{ external_vip_address }}:{{ apache_server_https_port }}>
   ServerName {{ apache_server_name }}
