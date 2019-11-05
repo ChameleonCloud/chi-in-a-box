@@ -12,6 +12,7 @@
 
 - name: Pull Docker images.
   docker_image:
+    source: pull
     name: "{{ item.image }}"
     force: yes
   loop: "{{ prometheus_services_list }}"

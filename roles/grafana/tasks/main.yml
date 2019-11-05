@@ -1,6 +1,7 @@
 ---
 - name: Pull Grafana image.
   docker_image:
+    source: pull
     name: "{{ grafana_docker_image }}"
   tags:
     - pull

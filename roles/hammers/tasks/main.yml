@@ -4,6 +4,7 @@
 
 - name: Pull Docker image.
   docker_image:
+    source: pull
     name: "{{ hammers_docker_image }}"
     force: yes
 

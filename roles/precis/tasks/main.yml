@@ -49,6 +49,7 @@
 
 - name: Pull precis service container images.
   docker_image:
+    source: pull
     name: "{{ item }}"
     state: present
     force: yes

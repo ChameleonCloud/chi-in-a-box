@@ -1,6 +1,7 @@
 ---
 - name: Pull Docker Registry image.
   docker_image:
+    source: pull
     name: "{{ docker_registry_image }}"
   tags:
     - pull

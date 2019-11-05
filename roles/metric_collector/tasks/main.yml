@@ -1,6 +1,7 @@
 ---
 - name: Pull metric collector images.
   docker_image:
+    source: pull
     name: "{{ metric_collector_docker_image }}"
     force: yes
   tags:

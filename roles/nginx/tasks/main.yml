@@ -5,6 +5,7 @@
 
 - name: Pull Nginx image.
   docker_image:
+    source: pull
     name: "{{ nginx_docker_image }}"
   tags:
     - pull
