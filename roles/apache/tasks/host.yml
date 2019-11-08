@@ -19,12 +19,12 @@
     name: "{{ apache_config_path }}/conf.d"
     state: directory
 
-- name: "Create Apache configuration for {{ apache_server_name }}"
+- name: "Create Apache configuration for {{ apache_server_alias | default(apache_server_name) }}"
   template:
     src: vhost.conf.j2
     dest: "{{ apache_config_path }}/conf.d/{{ apache_server_priority }}-{{ apache_server_name_normalized }}.conf"
   vars:
-    apache_server_name_normalized: "{{ apache_server_name | replace('.', '_') }}"
+    apache_server_name_normalized: "{{ apache_server_alias | default(apache_server_name | replace('.', '_')) }}"
   tags:
     - configuration
     - apache
