@@ -26,6 +26,7 @@
     - set_fact:
         prometheus_server_port: "{{ prometheus_services['server'].port }}"
         prometheus_server_users: "{{ prometheus_server_users }}"
+        prometheus_monitoring_user: "{{ prometheus_monitoring_user }}"
       when: inventory_hostname in groups[prometheus_services['server'].group]
 
 - hosts: frontends
@@ -34,6 +35,12 @@
       block:
         - set_fact:
             prometheus_server: "{{ hostvars[groups['prometheus'][0]] }}"
+        - name: Create password for readonly user.
+          htpasswd:
+            path: "/etc/httpd/prometheus_server.htpasswd"
+            name: "{{ prometheus_server.prometheus_monitoring_user }}"
+            password: "{{ prometheus_monitoring_password }}"
+            mode: 0640
         - name: Configure virtual host.
           include_role:
             name: apache
@@ -50,18 +57,27 @@
 
                 AuthType Basic
                 AuthName "Prometheus authentication"
-                AuthBasicProvider socache external
+                AuthBasicProvider file socache external
+                AuthUserFile /etc/httpd/prometheus_server.htpasswd
                 AuthExternal keystone-user
                 AuthExternalProvideCache On
                 AuthnCacheProvideFor keystone-user
-
-                Require user {{ prometheus_server.prometheus_server_users | join(' ') }}
 
                 # preserve Host header to avoid cross-origin problems
                 ProxyPreserveHost on
                 # proxy to Alertmanager
                 ProxyPass         http://{{ groups['prometheus'][0] }}:{{ prometheus_server.prometheus_server_port }}/
                 ProxyPassReverse  http://{{ groups['prometheus'][0] }}:{{ prometheus_server.prometheus_server_port }}/
+
+                # Read access to monitoring user + admins
+                <Limit GET HEAD>
+                  Require user {{ prometheus_server.prometheus_monitoring_user }} {{ prometheus_server.prometheus_server_users | join(' ') }}
+                </Limit>
+
+                # TODO: Write access to operators by group membership
+                <Limit POST PUT DELETE PATCH>
+                  Require user {{ prometheus_server.prometheus_server_users | join(' ') }}
+                </Limit>
               </Location>
           when: prometheus_server_hostname is defined
     - name: Configure virtual host for Prometheus Alertmanager.

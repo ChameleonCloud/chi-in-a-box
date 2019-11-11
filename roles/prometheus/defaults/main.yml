@@ -4,6 +4,7 @@ prometheus_docker_network_subnet: 172.18.0.0/24
 # Users allowed to access the web UIs
 prometheus_users: []
 
+prometheus_monitoring_user: monitoring
 prometheus_server_users: "{{ prometheus_users }}"
 
 enable_prometheus_alertmanager: yes
