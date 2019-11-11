@@ -1,5 +1,5 @@
 ---
 - name: Generate JupyterHub API token
-  command: docker exec jupyterhub jupyterhub token prometheus >/etc/prometheus/secrets/jupyterhub
+  shell: docker exec jupyterhub jupyterhub token prometheus >/etc/prometheus/secrets/jupyterhub
   args: 
     creates: /etc/prometheus/secrets/jupyterhub
