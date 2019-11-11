@@ -6,13 +6,6 @@
     - restart prometheus
 
 - file:
-    name: "{{ service.config_dir }}/secrets"
-    state: directory
-    # Prometheus server container runs as user=nobody
-    owner: nobody
-    mode: 0640
-
-- file:
     name: "{{ service.config_dir }}/rules"
     state: directory
 

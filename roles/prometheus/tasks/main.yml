@@ -33,6 +33,15 @@
   when: inventory_hostname in groups[item.group] and
         item.config_dir is defined
 
+- name: Create secrets directory.
+  file:
+    name: "/etc/prometheus/secrets"
+    state: directory
+    # Prometheus server container runs as user=nobody
+    owner: nobody
+    mode: 0640
+  when: inventory_hostname in groups[prometheus_services['server']]
+
 - include_tasks: alertmanager.yml
   vars:
     service: "{{ prometheus_services['alertmanager'] }}"
@@ -62,6 +71,9 @@
   vars:
     service: "{{ prometheus_services['snmp-exporter'] }}"
   when: inventory_hostname in groups[service.group]
+
+# Prometheus server task should go last as it may be using
+# credentials generated in above steps.
 
 - include_tasks: server.yml
   vars:
