@@ -25,6 +25,9 @@ scrape_configs:
 {% if service.scrape_interval is defined %}
   scrape_interval: {{ service.scrape_interval }}
 {% endif %}
+{% if service.bearer_token_file is defined %}
+  bearer_token_file: {{ service.bearer_token_file }}
+{% endif %}
   static_configs:
 {% for host in groups[service.group] %}
   - targets: ['{{ hostvars[host]['ansible_' + hostvars[host]['network_interface']]['ipv4']['address'] }}:{{ service.port }}']

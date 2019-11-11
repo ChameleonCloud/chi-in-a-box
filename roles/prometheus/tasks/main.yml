@@ -38,6 +38,11 @@
     service: "{{ prometheus_services['alertmanager'] }}"
   when: inventory_hostname in groups[service.group]
 
+- include_tasks: jupyterhub_exporter.yml
+  vars:
+    service: "{{ prometheus_services['jupyterhub-exporter'] }}"
+  when: inventory_hostname in groups[service.group]
+
 - include_tasks: mysql_exporter.yml
   vars:
     service: "{{ prometheus_services['mysql-exporter'] }}"

@@ -36,6 +36,7 @@ prometheus_services:
       - "prometheus-data:/prometheus"
       - "/etc/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml"
       - "/etc/prometheus/rules:/etc/prometheus/rules"
+      - "/etc/prometheus/secrets:/etc/prometheus/secrets"
   alertmanager:
     service_name: prometheus_alertmanager
     image: prom/alertmanager:v0.15.2
@@ -53,6 +54,7 @@ prometheus_services:
     group: jupyterhub
     port: 8075
     scrape_target: yes
+    bearer_token_file: /etc/prometheus/secrets/jupyterhub
   mysql-exporter:
     service_name: prometheus_mysql_exporter
     image: prom/mysqld-exporter:v0.11.0
