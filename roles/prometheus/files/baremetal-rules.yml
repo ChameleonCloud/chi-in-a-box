@@ -14,7 +14,6 @@ groups:
     expr: sum(openstack_node_totals{provision_state="error",maintenance="False"}) by (hostname, name)
     labels:
       severity: critical
-      can_resolve: no
     annotations:
       summary: "Ironic node in error provision state"
       description: "Ironic node {{ $labels.name }} on {{ $labels.hostname }} is in an error provision state."
