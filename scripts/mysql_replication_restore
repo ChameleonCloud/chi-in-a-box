@@ -1,23 +1,45 @@
 #!/usr/bin/env bash
 set -e -u -o pipefail
 
-snapshot_file="${1:-}"
-binlog_file="${2:-}"
-binlog_pos="${3:-}"
+ask_confirm=1
+
+declare -a posargs=()
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    -y|--yes)
+      ask_confirm=0
+      ;;
+    *)
+      posargs+=("$1")
+      ;;
+  esac
+  shift
+done
+
+snapshot_file="${posargs[0]:-}"
+binlog_file="${posargs[1]:-}"
+binlog_pos="${posargs[2]:-}"
 
 if [[ ! -f "$snapshot_file" || -z "$binlog_file" || -z "$binlog_pos" ]]; then
   cat <<USAGE
-Usage: $(basename $0) <snapshot_file> <binlog_file> <binlog_position>
+Usage: $(basename $0) [-y] <snapshot_file> <binlog_file> <binlog_position>
 
 Restores slave replication by bringing the replicated database in sync
 with the tables on the master server, then restarting replication from
 the given binlog file and position captured at time of snapshot.
+
+Options:
+  -y, --yes: answer any confirmation prompts in affirmative
 
 Example: $(basename $0) mysql_snapshot.sql mariadb-bin.0000001 123456
 
 USAGE
   exit 1
 fi
+
+log() {
+  echo "$@" >&2
+}
 
 read_snapshot() {
   local snapshot="$1"
@@ -29,39 +51,51 @@ read_snapshot() {
   fi
 }
 
-echo "Stopping slave"
+log "Stopping slave ..."
 mysql <<SQL
 stop slave;
 SQL
 
 tmpfile="$(mktemp)"
 backup_file="$HOME/keystone-backup-$(date +'%Y%m%d%H%M').sql"
-echo "Backing up database to $backup_file"
+log "Backing up database to $backup_file ..."
 mysqldump keystone > "$backup_file"
-echo "Snapshotting non-replicated tables to $tmpfile"
+log "Snapshotting non-replicated tables to $tmpfile ..."
 mysqldump keystone trust trust_role revocation_event > "$tmpfile"
 
-read -p "About to drop the slave database. You sure you're ready? [y/N]: " -n 1 -r
-echo
-if [[ $REPLY =~ ^[Yy]$ ]]; then
-  echo "Dropping and recreating slave database"
+prompt_timeout=15;
+if [[ $ask_confirm == 0 ]]; then
+  prompt_timeout=0;
+fi
+
+read -p "About to drop the slave database. You sure you're ready? [y/N]: " -n 1 -r -t $prompt_timeout >&2
+log
+
+if [[ $ask_confirm == 0 || $REPLY =~ ^[Yy]$ ]]; then
+  log "Dropping and recreating slave database ..."
   mysql <<SQL
 --- Fire the torpedos
 drop database keystone;
 create database keystone;
 SQL
-  echo "Restoring tables from master snapshot"
+  
+  log "Restoring tables from master snapshot ..."
   read_snapshot "$snapshot_file" | mysql keystone
-  echo "Restoring non-replicated tables"
+  
+  log "Restoring non-replicated tables ..."
   read_snapshot "$tmpfile" | mysql keystone
-  echo "Reconfiguring replication"
+  
+  log "Reconfiguring replication ..."
   mysql <<SQL
 change master to master_log_file="$binlog_file", master_log_pos=$binlog_pos;
 start slave;
-show slave status;
 SQL
+  sleep 3
 
-  echo "Cleaning up temp files"
+  log "Current slave status: "
+  mysql -e 'show slave status\G' | grep -iE 'slave_io_state|last_error' | sed -E 's/^\s+//'
+
+  log "Cleaning up temp files ..."
   rm -f "$tmpfile"
-  echo "Done."
+  log "Done."
 fi
