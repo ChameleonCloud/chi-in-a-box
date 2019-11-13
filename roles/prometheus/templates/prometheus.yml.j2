@@ -3,7 +3,6 @@
 {% set snmp_exporter_service = prometheus_services['snmp-exporter'] %}
 {% set snmp_exporter_vars = hostvars[groups[snmp_exporter_service.group][0]] %}
 {% set snmp_exporter_switches = switch_configs | selectattr('snmp', 'defined') | list %}
-{% set ceph_mgr_nodes = groups['storage-monitoring'] | map('extract', hostvars, ['ansible_default_ipv4', 'address']) | list %}
 ---
 global:
   scrape_interval:     30s
@@ -57,22 +56,3 @@ scrape_configs:
     - target_label: __address__
       replacement: '{{ snmp_exporter_vars['ansible_' + snmp_exporter_vars['network_interface']]['ipv4']['address'] }}:{{ snmp_exporter_service.port }}'
 {% endfor %}
-{% if ceph_mgr_nodes | length > 0 %}
-- job_name: 'node'
-  static_configs:
-    - targets:
-{% for host in ceph_mgr_nodes %}
-        - "{{ host }}:9283"
-{% endfor %}
-      labels:
-        cluster: "{{ chameleon_site_name }}"
-- job_name: 'ceph'
-  honor_labels: true
-  static_configs:
-    - targets:
-{% for host in ceph_mgr_nodes %}
-        - "{{ host }}:9100"
-{% endfor %}
-      labels:
-        instance: "ceph"
-{% endif %}

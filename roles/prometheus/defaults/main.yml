@@ -96,6 +96,14 @@ prometheus_services:
     scrape_target: no
     volumes:
      - "/etc/prometheus/snmp-exporter:/etc/snmp_exporter"
+  ceph-exporter:
+    group: prometheus-ceph-exporter
+    port: 9283
+    scrape_target: yes
+  ceph-node-exporter:
+    group: prometheus-ceph-exporter
+    port: 9100
+    scrape_target: yes
   push-gateway:
     service_name: prometheus_pushgateway
     image: prom/pushgateway:v0.8.0
