@@ -1,3 +1,10 @@
+---
+- name: Include cron notification script
+  include_role:
+    name: common
+    tasks_from: cron
+    defaults_from: cron
+    
 - name: Generate SWIFT auth token for Gnocchi backup
   local_action:
     module: os_auth
@@ -13,12 +20,6 @@
     mode: 0700
     dest: /usr/local/sbin/gnocchi-backup
 
-- name: Configure gnocchi prometheus notification script file
-  template:
-    src: notification.j2
-    mode: 0700
-    dest: "{{ gnocchi_backup_notification }}"
-
 - name: Add gnocchi backup cron jobs
   cron:
     name: "{{ gnocchi_backup_cron_name }}"
@@ -27,5 +28,4 @@
     day: "{{ gnocchi_backup_cron_day }}"
     month: "{{ gnocchi_backup_cron_month }}"
     weekday: "{{ gnocchi_backup_cron_weekday }}"
-    job: '{{ gnocchi_backup_cron_script }} && {{ gnocchi_backup_notification }} "gnocchi_backup"'
-
+    job: "{{ gnocchi_backup_cron_script }} && {{ cron_notification }} gnocchi_backup"

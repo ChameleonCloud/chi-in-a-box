@@ -1,0 +1,14 @@
+---
+- name: Add cron success notification script
+  template:
+    src: notification.sh.j2
+    dest: "{{ cron_notification }}"
+    mode: 0700
+  vars:
+    prometheus_push_gateway: "http://{{ groups['prometheus-push-gateway'][0] }}:9091"
+
+# Set a fact so that when these tasks are included, the including
+# role can reference this value.
+- name: Set fact for notification script path
+  set_fact:
+    cron_notification: "{{ cron_notification }}"

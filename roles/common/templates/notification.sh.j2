@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+curl --data-binary @- {{ prometheus_push_gateway }}/metrics/job/cron <<DATA
+# TYPE cron_last_success gauge
+# HELP cron_last_success The timestamp of the last time this cron job completed successfully.
+cron_last_success{name="$1"} $(date +%s)
+DATA
