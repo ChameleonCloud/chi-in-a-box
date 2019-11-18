@@ -1,4 +1,10 @@
 ---
+- name: Include cron notification script
+  include_role:
+    name: common
+    tasks_from: cron
+    defaults_from: cron
+
 - name: Configure mariadb backup script file
   template:
     src: mariadb.j2
@@ -13,12 +19,6 @@
     dest: "{{ mariadb_backup_cron_script }}"
   when: inventory_hostname_short == "dev"
 
-- name: Configure mariadb prometheus notification script file
-  template:
-    src: notification.j2
-    mode: 0700
-    dest: "{{ mariadb_backup_notification }}"
-
 - name: Add mariadb backup cron jobs.
   cron:
     name: "{{ mariadb_backup_cron_name }}"
@@ -27,4 +27,4 @@
     day: "{{ mariadb_backup_cron_day }}"
     month: "{{ mariadb_backup_cron_month }}"
     weekday: "{{ mariadb_backup_cron_weekday }}"
-    job: '{{ mariadb_backup_cron_script }} && {{ mariadb_backup_notification }} "mariadb-backup"'
+    job: "{{ mariadb_backup_cron_script }} && {{ cron_notification }} mariadb-backup"
