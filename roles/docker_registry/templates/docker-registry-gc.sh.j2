@@ -11,16 +11,24 @@ docker run --network {{ docker_registry_docker_network }} --rm anoxis/registry-c
 pushd {{ docker_registry_config_path }}
 
 echo "Restarting registry in maintenance mode ..."
+
+# Swap configurations; set trap to revert this action
+# on exit or error
 ln -sf config.maintenance.yml config.yml
+revert() {
+  # Restore original config
+  ln -sf config.prod.yml config.yml
+  systemctl restart {{ docker_registry_service_name }}
+}
+trap revert EXIT
+
 systemctl restart {{ docker_registry_service_name }}
 
 sleep 2
 
 echo "Performing full mark-sweep GC ..."
+
 docker exec {{ docker_registry_service_name }} \
   bin/registry garbage-collect /etc/docker/registry/config.yml
 
-# Restoring original config
-ln -sf config.prod.yml config.yml
-echo "Restarting registry in production mode ..."
-systemctl restart {{ docker_registry_service_name }}
+# Exit trap will cause config to revert automatically
