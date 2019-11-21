@@ -11,6 +11,8 @@ kolla_install_type: source
 
 virtualenv: /etc/ansible/venv
 
+chameleon_portal_url: https://www.chameleoncloud.org
+
 enable_mariadb: yes
 enable_chrony: yes
 enable_fluentd: yes
