@@ -31,7 +31,9 @@ pipeline {
         script {
           slackThread = startSlackThread('notifications')
         }
-        sh "./cc-ansible reconfigure --tags=${params.KOLLA_SERVICE_NAME}"
+        ansiColor('xterm') {
+          sh "./cc-ansible reconfigure --tags=${params.KOLLA_SERVICE_NAME}"
+        }
       }
     }
   }
