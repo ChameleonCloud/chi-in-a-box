@@ -31,7 +31,9 @@ pipeline {
         script {
           slackThread = startSlackThread('notifications')
         }
-        sh "./cc-ansible --playbook playbooks/${params.PLAYBOOK_NAME}.yml"
+        ansiColor('xterm') {
+          sh "./cc-ansible --playbook playbooks/${params.PLAYBOOK_NAME}.yml"
+        }
       }
     }
   }

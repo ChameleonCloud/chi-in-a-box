@@ -1,6 +1,6 @@
 pipeline {
   agent any
-  
+
   parameters {
     choice(name: 'JENKINS_AGENT_LABEL', choices: ['ansible-uc-dev', 'ansible-uc-prod'],
            description: 'Environment to deploy to')
@@ -30,7 +30,7 @@ pipeline {
       }
       steps {
         // TODO: pass in KOLLA_PULL here
-        build job: 'kolla-ansible-reconfigure', wait: true, parameters: [
+        build job: 'kolla-ansible-deploy', wait: true, parameters: [
           string(name: 'KOLLA_SERVICE_NAME', value: params.KOLLA_SERVICE_NAME),
           string(name: 'JENKINS_AGENT_LABEL', value: params.JENKINS_AGENT_LABEL)
         ]
