@@ -1,0 +1,13 @@
+[mysqld]
+server-id = {{ db_replication_id }}
+binlog-do-db = keystone
+binlog-format = ROW
+replicate-ignore-table = keystone.revocation_event
+replicate-ignore-table = keystone.trust
+replicate-ignore-table = keystone.trust_role
+replicate-ignore-table = keystone.endpoint
+replicate-ignore-table = keystone.endpoint_group
+replicate-ignore-table = keystone.project_endpoint_group
+replicate-ignore-table = keystone.service
+replicate-ignore-table = keystone.region
+replicate-ignore-db = mysql
