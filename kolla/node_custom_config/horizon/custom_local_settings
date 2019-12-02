@@ -74,12 +74,6 @@ SSO_CALLBACK_HOST = '{{ kolla_external_fqdn }}'
 # A dictionary of settings which can be used to provide the default values for
 # properties found in the Launch Instance modal.
 LAUNCH_INSTANCE_DEFAULTS = {
-    'config_drive': False,
-    'enable_scheduler_hints': True,
-    'disable_image': False,
-    'disable_instance_snapshot': True,
-    'disable_volume': True,
-    'disable_volume_snapshot': True,
     'create_volume': False,
 }
 
