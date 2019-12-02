@@ -11,7 +11,7 @@
 - name: Set up jupyter usage cron job
   cron:
     name: "chameleon-usage-jupyter"
-    minute: "5"
+    minute: "*/5"
     hour: "*"
     day: "*"
     month: "*"
