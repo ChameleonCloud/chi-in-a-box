@@ -1,4 +1,25 @@
 ---
 - hosts: chameleon_usage
   roles:
-    - chameleon_usage
+    - role: chameleon_usage
+      vars:
+          action: 'mysql_init'
+    - role: chameleon_usage
+      vars:
+          action: 'config'
+    - role: chameleon_usage
+      vars:
+          action: 'node'
+    - role: chameleon_usage
+      when: enable_usage_appliance_report
+      vars:
+          action: 'heat_template'
+
+- hosts: chameleon_usage_jupyter
+  roles:
+    - role: chameleon_usage
+      vars:
+          action: 'config'
+    - role: chameleon_usage
+      vars:
+          action: 'jupyter'

@@ -1,0 +1,19 @@
+---
+- name: Configure chameleon usage data extract docker bash wrapper
+  template:
+    src: chameleon-usage-extract-data.j2
+    mode: a+x
+    dest: /usr/local/sbin/chameleon-usage-extract-data
+    
+- name: Fill in up-to-date data to chameleon_usage
+  command: "/usr/local/sbin/chameleon-usage-extract-data"
+
+- name: Set up data extract cron job
+  cron:
+    name: "chameleon_usage"
+    minute: "0"
+    hour: "7"
+    day: "*"
+    month: "*"
+    weekday: "*"
+    job: "/usr/local/sbin/chameleon-usage-extract-data | /usr/bin/logger -t \"chameleon_usage\""

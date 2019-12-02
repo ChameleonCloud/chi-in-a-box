@@ -1,0 +1,19 @@
+---
+- name: Configure chameleon usage heat template download docker bash wapper
+  template:
+    src:  chameleon-usage-heat-template-downloads.j2
+    mode: a+x
+    dest: /usr/local/sbin/chameleon-usage-heat-template-downloads
+    
+- name: Fill in up-to-date data to chameleon_usage
+  command: "/usr/local/sbin/chameleon-usage-heat-template-downloads"
+  
+- name: Set up heat template downloads cron job
+  cron:
+    name: "heat_template_downloads"
+    minute: "0"
+    hour: "5"
+    day: "*"
+    month: "*"
+    weekday: "*"
+    job: "/usr/local/sbin/chameleon-usage-heat-template-downloads | /usr/bin/logger -t \"heat_template_downloads\""

@@ -1,0 +1,19 @@
+---
+- name: Configure chameleon jupyter usage docker bash wapper
+  template:
+    src:  chameleon-usage-jupyter.j2
+    mode: a+x
+    dest: /usr/local/sbin/chameleon-usage-jupyter
+    
+- name: Fill in current data to chameleon_usage
+  command: "/usr/local/sbin/chameleon-usage-jupyter"
+  
+- name: Set up jupyter usage cron job
+  cron:
+    name: "chameleon-usage-jupyter"
+    minute: "5"
+    hour: "*"
+    day: "*"
+    month: "*"
+    weekday: "*"
+    job: "/usr/local/sbin/chameleon-usage-jupyter | /usr/bin/logger -t \"chameleon-usage-jupyter\""
