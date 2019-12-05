@@ -1,0 +1,2 @@
+[client.cinder-backup]
+	key = {% cephx_key_cinder_backup %}

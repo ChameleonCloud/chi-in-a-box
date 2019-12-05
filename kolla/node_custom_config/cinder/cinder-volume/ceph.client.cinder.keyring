@@ -1,0 +1,2 @@
+[client.cinder]
+	key = {% cephx_key_cinder_volume %}
