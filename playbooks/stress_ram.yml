@@ -31,7 +31,6 @@
       --timeout 1440m
       --vm-method all
       --vm 90%
-      --vm-bytes 1G
-
-
-  
+      --vm-bytes "{{ (ansible_memfree_mb*1024) |int|abs }}k"
+      -m 1
+      -vm-keep
