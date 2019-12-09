@@ -17,3 +17,22 @@
     month: "*"
     weekday: "*"
     job: "/usr/local/sbin/chameleon-usage-jupyter | /usr/bin/logger -t \"chameleon-usage-jupyter\""
+    
+- name: Configure chameleon jupyter usage report cache docker bash wrapper
+  template:
+    src: chameleon-usage-jupyter-usage-report-cache.j2
+    mode: a+x
+    dest: /usr/local/sbin/chameleon-usage-jupyter-usage-report-cache
+    
+- name: Create jupyter usage report cache table and fill in data
+  command: "/usr/local/sbin/chameleon-usage-jupyter-usage-report-cache"
+  
+- name: Set up jupyter usage report cache cron job
+  cron:
+    name: "chameleon-usage-jupyter-usage-report-cache"
+    minute: "*"
+    hour: "6"
+    day: "*"
+    month: "*"
+    weekday: "*"
+    job: "/usr/local/sbin/chameleon-usage-jupyter-usage-report-cache | /usr/bin/logger -t \"chameleon-usage-jupyter-usage-report-cache\""
