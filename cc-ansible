@@ -147,26 +147,6 @@ USAGE
   exit 1
 }
 
-if [[ "${command:-}" == "init" ]]; then
-  init
-  exit $?
-fi
-
-if [[ -z "${CC_ANSIBLE_SITE:-}" ]]; then
-  cat <<ERRMSG
-Error: no site specified! Please specify which site to execute under with either
-the --site <dir> flag or by setting the CC_ANSIBLE_SITE environment variable.
-
-Example:
-  cc-ansible --site /etc/sites/production
-
-  CC_ANSIBLE_SITE=/etc/sites/production $(basename $0)
-ERRMSG
-  exit 1
-fi
-
-CC_ANSIBLE_VAULT_PASSWORD="${CC_ANSIBLE_VAULT_PASSWORD:-$CC_ANSIBLE_SITE/vault_password}"
-
 # Automatically update dependencies
 if [[ "$CHECK_UPDATES" == "yes" || "$FORCE_UPDATES" == "yes" ]]; then
   # Update base pip packages
@@ -214,6 +194,28 @@ if [[ "$CHECK_UPDATES" == "yes" || "$FORCE_UPDATES" == "yes" ]]; then
   fi
   ln -sf "$MITOGEN_INSTALL_DIR" "$DIR/venv/lib/mitogen-latest"
 fi
+
+# Check for 'init' command first, as it should work even if the 'site' vars
+# are defined.
+if [[ "${command:-}" == "init" ]]; then
+  init
+  exit $?
+fi
+
+if [[ -z "${CC_ANSIBLE_SITE:-}" ]]; then
+  cat <<ERRMSG
+Error: no site specified! Please specify which site to execute under with either
+the --site <dir> flag or by setting the CC_ANSIBLE_SITE environment variable.
+
+Example:
+  cc-ansible --site /etc/sites/production
+
+  CC_ANSIBLE_SITE=/etc/sites/production $(basename $0)
+ERRMSG
+  exit 1
+fi
+
+CC_ANSIBLE_VAULT_PASSWORD="${CC_ANSIBLE_VAULT_PASSWORD:-$CC_ANSIBLE_SITE/vault_password}"
 
 # Handle subcommands
 if [[ -n $command ]]; then
