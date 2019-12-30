@@ -17,6 +17,7 @@ enable_mariadb: yes
 enable_chrony: yes
 enable_fluentd: yes
 enable_memcached: yes
+memcached_max_memory: 2048
 enable_rabbitmq: yes
 
 # Blazar
