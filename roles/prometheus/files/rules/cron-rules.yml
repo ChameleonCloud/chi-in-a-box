@@ -1,21 +1,21 @@
 groups:
-- name: cron.rules
+- name: cron
   rules:
+  - record: cron_last_success_threshold
+    expr: 3600 * 48
+    labels:
+        name: gnocchi_backup
   - alert: CronJobNoRecentSuccess
     expr: |
-            time() - cron_last_success
-          > on (name) group_left()
-            (
-                cron_last_success_threshold
-              or on (name)
-                count by (name)(cron_last_success) * 0 + (3600 * 24)
-            )
+      time() - cron_last_success
+      > on (name) group_left() (
+        cron_last_success_threshold
+        or on (name) (
+          count by (name)(cron_last_success) * 0 + (3600 * 24)
+        )
+      )
     labels:
       severity: critical
     annotations:
       summary: "{{ $labels.exported_job }} cron job has not succeeded in more than 24 hours."
       description: "{{ $labels.exported_job }} last succeeded {{ humanizeDuration $value }} ago and is likely failing."
-  - record: cron_last_success_threshold
-    expr: 3600 * 48
-    labels:
-        name: gnocchi_backup
