@@ -1,4 +1,10 @@
 ---
+- name: Include cron notification script
+  include_role:
+    name: common
+    tasks_from: cron
+    defaults_from: cron
+
 - set_fact:
     hammers_list: "{{ hammers | dict2items | map(attribute='value') | list }}"
 
@@ -60,5 +66,5 @@
     day: "{{ item.cron_times.day | default('*') }}"
     month: "{{ item.cron_times.month | default('*') }}"
     weekday: "{{ item.cron_times.weekday | default('*') }}"
-    job: "/usr/local/sbin/cc-hammer {{ item.cmd }} | /usr/bin/logger -t {{ item.hammer_name }}"
+    job: "/usr/local/sbin/cc-hammer {{ item.cmd }} | /usr/bin/logger -t {{ item.hammer_name }} && {{ cron_notification }} {{ item.hammer_name }}"
   loop: "{{ hammers_list }}"
