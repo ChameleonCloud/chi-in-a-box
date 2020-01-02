@@ -5,16 +5,8 @@
   notify:
     - restart prometheus
 
-- file:
-    name: "{{ service.config_dir }}/rules"
-    state: directory
-
 - copy:
-    src: "{{ item }}"
-    dest: "{{ service.config_dir }}/rules/{{ item }}"
-  loop:
-    - baremetal-rules.yml
-    - control-rules.yml
-    - mysql-rules.yml
+    src: "rules"
+    dest: "{{ service.config_dir }}"
   notify:
     - restart prometheus
