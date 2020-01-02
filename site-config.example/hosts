@@ -668,7 +668,11 @@ blazar
 
 # Prometheus
 [prometheus-node-exporter:children]
-baremetal
+control
+network
+compute
+storage
+monitoring
 
 [prometheus-mysqld-exporter:children]
 mariadb
@@ -680,25 +684,33 @@ haproxy
 memcached
 
 [prometheus-openstack-exporter:children]
-control
+monitoring
 
 [prometheus-push-gateway:children]
-control
+monitoring
 
 [prometheus-snmp-exporter:children]
-control
+monitoring
 
 [prometheus-ceph-exporter:children]
 ceph-mon
 
 [prometheus-cadvisor:children]
-baremetal
+control
+network
+compute
+storage
+monitoring
 
 [prometheus-alertmanager:children]
 monitoring
 
 [prometheus-jupyterhub-exporter:children]
 jupyterhub
+
+# JupyterHub
+[jupyterhub:children]
+control
 
 # Experiment precis service(s)
 [precis:children]

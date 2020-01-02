@@ -51,7 +51,7 @@ prometheus_services:
       - "alertmanager-data:/alertmanager"
       - "/etc/alertmanager:/etc/alertmanager"
   jupyterhub-exporter:
-    group: jupyterhub
+    group: prometheus-jupyterhub-exporter
     port: 8075
     scrape_target: yes
     bearer_token_file: /etc/prometheus/secrets/jupyterhub
@@ -96,6 +96,7 @@ prometheus_services:
     scrape_target: no
     volumes:
      - "/etc/prometheus/snmp-exporter:/etc/snmp_exporter"
+  # The Ceph exporters use the built-in Prometheus metrics agent Ceph provides
   ceph-exporter:
     group: prometheus-ceph-exporter
     port: 9283
