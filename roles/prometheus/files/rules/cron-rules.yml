@@ -11,7 +11,7 @@ groups:
       > on (name) group_left() (
         cron_last_success_threshold
         or on (name) (
-          count by (name)(cron_last_success) * 0 + (3600 * 24)
+          count by (name)(cron_last_success) * 0 + (3600 * 25)
         )
       )
     labels:
