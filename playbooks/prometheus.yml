@@ -79,7 +79,9 @@
                   Require user {{ prometheus_server.prometheus_server_users | join(' ') }}
                 </Limit>
               </Location>
-          when: prometheus_server_hostname is defined
+          when: 
+            - prometheus_server_hostname is defined
+            - external_vip_address is defined
     - name: Configure virtual host for Prometheus Alertmanager.
       block:
         - set_fact:
@@ -111,4 +113,6 @@
                 ProxyPass         http://{{ groups['prometheus-alertmanager'][0] }}:{{ prometheus_alertmanager.prometheus_alertmanager_port }}/
                 ProxyPassReverse  http://{{ groups['prometheus-alertmanager'][0] }}:{{ prometheus_alertmanager.prometheus_alertmanager_port }}/
               </Location>
-          when: prometheus_alertmanager_hostname is defined
+          when: 
+            - prometheus_alertmanager_hostname is defined
+            - external_vip_address is defined
