@@ -1,0 +1,14 @@
+---
+- name: Add ElasticSeach clean up script
+  template:
+    src: clean_es_curator.sh.j2
+    dest: /usr/local/sbin/clean_es_curator
+    mode: 0700
+  vars:
+    es_curator_retention_days: 5
+- name: Add ElasticSearch clean up job
+  cron:
+    name: "clean-es-curator"
+    minute: 55
+    hour: 5
+    job: "/usr/local/sbin/clean_es_curator"
