@@ -1,0 +1,20 @@
+---
+usage_report_cron_name: usage_report
+usage_report_cron_minute: '0'
+usage_report_cron_hour: '3'
+usage_report_cron_day: '*'
+usage_report_cron_month: '*'
+usage_report_cron_weekday: '*'
+usage_report_cron_script: /usr/local/sbin/usage.py
+usage_report_credentials: /usr/local/sbin/usage-credentials
+cron_notification: /usr/local/sbin/notification
+
+usage_report_tas_url: 'https://tas.tacc.utexas.edu/api'
+usage_report_tas_usr: 'tasclient'
+usage_report_mysql_tacc: '10.20.111.249'
+usage_report_mysql_uc: '192.5.87.4'
+usage_report_mysql_kvm: '10.20.111.245'
+usage_report_mysql_user: 'usage'
+usage_report_portal_host: 'udcc-db01.tacc.utexas.edu'
+usage_report_portal_user: 'chameleon_ro'
+

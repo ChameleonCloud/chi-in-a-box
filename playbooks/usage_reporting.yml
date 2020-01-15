@@ -1,0 +1,4 @@
+---
+- hosts: database
+  roles:
+    - usage_reporting
