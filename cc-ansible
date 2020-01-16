@@ -58,7 +58,7 @@ done
 #
 
 init() {
-  local site_config="${CC_ANSIBLE_SITE:-$DIR/site-config}"
+  local site_config="$CC_ANSIBLE_SITE"
   
   if [[ -d "$site_config" ]]; then
     echo "Site config already exists at $site_config! Aborting."
@@ -156,6 +156,29 @@ get_defined_var() {
     | jq -r ".$varname"
 }
 
+# On init, there is no requirement that the site config directory be defined,
+# because one of init's tasks is creating this directory. Set a default.
+if [[ "${command:-}" == "init" ]]; then
+  CC_ANSIBLE_SITE="${CC_ANSIBLE_SITE:-$DIR/site-config}"
+elif [[ -z "${CC_ANSIBLE_SITE:-}" ]]; then
+  cat <<ERRMSG
+Error: no site specified! Please specify which site to execute under with either
+the --site <dir> flag or by setting the CC_ANSIBLE_SITE environment variable.
+
+Example:
+  cc-ansible --site /etc/sites/production
+
+  CC_ANSIBLE_SITE=/etc/sites/production $(basename $0)
+ERRMSG
+  exit 1
+fi
+
+CC_ANSIBLE_VAULT_PASSWORD="${CC_ANSIBLE_VAULT_PASSWORD:-$CC_ANSIBLE_SITE/vault_password}"
+CC_ANSIBLE_ENV="$CC_ANSIBLE_SITE/.env"
+if [[ -f "$CC_ANSIBLE_ENV" ]]; then
+  set -a; source "$CC_ANSIBLE_ENV"; set +a
+fi
+
 # Automatically update dependencies
 if [[ "$CHECK_UPDATES" == "yes" || "$FORCE_UPDATES" == "yes" ]]; then
   # Update base pip packages
@@ -177,19 +200,16 @@ if [[ "$CHECK_UPDATES" == "yes" || "$FORCE_UPDATES" == "yes" ]]; then
     sha256sum "$galaxy_role_requirements" > "$galaxy_role_requirements_chksum"
   fi
 
-  # Update vendored Kolla-Ansible
-  kolla_ansible_submodule_status="$(git submodule status kolla/kolla-ansible)"
-  case "${kolla_ansible_submodule_status:0:1}" in
-    -|+)
-      git submodule update --init kolla/kolla-ansible
-      (cd kolla/kolla-ansible; python setup.py install; pip install -r requirements.txt)
-      ;;
-    *)
-      ;;
-  esac
-  # Handle case of venv being recreated though submodule is up to date.
-  if ! pip freeze | grep -q kolla-ansible; then
-    (cd kolla/kolla-ansible; python setup.py install; pip install -r requirements.txt)
+  kolla_ansible_remote=https://github.com/chameleoncloud/kolla-ansible.git
+  kolla_ansible_checkout=${KOLLA_ANSIBLE_BRANCH:-chameleoncloud/train}
+  kolla_ansible_gitref="$DIR/kolla-ansible.gitref"
+  kolla_ansible_egglink="$DIR/venv/src/kolla-ansible"
+  if [[ "$FORCE_UPDATES" == "yes" || ! -f "$kolla_ansible_gitref" || ! -d "$kolla_ansible_egglink" ]] || \
+        ! diff -q >/dev/null \
+          $kolla_ansible_gitref \
+          <(cd $kolla_ansible_egglink; git fetch; git show-ref -s -d origin/$kolla_ansible_checkout); then
+    pip install -e git+$kolla_ansible_remote@$kolla_ansible_checkout#egg=kolla-ansible
+    (cd $kolla_ansible_egglink; git rev-parse HEAD > $kolla_ansible_gitref)
   fi
 
   # Update Mitogen
@@ -203,28 +223,6 @@ if [[ "$CHECK_UPDATES" == "yes" || "$FORCE_UPDATES" == "yes" ]]; then
   fi
   ln -sf "$MITOGEN_INSTALL_DIR" "$DIR/venv/lib/mitogen-latest"
 fi
-
-# Check for 'init' command first, as it should work even if the 'site' vars
-# are defined.
-if [[ "${command:-}" == "init" ]]; then
-  init
-  exit $?
-fi
-
-if [[ -z "${CC_ANSIBLE_SITE:-}" ]]; then
-  cat <<ERRMSG
-Error: no site specified! Please specify which site to execute under with either
-the --site <dir> flag or by setting the CC_ANSIBLE_SITE environment variable.
-
-Example:
-  cc-ansible --site /etc/sites/production
-
-  CC_ANSIBLE_SITE=/etc/sites/production $(basename $0)
-ERRMSG
-  exit 1
-fi
-
-CC_ANSIBLE_VAULT_PASSWORD="${CC_ANSIBLE_VAULT_PASSWORD:-$CC_ANSIBLE_SITE/vault_password}"
 
 # Handle subcommands
 if [[ -n $command ]]; then
