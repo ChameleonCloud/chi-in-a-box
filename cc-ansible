@@ -147,6 +147,15 @@ USAGE
   exit 1
 }
 
+get_defined_var() {
+  local varname="$1"
+  ansible localhost --one-line -m debug -a "var=$varname" \
+    --extra-vars="@$DIR/kolla/defaults.yml" \
+    --extra-vars="@$CC_ANSIBLE_SITE/globals.yml" 2>/dev/null \
+    | sed 's/^.*=> //' \
+    | jq -r ".$varname"
+}
+
 # Automatically update dependencies
 if [[ "$CHECK_UPDATES" == "yes" || "$FORCE_UPDATES" == "yes" ]]; then
   # Update base pip packages
@@ -281,11 +290,7 @@ kolla_args+=(--extra cc_ansible_site_dir="$CC_ANSIBLE_SITE")
 if [[ "${POSARGS[@]}" != *"bootstrap-servers"* ]]; then
   # Run a quick ad-hoc command to figure out the derived value of the
   # 'virtualenv' variable, as it can differ by site.
-  virtualenv=$(ansible localhost --one-line -m debug -a 'var=virtualenv' \
-    --extra-vars="@$DIR/kolla/defaults.yml" \
-    --extra-vars="@$CC_ANSIBLE_SITE/globals.yml" 2>/dev/null \
-    | sed 's/^.*=> //' \
-    | jq -r .virtualenv)
+  virtualenv=$(get_defined_var virtualenv)
   kolla_args+=(--extra ansible_python_interpreter="$virtualenv/bin/python")
 fi
 kolla_args+=("${POSARGS[@]}")
