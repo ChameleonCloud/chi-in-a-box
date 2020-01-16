@@ -20,7 +20,7 @@ groups:
       runbook: https://github.com/ChameleonCloud/chi-in-a-box/wiki/%5BRunbook%5D-IronicNodeInErrorState
 
   - alert: IronicNodeConsoleDisabled
-    expr: sum(openstack_node_totals{console_enabled="False",maintenance="False"}) by (hostname, name)
+    expr: sum(openstack_node_totals{console_enabled="False",provision_state="active",maintenance="False"}) by (hostname, name)
     labels:
       severity: warning
     annotations:
