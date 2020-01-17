@@ -1,6 +1,12 @@
 ---
 - set_fact:
     prometheus_services_list: "{{ prometheus_services | dict2items | map(attribute='value') | list }}"
+    prometheus_docker_groups: >-
+      {{ prometheus_services 
+        | dict2items 
+        | map(attribute='value') 
+        | selectattr('image', 'defined') 
+        | map(attribute='group') | list }}
 
 - name: Create Docker network.
   docker_network:
@@ -9,6 +15,7 @@
     ipam_config:
       - subnet: "{{ prometheus_docker_network_subnet }}"
     state: present
+  when: group_names | intersect(prometheus_docker_groups) | length > 0
 
 - name: Pull Docker images.
   docker_image:

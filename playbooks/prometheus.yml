@@ -1,7 +1,6 @@
 ---
 - hosts:
     - prometheus
-    - prometheus-ceph-exporter
     - prometheus-mysqld-exporter
     - prometheus-openstack-exporter
     - prometheus-push-gateway
