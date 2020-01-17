@@ -17,7 +17,7 @@
     - role: chameleon_usage
       when: enable_user_project_report
       vars:
-          action: 'user_project_report'
+          action: 'user_project'
 
 - hosts: chameleon_usage_jupyter
   roles:
