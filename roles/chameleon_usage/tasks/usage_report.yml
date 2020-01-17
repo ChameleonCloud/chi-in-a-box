@@ -3,20 +3,20 @@
   template:
     src: usage-credentials.j2
     mode: 0700
-    dest: /usr/local/sbin/usage-credentials
+    dest: /usr/local/sbin/user_project_report_credentials
 
 - name: Place usage script
   template:
-    src: /root/scripts/chameleon-usage-reporting/project_usage_collect/usage.py
+    src: /root/scripts/chameleon-usage-reporting/project_usage_collect/user_project_report.py
     mode: 0700
-    dest: /usr/local/sbin/usage.py
+    dest: /usr/local/sbin/user_project_report.py
 
 - name: Add glance backup cron jobs.
   cron:
-    name: "{{ usage_report_cron_name }}"
-    minute: "{{ usage_report_cron_minute }}"
-    hour: "{{ usage_report_cron_hour }}"
-    day: "{{ usage_report_cron_day }}"
-    month: "{{ usage_report_cron_month }}"
-    weekday: "{{ usage_report_cron_weekday }}"
-    job: "source {{ usage_report_credentials }} && {{ usage_report_cron_script }} && {{ cron_notification }} usage_report"
+    name: "{{ user_project_report_cron_name }}"
+    minute: "{{ user_project_report_cron_minute }}"
+    hour: "{{ user_project_report_cron_hour }}"
+    day: "{{ user_project_report_cron_day }}"
+    month: "{{ user_project_report_cron_month }}"
+    weekday: "{{ user_project_report_cron_weekday }}"
+    job: "source {{ user_project_report_credentials }} && {{ user_project_report_cron_script }} && {{ cron_notification }} user_project_report"

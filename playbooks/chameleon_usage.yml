@@ -15,9 +15,9 @@
       vars:
           action: 'heat_template'
     - role: chameleon_usage
-      when: enable_usage_report_sync
+      when: enable_user_project_report
       vars:
-          action: 'usage_report'
+          action: 'user_project_report'
 
 - hosts: chameleon_usage_jupyter
   roles:
