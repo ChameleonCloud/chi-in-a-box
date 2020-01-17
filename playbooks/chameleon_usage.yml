@@ -14,6 +14,10 @@
       when: enable_usage_appliance_report
       vars:
           action: 'heat_template'
+    - role: chameleon_usage
+      when: enable_usage_report_sync
+      vars:
+          action: 'usage_report'
 
 - hosts: chameleon_usage_jupyter
   roles:
