@@ -1,0 +1,8 @@
+---
+# Initial assumption is that this is also the deployment node,
+# therefore any provisioning can be done locally.
+ansible_connection: local
+
+# CentOS default names
+network_interface: eno1
+kolla_external_vip_interface: eno2

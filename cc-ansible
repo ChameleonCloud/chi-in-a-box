@@ -4,7 +4,7 @@ DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 FORCE_UPDATES=no
 if [[ ! -d "$DIR/venv" ]]; then
   echo "Creating virtualenv at $DIR/venv ..."
-  virtualenv --system-site-packages "$DIR/venv"
+  virtualenv "$DIR/venv"
   "$DIR/venv/bin/pip" install --upgrade pip
   FORCE_UPDATES=yes
 fi
@@ -62,7 +62,7 @@ init() {
   
   if [[ -d "$site_config" ]]; then
     echo "Site config already exists at $site_config! Aborting."
-    return -1
+    return 1
   fi
 
   # Copy files from example
