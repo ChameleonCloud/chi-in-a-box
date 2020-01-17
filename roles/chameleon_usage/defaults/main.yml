@@ -6,3 +6,24 @@ chameleon_portal_mysql_host: udcc-db01.tacc.utexas.edu
 chameleon_portal_mysql_user: chameleon_ro
 ga_reporting_private_key_json_location: /root/ga-service-account-private-key.json
 google_analytics_view_id: 90514617
+
+user_project_report_cron_name: user_project_report
+user_project_report_cron_minute: '0'
+user_project_report_cron_hour: '3'
+user_project_report_cron_day: '*'
+user_project_report_cron_month: '*'
+user_project_report_cron_weekday: '*'
+user_project_report_cron_script: /usr/local/sbin/user_project_report.py
+user_project_report_credentials: /usr/local/sbin/user_project_report_credentials
+cron_notification: /usr/local/sbin/notification
+enable_user_project_report: no
+
+user_project_report_tas_url: 'https://tas.tacc.utexas.edu/api'
+user_project_report_tas_usr: 'tasclient'
+user_project_report_mysql_tacc: '10.20.111.249'
+user_project_report_mysql_uc: '192.5.87.4'
+user_project_report_mysql_kvm: '10.20.111.245'
+user_project_report_mysql_user: 'usage'
+user_project_report_portal_host: 'udcc-db01.tacc.utexas.edu'
+user_project_report_portal_user: 'chameleon_ro'
+
