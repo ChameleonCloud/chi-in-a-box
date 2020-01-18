@@ -32,6 +32,8 @@ receivers:
   slack_configs:
   - channel: '#notifications'
     send_resolved: true
+    title: {% raw %}'{{ template "slack.chameleon.title" . }}'
+{% endraw %}
     text: {% raw %}'{{ template "slack.chameleon.text" . }}'
 {% endraw %}
     color: {% raw %}'{{ template "slack.chameleon.color" . }}'
@@ -45,6 +47,8 @@ receivers:
   slack_configs:
   - channel: '#notifications'
     send_resolved: false
+    title: {% raw %}'{{ template "slack.chameleon.title" . }}'
+{% endraw %}
     text: {% raw %}'{{ template "slack.chameleon.text" . }}'
 {% endraw %}
     color: {% raw %}'{{ template "slack.chameleon.color" . }}'
