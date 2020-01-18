@@ -7,7 +7,7 @@
 {{ end }}
 
 {{ define "slack.chameleon.title" }}
-[{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] {{ .CommonLabels.alertname }} @ {{ .CommonLabels.hostname }} ({{ .CommonAnnotations.severity }})
+[{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] {{ .CommonLabels.alertname }} @ {{ .CommonLabels.hostname }} ({{ .CommonLabels.severity }})
 {{ end }}
 
 {{ define "slack.chameleon.text" }}
