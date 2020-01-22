@@ -1,10 +1,12 @@
 groups:
 - name: cron
   rules:
+
   - record: cron_last_success_threshold
     expr: 3600 * 48
     labels:
         name: gnocchi_backup
+
   - alert: CronJobNoRecentSuccess
     expr: |
       time() - cron_last_success
@@ -19,3 +21,4 @@ groups:
     annotations:
       summary: "{{ $labels.exported_job }} cron job has not succeeded in more than 24 hours."
       description: "{{ $labels.exported_job }} last succeeded {{ humanizeDuration $value }} ago and is likely failing."
+      runbook: https://github.com/ChameleonCloud/chi-in-a-box/wiki/%5BRunbook%5D-CronJobNoRecentSuccess

@@ -14,6 +14,7 @@ groups:
     annotations:
       summary: "Low Ironic cache space on {{ $labels.hostname }}"
       description: "Ironic process on {{ $labels.hostname }} has less than 15GB of space to use for image cache."
+      runbook: https://github.com/ChameleonCloud/chi-in-a-box/wiki/%5BRunbook%5D-IronicLowImageCacheSpace
 
   - alert: NodeExporterDown
     expr: up == 0
@@ -23,6 +24,7 @@ groups:
     annotations:
       summary: "Exporter job *{{ $labels.job }}* is down"
       description: "The exporter job *{{ $labels.job }}* on {{ $labels.hostname }} is no longer returning metrics."
+      runbook: https://github.com/ChameleonCloud/chi-in-a-box/wiki/%5BRunbook%5D-NodeExporterDown
 
   - alert: NodeNetworkBridgeDown
     expr: |
@@ -34,6 +36,7 @@ groups:
     annotations:
       summary: "Bridge *{{ $labels.device }}* is no longer reporting metrics"
       description: "The network bridge *{{ $labels.device }}* on {{ $labels.hostname }} could be down."
+      runbook: https://github.com/ChameleonCloud/chi-in-a-box/wiki/%5BRunbook%5D-NodeNetworkBridgeDown
 
   - alert: NodeNetworkBridgeLowTraffic
     expr: |
@@ -41,13 +44,14 @@ groups:
         == 0
       and
       rate(node_network_transmit_packets_total{device=~"br.*"}[5m] offset 1d)
-        > 0
+        > 100
     for: 30m
     labels:
       severity: warning
     annotations:
       summary: "Bridge *{{ $labels.device }}* has lower than normal packet activity"
       description: "The network bridge *{{ $labels.device }}* on {{ $labels.hostname }} had no traffic for the last 30 minutes."
+      runbook: https://github.com/ChameleonCloud/chi-in-a-box/wiki/%5BRunbook%5D-NodeNetworkBridgeLowTraffic
 
   - alert: OpenStackAPIDown
     expr: openstack_check_api == 0
