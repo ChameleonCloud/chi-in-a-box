@@ -1,14 +1,18 @@
 # {{ ansible_managed }}
 # Virtual host for {{ apache_server_name }}
 
+{% if apache_server_bind_address is not defined %}
+  {% set apache_server_bind_address = external_vip_address %}
+{% endif %}
+
 {% if apache_server_http_port is not none %}
-<VirtualHost {{ external_vip_address }}:{{ apache_server_http_port }}>
+<VirtualHost {{ apache_server_bind_address }}:{{ apache_server_http_port }}>
   ServerName {{ apache_server_name }}
   Redirect / https://{{ apache_server_name }}/
 </VirtualHost>
 {% endif %}
 
-<VirtualHost {{ external_vip_address }}:{{ apache_server_https_port }}>
+<VirtualHost {{ apache_server_bind_address }}:{{ apache_server_https_port }}>
   ServerName {{ apache_server_name }}
 
   # Allow Keystone authentication to be used
