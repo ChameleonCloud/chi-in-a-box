@@ -20,10 +20,10 @@ HORIZON_CONFIG['help_url'] = '{{ horizon_help_url }}'
 
 {% if enable_blazar | bool %}
 # Blazar-specific settings
-{% if blazar_floatingip_reservation_network_id is defined %}
+{% if blazar_floatingip_reservation_network_regex is defined %}
 OPENSTACK_BLAZAR_FLOATINGIP_RESERVATION = {
   # Allow reserving floating IPs on this network
-  'network_id': '{{ blazar_floatingip_reservation_network_id }}',
+  'network_name_regex': '{{ blazar_floatingip_reservation_network_regex }}'
 }
 {% endif %}
 # Used for Blazar dashboard, which needs to pull data from the MySQL database
