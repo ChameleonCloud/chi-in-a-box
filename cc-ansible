@@ -69,11 +69,13 @@ init() {
   mkdir -p "$(dirname $site_config)"
   cp -a "$DIR/site-config.example/" "$site_config"
 
+  local inventory="$site_config/inventory"
+
   # Do some simple hostname guessing
   this_host=$(hostname -s)
-  sed -i.bak "s/<host>/$this_host/g" "$site_config/hosts" \
-    && rm -f "$site_config/hosts.bak"
-  mv "$site_config/host_vars/<host>" "$site_config/host_vars/$this_host"
+  sed -i.bak "s/<host>/$this_host/g" "$inventory/hosts" \
+    && rm -f "$inventory/hosts.bak"
+  mv "$inventory/host_vars/<host>" "$inventory/host_vars/$this_host"
 
   # Generate vault password
   openssl rand -base64 2048 >"$site_config/vault_password" \
