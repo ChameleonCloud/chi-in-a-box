@@ -127,13 +127,14 @@ case "${POSARGS[0]}" in
     db_host systemctl restart mariadb
     redis_host systemctl restart redis
 
-    echo "Starting core infrastructure containers"
-    ./cc-ansible reconfigure
-
     echo "Starting custom infrastructure"
+    ./cc-ansible --playbook playbooks/docker_registry.yml
+    ./cc-ansible --playbook playbooks/prometheus.yml
     systemctl restart 'experiment-precis-*'
     systemctl restart chameleon-vendordata
-    ./cc-ansible --playbook playbooks/prometheus.yml
+
+    echo "Starting core infrastructure containers"
+    ./cc-ansible reconfigure
 
     echo "Done. Check Docker container statuses for possible startup errors."
     ;;
