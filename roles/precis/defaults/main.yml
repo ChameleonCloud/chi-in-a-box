@@ -42,3 +42,5 @@ precis_endpoint_port: 8910
 
 precis_generator_docker_image: docker.chameleoncloud.org/experiment-precis/generator:latest
 precis_generator_service_name: experiment-precis-generator
+
+precis_cleanup_docker_image: docker.chameleoncloud.org/experiment-precis/cleanup:latest

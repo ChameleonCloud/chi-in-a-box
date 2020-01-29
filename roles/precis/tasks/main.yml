@@ -106,6 +106,12 @@
       notify:
         - restart precis endpoint
         - restart precis generator
+    - name: Create service configuration.
+      template:
+        src: "precis_cleanup.conf.j2"
+        mode: 0600
+        dest: "{{ precis_config_path }}/cleanup.conf"
+        owner: "{{ precis_user }}"
     - name: Configure systemd service.
       template:
         src: "{{ item.template }}"
@@ -135,3 +141,25 @@
     - "{{ precis_event_listener_service_name }}"
     - "{{ precis_endpoint_service_name }}"
     - "{{ precis_generator_service_name }}"
+
+- name: Include cron notification script
+  include_role:
+    name: common
+    tasks_from: cron
+    defaults_from: cron
+
+- name: Configure precis cleanup docker bash wrapper.
+  template:
+    src: precis_cleanup.j2
+    mode: a+x
+    dest: /usr/local/sbin/precis_cleanup
+
+- name: Set up precis cleanup cron job.
+  cron:
+    name: "precis_cleaup"
+    minute: "0"
+    hour: "0"
+    day: "1"
+    month: "*"
+    weekday: "*"
+    job: "/usr/local/sbin/precis_cleanup | /usr/bin/logger -t precis_cleanup && {{ cron_notification }}"

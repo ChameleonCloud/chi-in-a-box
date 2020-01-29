@@ -1,0 +1,5 @@
+#! /bin/sh
+
+docker run --rm --net=host \
+    -v "{{ precis_config_path }}/cleanup.conf:/etc/experiment_precis/cleanup.conf" \
+    {{ precis_cleanup_docker_image }} 2>&1
