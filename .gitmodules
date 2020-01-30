@@ -1,4 +1,0 @@
-[submodule "kolla/kolla-ansible"]
-	path = kolla/kolla-ansible
-    url = https://github.com/ChameleonCloud/kolla-ansible.git
-    branch = chameleoncloud/rocky

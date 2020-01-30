@@ -2,8 +2,9 @@
 .facts/
 # When ansible fails, retry files are left in the playbooks directory
 *.retry
-# Checksums for dependencies
+# Checksums/stamps for dependencies
 *.sha256
+*.gitref
 # The default site-config is generated here
 site-config/
 # The vault passwords are stored here by convention
