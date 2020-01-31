@@ -1,0 +1,3 @@
+PROVIDER = "virtualbox"
+
+WIFI = true

@@ -11,8 +11,12 @@ site-config/
 vault_password
 # Ansible Galaxy roles
 roles/galaxy.ansible.com/
-# The virtualenv environment
-venv/
+# The virtualenv environment(s)
+venv*
 # Kolla SSL certificates (dev only)
 kolla/certificates
 kolla/node_custom_config/certificates
+# Vagrant development environment
+vagrant/.vagrant
+vagrant/storage
+vagrant/vagrantkey*
