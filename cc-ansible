@@ -5,7 +5,7 @@ VIRTUALENV="${VIRTUALENV:-$DIR/venv}"
 FORCE_UPDATES=no
 if [[ ! -d "$VIRTUALENV" ]]; then
   echo "Creating virtualenv at $VIRTUALENV ..."
-  virtualenv "$VIRTUALENV"
+  virtualenv "$VIRTUALENV" --system-site-packages
   "$VIRTUALENV/bin/pip" install --upgrade pip
   FORCE_UPDATES=yes
 fi
@@ -189,7 +189,7 @@ if [[ "$CHECK_UPDATES" == "yes" || "$FORCE_UPDATES" == "yes" ]]; then
   pip_requirements_chksum="$VIRTUALENV/requirements.txt.sha256"
   if [[ "$FORCE_UPDATES" == "yes" || ! -f "$pip_requirements_chksum" ]] || \
         ! sha256sum --quiet --check "$pip_requirements_chksum"; then
-    pip install -r "$pip_requirements"
+    pip install --upgrade -r "$pip_requirements"
     sha256sum "$pip_requirements" > "$pip_requirements_chksum"
   fi
 
