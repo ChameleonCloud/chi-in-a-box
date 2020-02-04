@@ -88,7 +88,7 @@
           group_var: precis_rabbitmq_inventory_group
     - name: Set bind address.
       set_fact:
-        precis_endpoint_bind_address: "{{ ansible_facts[network_interface]['ipv4']['address'] }}"
+        precis_bind_address: "{{ ansible_facts[network_interface]['ipv4']['address'] }}"
     - name: Create event listener configuration.
       template:
         src: "precis_event_listener.conf.j2"
