@@ -31,4 +31,16 @@ A NAT network is used to simulate the "public" network in the CHI-in-a-Box insta
 VBoxManage natnetwork add -t OSNetwork -n "172.16.10.0/24" -e -h on
 ```
 
-Note: which versions tested?
+### Create Vagrant environment
+
+The Vagrant environment is managed in the [`./vagrant`](./vagrant) directory.
+You should use the wrapper-script provided in that directory to access Vagrant, as it sets up some things for you and accounts for Virtualbox-specific things such as the persistence of a default DHCP server that conflicts with the one required for the CHI-in-a-Box environment.
+
+```shell
+cd vagrant
+./vagrant up
+# To SSH to the provisioned server:
+./vagrant ssh
+```
+
+**Note**: when working in the Vagrant VM, be careful of what you delete! The host checkout of `chi-in-a-box` is mounted inside the virtual machine, so if it is deleted, you may be losing work-in-progress.
