@@ -51,7 +51,7 @@ prometheus_services:
       - "alertmanager-data:/alertmanager"
       - "/etc/alertmanager:/etc/alertmanager"
   jupyterhub-exporter:
-    group: prometheus-jupyterhub-exporter
+    group: jupyterhub
     port: 8075
     scrape_target: yes
     bearer_token_file: /etc/prometheus/secrets/jupyterhub
@@ -108,4 +108,12 @@ prometheus_services:
     restart_handler: restart pushgateway
     port: 9091
     config_dir: /etc/prometheus
+    scrape_target: yes
+  precis-event-listener-exporter:
+    group: precis
+    port: 8913
+    scrape_target: yes
+  precis-endpoint-exporter:
+    group: precis
+    port: 8912
     scrape_target: yes
