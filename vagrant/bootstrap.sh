@@ -58,7 +58,8 @@ function prep_work {
 
     cat >/etc/profile.d/chi_in_a_box.sh <<EOF
 export VIRTUALENV=$CHI_IN_A_BOX_PATH/vagrant/venv
-export CC_ANSIBLE_SITE_CONFIG=$CHI_IN_A_BOX_PATH/vagrant/site-config
+export ANSIBLE_STRATEGY_PLUGINS=$CHI_IN_A_BOX_PATH/vagrant/venv/lib/mitogen-latest/ansible_mitogen/plugins/strategy
+export CC_ANSIBLE_SITE=$CHI_IN_A_BOX_PATH/vagrant/site-config
 EOF
 }
 
