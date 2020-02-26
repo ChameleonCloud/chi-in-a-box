@@ -1,4 +1,21 @@
 ---
+- name: Create cep service
+  os_keystone_service:
+    name: cep
+    service_type: cep
+    auth: "{{ openstack_auth }}"
+    description: "Chameleon Experiment Precis"
+    region_name: "{{ openstack_region_name }}"
+
+- name: Create cep endpoint
+  os_keystone_endpoint:
+    service: cep
+    auth: "{{ openstack_auth }}"
+    url: "https://{{ precis_server_hostname }}:{{ precis_endpoint_port }}"
+    endpoint_interface: public
+    region: "{{ openstack_region_name }}"
+    region_name: "{{ openstack_region_name }}"
+
 - name: Create RabbitMQ entities.
   block:
     - name: Create RabbitMQ user.
@@ -54,6 +71,7 @@
     state: present
     force_source: yes
   loop:
+    - "{{ precis_init_docker_image }}"
     - "{{ precis_event_listener_docker_image }}"
     - "{{ precis_endpoint_docker_image }}"
     - "{{ precis_generator_docker_image }}"
@@ -89,6 +107,12 @@
     - name: Set bind address.
       set_fact:
         precis_bind_address: "{{ ansible_facts[network_interface]['ipv4']['address'] }}"
+    - name: Create init configuration.
+      template:
+        src: "precis_init.conf.j2"
+        mode: 0600
+        dest: "{{ precis_config_path }}/init.conf"
+        owner: "{{ precis_user }}"
     - name: Create event listener configuration.
       template:
         src: "precis_event_listener.conf.j2"
@@ -131,6 +155,12 @@
           service: "{{ precis_generator_service_name }}"
   tags:
     - configuration
+
+- name: Create precis database
+  shell: |
+    docker run --rm --net={{ precis_docker_network }} \
+    -v "{{ precis_config_path }}/init.conf:/etc/experiment_precis/init.conf" \
+    {{ precis_init_docker_image }} 2>&1
 
 - name: Enable precis services on boot.
   systemd:
