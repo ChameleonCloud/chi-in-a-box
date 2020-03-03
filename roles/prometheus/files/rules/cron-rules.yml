@@ -3,9 +3,14 @@ groups:
   rules:
 
   - record: cron_last_success_threshold
-    expr: 3600 * 48
+    expr: 3600 * 24 * 2
     labels:
-        name: gnocchi_backup
+      name: gnocchi_backup
+  - record: cron_last_success_threshold
+    # This job runs once a month, check that it has run in last 32 days.
+    expr: 3600 * 24 * 32
+    labels:
+      name: precis_cleanup
 
   - alert: CronJobNoRecentSuccess
     expr: |

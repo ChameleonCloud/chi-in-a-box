@@ -192,4 +192,4 @@
     day: "1"
     month: "*"
     weekday: "*"
-    job: "/usr/local/sbin/precis_cleanup | /usr/bin/logger -t precis_cleanup && {{ cron_notification }}"
+    job: "/usr/local/sbin/precis_cleanup | /usr/bin/logger -t precis_cleanup && {{ cron_notification }} precis_cleanup"
