@@ -1,7 +1,7 @@
 ---
 - name: Place credentials file
   template:
-    src: usage-credentials.j2
+    src: user_project_report_credentials.j2
     mode: 0700
     dest: /usr/local/sbin/user_project_report_credentials
 
