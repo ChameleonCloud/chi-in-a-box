@@ -83,6 +83,14 @@ ironic_provisioning_network_gateway: "{{ ironic_provisioning_network_cidr | ipad
 ironic_cleaning_network: "{{ ironic_provisioning_network }}"
 ironic_image_cache_size: 20480 # MB
 ironic_pxe_append_params: "nofb nomodeset vga=normal console=tty0 console=ttyS0,9600 systemd.journald.forward_to_console=yes rootpwd={{ ironic_pxe_root_password }}"
+ironic_ks_services:
+  - name: "ironic"
+    type: "baremetal"
+    description: "Ironic baremetal provisioning service"
+    endpoints:
+      - {'interface': 'admin', 'url': '{{ ironic_admin_endpoint }}'}
+      - {'interface': 'internal', 'url': '{{ ironic_internal_endpoint }}'}
+      - {'interface': 'public', 'url': '{{ ironic_public_endpoint }}'}
 
 # Keystone
 enable_keystone: yes

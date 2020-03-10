@@ -26,4 +26,3 @@ user_project_report_mysql_kvm: '10.20.111.245'
 user_project_report_mysql_user: 'usage'
 user_project_report_portal_host: 'udcc-db01.tacc.utexas.edu'
 user_project_report_portal_user: 'chameleon_ro'
-
