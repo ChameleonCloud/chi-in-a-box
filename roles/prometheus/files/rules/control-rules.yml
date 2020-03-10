@@ -38,6 +38,18 @@ groups:
       description: "The network bridge *{{ $labels.device }}* on {{ $labels.hostname }} could be down."
       runbook: https://github.com/ChameleonCloud/chi-in-a-box/wiki/%5BRunbook%5D-NodeNetworkBridgeDown
 
+  - alert: NodeFileSystemAlmostOutOfSpace
+    expr: |
+      predict_linear(node_filesystem_avail_bytes{fstype!="tmpfs"}[1h], (3600 * 24 * 3)) 
+        <= 0
+    for: 12h
+    labels:
+      severity: critical
+    annotations:
+      summary: "Mount *{{ $labels.mountpoint }}* is almost out of space"
+      description: "*{{ $labels.mountpoint }}* (device {{ $labels.device }}) on {{ $labels.hostname }} will run out of space in less than 3 days."
+      runbook: https://github.com/ChameleonCloud/chi-in-a-box/wiki/%5BRunbook%5D-NodeFileSystemAlmostOutOfSpace
+
   - alert: NodeNetworkBridgeLowTraffic
     expr: |
       rate(node_network_transmit_packets_total{device=~"br.*"}[5m])
