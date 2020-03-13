@@ -3,6 +3,7 @@
   docker_image:
     source: pull
     name: "{{ grafana_docker_image }}"
+    force_source: yes
   tags:
     - pull
 
