@@ -8,9 +8,7 @@ ExecStart=/bin/docker run --name=%N \
                           --net={{ nginx_docker_network_name }} \
                           -v {{ grafana_docker_volume_name }}:/var/lib/grafana \
                           -v {{ grafana_config_path }}/ldap.toml:/etc/grafana/ldap.toml \
-                          -e GF_AUTH_ALLOW_SIGNUP=true \
-                          -e GF_AUTH_LDAP_ENABLED=true \
-                          -e GF_AUTH_LDAP_CONFIG_FILE=/etc/grafana/ldap.toml \
+                          -v {{ grafana_config_path }}/grafana.ini:/etc/grafana/grafana.ini \
                           -e "GF_INSTALL_PLUGINS={{ grafana_plugins | join(',') }}" \
                           {{ grafana_docker_image }}
 ExecStop=/bin/docker stop -t 2 %N

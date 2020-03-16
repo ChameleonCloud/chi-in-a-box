@@ -15,6 +15,12 @@
       file:
         path: "{{ grafana_config_path }}"
         state: directory
+    - name: Configure Grafana
+      template:
+        src: grafana.ini.j2
+        dest: "{{ grafana_config_path }}/grafana.ini"
+      notify:
+        - restart grafana
     - name: Configure Grafana LDAP authentication.
       template:
         src: ldap.toml.j2
