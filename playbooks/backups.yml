@@ -4,11 +4,6 @@
     - mariadb
   tags: [ mariadb, all ]
 
-- hosts: backups-glance
-  roles:
-    - glance
-  tags: [ glance, all ]
-
 - hosts: gnocchi
   roles:
     - gnocchi
