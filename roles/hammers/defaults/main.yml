@@ -69,3 +69,9 @@ hammers:
       cmd: "unutilized-lease-reaper delete"
       cron_times:
           minute: 5
+  enforce_node_retirement:
+      hammer_name: hammers-enforcenoderetirement
+      cmd: "retirement-enforcer"
+      cron_times:
+          minute: 50
+          hour: 4
