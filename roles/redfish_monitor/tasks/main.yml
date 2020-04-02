@@ -29,7 +29,7 @@
     network_mode: host
     env_file: "{{ redfish_monitor_env_file }}"
     volumes:
-      - "{{ redfish_monitor_log_folder }}:/var/log"
+      - "{{ redfish_monitor_log_folder }}:{{ redfish_monitor_log_folder }}"
     command:
         - "redfish-monitor"
         - "-u"
