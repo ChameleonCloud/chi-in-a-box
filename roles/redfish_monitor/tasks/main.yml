@@ -1,0 +1,40 @@
+---
+- name: Pull Docker image.
+  docker_image:
+    source: pull
+    name: "{{ redfish_monitor_docker_image }}"
+    force_source: yes
+
+- name: Create config directory.
+  file:
+    path: "{{ redfish_monitor_config_path }}"
+    state: directory
+
+- name: Create log directory.
+  file:
+    path: "{{ redfish_monitor_log_folder }}"
+    state: directory
+
+- name: Configure redfish-monitor env file
+  template:
+    src: redfish-monitor.env.j2
+    mode: 0600
+    dest: "{{ redfish_monitor_env_file }}"
+
+- name: Start redfish-monitor docker container
+  docker_container:
+    name: redfish_monitor
+    auto_remove: yes
+    image: "{{ redfish_monitor_docker_image }}"
+    network_mode: host
+    env_file: "{{ redfish_monitor_env_file }}"
+    volumes:
+      - "{{ redfish_monitor_log_folder }}:/var/log"
+    command:
+        - "redfish-monitor"
+        - "-u"
+        - "$REDFISH_USER"
+        - "-p"
+        - "$REDFISH_PASSWORD"
+        - "--minutes"
+        - "{{ redfish_monitor_minute_interval }}"
