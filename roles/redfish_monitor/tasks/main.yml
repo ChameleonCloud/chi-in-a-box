@@ -21,20 +21,16 @@
     mode: 0600
     dest: "{{ redfish_monitor_env_file }}"
 
-- name: Start redfish-monitor docker container
-  docker_container:
-    name: redfish_monitor
-    auto_remove: yes
-    image: "{{ redfish_monitor_docker_image }}"
-    network_mode: host
-    env_file: "{{ redfish_monitor_env_file }}"
-    volumes:
-      - "{{ redfish_monitor_log_folder }}:{{ redfish_monitor_log_folder }}"
-    command:
-        - "redfish-monitor"
-        - "-u"
-        - "$REDFISH_USER"
-        - "-p"
-        - "$REDFISH_PASSWORD"
-        - "--minutes"
-        - "{{ redfish_monitor_minute_interval }}"
+- name: Create redfish_monitor services.
+  template:
+    src: "redfish_monitor.service.j2"
+    dest: "/usr/lib/systemd/system/redfish_monitor.service"
+  notify:
+    - reload systemd daemon
+    - restart redfish monitor
+
+- name: Enable redfish_monitor service.
+  systemd:
+    service: redfish_monitor
+    state: started
+    enabled: yes
