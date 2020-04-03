@@ -24,6 +24,6 @@ groups:
     labels:
       severity: critical
     annotations:
-      summary: "{{ $labels.exported_job }} cron job has not succeeded in more than 24 hours."
-      description: "{{ $labels.exported_job }} last succeeded {{ humanizeDuration $value }} ago and is likely failing."
+      summary: "{{ $labels.name }} cron job has not succeeded in more than 24 hours."
+      description: "{{ $labels.name }} last succeeded {{ humanizeDuration $value }} ago and is likely failing."
       runbook: https://github.com/ChameleonCloud/chi-in-a-box/wiki/%5BRunbook%5D-CronJobNoRecentSuccess
