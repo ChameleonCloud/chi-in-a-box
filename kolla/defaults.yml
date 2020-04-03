@@ -135,6 +135,11 @@ nova_public_endpoint: "{{ public_protocol }}://{{ kolla_external_fqdn }}:{{ nova
 enable_prometheus: no
 prometheus_bind_address: "{{ lookup('vars', 'ansible_' + network_interface).ipv4.address }}"
 
+# Redfish Monitor
+redfish_monitor_openstack_user: "{{ keystone_admin_username }}"
+redfish_monitor_openstack_password: "{{ keystone_admin_password }}"
+redfish_monitor_openstack_project_name: "{{ keystone_admin_project }}"
+
 # Swift
 enable_swift: no
 
