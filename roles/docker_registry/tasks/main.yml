@@ -18,10 +18,6 @@
     # buggy auto-detect region attempts by this module
     cloud: ""
   no_log: True
-  vars:
-    # Ensure when we run this on the ansible host, we use the Virtualenv
-    # (which should already be set up.)
-    ansible_python_interpreter: "{{ ansible_python_interpreter }}"
 
 - name: Create Docker network.
   docker_network:

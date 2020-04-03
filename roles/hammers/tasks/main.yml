@@ -46,10 +46,6 @@
     host: "%"
     password: "{{ hammers_mysql_password }}"
     priv: "*.*:SELECT,UPDATE,DELETE"
-  vars:
-    # Ensure when we run this on the ansible host, we use the Virtualenv
-    # (which should already be set up.)
-    ansible_python_interpreter: "{{ ansible_python_interpreter }}"
 
 - name: Configure Hammers my.cnf
   template:

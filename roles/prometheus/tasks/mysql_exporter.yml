@@ -11,10 +11,6 @@
     host: "{{ prometheus_docker_network_ipv4 | ipaddr('network') }}/{{ prometheus_docker_network_ipv4 | ipaddr('netmask') }}"
     password: "{{ prometheus_mysql_exporter_password }}"
     priv: "*.*:PROCESS,REPLICATION CLIENT,SELECT"
-  vars:
-    # Ensure when we run this on the ansible host, we use the Virtualenv
-    # (which should already be set up.)
-    ansible_python_interpreter: "{{ ansible_python_interpreter }}"
 
 - name: Configure MySQL exporter.
   template:
