@@ -189,7 +189,7 @@ if [[ "$CHECK_UPDATES" == "yes" || "$FORCE_UPDATES" == "yes" ]]; then
   pip_requirements_chksum="$VIRTUALENV/requirements.txt.sha256"
   if [[ "$FORCE_UPDATES" == "yes" || ! -f "$pip_requirements_chksum" ]] || \
         ! sha256sum --quiet --check "$pip_requirements_chksum"; then
-    pip install --upgrade -r "$pip_requirements"
+    pip install --upgrade --force-reinstall -r "$pip_requirements"
     sha256sum "$pip_requirements" > "$pip_requirements_chksum"
   fi
 
@@ -247,6 +247,13 @@ if [[ -n "${CC_ANSIBLE_PLAYBOOK:-}" ]]; then
 
   ansible_path="$VIRTUALENV/share/kolla-ansible/ansible"
   playbook_file="$ansible_path/$(basename $CC_ANSIBLE_PLAYBOOK)"
+
+  # Because we execute within Kolla-Ansible's playbook directory, "magic"
+  # paths will not work any more--add our plugins/libraries to Ansible's
+  # search path directly.
+  export ANSIBLE_ACTION_PLUGINS="$DIR/playbooks/action_plugins"
+  export ANSIBLE_LIBRARY="$DIR/playbooks/library"
+
   # Copy the playbook to a new location relative to the Kolla-Ansible installation
   # to allow the group_vars/ in the playbook directory to take effect.
   cp "$(realpath $CC_ANSIBLE_PLAYBOOK)" "$playbook_file"
@@ -258,6 +265,7 @@ if [[ -n "${CC_ANSIBLE_PLAYBOOK:-}" ]]; then
     mv "$ansible_path/_roles" "$ansible_path/roles"
   }
   TRAPS+=(_playbook_override_cleanup)
+
   # Prepare an invocation of Kolla-Ansible targeting this playbook
   POSARGS+=(deploy --playbook "$playbook_file")
 fi
@@ -301,4 +309,4 @@ if [[ "${POSARGS[@]}" != *"bootstrap-servers"* ]]; then
 fi
 kolla_args+=("${POSARGS[@]}")
 
-kolla-ansible "${kolla_args[@]}"
+$VIRTUALENV/bin/kolla-ansible "${kolla_args[@]}"
