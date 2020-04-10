@@ -1,7 +1,7 @@
 ---
 - hosts: mariadb
   roles:
-    - mariadb
+    - chameleon_mariadb
   tags: [ mariadb, all ]
 
 - hosts: gnocchi
