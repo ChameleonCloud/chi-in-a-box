@@ -60,7 +60,7 @@ done
 
 init() {
   local site_config="$CC_ANSIBLE_SITE"
-  
+
   if [[ -d "$site_config" ]]; then
     echo "Site config already exists at $site_config! Aborting."
     return 1
@@ -216,7 +216,7 @@ if [[ "$CHECK_UPDATES" == "yes" || "$FORCE_UPDATES" == "yes" ]]; then
     # Ensure the /share folder is placed; this is not copied when using the "develop" setup.py method.
     # This is a bit weird, perhaps there is some way to pass an additional flag to pip to make it
     # copy this even though it's installing as source. We use source install to keep track of the Git revision.
-    mkdir -p "$VIRTUALENV/share" && ln -sf "$kolla_ansible_egglink" "$VIRTUALENV/share/kolla-ansible" 
+    mkdir -p "$VIRTUALENV/share" && ln -sf "$kolla_ansible_egglink" "$VIRTUALENV/share/kolla-ansible"
     (cd $kolla_ansible_egglink; git rev-parse HEAD > $kolla_ansible_gitref)
   fi
 
@@ -258,12 +258,8 @@ if [[ -n "${CC_ANSIBLE_PLAYBOOK:-}" ]]; then
   # Copy the playbook to a new location relative to the Kolla-Ansible installation
   # to allow the group_vars/ in the playbook directory to take effect.
   cp "$(realpath $CC_ANSIBLE_PLAYBOOK)" "$playbook_file"
-  # Move roles out of the way so they do not have precedence in case there
-  # is a collision on role name.
-  mv "$ansible_path/roles" "$ansible_path/_roles"
   _playbook_override_cleanup() {
     rm -f "$playbook_file"
-    mv "$ansible_path/_roles" "$ansible_path/roles"
   }
   TRAPS+=(_playbook_override_cleanup)
 
