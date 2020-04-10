@@ -253,6 +253,7 @@ if [[ -n "${CC_ANSIBLE_PLAYBOOK:-}" ]]; then
   # search path directly.
   export ANSIBLE_ACTION_PLUGINS="$DIR/playbooks/action_plugins"
   export ANSIBLE_LIBRARY="$DIR/playbooks/library"
+  export ANSIBLE_TEMPLATES="$DIR/playbooks/templates"
 
   # Copy the playbook to a new location relative to the Kolla-Ansible installation
   # to allow the group_vars/ in the playbook directory to take effect.
