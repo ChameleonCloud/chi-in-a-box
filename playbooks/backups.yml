@@ -6,5 +6,5 @@
 
 - hosts: gnocchi
   roles:
-    - gnocchi
+    - chameleon_gnocchi
   tags: [ gnocchi, all ]
