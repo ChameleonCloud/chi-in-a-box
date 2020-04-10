@@ -1,0 +1,22 @@
+---
+keycloak_config_path: /etc/keycloak
+keycloak_docker_image: docker.chameleoncloud.org/keycloak:7
+keycloak_docker_network: keycloak
+keycloak_docker_network_subnet: 172.18.1.0/28
+keycloak_docker_volume_name: keycloak-storage
+keycloak_hostname: auth.chameleoncloud.org
+keycloak_port: 8085  # Just needs to be something that doesn't conflict
+keycloak_service_name: keycloak
+keycloak_backup_docker_volume_name: keycloak-backup
+
+# The admin user provisioned by default in Keycloak
+keycloak_user: admin
+# keycloack_password
+
+keycloak_db_service_name: keycloak-db
+keycloak_db_docker_image: mariadb:10.3
+keycloak_db_docker_volume_name: keycloak-db-storage
+keycloak_db_user: keycloak
+keycloak_db_db: keycloak
+# keycloak_db_root_password
+# keycloak_db_password
