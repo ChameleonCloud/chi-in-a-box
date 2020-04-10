@@ -50,26 +50,6 @@ function is_centos {
 # Install common packages and do some prepwork.
 function prep_work {
     yum install -y epel-release
-    yum install -y jq git python python-pip python-virtualenv
-
-    pushd "$CHI_IN_A_BOX_PATH"
-    VIRTUALENV=vagrant/venv ./cc-ansible init --site vagrant/site-config
-    popd
-
-    cat >/etc/profile.d/chi_in_a_box.sh <<EOF
-export VIRTUALENV=$CHI_IN_A_BOX_PATH/vagrant/venv
-export ANSIBLE_STRATEGY_PLUGINS=$CHI_IN_A_BOX_PATH/vagrant/venv/lib/mitogen-latest/ansible_mitogen/plugins/strategy
-export CC_ANSIBLE_SITE=$CHI_IN_A_BOX_PATH/vagrant/site-config
-EOF
-}
-
-function configure_kolla {
-    # Set network interfaces
-    # kolla-cli property set network_interface eth1
-    # kolla-cli property set neutron_external_interface eth2
-    # Set VIP address to be on the vagrant private network
-    # kolla-cli property set kolla_internal_vip_address 172.28.128.254
-    echo "placeholder"
 }
 
 # if [ "$MODE" == 'aio' ]; then
@@ -112,6 +92,23 @@ function configure_kolla {
 
 # Configure the operator node and install some additional packages.
 function configure_operator {
+    yum install -y jq git python python-pip python-virtualenv
+
+    pushd "$CHI_IN_A_BOX_PATH"
+    VIRTUALENV=vagrant/venv ./cc-ansible init --site vagrant/site-config
+    popd
+
+    cat >/etc/profile.d/chi_in_a_box.sh <<EOF
+export VIRTUALENV=$CHI_IN_A_BOX_PATH/vagrant/venv
+export ANSIBLE_STRATEGY_PLUGINS=$CHI_IN_A_BOX_PATH/vagrant/venv/lib/mitogen-latest/ansible_mitogen/plugins/strategy
+export CC_ANSIBLE_SITE=$CHI_IN_A_BOX_PATH/vagrant/site-config
+EOF
+
+    cat >>vagrant/site-config/host_vars/operator <<EOF
+ansible_become: yes
+ansible_become_user: root
+EOF
+
     # Make sure Ansible uses scp.
     cat > ~vagrant/.ansible.cfg <<EOF
 [defaults]

@@ -88,7 +88,7 @@ NUMBER_OF_MONITOR_NODES ||= 1
 
 NODE_SETTINGS ||= {
   aio: {
-    cpus: 4,
+    cpus: 2,
     memory: 4096
   },
   operator: {
@@ -229,7 +229,7 @@ Vagrant.configure(2) do |config|
   config.vm.define "operator", primary: true do |admin|
     admin.vm.hostname = "operator.local"
     admin.vm.provision :shell, path: PROVISION_SCRIPT, args: "operator #{MULTINODE ? 'multinode' : 'aio'} #{chi_in_a_box_path} #{NUMBER_OF_COMPUTE_NODES} #{NUMBER_OF_STORAGE_NODES} #{NUMBER_OF_NETWORK_NODES} #{NUMBER_OF_CONTROL_NODES} #{NUMBER_OF_MONITOR_NODES}"
-    admin.vm.synced_folder chi_in_a_box_repo_path, chi_in_a_box_path, create:"True", type: get_default(:sync_method)
+    admin.vm.synced_folder chi_in_a_box_repo_path, chi_in_a_box_path, create:"True", type: get_default(:sync_method), mount_options: ["ro"]
     admin.vm.synced_folder File.join(vagrant_dir, 'storage', 'operator'), "/data/host", create:"True", type: get_default(:sync_method)
     admin.vm.synced_folder File.join(vagrant_dir, 'storage', 'shared'), "/data/shared", create:"True", type: get_default(:sync_method)
     admin.vm.synced_folder ".", vagrant_shared_folder, disabled: true
