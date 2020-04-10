@@ -8,7 +8,7 @@
     - prometheus-openstack-exporter
     - prometheus-push-gateway
   roles:
-    - prometheus
+    - chameleon_prometheus
   tasks:
     - set_fact:
         prometheus_alertmanager_port: "{{ prometheus_services['alertmanager'].port }}"
@@ -70,7 +70,7 @@
                   Require user {{ prometheus_server.prometheus_server_users | join(' ') }}
                 </Limit>
               </Location>
-          when: 
+          when:
             - prometheus_server_hostname is defined
             - external_vip_address is defined
     - name: Configure virtual host for Prometheus Alertmanager.
@@ -104,6 +104,6 @@
                 ProxyPass         http://{{ groups['prometheus-alertmanager'][0] }}:{{ prometheus_alertmanager.prometheus_alertmanager_port }}/
                 ProxyPassReverse  http://{{ groups['prometheus-alertmanager'][0] }}:{{ prometheus_alertmanager.prometheus_alertmanager_port }}/
               </Location>
-          when: 
+          when:
             - prometheus_alertmanager_hostname is defined
             - external_vip_address is defined
