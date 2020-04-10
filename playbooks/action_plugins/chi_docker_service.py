@@ -114,7 +114,7 @@ class ActionModule(action.ActionBase):
         mounts = module_args.get("mounts", [])
         ports = module_args.get("ports", [])
         environment = module_args.get("environment", {})
-        bind_address = module_args.get("bind_address", None)
+        bind_address = module_args.get("bind_address", task_vars.get("api_interface_address"))
         stop_timeout = module_args.get("stop_timeout", DEFAULT_STOP_TIMEOUT)
 
         try:

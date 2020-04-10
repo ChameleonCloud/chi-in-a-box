@@ -2,11 +2,11 @@
 - name: Pull Keycloak images.
   docker_image:
     source: pull
-    name: "{{ item }}"
+    name: "{{ item.value.image }}"
     force_source: yes
-  loop:
-    - "{{ keycloak_docker_image }}"
-    - "{{ keycloak_db_docker_image }}"
+  loop: "{{ keycloak_services|dict2items }}"
+  loop_control:
+    label: "{{ item.value.image }}"
   tags:
     - pull
 
@@ -16,39 +16,21 @@
     ipam_config:
       - subnet: "{{ keycloak_docker_network_subnet }}"
 
-- name: Configure Keycloack DB.
+- name: Configure Keycloak services.
   chi_docker_service:
-    name: "{{ keycloak_db_service_name }}"
-    image: "{{ keycloak_db_docker_image }}"
-    network: "{{ keycloak_docker_network }}"
-    environment:
-      MYSQL_ROOT_PASSWORD: "{{ keycloak_db_root_password }}"
-      MYSQL_USER: "{{ keycloak_db_user }}"
-      MYSQL_PASSWORD: "{{ keycloak_db_password }}"
-      MYSQL_DATABASE: "{{ keycloak_db_db }}"
-    mounts:
-      - type: volume
-        src: "{{ keycloak_db_docker_volume_name }}"
-        dst: /var/lib/mysql
+    name: "{{ item.key }}"
+    image: "{{ item.value.image }}"
+    network: "{{ item.value.network }}"
+    environment: "{{ item.value.environment }}"
+    mounts: "{{ item.value.mounts }}"
+    ports: "{{ item.value.ports|default([]) }}"
+  loop: "{{ keycloak_services|dict2items }}"
+  loop_control:
+    label: "{{ item.key }}"
 
-- name: Configure Keycloak service.
-  chi_docker_service:
-    name: "{{ keycloak_service_name }}"
-    image: "{{ keycloak_docker_image }}"
-    network: "{{ keycloak_docker_network }}"
-    environment:
-      DB_VENDOR: mariadb
-      DB_ADDR: "{{ keycloak_db_service_name }}"
-      DB_DATABASE: "{{ keycloak_db_db }}"
-      DB_USER: "{{ keycloak_db_user }}"
-      DB_PASSWORD: "{{ keycloak_db_password }}"
-      KEYCLOAK_USER: "{{ keycloak_user }}"
-      KEYCLOAK_PASSWORD: "{{ keycloak_password }}"
-      JGROUPS_DISCOVERY_PROTOCOL: JDBC_PING
-      JGROUPS_DISCOVERY_PROPERTIES: datasource_jndi_name=java:jboss/datasources/KeycloakDS,info_writer_sleep_time=500
-    ports:
-      - "{{ keycloak_port }}:8080"
-    mounts:
-      - type: volume
-        src: "{{ keycloak_backup_docker_volume_name }}"
-        dst: /backup
+- name: Configure haproxy for Keycloak
+  import_role:
+    name: haproxy-config
+  vars:
+    project_services: "{{ keycloak_services }}"
+  when: enable_haproxy | bool

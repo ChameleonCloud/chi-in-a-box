@@ -1,5 +1,5 @@
 ---
-openstack_release: train 
+openstack_release: train
 cloud: envvars
 
 docker_namespace: kolla
@@ -90,6 +90,10 @@ ironic_pxe_append_params: "nofb nomodeset vga=normal console=tty0 console=ttyS0,
 #      - {'interface': 'admin', 'url': '{{ ironic_admin_endpoint }}'}
 #      - {'interface': 'internal', 'url': '{{ ironic_internal_endpoint }}'}
 #      - {'interface': 'public', 'url': '{{ ironic_public_endpoint }}'}
+
+# Keycloak
+enable_keycloak: no
+enable_keycloak_external: "{{ enable_keycloak }}"
 
 # Keystone
 enable_keystone: yes
