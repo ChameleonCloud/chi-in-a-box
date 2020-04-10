@@ -1,7 +1,7 @@
 ---
 - name: Include cron notification script
   include_role:
-    name: common
+    name: chameleon_common
     tasks_from: cron
     defaults_from: cron
 
