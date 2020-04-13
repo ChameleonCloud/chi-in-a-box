@@ -46,6 +46,7 @@ keycloak_services:
         listen_port: "{{ keycloak_port }}"
       keycloak_server_external:
         enabled: "{{ enable_keycloak_external }}"
+        frontend_enabled: "{{ enable_keycloak_external_frontend }}"
         mode: "http"
         external: true
         port: "{{ keycloak_port }}"
