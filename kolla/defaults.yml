@@ -94,6 +94,7 @@ ironic_pxe_append_params: "nofb nomodeset vga=normal console=tty0 console=ttyS0,
 # Keycloak
 enable_keycloak: no
 enable_keycloak_external: "{{ enable_keycloak }}"
+enable_keycloak_external_frontend: no
 
 # Keystone
 enable_keystone: yes
