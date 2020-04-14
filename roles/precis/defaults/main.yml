@@ -16,6 +16,7 @@ precis_rabbitmq_listener_bindings:
   - neutron
   - nova
   - openstack
+  - glance
 precis_rabbitmq_rpc_queue: experiment_precis_service_queue
 
 # precis_mysql_host: ''
