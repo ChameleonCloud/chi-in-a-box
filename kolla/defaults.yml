@@ -21,6 +21,8 @@ enable_rabbitmq: yes
 
 # Blazar
 enable_blazar: yes
+enable_blazar_usage_enforcement: yes
+blazar_project_enforcement_id: charge_code
 # When to send lease notification email
 blazar_minutes_before_end_lease: 2880
 blazar_default_max_lease_duration: 604800
@@ -37,6 +39,7 @@ blazar_floatingip_billrate: 0.0
 blazar_database_name: blazar
 blazar_database_user: blazar
 blazar_database_port: "{{ database_port }}"
+blazar_email_relay: "{{ kolla_internal_fqdn }}"
 
 # Cinder
 enable_cinder: no
