@@ -74,3 +74,16 @@ groups:
       summary: "OpenStack {{ $labels.service | title }} service is down"
       description: "The *{{ $labels.service | title }}* service on {{ $labels.hostname }} is not responding."
       runbook: https://github.com/ChameleonCloud/chi-in-a-box/wiki/%5BRunbook%5D-OpenStackAPIDown
+
+  - record: service_type:precis_events_total:rate1w
+    expr: sum(rate(precis_events_total{type="parsed"}[1w])) by (service)
+  
+  - alert: PrecisParsedEventsLow
+    expr: service_type:precis_events_total:rate1w == 0
+    for: 1d
+    labels:
+      severity: warning
+    annotations:
+      summary: "Experiment Precis event listener stops parsing OpenStack *{{ $labels.service }}* service notification messages"
+      description: "The Experiment Precis parsed no *{{ $labels.service }}* events for the last 1 week."
+      runbook: https://github.com/ChameleonCloud/chi-in-a-box/wiki/%5BRunbook%5D-PrecisParsedEventsLow
