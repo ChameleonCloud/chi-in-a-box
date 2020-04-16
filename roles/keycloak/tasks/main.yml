@@ -17,13 +17,16 @@
       - subnet: "{{ keycloak_docker_network_subnet }}"
 
 - name: Configure Keycloak services.
-  chi_docker_service:
-    name: "{{ item.key }}"
-    image: "{{ item.value.image }}"
-    network: "{{ item.value.network }}"
-    environment: "{{ item.value.environment }}"
-    mounts: "{{ item.value.mounts }}"
-    ports: "{{ item.value.ports|default([]) }}"
+  include_role:
+    name: diurnalist.docker_service
+  vars:
+    service_name: "{{ item.key }}"
+    service_bind_address: "{{ api_interface_address }}"
+    docker_image: "{{ item.value.image }}"
+    docker_network: "{{ item.value.network }}"
+    docker_environment: "{{ item.value.environment }}"
+    docker_mounts: "{{ item.value.mounts }}"
+    docker_ports: "{{ item.value.ports|default([]) }}"
   loop: "{{ keycloak_services|dict2items }}"
   loop_control:
     label: "{{ item.key }}"
