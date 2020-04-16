@@ -30,8 +30,10 @@ keycloak_services:
       DB_PASSWORD: "{{ keycloak_db_password }}"
       KEYCLOAK_USER: "{{ keycloak_user }}"
       KEYCLOAK_PASSWORD: "{{ keycloak_password }}"
+      KEYCLOAK_FRONTEND_URL: "https://{{ keycloak_hostname }}"
       JGROUPS_DISCOVERY_PROTOCOL: JDBC_PING
       JGROUPS_DISCOVERY_PROPERTIES: datasource_jndi_name=java:jboss/datasources/KeycloakDS,info_writer_sleep_time=500
+      PROXY_ADDRESS_FORWARDING: true
     ports:
       - "{{ keycloak_port }}:8080"
     mounts:
