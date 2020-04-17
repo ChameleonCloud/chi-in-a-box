@@ -1,13 +1,4 @@
 ---
-- name: Include cron notification script
-  include_role:
-    name: chameleon_common
-    tasks_from: cron
-    defaults_from: cron
-
-- set_fact:
-    hammers_list: "{{ hammers | dict2items | map(attribute='value') | list }}"
-
 - name: Pull Docker image.
   docker_image:
     source: pull
@@ -54,13 +45,13 @@
   vars:
     mysql_host: "{{ hammers_mysql_host }}"
 
-- name: Add hammer cron jobs.
-  cron:
-    name: "{{ item.hammer_name }}"
-    minute: "{{ item.cron_times.minute | default('*') }}"
-    hour: "{{ item.cron_times.hour | default('*') }}"
-    day: "{{ item.cron_times.day | default('*') }}"
-    month: "{{ item.cron_times.month | default('*') }}"
-    weekday: "{{ item.cron_times.weekday | default('*') }}"
-    job: "/usr/local/sbin/cc-hammer {{ item.cmd }} | /usr/bin/logger -t {{ item.hammer_name }} && {{ cron_notification }} {{ item.hammer_name }}"
-  loop: "{{ hammers_list }}"
+- name: Add hammer periodic tasks.
+  include_role:
+    name: diurnalist.periodic_task
+  vars:
+    task_name: "hammer_{{ item.key }}"
+    task_command: "/usr/local/sbin/cc-hammer {{ item.value.cmd }}"
+    task_calendar: "{{ item.value.calendar }}"
+  loop: "{{ hammers | dict2items }}"
+  loop_control:
+    label: "{{ item.key }}"
