@@ -37,3 +37,17 @@
   vars:
     project_services: "{{ keycloak_services }}"
   when: enable_haproxy | bool
+
+- name: Create periodic realm export script.
+  copy:
+    src: keycloak_backup_realm.sh
+    dest: /usr/local/sbin/keycloak_backup_realm.sh
+    mode: "0700"
+
+- name: Configure periodic realm export.
+  include_role:
+    name: diurnalist.periodic-task
+  vars:
+    task_name: keycloak_backup_realm
+    task_calendar: daily
+    task_command: "/usr/local/sbin/keycloak_backup_realm.sh {{ keycloak_realm_name }}"
