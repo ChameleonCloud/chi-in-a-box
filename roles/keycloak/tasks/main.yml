@@ -46,7 +46,7 @@
 
 - name: Configure periodic realm export.
   include_role:
-    name: diurnalist.periodic-task
+    name: diurnalist.periodic_task
   vars:
     task_name: keycloak_backup_realm
     task_calendar: daily
