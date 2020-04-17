@@ -5,15 +5,15 @@ realm_name="$1"
 backup_dir="/backup/${realm_name}_$(date +%Y-%m-%dT%H-%m)"
 
 # Ensure proper permissions
-docker exec -it -uroot keycloak_server chown -R jboss: /backup
+docker exec -uroot keycloak_server chown -R jboss: /backup
 
 # Create backup directory
-docker exec -it keycloak_server mkdir -p "$backup_dir"
+docker exec keycloak_server mkdir -p "$backup_dir"
 
 # Export realm
 # The 'sed' will cause the server to automatically terminate if the message
 # signifying the export completed successfully is printed.
-docker exec -it keycloak_server /opt/jboss/keycloak/bin/standalone.sh \
+docker exec keycloak_server /opt/jboss/keycloak/bin/standalone.sh \
   -Djboss.socket.binding.port-offset=100 -Dkeycloak.migration.action=export \
   -Dkeycloak.migration.realmName="$realm_name" \
   -Dkeycloak.migration.usersExportStrategy=DIFFERENT_FILES \
