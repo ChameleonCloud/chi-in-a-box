@@ -3,7 +3,7 @@
   tasks:
     - name: Add common cron jobs
       include_role:
-        name: common
+        name: chameleon_common
         defaults_from: cron
         tasks_from: cron
     - name: Add fluentd restart job
@@ -19,5 +19,5 @@
   tasks:
     - name: Add ElasticSearch cron job
       include_role:
-        name: common
+        name: chameleon_common
         tasks_from: elasticsearch

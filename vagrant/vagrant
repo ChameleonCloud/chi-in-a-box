@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -e -u -o pipefail
+
+if netname=$(VboxManage list dhcpservers | grep -io '[a-z0-9\-_]*-vboxnet0'); then
+  echo "Deleting Virtualbox-created DHCP server \"$netname\""
+  VboxManage dhcpserver remove --netname "$netname"
+fi
+
+# TODO: no Windows support yet
+case "$(uname)" in
+  Darwin)
+    export VAGRANT_PROFILE=macosx
+    ;;
+  *)
+    export VAGRANT_PROFILE=linux
+    ;;
+esac
+
+vagrant "$@"

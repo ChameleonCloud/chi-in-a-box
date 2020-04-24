@@ -77,6 +77,17 @@ LAUNCH_INSTANCE_DEFAULTS = {
     'create_volume': False,
 }
 
+# [2020-02-05 diurnalist]
+# TODO: solve the root problem here and re-enable this extension.
+# Turn off SimpleTenantUsage extension, which has caused severe performance
+# penalties in our version of Horizon. This makes the little table on the
+# main dashboard page, which shows a list of recent instances, not show up.
+# The API calls to Nova to populate this UI were going through an endless loop,
+# clogging up server resources.
+OPENSTACK_NOVA_EXTENSIONS_BLACKLIST = [
+    'SimpleTenantUsage',
+]
+
 # The OPENSTACK_IMAGE_BACKEND settings can be used to customize features
 # in the OpenStack Dashboard related to the Image service, such as the list
 # of supported image formats.

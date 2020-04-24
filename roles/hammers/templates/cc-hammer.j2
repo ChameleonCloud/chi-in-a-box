@@ -3,7 +3,8 @@
 docker run --rm \
   --net=host \
   --env-file "{{ hammers_env_file }}" \
+  -e TZ=$(timedatectl | grep 'Time zone' | awk '{ print $3 }') \
   -v "/etc/hammers/slack.json:/etc/hammers/slack.json" \
   -v "/etc/hammers/my.cnf:/root/.my.cnf" \
-  {{ hammers_docker_image }} $@ \
+  {{ hammers_docker_image }} "$@" \
   --slack "{{ hammers_config_path }}/slack.json" 2>&1

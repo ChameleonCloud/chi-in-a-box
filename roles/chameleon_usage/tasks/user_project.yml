@@ -1,13 +1,13 @@
 ---
 - name: Place credentials file
   template:
-    src: usage-credentials.j2
+    src: user_project_report_credentials.j2
     mode: 0700
     dest: /usr/local/sbin/user_project_report_credentials
 
 - name: Place usage script
   template:
-    src: /root/scripts/chameleon-usage-reporting/project_usage_collect/user_project_report.py
+    src: /root/scripts/chameleon-usage-reporting/user_project_report/user_project_report.py
     mode: 0700
     dest: /usr/local/sbin/user_project_report.py
 

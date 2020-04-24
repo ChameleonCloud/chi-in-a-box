@@ -1,0 +1,7 @@
+---
+redfish_monitor_service_name: redfish_monitor
+redfish_monitor_config_path: /etc/redfish-monitor
+redfish_monitor_docker_image: "{{ docker_registry }}/redfish-monitor:latest"
+redfish_monitor_env_file: /etc/redfish-monitor/redfish-monitor.env
+redfish_monitor_log_folder: /var/log/kolla/redfish-monitor
+redfish_monitor_minute_interval: 15

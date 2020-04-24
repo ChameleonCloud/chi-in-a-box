@@ -1,0 +1,30 @@
+---
+- name: Include cron notification script
+  include_role:
+    name: chameleon_common
+    tasks_from: cron
+    defaults_from: cron
+
+- name: Configure mariadb backup script file
+  template:
+    src: mariadb.j2
+    mode: 0700
+    dest: "{{ mariadb_backup_cron_script }}"
+  when: inventory_hostname_short == "m01-07"
+
+- name: Configure mariadb backup script file without rsync for dev
+  template:
+    src: mariadbdev.j2
+    mode: 0700
+    dest: "{{ mariadb_backup_cron_script }}"
+  when: inventory_hostname_short == "dev"
+
+- name: Add mariadb backup cron jobs.
+  cron:
+    name: "{{ mariadb_backup_cron_name }}"
+    minute: "{{ mariadb_backup_cron_minute }}"
+    hour: "{{ mariadb_backup_cron_hour }}"
+    day: "{{ mariadb_backup_cron_day }}"
+    month: "{{ mariadb_backup_cron_month }}"
+    weekday: "{{ mariadb_backup_cron_weekday }}"
+    job: "{{ mariadb_backup_cron_script }} && {{ cron_notification }} mariadb-backup"

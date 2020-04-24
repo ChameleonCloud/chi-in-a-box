@@ -719,3 +719,13 @@ control
 # Chameleon vendordata service
 [vendordata:children]
 control
+
+# Keycloak identity provider
+[keycloak:children]
+control
+
+[keycloak_server:children]
+keycloak
+
+[keycloak_db:children]
+keycloak

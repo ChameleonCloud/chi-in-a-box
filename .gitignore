@@ -20,3 +20,6 @@ kolla/node_custom_config/certificates
 vagrant/.vagrant
 vagrant/storage
 vagrant/vagrantkey*
+# Python build files
+*.pyc
+__pycache__/

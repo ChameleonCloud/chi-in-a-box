@@ -1,10 +1,9 @@
 ---
-openstack_release: rocky
-blazar_tag: stein
-cloud: "envvars"
+openstack_release: train
+cloud: envvars
 
 docker_namespace: kolla
-docker_registry_username: kolla
+docker_registry_username: registry
 docker_registry: docker.chameleoncloud.org
 kolla_base_distro: centos
 kolla_install_type: source
@@ -22,6 +21,8 @@ enable_rabbitmq: yes
 
 # Blazar
 enable_blazar: yes
+enable_blazar_usage_enforcement: yes
+blazar_project_enforcement_id: charge_code
 # When to send lease notification email
 blazar_minutes_before_end_lease: 2880
 blazar_default_max_lease_duration: 604800
@@ -38,6 +39,7 @@ blazar_floatingip_billrate: 0.0
 blazar_database_name: blazar
 blazar_database_user: blazar
 blazar_database_port: "{{ database_port }}"
+blazar_email_relay: "{{ kolla_internal_fqdn }}"
 
 # Cinder
 enable_cinder: no
@@ -56,6 +58,7 @@ hammers_openstack_project_name: "{{ keystone_admin_project }}"
 enable_haproxy: yes
 kolla_enable_tls_external: yes
 haproxy_listen_neutron_server_extra: ["timeout server 15m"]
+haproxy_service_template: "haproxy_single_service_split.cfg.j2"
 
 # Heat
 enable_heat: yes
@@ -83,6 +86,19 @@ ironic_provisioning_network_gateway: "{{ ironic_provisioning_network_cidr | ipad
 ironic_cleaning_network: "{{ ironic_provisioning_network }}"
 ironic_image_cache_size: 20480 # MB
 ironic_pxe_append_params: "nofb nomodeset vga=normal console=tty0 console=ttyS0,9600 systemd.journald.forward_to_console=yes rootpwd={{ ironic_pxe_root_password }}"
+#ironic_ks_services:
+#  - name: "ironic"
+#    type: "baremetal"
+#    description: "Ironic baremetal provisioning service"
+#    endpoints:
+#      - {'interface': 'admin', 'url': '{{ ironic_admin_endpoint }}'}
+#      - {'interface': 'internal', 'url': '{{ ironic_internal_endpoint }}'}
+#      - {'interface': 'public', 'url': '{{ ironic_public_endpoint }}'}
+
+# Keycloak
+enable_keycloak: no
+enable_keycloak_external: "{{ enable_keycloak }}"
+enable_keycloak_external_frontend: no
 
 # Keystone
 enable_keystone: yes
@@ -127,6 +143,11 @@ nova_public_endpoint: "{{ public_protocol }}://{{ kolla_external_fqdn }}:{{ nova
 # Prometheus
 enable_prometheus: no
 prometheus_bind_address: "{{ lookup('vars', 'ansible_' + network_interface).ipv4.address }}"
+
+# Redfish Monitor
+redfish_monitor_openstack_user: "{{ keystone_admin_username }}"
+redfish_monitor_openstack_password: "{{ keystone_admin_password }}"
+redfish_monitor_openstack_project_name: "{{ keystone_admin_project }}"
 
 # Swift
 enable_swift: no

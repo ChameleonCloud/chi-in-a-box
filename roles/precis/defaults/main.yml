@@ -16,6 +16,7 @@ precis_rabbitmq_listener_bindings:
   - neutron
   - nova
   - openstack
+  - glance
 precis_rabbitmq_rpc_queue: experiment_precis_service_queue
 
 # precis_mysql_host: ''
@@ -31,9 +32,12 @@ precis_mysql_external_database_privileges:
   - nova.*:SELECT
   - nova_api.*:SELECT
   - gnocchi.*:SELECT
+  
+precis_init_docker_image: docker.chameleoncloud.org/experiment-precis/init:latest
 
 precis_event_listener_docker_image: docker.chameleoncloud.org/experiment-precis/event-listener:latest
 precis_event_listener_service_name: experiment-precis-event-listener
+precis_event_listener_prometheus_port: 8913
 
 precis_endpoint_docker_image: docker.chameleoncloud.org/experiment-precis/endpoint:latest
 precis_endpoint_service_name: experiment-precis-endpoint
@@ -42,5 +46,6 @@ precis_endpoint_port: 8910
 
 precis_generator_docker_image: docker.chameleoncloud.org/experiment-precis/generator:latest
 precis_generator_service_name: experiment-precis-generator
+precis_generator_prometheus_port: 8912
 
 precis_cleanup_docker_image: docker.chameleoncloud.org/experiment-precis/cleanup:latest

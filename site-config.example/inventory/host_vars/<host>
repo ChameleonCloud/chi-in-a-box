@@ -3,6 +3,5 @@
 # therefore any provisioning can be done locally.
 ansible_connection: local
 
-# CentOS default names
-network_interface: eno1
-kolla_external_vip_interface: eno2
+#network_interface: eth1
+#kolla_external_vip_interface: eth2

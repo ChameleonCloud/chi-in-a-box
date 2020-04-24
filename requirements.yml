@@ -1,3 +1,7 @@
 ---
+- src: diurnalist.docker_service
+
+- src: diurnalist.periodic_task
+
 - src: michaelrigart.interfaces
   version: v1.2.0

@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
-VIRTUALENV="${VIRTUALENV:-$DIR/venv}"
+VIRTUALENV="$(realpath ${VIRTUALENV:-$DIR/venv})"
 
-FORCE_UPDATES=no
+FORCE_UPDATES="${FORCE_UPDATES:-no}"
 if [[ ! -d "$VIRTUALENV" ]]; then
   echo "Creating virtualenv at $VIRTUALENV ..."
   virtualenv "$VIRTUALENV" --system-site-packages
@@ -46,6 +46,9 @@ while [[ $# -gt 0 ]]; do
     --no-update)
       CHECK_UPDATES=no
       ;;
+    --force-update)
+      FORCE_UPDATES=yes
+      ;;
     *)
       POSARGS+=($key)
       ;;
@@ -60,7 +63,7 @@ done
 
 init() {
   local site_config="$CC_ANSIBLE_SITE"
-  
+
   if [[ -d "$site_config" ]]; then
     echo "Site config already exists at $site_config! Aborting."
     return 1
@@ -189,7 +192,7 @@ if [[ "$CHECK_UPDATES" == "yes" || "$FORCE_UPDATES" == "yes" ]]; then
   pip_requirements_chksum="$VIRTUALENV/requirements.txt.sha256"
   if [[ "$FORCE_UPDATES" == "yes" || ! -f "$pip_requirements_chksum" ]] || \
         ! sha256sum --quiet --check "$pip_requirements_chksum"; then
-    pip install --upgrade -r "$pip_requirements"
+    pip install --upgrade --force-reinstall -r "$pip_requirements"
     sha256sum "$pip_requirements" > "$pip_requirements_chksum"
   fi
 
@@ -199,12 +202,12 @@ if [[ "$CHECK_UPDATES" == "yes" || "$FORCE_UPDATES" == "yes" ]]; then
   galaxy_role_requirements_chksum="$VIRTUALENV/requirements.yml.sha256"
   if [[ "$FORCE_UPDATES" == "yes" || ! -f "$galaxy_role_requirements_chksum" ]] || \
         ! sha256sum --quiet --check "$galaxy_role_requirements_chksum"; then
-    ansible-galaxy install -p "$galaxy_role_path" -r "$galaxy_role_requirements"
+    ansible-galaxy install --force -p "$galaxy_role_path" -r "$galaxy_role_requirements"
     sha256sum "$galaxy_role_requirements" > "$galaxy_role_requirements_chksum"
   fi
 
   kolla_ansible_remote=https://github.com/chameleoncloud/kolla-ansible.git
-  kolla_ansible_checkout=${KOLLA_ANSIBLE_BRANCH:-chameleoncloud/rocky}
+  kolla_ansible_checkout=${KOLLA_ANSIBLE_BRANCH:-chameleoncloud/train}
   kolla_ansible_gitref="$VIRTUALENV/kolla-ansible.gitref"
   kolla_ansible_egglink="$VIRTUALENV/src/kolla-ansible"
   if [[ "$FORCE_UPDATES" == "yes" || ! -f "$kolla_ansible_gitref" || ! -d "$kolla_ansible_egglink" ]] || \
@@ -216,7 +219,7 @@ if [[ "$CHECK_UPDATES" == "yes" || "$FORCE_UPDATES" == "yes" ]]; then
     # Ensure the /share folder is placed; this is not copied when using the "develop" setup.py method.
     # This is a bit weird, perhaps there is some way to pass an additional flag to pip to make it
     # copy this even though it's installing as source. We use source install to keep track of the Git revision.
-    mkdir -p "$VIRTUALENV/share" && ln -sf "$kolla_ansible_egglink" "$VIRTUALENV/share/kolla-ansible" 
+    mkdir -p "$VIRTUALENV/share" && ln -sf "$kolla_ansible_egglink" "$VIRTUALENV/share/kolla-ansible"
     (cd $kolla_ansible_egglink; git rev-parse HEAD > $kolla_ansible_gitref)
   fi
 
@@ -247,17 +250,22 @@ if [[ -n "${CC_ANSIBLE_PLAYBOOK:-}" ]]; then
 
   ansible_path="$VIRTUALENV/share/kolla-ansible/ansible"
   playbook_file="$ansible_path/$(basename $CC_ANSIBLE_PLAYBOOK)"
+
+  # Because we execute within Kolla-Ansible's playbook directory, "magic"
+  # paths will not work any more--add our plugins/libraries to Ansible's
+  # search path directly.
+  export ANSIBLE_ACTION_PLUGINS="$DIR/playbooks/action_plugins"
+  export ANSIBLE_LIBRARY="$DIR/playbooks/library"
+  export ANSIBLE_TEMPLATES="$DIR/playbooks/templates"
+
   # Copy the playbook to a new location relative to the Kolla-Ansible installation
   # to allow the group_vars/ in the playbook directory to take effect.
   cp "$(realpath $CC_ANSIBLE_PLAYBOOK)" "$playbook_file"
-  # Move roles out of the way so they do not have precedence in case there
-  # is a collision on role name.
-  mv "$ansible_path/roles" "$ansible_path/_roles"
   _playbook_override_cleanup() {
     rm -f "$playbook_file"
-    mv "$ansible_path/_roles" "$ansible_path/roles"
   }
   TRAPS+=(_playbook_override_cleanup)
+
   # Prepare an invocation of Kolla-Ansible targeting this playbook
   POSARGS+=(deploy --playbook "$playbook_file")
 fi
@@ -301,4 +309,4 @@ if [[ "${POSARGS[@]}" != *"bootstrap-servers"* ]]; then
 fi
 kolla_args+=("${POSARGS[@]}")
 
-kolla-ansible "${kolla_args[@]}"
+$VIRTUALENV/bin/kolla-ansible "${kolla_args[@]}"

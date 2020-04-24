@@ -1,0 +1,18 @@
+# {{ ansible_managed }}
+[Unit]
+After=docker.service
+
+[Service]
+Restart=always
+ExecStart=/bin/docker run --name={{ redfish_monitor_service_name }} \
+                          --net=host \
+                          -v {{ redfish_monitor_log_folder }}:/var/log/redfish-monitor \
+                          --env-file {{ redfish_monitor_env_file }} \
+                          {{ redfish_monitor_docker_image }} \
+                          redfish-monitor --minutes {{ redfish_monitor_minute_interval }}
+
+ExecStop=/bin/docker stop -t 2 {{ redfish_monitor_service_name }}
+ExecStopPost=/bin/docker rm -f {{ redfish_monitor_service_name }}
+
+[Install]
+WantedBy=multi-user.target

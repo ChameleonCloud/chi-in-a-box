@@ -1,15 +1,10 @@
 ---
 - hosts: mariadb
   roles:
-    - mariadb
+    - chameleon_mariadb
   tags: [ mariadb, all ]
-
-- hosts: backups-glance
-  roles:
-    - glance
-  tags: [ glance, all ]
 
 - hosts: gnocchi
   roles:
-    - gnocchi
+    - chameleon_gnocchi
   tags: [ gnocchi, all ]

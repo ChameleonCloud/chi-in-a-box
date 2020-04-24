@@ -1,9 +1,0 @@
-# Docker options.
-docker_package: docker-ce
-docker_yum_repo_url: https://download.docker.com/linux/centos/7/$basearch/stable
-docker_yum_gpgkey: https://download.docker.com/linux/centos/gpg
-
-# Docker Compose options.
-docker_compose_enable: True
-docker_compose_version: "1.22.0"
-docker_compose_path: /usr/local/bin/docker-compose

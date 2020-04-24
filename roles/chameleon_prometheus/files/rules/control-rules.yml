@@ -1,0 +1,89 @@
+groups:
+- name: control_node
+  rules:
+
+  - alert: IronicLowImageCacheSpace
+    expr: |
+      min(node_filesystem_avail_bytes{mountpoint=~"/var(/lib(/(docker|ironic))?)?"})
+      by (hostname)
+      <
+      (1024 * 1024 * 1024 * 15)
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Low Ironic cache space on {{ $labels.hostname }}"
+      description: "Ironic process on {{ $labels.hostname }} has less than 15GB of space to use for image cache."
+      runbook: https://github.com/ChameleonCloud/chi-in-a-box/wiki/%5BRunbook%5D-IronicLowImageCacheSpace
+
+  - alert: NodeExporterDown
+    expr: up == 0
+    for: 15m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Exporter job *{{ $labels.job }}* is down"
+      description: "The exporter job *{{ $labels.job }}* on {{ $labels.hostname }} is no longer returning metrics."
+      runbook: https://github.com/ChameleonCloud/chi-in-a-box/wiki/%5BRunbook%5D-NodeExporterDown
+
+  - alert: NodeNetworkBridgeDown
+    expr: |
+      max_over_time(node_network_transmit_packets_total{device=~"br.*"}[1h])
+      unless node_network_transmit_packets_total
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Bridge *{{ $labels.device }}* is no longer reporting metrics"
+      description: "The network bridge *{{ $labels.device }}* on {{ $labels.hostname }} could be down."
+      runbook: https://github.com/ChameleonCloud/chi-in-a-box/wiki/%5BRunbook%5D-NodeNetworkBridgeDown
+
+  - alert: NodeFileSystemAlmostOutOfSpace
+    expr: |
+      predict_linear(node_filesystem_avail_bytes{fstype!="tmpfs"}[1h], (3600 * 24 * 3)) 
+        <= 0
+    for: 12h
+    labels:
+      severity: critical
+    annotations:
+      summary: "Mount *{{ $labels.mountpoint }}* is almost out of space"
+      description: "*{{ $labels.mountpoint }}* (device {{ $labels.device }}) on {{ $labels.hostname }} will run out of space in less than 3 days."
+      runbook: https://github.com/ChameleonCloud/chi-in-a-box/wiki/%5BRunbook%5D-NodeFileSystemAlmostOutOfSpace
+
+  - alert: NodeNetworkBridgeLowTraffic
+    expr: |
+      rate(node_network_transmit_packets_total{device=~"br.*"}[5m])
+        == 0
+      and
+      rate(node_network_transmit_packets_total{device=~"br.*"}[5m] offset 1d)
+        > 100
+    for: 30m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Bridge *{{ $labels.device }}* has lower than normal packet activity"
+      description: "The network bridge *{{ $labels.device }}* on {{ $labels.hostname }} had no traffic for the last 30 minutes."
+      runbook: https://github.com/ChameleonCloud/chi-in-a-box/wiki/%5BRunbook%5D-NodeNetworkBridgeLowTraffic
+
+  - alert: OpenStackAPIDown
+    expr: openstack_check_api == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: "OpenStack {{ $labels.service | title }} service is down"
+      description: "The *{{ $labels.service | title }}* service on {{ $labels.hostname }} is not responding."
+      runbook: https://github.com/ChameleonCloud/chi-in-a-box/wiki/%5BRunbook%5D-OpenStackAPIDown
+
+  - record: service_type:precis_events_total:rate1w
+    expr: sum(rate(precis_events_total{type="parsed"}[1w])) by (service)
+  
+  - alert: PrecisParsedEventsLow
+    expr: service_type:precis_events_total:rate1w == 0
+    for: 1d
+    labels:
+      severity: warning
+    annotations:
+      summary: "Experiment Precis event listener stops parsing OpenStack *{{ $labels.service }}* service notification messages"
+      description: "The Experiment Precis parsed no *{{ $labels.service }}* events for the last 1 week."
+      runbook: https://github.com/ChameleonCloud/chi-in-a-box/wiki/%5BRunbook%5D-PrecisParsedEventsLow
