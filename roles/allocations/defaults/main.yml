@@ -1,0 +1,15 @@
+---
+allocations_config_path: /etc/allocations
+allocations_docker_network: allocations
+allocations_docker_network_subnet: 172.18.11.0/24
+# Corresponds to the default user 1001 used in s2i builds
+allocations_user: 1001
+
+allocations_balance_service_docker_image: docker.chameleoncloud.org/allocations/balance-service:latest
+allocations_balance_service_name: allocations-balance-service
+allocations_balance_service_port: 8915
+
+redis_host: chi.uc.chameleoncloud.org
+allocations_auth_users: 
+  - blazar
+  - portal
