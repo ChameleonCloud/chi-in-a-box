@@ -18,7 +18,7 @@
 
 - name: Configure Keycloak services.
   include_role:
-    name: diurnalist.docker_service
+    name: chameleon.docker_service
   vars:
     service_name: "{{ item.key }}"
     service_bind_address: "{{ api_interface_address }}"
@@ -46,7 +46,7 @@
 
 - name: Configure periodic realm export.
   include_role:
-    name: diurnalist.periodic_task
+    name: chameleon.periodic_task
   vars:
     task_name: keycloak_backup_realm
     task_calendar: daily
