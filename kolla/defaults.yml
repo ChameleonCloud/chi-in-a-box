@@ -141,7 +141,7 @@ nova_internal_endpoint: "{{ internal_protocol }}://{{ kolla_internal_fqdn }}:{{ 
 nova_public_endpoint: "{{ public_protocol }}://{{ kolla_external_fqdn }}:{{ nova_api_port }}/v2.1"
 
 # Prometheus
-enable_prometheus: no
+enable_prometheus: "{{ inventory_hostname in groups['prometheus'] }}"
 prometheus_bind_address: "{{ lookup('vars', 'ansible_' + network_interface).ipv4.address }}"
 
 # Redfish Monitor

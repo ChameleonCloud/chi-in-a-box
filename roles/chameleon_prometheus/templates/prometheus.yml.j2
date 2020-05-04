@@ -1,4 +1,4 @@
-{% set alertmanager_service = prometheus_services['alertmanager'] %}
+{% set alertmanager_service = prometheus_services['prometheus-alertmanager'] %}
 {% set alertmanager_vars = hostvars[groups[alertmanager_service.group][0]] %}
 {% set snmp_exporter_service = prometheus_services['snmp-exporter'] %}
 {% set snmp_exporter_vars = hostvars[groups[snmp_exporter_service.group][0]] %}

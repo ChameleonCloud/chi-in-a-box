@@ -7,6 +7,7 @@
         | map(attribute='value') 
         | selectattr('image', 'defined') 
         | map(attribute='group') | list }}
+    enable_prometheus_alertmanager: inventory_hostname in groups['prometheus-alertmanager']
 
 - name: Create Docker network.
   docker_network:
@@ -44,11 +45,11 @@
   file:
     name: "/etc/prometheus/secrets"
     state: directory
-  when: inventory_hostname in groups[prometheus_services['server'].group]
+  when: inventory_hostname in groups[prometheus_services['prometheus-server'].group]
 
 - include_tasks: alertmanager.yml
   vars:
-    service: "{{ prometheus_services['alertmanager'] }}"
+    service: "{{ prometheus_services['prometheus-alertmanager'] }}"
   when: inventory_hostname in groups[service.group]
 
 - include_tasks: jupyterhub_exporter.yml
@@ -76,12 +77,14 @@
     service: "{{ prometheus_services['snmp-exporter'] }}"
   when: inventory_hostname in groups[service.group]
 
+- include_tasks: loadbalancer.yml
+
 # Prometheus server task should go last as it may be using
 # credentials generated in above steps.
 
 - include_tasks: server.yml
   vars:
-    service: "{{ prometheus_services['server'] }}"
+    service: "{{ prometheus_services['prometheus-server'] }}"
   when: inventory_hostname in groups[service.group]
 
 - name: Create Docker services.
