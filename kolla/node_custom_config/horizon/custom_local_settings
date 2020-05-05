@@ -61,10 +61,22 @@ CHAMELEON_SITES = {
 {% endfor %}
 }
 
+{% if enable_keystone_federation | bool %}
+WEBSSO_ENABLED = True
+WEBSSO_CHOICES = (
+    ('chameleon_portal', _('Chameleon Portal (Legacy)')),
+    ('chameleon_openid', _('Chameleon OpenID')),
+)
+WEBSSO_IDP_MAPPING = {
+    'chameleon_openid': ('chameleon', 'openid'),
+}
+WEBSSO_INITIAL_CHOICE = 'chameleon_portal'
+{% endif %}
+
 {% if enable_horizon_chameleon_websso | bool %}
 # Single-sign on support
 WEBSSO_ENABLED = True
-AUTHENTICATION_URLS = ['openstack_dashboard.cc_web_sso_urls','openstack_auth.urls',]
+AUTHENTICATION_URLS = ['openstack_dashboard.cc_web_sso_urls', 'openstack_auth.urls',]
 CHAMELEON_PORTAL_SSO_BASE_URL = '{{ horizon_chameleon_websso_host }}'
 CHAMELEON_PORTAL_SSO_LOGIN_PATH = '/sso/horizon/'
 CHAMELEON_PORTAL_SSO_LOGOUT_PATH = '/logout/'
