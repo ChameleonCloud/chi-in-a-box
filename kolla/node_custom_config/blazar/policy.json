@@ -20,11 +20,15 @@
     "blazar:oshosts:list_allocations": "rule:admin_or_owner",
     "blazar:oshosts:get_allocations": "rule:admin_or_owner",
     "blazar:oshosts:reallocate": "rule:admin_api",
+    "blazar:oshosts:get_resource_properties": "@",
+    "blazar:oshosts:patch_resource_properties": "rule:admin_api",
 
     "blazar:networks:create": "rule:admin_or_owner",
     "blazar:networks:delete": "rule:admin_or_owner",
     "blazar:networks:get": "rule:admin_or_owner",
     "blazar:networks:update": "rule:admin_or_owner",
     "blazar:networks:list_allocations": "rule:admin_or_owner",
-    "blazar:networks:get_allocations": "rule:admin_or_owner"
+    "blazar:networks:get_allocations": "rule:admin_or_owner",
+    "blazar:networks:get_resource_properties": "@",
+    "blazar:networks:patch_resource_properties": "rule:admin_api"
 }
