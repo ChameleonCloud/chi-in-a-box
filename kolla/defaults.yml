@@ -81,6 +81,9 @@ horizon_regions:
 # Keystone IdP federation
 identity_provider_url: "https://{{ keycloak_hostname }}/auth/realms/{{ keycloak_realm_name }}"
 keystone_identity_providers:
+  - name: portal
+    protocol:
+    public_name: Login with TAS (legacy accounts)
   - name: chameleon
     protocol: openid
     identifier: "{{ identity_provider_url }}"

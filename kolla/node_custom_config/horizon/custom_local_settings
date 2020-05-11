@@ -1,4 +1,4 @@
-from openstack_dashboard import settings
+from openstack_dashboard.settings import HORIZON_CONFIG
 from os import environ
 
 # Kolla-ansible defaults this to 'internalURL', which doesn't work when
@@ -16,7 +16,7 @@ DEFAULT_SERVICE_REGIONS = {
 SITE_BRANDING = 'ChameleonCloud'
 
 # Override help menu to point to our docs.
-settings.HORIZON_CONFIG['help_url'] = '{{ horizon_help_url }}'
+HORIZON_CONFIG['help_url'] = '{{ horizon_help_url }}'
 
 {% if enable_blazar | bool %}
 # Blazar-specific settings
@@ -62,8 +62,6 @@ CHAMELEON_SITES = {
 }
 
 {% if enable_horizon_chameleon_websso | bool %}
-WEBSSO_CHOICES = settings.WEBSSO_CHOICES + (('portal', 'Chameleon Portal (Legacy)'))
-settings.WEBSSO_IDP_MAPPING['portal'] = (None, None)
 WEBSSO_INITIAL_CHOICE = 'portal'
 WEBSSO_DEFAULT_REDIRECT = True
 WEBSSO_DEFAULT_REDIRECT_URL = '{{ horizon_chameleon_websso_host }}/sso/horizon'
