@@ -62,6 +62,7 @@ CHAMELEON_SITES = {
 }
 
 {% if enable_horizon_chameleon_websso | bool %}
+AUTHENTICATION_URLS = ['openstack_dashboard.cc_web_sso_urls', 'openstack_auth.urls']
 WEBSSO_INITIAL_CHOICE = 'portal'
 WEBSSO_DEFAULT_REDIRECT = True
 WEBSSO_DEFAULT_REDIRECT_URL = '{{ horizon_chameleon_websso_host }}/sso/horizon'
