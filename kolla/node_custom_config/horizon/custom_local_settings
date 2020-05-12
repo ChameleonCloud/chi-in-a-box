@@ -61,12 +61,33 @@ CHAMELEON_SITES = {
 {% endfor %}
 }
 
+# NOTE(jason): This is lifted from local_settings.j2 in Kolla-Ansible; we have
+# to override it to add in a kludgy entry for Portal SSO, which isn't a "true"
+# SSO in the same way as the others, which have e.g. Keystone mappings and
+# assume an identity provider is registered in Keystone. We also remove the
+# local login.
+{% if enable_keystone_federation | bool %}
+WEBSSO_ENABLED = True
+WEBSSO_CHOICES = (
+    ("portal", "Log in with TACC account (Legacy)"),
+{% for idp in keystone_identity_providers %}
+    ("{{ idp.name }}", "{{ idp.public_name }}"),
+{% endfor %}
+)
+WEBSSO_IDP_MAPPING = {
+    "portal": (None, None)
+{% for idp in keystone_identity_providers %}
+    "{{ idp.name }}": ("{{ idp.name }}", "{{ idp.protocol }}"),
+{% endfor %}
+}
+
 {% if enable_horizon_chameleon_websso | bool %}
 AUTHENTICATION_URLS = ['openstack_dashboard.cc_web_sso_urls', 'openstack_auth.urls']
 WEBSSO_INITIAL_CHOICE = 'portal'
 WEBSSO_DEFAULT_REDIRECT = True
 WEBSSO_DEFAULT_REDIRECT_URL = '{{ horizon_chameleon_websso_host }}/sso/horizon'
 WEBSSO_DEFAULT_REDIRECT_LOGOUT = '{{ horizon_chameleon_websso_host }}/logout'
+{% endif %}
 {% endif %}
 
 # A dictionary of settings which can be used to provide the default values for
