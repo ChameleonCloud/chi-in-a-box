@@ -75,7 +75,7 @@ WEBSSO_CHOICES = (
 {% endfor %}
 )
 WEBSSO_IDP_MAPPING = {
-    "portal": (None, None)
+    "portal": (None, None),
 {% for idp in keystone_identity_providers %}
     "{{ idp.name }}": ("{{ idp.name }}", "{{ idp.protocol }}"),
 {% endfor %}
