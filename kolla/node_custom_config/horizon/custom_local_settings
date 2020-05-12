@@ -68,7 +68,7 @@ CHAMELEON_SITES = {
 # local login.
 {% if enable_keystone_federation | bool %}
 WEBSSO_ENABLED = True
-WEBSSO_KEYSTONE_URL = "{{ keystone_public_url }}"
+WEBSSO_KEYSTONE_URL = "{{ keystone_public_url }}/v3"
 WEBSSO_CHOICES = (
     ("portal", "Log in with TACC account (Legacy)"),
 {% for idp in keystone_identity_providers %}
