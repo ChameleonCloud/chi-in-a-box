@@ -66,6 +66,9 @@ enable_heat: yes
 # Horizon
 enable_horizon: yes
 enable_horizon_chameleon_websso: yes
+# Keep this to 'no' until we have switched from old multi-region to new
+# multi-keystone model (with federation).
+horizon_use_keystone_internal_url: no
 horizon_help_url: https://chameleoncloud.readthedocs.io/en/latest/technical/baremetal.html
 horizon_redirect_root: /dashboard
 horizon_chameleon_websso_host: https://www.chameleoncloud.org
