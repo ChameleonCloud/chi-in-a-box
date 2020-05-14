@@ -94,6 +94,7 @@ keystone_identity_providers:
 keystone_identity_mappings:
   - name: chameleon_mapping
     file: "{{ node_custom_config }}/keystone/idp_mapping.json"
+keystone_federation_openid_discovery_url: "{{ chameleon_portal_url }}/auth/oidc_discovery"
 
 # Ironic
 enable_ironic: yes
