@@ -88,6 +88,8 @@ WEBSSO_INITIAL_CHOICE = 'portal'
 WEBSSO_DEFAULT_REDIRECT = True
 WEBSSO_DEFAULT_REDIRECT_URL = '{{ horizon_chameleon_websso_host }}/sso/horizon'
 WEBSSO_DEFAULT_REDIRECT_LOGOUT = '{{ horizon_chameleon_websso_host }}/logout'
+# Show users interstitial page upon logout instead of logging them out of Portal immediately
+WEBSSO_DEFAULT_REDIRECT_LOGOUT_CONFIRM = True
 {% endif %}
 {% endif %}
 
