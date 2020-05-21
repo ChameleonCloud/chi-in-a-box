@@ -27,6 +27,7 @@
     docker_environment: "{{ item.value.environment }}"
     docker_mounts: "{{ item.value.mounts }}"
     docker_ports: "{{ item.value.ports|default([]) }}"
+    docker_command: "{{ item.value.command|default(None) }}"
   loop: "{{ keycloak_services|dict2items }}"
   loop_control:
     label: "{{ item.key }}"

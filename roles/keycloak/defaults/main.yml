@@ -21,7 +21,7 @@ keycloak_services:
   keycloak_server:
     group: keycloak_server
     enabled: true
-    image: docker.chameleoncloud.org/keycloak:7
+    image: docker.chameleoncloud.org/keycloak:10
     network: "{{ keycloak_docker_network }}"
     environment:
       DB_VENDOR: mariadb
@@ -41,6 +41,9 @@ keycloak_services:
       - type: volume
         src: keycloak_backup
         dst: /backup
+    command: <
+      -b 0.0.0.0
+      -Dkeycloak.profile=preview
     haproxy:
       keycloak_server:
         enabled: "{{ enable_keycloak }}"
