@@ -1,6 +1,0 @@
----
-- name: Import realm
-  command: >
-    docker exec -e KEYCLOAK_USER={{ keycloak_user }} -e KEYCLOAK_PASSWORD={{ keycloak_password }}
-    -e KEYCLOAK_IMPORT=/backup/realm.json keycloak_server
-  no_log: True
