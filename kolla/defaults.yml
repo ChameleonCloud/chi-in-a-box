@@ -66,6 +66,9 @@ enable_heat: yes
 # Horizon
 enable_horizon: yes
 enable_horizon_chameleon_websso: yes
+# Keep this to 'no' until we have switched from old multi-region to new
+# multi-keystone model (with federation).
+horizon_use_keystone_internal_url: no
 horizon_help_url: https://chameleoncloud.readthedocs.io/en/latest/technical/baremetal.html
 horizon_redirect_root: /dashboard
 horizon_chameleon_websso_host: https://www.chameleoncloud.org
@@ -77,6 +80,20 @@ horizon_regions:
     blazar_database_port: "{{ blazar_database_port }}"
     blazar_database_user: "{{ blazar_database_user }}"
     blazar_database_password: "{{ blazar_database_password }}"
+
+# Keystone IdP federation
+identity_provider_url: "https://{{ keycloak_hostname }}/auth/realms/{{ keycloak_realm_name }}"
+keystone_identity_providers:
+  - name: chameleon
+    protocol: openid
+    identifier: "{{ identity_provider_url }}"
+    public_name: Login with Chameleon
+    client_id: "{{ keystone_idp_client_id }}"
+    client_secret: "{{ keystone_idp_client_secret }}"
+    attribute_mapping: chameleon_mapping
+keystone_identity_mappings:
+  - name: chameleon_mapping
+    file: "{{ node_custom_config }}/keystone/idp_mapping.json"
 
 # Ironic
 enable_ironic: yes
@@ -99,6 +116,8 @@ ironic_pxe_append_params: "nofb nomodeset vga=normal console=tty0 console=ttyS0,
 enable_keycloak: no
 enable_keycloak_external: "{{ enable_keycloak }}"
 enable_keycloak_external_frontend: no
+keycloak_realm_name: chameleon
+keycloak_hostname: auth.chameleoncloud.org
 
 # Keystone
 enable_keystone: yes

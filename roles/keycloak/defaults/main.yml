@@ -2,8 +2,8 @@
 project_name: keycloak
 
 keycloak_hostname: auth.chameleoncloud.org
-keycloak_port: 8085  # Just needs to be something that doesn't conflict
 keycloak_realm_name: chameleon
+keycloak_port: 8085  # Just needs to be something that doesn't conflict
 
 # The admin user provisioned by default in Keycloak
 keycloak_user: admin

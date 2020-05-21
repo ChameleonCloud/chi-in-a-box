@@ -1,0 +1,35 @@
+[
+  {
+    "local": [
+      {
+        "user": {
+          "name": "{0}",
+          "email": "{1}"
+        }
+      },
+      {
+        "projects": [
+          {
+            "name": "{2}",
+            "roles": [
+              {
+                "name": "member"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "remote": [
+      {
+        "type": "OIDC-preferred_username"
+      },
+      {
+        "type": "OIDC-email"
+      },
+      {
+        "type": "OIDC-groups"
+      }
+    ]
+  }
+]
