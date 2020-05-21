@@ -41,7 +41,7 @@ keycloak_services:
       - type: volume
         src: keycloak_backup
         dst: /backup
-    command: <
+    command: >
       -b 0.0.0.0
       -Dkeycloak.profile=preview
     haproxy:
