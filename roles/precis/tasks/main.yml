@@ -136,41 +136,48 @@
         mode: 0600
         dest: "{{ precis_config_path }}/cleanup.conf"
         owner: "{{ precis_user }}"
-    - name: Configure systemd service.
-      template:
-        src: "{{ item.template }}"
-        dest: "/etc/systemd/system/{{ item.service }}.service"
-      notify:
-        - "reload systemd daemon"
-        - "{{ item.handler }}"
+    - name: Configure systemd services
+      include_role:
+        name: chameleon.docker_service
+      vars:
+        service_name: "{{ item.service }}"
+        service_bind_address: "{{ api_interface_address }}"
+        docker_image: "{{ item.image }}"
+        docker_network: "{{ precis_docker_network }}"
+        docker_mounts: 
+          - type: bind
+            src: "{{ precis_config_path }}/{{ item.conf }}"
+            dst: "/etc/experiment_precis/{{ item.conf }}"
+        docker_ports: 
+          - "{{ api_interface_address }}:{{ item.port }}:8000/tcp"
       loop:
-        - template: "precis_event_listener.service.j2"
-          handler: "restart precis event listener"
+        - image: "{{ precis_event_listener_docker_image }}"
           service: "{{ precis_event_listener_service_name }}"
-        - template: "precis_endpoint.service.j2"
-          handler: "restart precis endpoint"
+          conf: "event_listener.conf"
+          port: "{{ precis_event_listener_prometheus_port }}"
+        - image: "{{ precis_endpoint_docker_image }}"
           service: "{{ precis_endpoint_service_name }}"
-        - template: "precis_generator.service.j2"
-          handler: "restart precis generator"
+          conf: "service.conf"
+          port: "{{ precis_endpoint_port }}"
+        - image: "{{ precis_generator_docker_image }}"
           service: "{{ precis_generator_service_name }}"
+          conf: "service.conf"
+          port: "{{ precis_generator_prometheus_port }}"
   tags:
     - configuration
+    
+- name: Configure haproxy for precis endpoint
+  import_role:
+    name: haproxy-config
+  vars:
+    project_services: "{{ precis_services }}"
+  when: enable_haproxy | bool
 
 - name: Create precis database
   shell: |
     docker run --rm --net={{ precis_docker_network }} \
     -v "{{ precis_config_path }}/init.conf:/etc/experiment_precis/init.conf" \
     {{ precis_init_docker_image }} 2>&1
-
-- name: Enable precis services on boot.
-  systemd:
-    service: "{{ item }}"
-    state: started
-    enabled: yes
-  loop:
-    - "{{ precis_event_listener_service_name }}"
-    - "{{ precis_endpoint_service_name }}"
-    - "{{ precis_generator_service_name }}"
 
 - name: Include cron notification script
   include_role:

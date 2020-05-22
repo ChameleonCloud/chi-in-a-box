@@ -49,3 +49,20 @@ precis_generator_service_name: experiment-precis-generator
 precis_generator_prometheus_port: 8912
 
 precis_cleanup_docker_image: docker.chameleoncloud.org/experiment-precis/cleanup:latest
+
+precis_services:
+  precis:
+    group: precis
+    enabled: "{{ enable_precis }}"
+    haproxy:
+      precis:
+        enabled: true
+        mode: "http"
+        port: "{{ precis_endpoint_port }}"
+        listen_port: "{{ precis_endpoint_port }}"
+      precis_external:
+        enabled: true
+        mode: "http"
+        external: true
+        port: "{{ precis_endpoint_port }}"
+        listen_port: "{{ precis_endpoint_port }}"
