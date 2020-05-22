@@ -28,7 +28,12 @@
         "type": "OIDC-email"
       },
       {
-        "type": "OIDC-groups"
+        "type": "OIDC-groups",
+        "blacklist": [
+          ".*-admins$",
+          ".*-managers$"
+        ],
+        "regex": true
       }
     ]
   }
