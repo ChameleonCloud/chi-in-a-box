@@ -76,7 +76,7 @@ groups:
       runbook: https://github.com/ChameleonCloud/chi-in-a-box/wiki/%5BRunbook%5D-OpenStackAPIDown
 
   - record: service_type:precis_events_total:rate1w
-    expr: sum(rate(precis_events_total{type="parsed"}[1w])) by (service)
+    expr: sum(rate(precis_events_total{type="parsed"}[1w])) by (service, hostname)
   
   - alert: PrecisParsedEventsLow
     expr: service_type:precis_events_total:rate1w == 0
