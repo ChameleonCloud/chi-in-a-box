@@ -77,25 +77,3 @@ keycloak_tasks:
     group: keycloak_server
     calendar: daily
     command: "/usr/local/sbin/keycloak_backup_realm.sh {{ keycloak_realm_name }}"
-  keycloak_tas_sync:
-    group: keycloak_tas_sync
-    calendar: hourly
-    docker:
-      image: docker.chameleoncloud.org/keycloak-tas-sync:latest
-      environment:
-        LDAP_BIND_UID: "{{ keycloak_tas_sync_ldap_bind_uid }}"
-        LDAP_BIND_PASSWORD: "{{ keycloak_tas_sync_ldap_bind_password|default(omit) }}"
-        LDAP_URL: ldap://ldap.tacc.utexas.edu:389
-        TAS_URL: https://tas.tacc.utexas.edu/api
-        TAS_CLIENT_KEY: "{{ keycloak_tas_sync_tas_client_key }}"
-        TAS_CLIENT_SECRET: "{{ keycloak_tas_sync_tas_client_secret|default(omit) }}"
-        KEYCLOAK_CLIENT_ID: "{{ keycloak_tas_sync_keycloak_client_id }}"
-        KEYCLOAK_CLIENT_SECRET: "{{ keycloak_tas_sync_keycloak_client_secret|default(omit) }}"
-        KEYCLOAK_CLIENT_PROVIDER_ALIAS: "{{ keycloak_tas_sync_provider_alias }}"
-        KEYCLOAK_CLIENT_PROVIDER_SUB: "{{ keycloak_tas_sync_provider_sub }}"
-
-keycloak_tas_sync_ldap_bind_uid: cctest
-keycloak_tas_sync_tas_client_key: tasclient
-keycloak_tas_sync_keycloak_client_id: user-group-import
-keycloak_tas_sync_provider_alias: tacc
-keycloak_tas_sync_provider_sub: 6c3f8474-e0f7-49f7-9ddd-90c1b899daab
