@@ -730,5 +730,5 @@ keycloak
 [keycloak_db:children]
 keycloak
 
-[keycloak_tas_sync]
-# Disabled by default
+[keycloak_tas_sync:children]
+keycloak
