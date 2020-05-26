@@ -9,12 +9,16 @@
     label: "{{ item.value.image }}"
   tags:
     - pull
+  when:
+    - inventory_hostname in groups[item.value.group]
 
 - name: Create Keycloak network.
   docker_network:
     name: "{{ keycloak_docker_network }}"
     ipam_config:
       - subnet: "{{ keycloak_docker_network_subnet }}"
+  when:
+    - inventory_hostname in groups.keycloak_server
 
 - name: Configure Keycloak services.
   include_role:
@@ -31,6 +35,8 @@
   loop: "{{ keycloak_services|dict2items }}"
   loop_control:
     label: "{{ item.key }}"
+  when:
+    - inventory_hostname in groups[item.value.group]
 
 - name: Configure haproxy for Keycloak
   import_role:
@@ -44,11 +50,33 @@
     src: keycloak_backup_realm.sh
     dest: /usr/local/sbin/keycloak_backup_realm.sh
     mode: "0700"
+  when:
+    - inventory_hostname in groups[keycloak_tasks.keycloak_realm_export.group]
 
-- name: Configure periodic realm export.
+- name: Pull Keycloak task images.
+  docker_image:
+    source: pull
+    name: "{{ item.value.docker.image }}"
+    force_source: yes
+  loop: "{{ keycloak_tasks|dict2items }}"
+  loop_control:
+    label: "{{ (item.value.docker | default({})).image|default(None) }}"
+  when:
+    - item.value.docker is defined
+    - inventory_hostname in groups[item.value.group]
+  tags:
+    - pull
+
+- name: Configure Keycloak periodic tasks.
   include_role:
     name: chameleon.periodic_task
   vars:
-    task_name: keycloak_backup_realm
-    task_calendar: daily
-    task_command: "/usr/local/sbin/keycloak_backup_realm.sh {{ keycloak_realm_name }}"
+    task_name: "{{ item.key }}"
+    task_calendar: "{{ item.value.calendar }}"
+    task_command: "{{ item.value.command|default(None) }}"
+    task_docker: "{{ item.value.docker|deafult(None) }}"
+  loop: "{{ keycloak_tasks|dict2items }}"
+  loop_control:
+    label: "{{ item.key }}"
+  when:
+    - inventory_hostname in groups[item.value.group]

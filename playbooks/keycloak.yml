@@ -1,4 +1,6 @@
 ---
-- hosts: keycloak
+- hosts:
+    - keycloak
+    - keycloak_tas_sync
   roles:
     - keycloak
