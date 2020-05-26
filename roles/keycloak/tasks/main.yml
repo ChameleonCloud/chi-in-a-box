@@ -74,7 +74,7 @@
     task_name: "{{ item.key }}"
     task_calendar: "{{ item.value.calendar }}"
     task_command: "{{ item.value.command|default(None) }}"
-    task_docker: "{{ item.value.docker|deafult(None) }}"
+    task_docker: "{{ item.value.docker|default(None) }}"
   loop: "{{ keycloak_tasks|dict2items }}"
   loop_control:
     label: "{{ item.key }}"
