@@ -729,3 +729,6 @@ keycloak
 
 [keycloak_db:children]
 keycloak
+
+[keycloak_tas_sync:children]
+keycloak

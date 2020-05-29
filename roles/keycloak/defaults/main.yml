@@ -71,3 +71,9 @@ keycloak_services:
       - type: volume
         src: keycloak_db_storage
         dst: /var/lib/mysql
+
+keycloak_tasks:
+  keycloak_realm_export:
+    group: keycloak_server
+    calendar: daily
+    command: "/usr/local/sbin/keycloak_backup_realm.sh {{ keycloak_realm_name }}"

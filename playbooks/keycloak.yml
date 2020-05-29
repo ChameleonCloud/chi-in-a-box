@@ -2,3 +2,11 @@
 - hosts: keycloak
   roles:
     - keycloak
+  when:
+    - enable_keycloak | bool
+
+- hosts: keycloak_tas_sync
+  roles:
+    - keycloak_tas_sync
+  when:
+    - enable_keycloak_tas_sync | bool
