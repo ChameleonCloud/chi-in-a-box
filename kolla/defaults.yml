@@ -170,7 +170,18 @@ redfish_monitor_openstack_password: "{{ keystone_admin_password }}"
 redfish_monitor_openstack_project_name: "{{ keystone_admin_project }}"
 
 # Swift
+rgw_port: 7480  # Override non-standard KA default of 6780
+# Disable complete rgw compatibility for now. If Ceph has these options set,
+# it is considered "compatible":
+#   rgw_swift_url_prefix = "/"
+#   rgw_enable_apis = swift,swift_auth,admin
+#   rgw_swift_enforce_content_length = true
+# This just means we expose swift on the /swift path prefix from Ceph, as it
+# is also supporting S3's API on a different path prefix.
+ceph_rgw_compatibility: no
+swift_keystone_user: ceph  # For legacy reasons, this is different than default
 enable_swift: no
+enable_swift_rgw: no
 
 # Monitoring
 # TODO: install ES curator

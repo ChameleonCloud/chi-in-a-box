@@ -1,0 +1,38 @@
+---
+# NOTE(jasonanderson): much of the following is copied from Kolla-Ansible. Ceph
+# support in KA is being dropped, but there is no simple way to link up the
+# Swift bits (HAProxy frontends and Keystone endpoints) with an external Ceph.
+# So we provide those targeted bits here.
+swift_keystone_user: ceph
+swift_admin_endpoint: "{{ admin_protocol }}://{{ kolla_internal_fqdn | put_address_in_context('url') }}:{{ rgw_port }}{{ '/' if ceph_rgw_compatibility|bool else '/swift/' }}v1"
+swift_internal_endpoint: "{{ internal_protocol }}://{{ kolla_internal_fqdn | put_address_in_context('url') }}:{{ rgw_port }}{{ '/' if ceph_rgw_compatibility|bool else '/swift/' }}v1"
+swift_public_endpoint: "{{ public_protocol }}://{{ kolla_external_fqdn | put_address_in_context('url') }}:{{ rgw_port }}{{ '/' if ceph_rgw_compatibility|bool else '/swift/' }}v1"
+chameleon_swift_ks_services:
+  - name: "swift"
+    type: "object-store"
+    description: "Openstack Object Storage"
+    endpoints:
+      - {'interface': 'admin', 'url': '{{ swift_admin_endpoint }}'}
+      - {'interface': 'internal', 'url': '{{ swift_internal_endpoint }}'}
+      - {'interface': 'public', 'url': '{{ swift_public_endpoint }}'}
+chameleon_swift_ks_users:
+  - project: "service"
+    user: "{{ swift_keystone_user }}"
+    password: "{{ swift_keystone_password }}"
+    role: "admin"
+
+chameleon_swift_services:
+  swift_api:
+    group: ceph-rgw
+    enabled: true
+    haproxy:
+      swift_api:
+        enabled: "{{ enable_swift_rgw }}"
+        mode: "http"
+        external: false
+        port: "{{ rgw_port }}"
+      swift_api_external:
+        enabled: "{{ enable_swift_rgw }}"
+        mode: "http"
+        external: true
+        port: "{{ rgw_port }}"
