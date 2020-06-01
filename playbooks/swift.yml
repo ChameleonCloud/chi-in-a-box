@@ -1,6 +1,5 @@
 ---
 - hosts: ceph-rgw
   roles:
-    - chameleon_swift
-  when:
-    - enable_swift_rgw | bool
+    - name: chameleon_swift
+      when: enable_swift_rgw | bool
