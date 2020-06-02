@@ -3,6 +3,7 @@
 # support in KA is being dropped, but there is no simple way to link up the
 # Swift bits (HAProxy frontends and Keystone endpoints) with an external Ceph.
 # So we provide those targeted bits here.
+project_name: "swift"
 swift_admin_endpoint: "{{ admin_protocol }}://{{ kolla_internal_fqdn | put_address_in_context('url') }}:{{ rgw_port }}{{ '/' if ceph_rgw_compatibility|bool else '/swift/' }}v1"
 swift_internal_endpoint: "{{ internal_protocol }}://{{ kolla_internal_fqdn | put_address_in_context('url') }}:{{ rgw_port }}{{ '/' if ceph_rgw_compatibility|bool else '/swift/' }}v1"
 swift_public_endpoint: "{{ public_protocol }}://{{ kolla_external_fqdn | put_address_in_context('url') }}:{{ rgw_port }}{{ '/' if ceph_rgw_compatibility|bool else '/swift/' }}v1"
