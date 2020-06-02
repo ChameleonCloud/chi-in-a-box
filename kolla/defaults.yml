@@ -84,7 +84,7 @@ horizon_regions:
 # Keystone IdP federation
 identity_provider_url: "https://{{ keycloak_hostname }}/auth/realms/{{ keycloak_realm_name }}"
 keystone_identity_providers:
-  - name: chameleon
+  - name: chameleon  # If this changes, the openrc.sh template also needs changing
     protocol: openid
     identifier: "{{ identity_provider_url }}"
     public_name: Login with Chameleon
