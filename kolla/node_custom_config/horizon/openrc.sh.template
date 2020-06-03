@@ -1,12 +1,10 @@
 {% raw -%}
 {% load shellfilter %}#!/usr/bin/env bash
-export OS_AUTH_URL={{ auth_url }}
+export OS_AUTH_URL={{ auth_url }}/v3
+export OS_IDENTITY_API_VERSION=3
 export OS_INTERFACE={{ interface }}
-export OS_IDENTITY_API_VERSION={{ os_identity_api_version }}
 export OS_PROJECT_ID={{ tenant_id }}
 export OS_PROJECT_NAME="{{ tenant_name|shellfilter }}"
-export OS_USER_DOMAIN_NAME="{{ user_domain_name|shellfilter }}"
-if [ -z "$OS_USER_DOMAIN_NAME" ]; then unset OS_USER_DOMAIN_NAME; fi
 export OS_PROJECT_DOMAIN_ID="{{ project_domain_id|shellfilter }}"
 if [ -z "$OS_PROJECT_DOMAIN_ID" ]; then unset OS_PROJECT_DOMAIN_ID; fi
 export OS_USERNAME="{{ user.username|shellfilter }}"
@@ -14,15 +12,17 @@ export OS_USERNAME="{{ user.username|shellfilter }}"
 export OS_IDENTITY_PROVIDER="chameleon"
 export OS_PROTOCOL="openid"
 export OS_AUTH_TYPE="v3oidcpassword"
-export OS_CLIENT_SECRET="none"
 echo "($OS_USERNAME) Please enter your Chameleon CLI password: "
 read -sr OS_PASSWORD_INPUT
 export OS_PASSWORD=$OS_PASSWORD_INPUT
 {% endraw %}
-export OS_DISCOVERY_URL="{{ identity_provider_url }}/.well-known/openid-configuration"
+export OS_DISCOVERY_ENDPOINT="{{ identity_provider_url }}/.well-known/openid-configuration"
 export OS_CLIENT_ID="{{ keystone_idp_client_id }}"
 {% raw -%}
+export OS_CLIENT_SECRET="none"
 {% else %}
+export OS_USER_DOMAIN_NAME="{{ user_domain_name|shellfilter }}"
+if [ -z "$OS_USER_DOMAIN_NAME" ]; then unset OS_USER_DOMAIN_NAME; fi
 echo "($OS_USERNAME) Please enter your Chameleon password: "
 read -sr OS_PASSWORD_INPUT
 export OS_PASSWORD=$OS_PASSWORD_INPUT
