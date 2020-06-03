@@ -18,7 +18,7 @@ export OS_CLIENT_SECRET="none"
 echo "($OS_USERNAME) Please enter your Chameleon CLI password: "
 read -sr OS_PASSWORD_INPUT
 export OS_PASSWORD=$OS_PASSWORD_INPUT
-{%- endraw %}
+{% endraw %}
 export OS_DISCOVERY_URL="{{ identity_provider_url }}/.well-known/openid-configuration"
 export OS_CLIENT_ID="{{ keystone_idp_client_id }}"
 {% raw -%}
@@ -29,4 +29,4 @@ export OS_PASSWORD=$OS_PASSWORD_INPUT
 {% endif %}
 export OS_REGION_NAME="{{ region|shellfilter }}"
 if [ -z "$OS_REGION_NAME" ]; then unset OS_REGION_NAME; fi
-{%- endraw %}
+{% endraw %}
