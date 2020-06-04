@@ -12,6 +12,8 @@ keycloak_tas_sync_tasks:
         TAS_URL: https://tas.tacc.utexas.edu/api
         TAS_CLIENT_KEY: "{{ keycloak_tas_sync_tas_client_key }}"
         TAS_CLIENT_SECRET: "{{ keycloak_tas_sync_tas_client_secret|default(omit) }}"
+        KEYCLOAK_SERVER_URL: "https://{{ keycloak_hostname }}"
+        KEYCLOAK_REALM_NAME: "{{ keycloak_realm_name }}"
         KEYCLOAK_CLIENT_ID: "{{ keycloak_tas_sync_keycloak_client_id }}"
         KEYCLOAK_CLIENT_SECRET: "{{ keycloak_tas_sync_keycloak_client_secret|default(omit) }}"
         KEYCLOAK_CLIENT_PROVIDER_ALIAS: "{{ keycloak_tas_sync_provider_alias }}"
