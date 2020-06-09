@@ -125,3 +125,10 @@ OPENSTACK_IMAGE_BACKEND = {
         ('raw', 'Raw'),
     ],
 }
+
+# The OPENSTACK_HEAT_STACK has the only setting available - enable_user_pass,
+# which can be used to disable the password field while launching the stack.
+# Set to False if HEAT uses trusts by default otherwise it needs to be set as True.
+OPENSTACK_HEAT_STACK = {
+    'enable_user_pass': False
+}
