@@ -27,3 +27,6 @@ jupyterhub_db_db: jupyterhub
 
 jupyterhub_notebook_docker_image: docker.chameleoncloud.org/jupyterhub-user:6e90f80
 jupyterhub_notebook_workdir: /work
+
+jupyterhub_keycloak_client_id: jupyterhub-prod
+jupyterhub_keycloak_client_secret:

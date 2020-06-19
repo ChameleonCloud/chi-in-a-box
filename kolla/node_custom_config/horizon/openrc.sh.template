@@ -9,13 +9,13 @@ export OS_PROJECT_DOMAIN_ID="{{ project_domain_id|shellfilter }}"
 if [ -z "$OS_PROJECT_DOMAIN_ID" ]; then unset OS_PROJECT_DOMAIN_ID; fi
 export OS_USERNAME="{{ user.username|shellfilter }}"
 {% if user.is_federated %}
-export OS_IDENTITY_PROVIDER="chameleon"
 export OS_PROTOCOL="openid"
 export OS_AUTH_TYPE="v3oidcpassword"
 echo "($OS_USERNAME) Please enter your Chameleon CLI password: "
 read -sr OS_PASSWORD_INPUT
 export OS_PASSWORD=$OS_PASSWORD_INPUT
 {% endraw %}
+export OS_IDENTITY_PROVIDER="{{ identity_provider_name }}"
 export OS_DISCOVERY_ENDPOINT="{{ identity_provider_url }}/.well-known/openid-configuration"
 export OS_CLIENT_ID="{{ keystone_idp_client_id }}"
 {% raw -%}
