@@ -36,7 +36,7 @@ while [[ $# -gt 0 ]]; do
       # Add proper flag support for --check as an option for dry-runs
       export EXTRA_OPTS="${EXTRA_OPTS:-} --check"
       ;;
-    decrypt_passwords|edit_passwords|help|init)
+    decrypt_passwords|edit_passwords|help|init|view_passwords)
       # Special subcommand!
       command="$key"
       ;;
@@ -121,7 +121,12 @@ edit_passwords() {
   cp "$tmpfile" "$CC_ANSIBLE_SITE/passwords.yml"
 }
 
+# Deprecated function name
 decrypt_passwords() {
+  view_passwords
+}
+
+view_passwords() {
   ansible-vault --vault-password-file="$CC_ANSIBLE_VAULT_PASSWORD" \
     view "$CC_ANSIBLE_SITE/passwords.yml"
 }
@@ -133,6 +138,7 @@ Usage: cc-ansible [-s|--site SITE]
                   ARGS
 
 Subcommands:
+  view_passwords: View the contents of the encrypted password file.
   edit_passwords: Update an encrypted passwords file for the given environment.
                   Opens an interactive editor and saves the results back out as
                   en encrypted file.
