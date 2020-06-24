@@ -7,7 +7,7 @@
 - hosts: haproxy
   tasks:
     - include_role:
-        role: chameleon_swift
+        name: chameleon_swift
         tasks_from: loadbalancer
       tags: swift
       when:
