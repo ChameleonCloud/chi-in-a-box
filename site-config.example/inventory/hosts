@@ -821,6 +821,9 @@ monitoring
 [prometheus-push-gateway:children]
 monitoring
 
+[prometheus-redis-exporter:children]
+redis
+
 [prometheus-snmp-exporter:children]
 monitoring
 

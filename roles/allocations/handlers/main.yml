@@ -1,5 +1,5 @@
 ---
-- name: "restart allocations balance service"
+- name: restart allocations api
   service:
-    name: "{{ allocations_balance_service_name }}"
+    name: allocations_api
     state: restarted

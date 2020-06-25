@@ -1,10 +1,10 @@
 [DEFAULT]
-debug: False
+debug: {{ allocations_api_debug | bool }}
 
 [serviceaccount]
 auth_url: {{ keystone_public_url }}/v3
 auth_users: {{ allocations_auth_users | join(",") }}
 
 [redis]
-host: {{ redis_host }}
-port: {{ redis_port }}
+host: {{ allocations_db_host }}
+port: {{ allocations_db_port }}

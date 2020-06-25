@@ -1,0 +1,16 @@
+location /allocations/ {
+  # Using a variable prevents Nginx from crashing out if the hostname cannot
+  # be resolved at start time.
+  set $upstream http://allocations_api:{{ allocations_api_port }};
+  # NOTE(jason): when using a variable for the upstream address, Nginx will
+  # require a resolver is explicitly set ;_; - it cannot automatically pick up
+  # the resolver in /etc/resolv.conf apparently. Set this explicitly to the
+  # Docker default nameserver.
+  resolver 127.0.0.11;
+  # When using variables in proxy_pass, it will not automatically pass through
+  # the request URI, so we have to construct it ourselves.
+  if ($request_uri ~* "/allocations(/.*$)") {
+    set $path $1;
+  }
+  proxy_pass $upstream$path;
+}
