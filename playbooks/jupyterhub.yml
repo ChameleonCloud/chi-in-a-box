@@ -30,6 +30,9 @@
           vars:
             apache_server_name: "{{ jupyterhub_hostname }}"
             apache_server_conf: |
+              # Set X-Scheme for tornado app; see https://github.com/jupyterhub/jupyterhub/issues/2284
+              RequestHeader set X-Scheme "https"
+
               RewriteEngine On
               RewriteCond %{HTTP:Connection} Upgrade [NC]
               RewriteCond %{HTTP:Upgrade} websocket [NC]
