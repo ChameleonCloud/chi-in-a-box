@@ -43,6 +43,7 @@ keycloak_services:
         dst: /backup
     command: >
       -b 0.0.0.0
+      -c standalone.xml
       -Dkeycloak.profile=preview
     haproxy:
       keycloak_server:
