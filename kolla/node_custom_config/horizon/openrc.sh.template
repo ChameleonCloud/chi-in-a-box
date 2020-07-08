@@ -3,7 +3,6 @@
 export OS_AUTH_URL={{ auth_url }}/v3
 export OS_IDENTITY_API_VERSION=3
 export OS_INTERFACE={{ interface }}
-export OS_PROJECT_ID={{ tenant_id }}
 export OS_PROJECT_NAME="{{ tenant_name|shellfilter }}"
 export OS_PROJECT_DOMAIN_ID="{{ project_domain_id|shellfilter }}"
 if [ -z "$OS_PROJECT_DOMAIN_ID" ]; then unset OS_PROJECT_DOMAIN_ID; fi
