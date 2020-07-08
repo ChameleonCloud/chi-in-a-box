@@ -12,6 +12,27 @@
   when:
     - inventory_hostname in groups[item.value.group]
 
+- name: Pull Keycloak extensions
+  block:
+    - name: Create extension directory
+      file:
+        name: "{{ keycloak_extension_path }}"
+        state: directory
+        mode: "0775"  # Keycloak needs to write metadata files to this directory
+    - name: Fetch extension jar files
+      maven_artifact:
+        group_id: "{{ item.group_id }}"
+        artifact_id: "{{ item.artifact_id }}"
+        version: "{{ item.version }}"
+        repository_url: "{{ item.repository_url }}"
+        username: "{{ item.username }}"
+        password: "{{ item.password }}"
+        mode: "0644"
+        # Name after artifact to ensure only 1 version of each artifact
+        # can be loaded at a time.
+        dest: "{{ keycloak_extension_path }}/{{ item.artifact_id }}.jar"
+      loop: "{{ keycloak_extensions }}"
+
 - name: Create Keycloak network.
   docker_network:
     name: "{{ keycloak_docker_network }}"

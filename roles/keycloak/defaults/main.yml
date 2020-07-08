@@ -41,6 +41,9 @@ keycloak_services:
       - type: volume
         src: keycloak_backup
         dst: /backup
+      - type: bind
+        src: "{{ keycloak_extension_path }}"
+        dst: /opt/jboss/keycloak/standalone/deployments
     command: >
       -b 0.0.0.0
       -c standalone.xml
@@ -78,3 +81,13 @@ keycloak_tasks:
     group: keycloak_server
     calendar: daily
     command: "/usr/local/sbin/keycloak_backup_realm.sh {{ keycloak_realm_name }}"
+
+keycloak_extension_path: /etc/keycloak/modules
+keycloak_extension_repository_username: chameleoncloud-ci
+keycloak_extensions:
+  - group_id: org.chameleoncloud
+    artifact_id: keycloak-chameleon
+    version: 1.0.0-SNAPSHOT
+    username: "{{ keycloak_extension_repository_username }}"
+    password: "{{ keycloak_extension_repository_password }}"
+    repository_url: https://maven.pkg.github.com/ChameleonCloud
