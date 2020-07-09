@@ -90,4 +90,4 @@ keycloak_extensions:
     version: 1.0.0-SNAPSHOT
     username: "{{ keycloak_extension_repository_username }}"
     password: "{{ keycloak_extension_repository_password }}"
-    repository_url: https://maven.pkg.github.com/ChameleonCloud
+    repository_url: https://maven.pkg.github.com/ChameleonCloud/keycloak-chameleon
