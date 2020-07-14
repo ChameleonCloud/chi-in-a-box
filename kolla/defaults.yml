@@ -162,6 +162,14 @@ nova_admin_endpoint: "{{ admin_protocol }}://{{ kolla_internal_fqdn }}:{{ nova_a
 nova_internal_endpoint: "{{ internal_protocol }}://{{ kolla_internal_fqdn }}:{{ nova_api_port }}/v2.1"
 nova_public_endpoint: "{{ public_protocol }}://{{ kolla_external_fqdn }}:{{ nova_api_port }}/v2.1"
 
+# Portal
+enable_portal: no
+# This should be in defaults b/c it may be used by other roles,
+# not just the portal role
+portal_nginx_conf_dir: /opt/chameleon/conf.d
+# The docker-compose network name for the Portal stack
+portal_network: portal
+
 # Prometheus
 enable_prometheus: no
 prometheus_bind_address: "{{ lookup('vars', 'ansible_' + network_interface).ipv4.address }}"

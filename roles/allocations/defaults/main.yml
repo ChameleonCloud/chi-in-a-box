@@ -1,15 +1,46 @@
 ---
 allocations_config_path: /etc/allocations
-allocations_docker_network: allocations
-allocations_docker_network_subnet: 172.18.11.0/24
 # Corresponds to the default user 1001 used in s2i builds
 allocations_user: 1001
 
-allocations_balance_service_docker_image: docker.chameleoncloud.org/allocations/balance-service:latest
-allocations_balance_service_name: allocations-balance-service
-allocations_balance_service_port: 8915
+allocations_api_debug: False
+allocations_api_tag: latest
+allocations_api_docker_image: "docker.chameleoncloud.org/allocations/balance-service:{{ allocations_api_tag }}"
+allocations_api_port: 8080
+# Will be exposed on localhost on host for convenience
+allocations_external_api_port: 8915
+
+allocations_db_tag: 6
+allocations_db_docker_image: "redis:{{ allocations_db_tag }}"
+allocations_db_host: allocations_db  # the Docker container name
+allocations_db_port: 6379
 
 redis_host: chi.uc.chameleoncloud.org
-allocations_auth_users: 
+allocations_auth_users:
   - blazar
   - portal
+
+allocations_services:
+  allocations_api:
+    group: allocations
+    enabled: true
+    image: "{{ allocations_api_docker_image }}"
+    network: "{{ portal_network }}"
+    ports:
+      - "{{ allocations_external_api_port }}:{{ allocations_api_port }}/tcp"
+    mounts:
+      - type: bind
+        src: "{{ allocations_config_path }}/service.conf"
+        dst: /etc/allocations/balance-service.conf
+  allocations_db:
+    group: allocations
+    enabled: true
+    image: "{{ allocations_db_docker_image }}"
+    network: "{{ portal_network }}"
+    ports:
+      - "{{ allocations_db_port }}:{{ allocations_db_port }}"
+    mounts:
+      - type: volume
+        src: allocations_db
+        dst: /data
+    command: redis-server --appendonly yes

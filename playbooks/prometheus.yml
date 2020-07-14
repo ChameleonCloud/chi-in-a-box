@@ -7,6 +7,7 @@
     - prometheus-node-exporter
     - prometheus-openstack-exporter
     - prometheus-push-gateway
+    - prometheus-redis-exporter
   roles:
     - chameleon_prometheus
   tasks:

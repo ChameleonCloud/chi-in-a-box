@@ -1,45 +1,73 @@
 ---
-- name: Pull allocations service container images.
+- name: Pull allocations API image.
   docker_image:
     source: pull
-    name: "{{ item }}"
+    name: "{{ allocations_api_docker_image }}"
     state: present
     force_source: yes
-  loop:
-    - "{{ allocations_balance_service_docker_image }}"
   notify:
-    - restart allocations balance service
+    - restart allocations api
   tags:
     - pull
-    
-- name: Create Docker network.
-  docker_network:
-    name: "{{ allocations_docker_network }}"
-    ipam_config:
-      - subnet: "{{ allocations_docker_network_subnet }}"
+  when:
+    - inventory_hostname in groups['allocations']
+
+- name: Pull allocations DB image.
+  docker_image:
+    source: pull
+    name: "{{ allocations_db_docker_image }}"
     state: present
-  when: allocations_docker_network != "host"
+    force_source: yes
+  tags:
+    - pull
+  when:
+    - inventory_hostname in groups['allocations']
 
-- name: Create init configuration.
-  template:
-    src: "allocations_balance_service.conf.j2"
-    mode: 0600
-    dest: "{{ allocations_config_path }}/service.conf"
-    owner: "{{ allocations_user }}"
-  notify:
-    - restart allocations balance service
+- name: Create API configuration.
+  block:
+    - name: Ensure configuration directory exists
+      file:
+        name: "{{ allocations_config_path }}"
+        state: directory
+    - name: Create API configuration.
+      template:
+        src: allocations_balance_service.conf.j2
+        mode: "0600"
+        dest: "{{ allocations_config_path }}/service.conf"
+        owner: "{{ allocations_user }}"
+      notify:
+        - restart allocations api
+  when:
+    - inventory_hostname in groups['allocations']
 
-- name: Configure allocations services
+- name: Create Nginx configuration
+  block:
+    - name: Ensure Nginx includes directory exists
+      file:
+        name: "{{ portal_nginx_conf_dir }}/includes"
+        state: directory
+    - name: Create Nginx configuration
+      template:
+        src: nginx.conf.j2
+        dest: "{{ portal_nginx_conf_dir }}/includes/portal_allocations.conf"
+  when:
+    - enable_portal | bool
+    - inventory_hostname in groups['portal']
+
+- name: Configure allocations services.
   include_role:
     name: chameleon.docker_service
   vars:
-    service_name: "{{ allocations_balance_service_name }}"
-    service_bind_address: "{{ api_interface_address }}"
-    docker_image: "{{ allocations_balance_service_docker_image }}"
-    docker_network: "{{ allocations_docker_network }}"
-    docker_mounts: 
-      - type: bind
-        src: "{{ allocations_config_path }}/service.conf"
-        dst: "/etc/allocations/balance-service.conf"
-    docker_ports: 
-      - "{{ api_interface_address }}:{{ allocations_balance_service_port }}:8080/tcp"
+    service_name: "{{ item.key }}"
+    service_bind_address: 127.0.0.1
+    docker_image: "{{ item.value.image }}"
+    docker_network: "{{ item.value.network|default('bridge') }}"
+    docker_environment: "{{ item.value.environment|default({}) }}"
+    docker_mounts: "{{ item.value.mounts|default([]) }}"
+    docker_ports: "{{ item.value.ports|default([]) }}"
+    docker_command: "{{ item.value.command|default('') }}"
+  loop: "{{ allocations_services|dict2items }}"
+  loop_control:
+    label: "{{ item.key }}"
+  when:
+    - inventory_hostname in groups[item.value.group]

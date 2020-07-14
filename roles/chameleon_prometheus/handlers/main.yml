@@ -42,3 +42,8 @@
   service:
     name: prometheus_pushgateway
     state: restarted
+
+- name: restart redis exporter
+  service:
+    name: prometheus_redis_exporter
+    state: restarted
