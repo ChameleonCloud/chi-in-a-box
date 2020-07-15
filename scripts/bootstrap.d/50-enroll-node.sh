@@ -26,7 +26,7 @@ update_node() {
 
   declare -a cmd_args=()
   cmd_args+=(--name "$node")
-  cmd_args+=(--driver pxe_ipmitool_socat)
+  cmd_args+=(--driver ipmi)
   cmd_args+=(--driver-info "ipmi_username=$ipmi_username")
   cmd_args+=(--driver-info "ipmi_password=$ipmi_password")
   cmd_args+=(--driver-info "ipmi_address=$ipmi_address")
@@ -89,6 +89,10 @@ openstack flavor show baremetal 2>/dev/null \
   || openstack flavor create \
       --public --ram 1 --vcpus 1 \
       --disk "$greatest_common_min_disk_size" \
+      --property resources:CUSTOM_BAREMETAL=1 \
+      --property resources:VCPU=0 \
+      --property resources:MEMORY_MB=0 \
+      --property resources:DISK_GB=0 \
       baremetal >/dev/null
 
 log "Ensuring freepool aggregate exists..."
@@ -120,7 +124,7 @@ for node in $nodes; do
 done
 
 log "Discovering hosts..."
-nova-manage cell_v2 discover_hosts
+docker exec nova_api nova-manage cell_v2 discover_hosts
 
 log "Done."
 log
