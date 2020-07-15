@@ -32,6 +32,8 @@
         # can be loaded at a time.
         dest: "{{ keycloak_extension_path }}/{{ item.artifact_id }}.jar"
       loop: "{{ keycloak_extensions }}"
+      loop_control:
+        label: "{{ item.group_id }}.{{ item.artifact_id }} ({{ item.version }})"
 
 - name: Create Keycloak network.
   docker_network:
