@@ -18,6 +18,10 @@ keycloak_tas_sync_tasks:
         KEYCLOAK_CLIENT_SECRET: "{{ keycloak_tas_sync_keycloak_client_secret|default(omit) }}"
         KEYCLOAK_CLIENT_PROVIDER_ALIAS: "{{ keycloak_tas_sync_provider_alias }}"
         KEYCLOAK_CLIENT_PROVIDER_SUB: "{{ keycloak_tas_sync_provider_sub }}"
+        PORTAL_MYSQL_HOST: "{{ chameleon_portal_mysql_host }}"
+        PORTAL_MYSQL_USER: "{{ chameleon_portal_mysql_user }}"
+        PORTAL_MYSQL_PASSWORD: "{{ chameleon_portal_mysql_password }}"
+        PORTAL_MYSQL_DATABASE: "{{ chameleon_portal_mysql_database }}"
 
 keycloak_tas_sync_ldap_bind_uid: cctest
 keycloak_tas_sync_tas_client_key: tasclient
