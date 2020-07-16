@@ -169,6 +169,9 @@ enable_portal: no
 portal_nginx_conf_dir: /opt/chameleon/conf.d
 # The docker-compose network name for the Portal stack
 portal_network: portal
+chameleon_portal_mysql_host: udcc-db01.tacc.utexas.edu
+chameleon_portal_mysql_user: chameleon_ro
+chameleon_portal_mysql_database: chameleon_prod
 
 # Prometheus
 enable_prometheus: no
