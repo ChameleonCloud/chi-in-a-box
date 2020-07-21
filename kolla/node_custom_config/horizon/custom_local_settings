@@ -10,6 +10,7 @@ OPENSTACK_ENDPOINT_TYPE = 'publicURL'
 
 # Default user to specific region on login.
 DEFAULT_SERVICE_REGIONS = {
+  '*': '{{ openstack_region_name }}',
   '{{ horizon_keystone_url }}': '{{ openstack_region_name }}',
 }
 
