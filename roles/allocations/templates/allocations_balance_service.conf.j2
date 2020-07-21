@@ -2,9 +2,14 @@
 debug: {{ allocations_api_debug | bool }}
 
 [serviceaccount]
-auth_url: {{ keystone_public_url }}/v3
+default_auth_url: {{ keystone_public_url }}/v3
+allowed_auth_urls: {{ allocations_allowed_auth_urls | join(",") }}
 auth_users: {{ allocations_auth_users | join(",") }}
 
 [redis]
 host: {{ allocations_db_host }}
 port: {{ allocations_db_port }}
+
+[enforcement]
+project_enforcement_id: {{ allocations_project_enforcement_id }}
+usage_default_allocated: {{ allocations_usage_default_allocated }}
