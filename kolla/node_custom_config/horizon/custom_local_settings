@@ -13,7 +13,7 @@ DEFAULT_SERVICE_REGIONS = {
   '*': '{{ openstack_region_name }}',
 }
 
-{% if not horizon_enable_multiregion_select | bool %}
+{% if not (horizon_enable_multiregion_select | bool) %}
 OPENSTACK_KEYSTONE_MULTIREGION_SUPPORT = False
 {% endif %}
 
