@@ -11,8 +11,11 @@ OPENSTACK_ENDPOINT_TYPE = 'publicURL'
 # Default user to specific region on login.
 DEFAULT_SERVICE_REGIONS = {
   '*': '{{ openstack_region_name }}',
-  '{{ horizon_keystone_url }}': '{{ openstack_region_name }}',
 }
+
+{% if not horizon_enable_multiregion_select | bool %}
+OPENSTACK_KEYSTONE_MULTIREGION_SUPPORT = False
+{% endif %}
 
 SITE_BRANDING = 'ChameleonCloud'
 

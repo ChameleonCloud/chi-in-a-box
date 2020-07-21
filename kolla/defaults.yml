@@ -80,6 +80,7 @@ horizon_regions:
     blazar_database_port: "{{ blazar_database_port }}"
     blazar_database_user: "{{ blazar_database_user }}"
     blazar_database_password: "{{ blazar_database_password }}"
+horizon_enable_multiregion_select: yes
 
 # Keystone IdP federation
 identity_provider_url: "{{ keycloak_url }}/auth/realms/{{ keycloak_realm_name }}"
