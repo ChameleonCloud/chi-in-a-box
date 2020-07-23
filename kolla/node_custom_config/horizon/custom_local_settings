@@ -13,8 +13,22 @@ DEFAULT_SERVICE_REGIONS = {
   '*': '{{ openstack_region_name }}',
 }
 
-{% if not (horizon_enable_multiregion_select | bool) %}
+# Used by server instance page to create links from the instance overview
+# to the resource catalog.
+CHAMELEON_PORTAL_API_BASE_URL = '{{ chameleon_portal_url }}'
+CHAMELEON_REFERENCE_API_URL = '{{ chameleon_reference_api_url }}'
+CHAMELEON_SITE_ID = '{{ chameleon_site_name }}'
+{% if enable_chameleon_multisite | bool %}
+# Hide the region dropdown
 OPENSTACK_KEYSTONE_MULTIREGION_SUPPORT = False
+# Show the site dropdown
+CHAMELEON_MULTISITE_SUPPORT = True
+{% else %}
+CHAMELEON_SITES = {
+{% for conf in horizon_regions %}
+  '{{ conf.region_name }}': '{{ conf.chameleon_site_name }}',
+{% endfor %}
+}
 {% endif %}
 
 SITE_BRANDING = 'ChameleonCloud'
@@ -55,15 +69,6 @@ AVAILABLE_THEMES = [
   ('chameleoncloud', 'ChameleonCloud', '/etc/openstack-dashboard/themes/chameleoncloud'),
 ]
 DEFAULT_THEME = 'chameleoncloud'
-
-# Used by server instance page to create links from the instance overview
-# to the resource catalog.
-CHAMELEON_PORTAL_API_BASE_URL = 'https://www.chameleoncloud.org'
-CHAMELEON_SITES = {
-{% for conf in horizon_regions %}
-  '{{ conf.region_name }}': '{{ conf.chameleon_site_name }}',
-{% endfor %}
-}
 
 # NOTE(jason): This is lifted from local_settings.j2 in Kolla-Ansible; we have
 # to override it to add in a kludgy entry for Portal SSO, which isn't a "true"

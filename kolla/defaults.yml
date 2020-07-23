@@ -11,6 +11,11 @@ kolla_install_type: source
 virtualenv: /etc/ansible/venv
 
 chameleon_portal_url: https://www.chameleoncloud.org
+chameleon_reference_api_url: https://api.chameleoncloud.org
+# Whether to show a dropdown in the Horizon GUI that provides links to other
+# Chameleon testbed sites.
+# NOTE(jason): this should eventually be on by default.
+enable_chameleon_multisite: no
 
 enable_mariadb: yes
 enable_chrony: yes
@@ -80,7 +85,6 @@ horizon_regions:
     blazar_database_port: "{{ blazar_database_port }}"
     blazar_database_user: "{{ blazar_database_user }}"
     blazar_database_password: "{{ blazar_database_password }}"
-horizon_enable_multiregion_select: yes
 
 # Keystone IdP federation
 identity_provider_url: "{{ keycloak_url }}/auth/realms/{{ keycloak_realm_name }}"
