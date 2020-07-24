@@ -59,11 +59,11 @@
       - name: pxe_deploy_kernel
         container_format: aki
         disk_format: aki
-        url: "https://tarballs.openstack.org/ironic-python-agent/coreos/files/coreos_production_pxe-stable-{{ openstack_release }}.vmlinuz"
+        url: "https://tarballs.opendev.org/openstack/ironic-python-agent/dib/files/ipa-centos7-stable-{{ openstack_release }}.kernel"
       - name: pxe_deploy_ramdisk
         container_format: aki
         disk_format: aki
-        url: "https://tarballs.openstack.org/ironic-python-agent/coreos/files/coreos_production_pxe_image-oem-stable-{{ openstack_release }}.cpio.gz"
+        url: "https://tarballs.opendev.org/openstack/ironic-python-agent/dib/files/ipa-centos7-stable-{{ openstack_release }}.initramfs"
   - name: Check state of Glance images.
     os_image_facts:
       cloud: "{{ cloud }}"
