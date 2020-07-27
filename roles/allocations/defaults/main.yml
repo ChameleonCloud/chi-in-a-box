@@ -2,6 +2,8 @@
 allocations_config_path: /etc/allocations
 # Corresponds to the default user 1001 used in s2i builds
 allocations_user: 1001
+allocations_project_enforcement_id: charge_code
+allocations_usage_default_allocated: 20000.0
 
 allocations_api_debug: False
 allocations_api_tag: latest
@@ -19,6 +21,11 @@ redis_host: chi.uc.chameleoncloud.org
 allocations_auth_users:
   - blazar
   - portal
+allocations_allowed_auth_urls:
+  - https://chi.uc.chameleoncloud.org:5000/v3
+  - https://chi.tacc.chameleoncloud.org:5000/v3
+  - https://dev.uc.chameleoncloud.org:5000/v3
+  - https://dev.tacc.chameleoncloud.org:5000/v3
 
 allocations_services:
   allocations_api:
@@ -31,7 +38,8 @@ allocations_services:
     mounts:
       - type: bind
         src: "{{ allocations_config_path }}/service.conf"
-        dst: /etc/allocations/balance-service.conf
+        dst: /etc/allocations/service.conf
+    command: python balance_service/app.py
   allocations_db:
     group: allocations
     enabled: true
