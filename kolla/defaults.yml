@@ -14,8 +14,7 @@ chameleon_portal_url: https://www.chameleoncloud.org
 chameleon_reference_api_url: https://api.chameleoncloud.org
 # Whether to show a dropdown in the Horizon GUI that provides links to other
 # Chameleon testbed sites.
-# NOTE(jason): this should eventually be on by default.
-enable_chameleon_multisite: no
+enable_chameleon_multisite: yes
 
 enable_mariadb: yes
 enable_chrony: yes
