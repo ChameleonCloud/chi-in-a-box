@@ -9,7 +9,9 @@
     - include_role:
         name: keycloak
         tasks_from: loadbalancer
-      when: enable_haproxy | bool
+      when:
+        - enable_keycloak | bool
+        - enable_haproxy | bool
 
 - hosts: keycloak_tas_sync
   roles:
