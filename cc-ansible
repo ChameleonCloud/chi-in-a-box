@@ -29,7 +29,7 @@ while [[ $# -gt 0 ]]; do
       shift # Past arg
       ;;
     -s|--site)
-      CC_ANSIBLE_SITE="$2"
+      CC_ANSIBLE_SITE="$(realpath $2)"
       shift # Past arg
       ;;
     --check)
