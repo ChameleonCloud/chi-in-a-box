@@ -1,3 +1,48 @@
+#!/usr/bin/env bash
+# Enroll nodes in Ironic/Blazar from a configuration file. The configuration
+# file declares nodes by name and includes important configuration, namely the
+# IPMI authentication details and the physical switch information and NIC MAC
+# addresses for the bare metal node.
+#
+# Reads a node configuration from the first positional argument, and defaults
+# to looking for a file "nodes.conf".
+#
+# Usage:
+#   enroll_nodes path/to/nodes.conf
+#
+# Sample configuration format:
+#
+#   [node01]
+#   ipmi_username = root
+#   ipmi_password = hopefully_not_default
+#   ipmi_address = 10.10.10.1
+#   # Optional, defaults to this value.
+#   ipmi_port = 623
+#   # Arbitrary terminal port; this is used to plumb a socat process to allow
+#   # reading and writing to a virtual console. It is just important that it does
+#   # not conflict with another node or host process.
+#   ipmi_terminal_port = 30133
+#   switch_name = LeafSwitch01
+#   switch_port_id = Te 1/10/1
+#   mac_address = 00:00:de:ad:be:ef
+#
+set -e -u -o pipefail
+
+NODE_CONF="${1:-nodes.conf}"
+
+export OPENSTACK_RELEASE=train
+export OS_BAREMETAL_API_VERSION=1.29
+
+log() {
+  echo "$@" >&2
+}
+export -f log
+
+log "Loading OpenStack environment from $HOME/adminrc."
+log
+
+source "$HOME/adminrc"
+
 log "################################"
 log " Node enrollment"
 log "################################"

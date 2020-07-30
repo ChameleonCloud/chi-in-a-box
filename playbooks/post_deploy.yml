@@ -1,31 +1,32 @@
 ---
 - hosts: control
+
   pre_tasks:
   - name: Set facts for Ironic interfaces.
-    block:
-    - set_fact:
-        ironic_interfaces:
-        - device: "{{ network_interface | replace('_', '-') }}.{{ ironic_provisioning_network_vlan }}"
-          bootproto: static
-          address: "{{ ironic_provisioning_network_gateway }}"
-          netmask: "{{ ironic_provisioning_network_cidr | ipaddr('netmask') }}"
+    set_fact:
+      ironic_interfaces:
+      - device: "{{ network_interface | replace('_', '-') }}.{{ ironic_provisioning_network_vlan }}"
+        bootproto: static
+        address: "{{ ironic_provisioning_network_gateway }}"
+        netmask: "{{ ironic_provisioning_network_cidr | ipaddr('netmask') }}"
     when: enable_ironic | bool and
           ironic_provisioning_network_vlan is defined
   - name: Set facts for Corsa interfaces.
-    block:
-    - set_fact:
-        corsa_nat_interfaces:
-        - device: "{{ network_interface | replace('_', '-') }}.{{ corsa_nat_network_vlan }}"
-          bootproto: static
-          address: "{{ corsa_nat_network_gateway }}"
-          netmask: "{{ corsa_nat_network_cidr | ipaddr('netmask') }}"
+    set_fact:
+      corsa_nat_interfaces:
+      - device: "{{ network_interface | replace('_', '-') }}.{{ corsa_nat_network_vlan }}"
+        bootproto: static
+        address: "{{ corsa_nat_network_gateway }}"
+        netmask: "{{ corsa_nat_network_cidr | ipaddr('netmask') }}"
     when: corsa_nat_network_cidr is defined
+
   roles:
-  - role: michaelrigart.interfaces
+  - name: michaelrigart.interfaces
     interfaces_ether_interfaces: >
       {{ (ironic_interfaces | default([])) +
          (corsa_nat_interfaces | default([])) }}
     become: True
+
   tasks:
   - name: Set fact for Corsa switches.
     set_fact:
@@ -51,7 +52,6 @@
 # until here.
 - hosts: deployment
   tasks:
-
   # Ironic-related configuration
   - set_fact:
       glance_images_tmp: "/tmp"
