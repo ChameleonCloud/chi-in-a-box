@@ -17,6 +17,8 @@ storage:
     endpointtype: {{ docker_registry_swift_endpointtype }}
   delete:
     enabled: true
+  redirect:
+    enabled: false
 {% if maintenance is defined and maintenance | bool %}
   maintenance:
     readonly:
