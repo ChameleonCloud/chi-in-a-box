@@ -30,13 +30,11 @@ blazar_project_enforcement_id: charge_code
 # When to send lease notification email
 blazar_minutes_before_end_lease: 2880
 blazar_default_max_lease_duration: 604800
+blazar_default_reservation_extension_window: 172800
 blazar_usage_default_allocated: 20000.0
 # Redis currently binds on public IP, use public FQDN
 blazar_usage_db_host: "{{ kolla_external_fqdn }}"
-blazar_usage_project_exemptions:
-  - Chameleon
-  - maintenance
-  - "{{ keystone_admin_project }}"
+blazar_usage_project_exemptions: []
 blazar_floatingip_billrate: 0.0
 # TODO: support looking up network with this name and fetching ID
 # blazar_floatingip_reservation_network: public
