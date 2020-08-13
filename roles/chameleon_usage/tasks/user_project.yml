@@ -1,15 +1,17 @@
 ---
-- name: Place credentials file
+- name: Configure credentials file
   template:
     src: user_project_report_credentials.j2
     mode: 0700
-    dest: /usr/local/sbin/user_project_report_credentials
+    dest: "{{ chameleon_usage_config_dir }}/user_project_report_credentials"
+  vars:
+    mysql_host: "{{ chameleon_usage_mysql_host }}"
 
-- name: Place usage script
+- name: Configure chameleon usage user project report docker bash wrapper
   template:
-    src: /root/scripts/chameleon-usage-reporting/user_project/user_project_report.py
-    mode: 0700
-    dest: /usr/local/sbin/user_project_report.py
+    src: chameleon-usage-user-project-report.j2
+    mode: a+x
+    dest: /usr/local/sbin/chameleon-usage-user-project-report
 
 - name: Add glance backup cron jobs.
   cron:
@@ -19,4 +21,4 @@
     day: "*"
     month: "*"
     weekday: "*"
-    job: "source {{ user_project_report_credentials }} && {{ user_project_report_cron_script }} && {{ cron_notification }} user_project_report"
+    job: "/usr/local/sbin/chameleon-usage-user-project-report | /usr/bin/logger -t \"chameleon_usage_user_project\""
