@@ -216,3 +216,4 @@ enable_ceph: no
 
 # Chameleon usage
 enable_usage_appliance_report: no
+enable_user_project_report: no
