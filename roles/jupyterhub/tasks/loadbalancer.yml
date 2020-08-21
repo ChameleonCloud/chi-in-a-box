@@ -1,0 +1,7 @@
+---
+- name: Configure haproxy for JupyterHub
+  import_role:
+    name: haproxy-config
+  vars:
+    project_services: "{{ jupyterhub_services }}"
+  tags: always

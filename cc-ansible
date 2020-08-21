@@ -220,7 +220,9 @@ if [[ "$CHECK_UPDATES" == "yes" || "$FORCE_UPDATES" == "yes" ]]; then
         ! diff -q >/dev/null \
           $kolla_ansible_gitref \
           <(cd $kolla_ansible_egglink; git fetch; git show-ref -s -d origin/$kolla_ansible_checkout); then
+    pushd $VIRTUALENV
     pip install -e git+$kolla_ansible_remote@$kolla_ansible_checkout#egg=kolla-ansible
+    popd
     # [jca 2020-01-30] TODO:
     # Ensure the /share folder is placed; this is not copied when using the "develop" setup.py method.
     # This is a bit weird, perhaps there is some way to pass an additional flag to pip to make it
