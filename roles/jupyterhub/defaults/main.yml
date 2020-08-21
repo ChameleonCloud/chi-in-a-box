@@ -109,10 +109,10 @@ jupyterhub_artifact_sharing_swift_container:
 jupyterhub_ks_services: []
 jupyterhub_ks_users:
   - project: service
-    user: "{{ jupyterhub_keystone_user }}"
-    password: "{{ jupyterhub_keystone_password }}"
+    user: "{{ jupyterhub_artifact_sharing_keystone_user }}"
+    password: "{{ jupyterhub_artifact_sharing_keystone_password }}"
     role: admin
   - project: "{{ jupyterhub_artifact_sharing_keystone_trust_project_name }}"
-    user: "{{ jupyterhub_keystone_user }}"
-    password: "{{ jupyterhub_keystone_password }}"
+    user: "{{ jupyterhub_artifact_sharing_keystone_user }}"
+    password: "{{ jupyterhub_artifact_sharing_keystone_password }}"
     role: member
