@@ -42,3 +42,11 @@
           RBD_CONF_CLUSTER="{{ jupyterhub_ceph_cluster }}" \
           RBD_CONF_KEYRING_USER="{{ jupyterhub_ceph_client }}"
       when: docker_plugin_list.stdout | join ('') is not search(jupyterhub_ceph_docker_volume_driver_alias)
+
+  - name: Configure JupyterHub for Ceph.
+    set_fact:
+      jupyterhub_environment: >-
+        {{ jupyterhub_environment | combine({
+          'DOCKER_VOLUME_DRIVER': jupyterhub_ceph_docker_volume_driver_alias,
+          'DOCKER_VOLUME_DRIVER_OPTS': 'size=1024,order=22'
+        }) }}

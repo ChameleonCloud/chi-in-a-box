@@ -139,6 +139,10 @@ keystone_project_domain: default
 keystone_authversion: 3
 openstack_keystone_auth_url: "{{ internal_protocol }}://{{ kolla_internal_fqdn }}:{{ keystone_public_port }}"
 
+# JupyterHub
+enable_jupyterhub: no
+enable_jupyterhub_external: "{{ enable_jupyterhub }}"
+
 # Neutron
 enable_neutron: yes
 enable_openvswitch: yes
