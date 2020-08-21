@@ -142,6 +142,7 @@ openstack_keystone_auth_url: "{{ internal_protocol }}://{{ kolla_internal_fqdn }
 # JupyterHub
 enable_jupyterhub: no
 enable_jupyterhub_external: "{{ enable_jupyterhub }}"
+enable_jupyterhub_external_frontend: "{{ enable_jupyterhub_external }}"
 
 # Neutron
 enable_neutron: yes
