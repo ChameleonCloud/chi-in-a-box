@@ -90,11 +90,15 @@ WEBSSO_IDP_MAPPING = {
     "{{ idp.name }}": ("{{ idp.name }}", "{{ idp.protocol }}"),
 {% endfor %}
 }
+WEBSSO_DEFAULT_REDIRECT = True
+# This really shouldn't have to be set, but it's set at configuration parse
+# time and derived from a value (OPENSTACK_KEYSTONE_URL) that is overriden by
+# our configuration.
+WEBSSO_DEFAULT_REDIRECT_REGION = '{{ keystone_public_url }}/v3'
+WEBSSO_DEFAULT_REDIRECT_PROTOCOL = 'openid'
 
 {% if enable_horizon_chameleon_websso | bool %}
 AUTHENTICATION_URLS = ['openstack_dashboard.cc_web_sso_urls', 'openstack_auth.urls']
-WEBSSO_INITIAL_CHOICE = 'portal'
-WEBSSO_DEFAULT_REDIRECT = True
 WEBSSO_DEFAULT_REDIRECT_URL = '{{ horizon_chameleon_websso_host }}/sso/horizon'
 WEBSSO_DEFAULT_REDIRECT_LOGOUT = '{{ horizon_chameleon_websso_host }}/logout'
 # Show users interstitial page upon logout instead of logging them out of Portal immediately
