@@ -5,7 +5,7 @@ VIRTUALENV="$(realpath ${VIRTUALENV:-$DIR/venv})"
 FORCE_UPDATES="${FORCE_UPDATES:-no}"
 if [[ ! -d "$VIRTUALENV" ]]; then
   echo "Creating virtualenv at $VIRTUALENV ..."
-  virtualenv "$VIRTUALENV" --system-site-packages
+  python3 -m venv "$VIRTUALENV" --system-site-packages
   "$VIRTUALENV/bin/pip" install --upgrade pip
   FORCE_UPDATES=yes
 fi
@@ -163,7 +163,8 @@ get_defined_var() {
   local varname="$1"
   ansible localhost --one-line -m debug -a "var=$varname" \
     --extra-vars="@$DIR/kolla/defaults.yml" \
-    --extra-vars="@$CC_ANSIBLE_SITE/globals.yml" 2>/dev/null \
+    --extra-vars="@$CC_ANSIBLE_SITE/globals.yml" \
+    --inventory="$CC_ANSIBLE_SITE/inventory/hosts" 2>/dev/null \
     | sed 's/^.*=> //' \
     | jq -r ".$varname"
 }
