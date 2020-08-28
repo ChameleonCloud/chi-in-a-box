@@ -1,7 +1,7 @@
 ---
 jupyterhub_config_path: /etc/jupyterhub
 jupyterhub_crypt_key:
-jupyterhub_tag: "6168486"
+jupyterhub_tag: b4f9dc8
 jupyterhub_image_full: "docker.chameleoncloud.org/jupyterhub:{{ jupyterhub_tag }}"
 jupyterhub_docker_network: jupyterhub
 jupyterhub_docker_network_subnet: 172.18.20.0/24
@@ -33,6 +33,7 @@ jupyterhub_environment:
   OS_REGION_NAME: "{{ openstack_region_name }}"
   OS_IDENTITY_PROVIDER: "{{ identity_provider_name }}"
   OS_PROTOCOL: openid
+  OS_PROJECT_DOMAIN_NAME: "{{ identity_provider_domain_name }}"
   ARTIFACT_SHARING_OS_AUTH_TYPE: v3password
   ARTIFACT_SHARING_OS_USERNAME: "{{ jupyterhub_artifact_sharing_keystone_user }}"
   ARTIFACT_SHARING_OS_PASSWORD: "{{ jupyterhub_artifact_sharing_keystone_password }}"
@@ -95,7 +96,7 @@ jupyterhub_ceph_pool: jupyter-volumes
 jupyterhub_ceph_docker_volume_driver: docker.chameleoncloud.org/wetopi/rbd:latest
 jupyterhub_ceph_docker_volume_driver_alias: rbd
 
-jupyterhub_notebook_tag: 68b410b
+jupyterhub_notebook_tag: 48ad470
 jupyterhub_notebook_image_full: "docker.chameleoncloud.org/jupyterhub-user:{{ jupyterhub_notebook_tag }}"
 jupyterhub_notebook_workdir: /work
 

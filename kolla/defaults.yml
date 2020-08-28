@@ -87,6 +87,7 @@ horizon_regions:
 # Keystone IdP federation
 identity_provider_url: "{{ keycloak_url }}/auth/realms/{{ keycloak_realm_name }}"
 identity_provider_name: chameleon
+identity_provider_domain_name: chameleon
 keystone_identity_providers:
   - name: "{{ identity_provider_name }}"
     protocol: openid
