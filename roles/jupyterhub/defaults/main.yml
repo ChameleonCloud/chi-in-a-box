@@ -1,7 +1,7 @@
 ---
 jupyterhub_config_path: /etc/jupyterhub
 jupyterhub_crypt_key:
-jupyterhub_tag: b4f9dc8
+jupyterhub_tag: 68dd6bb
 jupyterhub_image_full: "docker.chameleoncloud.org/jupyterhub:{{ jupyterhub_tag }}"
 jupyterhub_docker_network: jupyterhub
 jupyterhub_docker_network_subnet: 172.18.20.0/24
