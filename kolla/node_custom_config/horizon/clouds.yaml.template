@@ -1,0 +1,49 @@
+# This is a clouds.yaml file, which can be used by OpenStack tools as a source
+# of configuration on how to connect to Chameleon.
+#
+# If you are only a member of one project, just put this file in
+# ~/.config/openstack/clouds.yaml and tools like the CLI will just work with no
+# further config. (You will need to add your password to the auth section)
+#
+# If you are a member of multiple projects, when invoking the CLI, provide
+# either the env variable OS_CLOUD=<project> or flag --os-cloud=<project> to
+# target your operation to the desired project, where <project> is the name
+# (or nickname, if set) of your project.
+{% raw -%}
+clouds:
+  chameleon:
+    auth:
+      username: "{{ user.username }}"
+    {% if user_domain_name %}
+      user_domain_name: "{{ user_domain_name }}"
+    {% endif %}
+    {% if user.is_federated %}
+      protocol: openid
+      auth_type: v3oidcpassword
+      password: "Please enter your password"
+{% endraw %}
+      identity_provider: "{{ identity_provider_name }}"
+      discovery_endpoint: "{{ identity_provider_url }}/.well-known/openid-configuration"
+      client_id: "{{ keystone_idp_client_id }}"
+{% raw -%}
+      client_secret: none
+    {% else %}
+      auth_type: v3password
+    {% endif %}
+  {% if regions %}
+    regions:
+      {% for r in regions %}
+    - {{ r }}
+      {% endfor %}
+  {% elif region %}
+    region_name: "{{ region }}"
+  {% endif %}
+    interface: "{{ interface }}"
+    identity_api_version: {{ os_identity_api_version }}
+{% for project in projects %}
+  "{% if project.nickname %}{{ project.nickname }}{% else %}{{ project.name }}{% endif %}":
+    profile: chameleon
+    auth:
+      project_id: "{{ project.id }}"
+{% endfor %}
+{% endraw %}
