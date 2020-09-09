@@ -10,8 +10,26 @@ OPENSTACK_ENDPOINT_TYPE = 'publicURL'
 
 # Default user to specific region on login.
 DEFAULT_SERVICE_REGIONS = {
-  '{{ horizon_keystone_url }}': '{{ openstack_region_name }}',
+  '*': '{{ openstack_region_name }}',
 }
+
+# Used by server instance page to create links from the instance overview
+# to the resource catalog.
+CHAMELEON_PORTAL_API_BASE_URL = '{{ chameleon_portal_url }}'
+CHAMELEON_REFERENCE_API_URL = '{{ chameleon_reference_api_url }}'
+CHAMELEON_SITE_ID = '{{ chameleon_site_name }}'
+{% if enable_chameleon_multisite | bool %}
+# Hide the region dropdown
+OPENSTACK_KEYSTONE_MULTIREGION_SUPPORT = False
+# Show the site dropdown
+CHAMELEON_MULTISITE_SUPPORT = False
+{% else %}
+CHAMELEON_SITES = {
+{% for conf in horizon_regions %}
+  '{{ conf.region_name }}': '{{ conf.chameleon_site_name }}',
+{% endfor %}
+}
+{% endif %}
 
 SITE_BRANDING = 'ChameleonCloud'
 
@@ -52,23 +70,39 @@ AVAILABLE_THEMES = [
 ]
 DEFAULT_THEME = 'chameleoncloud'
 
-# Used by server instance page to create links from the instance overview
-# to the resource catalog.
-CHAMELEON_PORTAL_API_BASE_URL = 'https://www.chameleoncloud.org'
-CHAMELEON_SITES = {
-{% for conf in horizon_regions %}
-  '{{ conf.region_name }}': '{{ conf.chameleon_site_name }}',
+# NOTE(jason): This is lifted from local_settings.j2 in Kolla-Ansible; we have
+# to override it to add in a kludgy entry for Portal SSO, which isn't a "true"
+# SSO in the same way as the others, which have e.g. Keystone mappings and
+# assume an identity provider is registered in Keystone. We also remove the
+# local login.
+{% if enable_keystone_federation | bool %}
+WEBSSO_ENABLED = True
+WEBSSO_KEYSTONE_URL = "{{ keystone_public_url }}/v3"
+WEBSSO_CHOICES = (
+    ("portal", "Log in with TACC account (Legacy)"),
+{% for idp in keystone_identity_providers %}
+    ("{{ idp.name }}", "{{ idp.public_name }}"),
+{% endfor %}
+)
+WEBSSO_IDP_MAPPING = {
+    "portal": (None, None),
+{% for idp in keystone_identity_providers %}
+    "{{ idp.name }}": ("{{ idp.name }}", "{{ idp.protocol }}"),
 {% endfor %}
 }
-
+WEBSSO_DEFAULT_REDIRECT = True
+# This really shouldn't have to be set, but it's set at configuration parse
+# time and derived from a value (OPENSTACK_KEYSTONE_URL) that is overriden by
+# our configuration.
+WEBSSO_DEFAULT_REDIRECT_REGION = '{{ keystone_public_url }}/v3'
+WEBSSO_DEFAULT_REDIRECT_PROTOCOL = 'openid'
 {% if enable_horizon_chameleon_websso | bool %}
-# Single-sign on support
-WEBSSO_ENABLED = True
-AUTHENTICATION_URLS = ['openstack_dashboard.cc_web_sso_urls','openstack_auth.urls',]
-CHAMELEON_PORTAL_SSO_BASE_URL = '{{ horizon_chameleon_websso_host }}'
-CHAMELEON_PORTAL_SSO_LOGIN_PATH = '/sso/horizon/'
-CHAMELEON_PORTAL_SSO_LOGOUT_PATH = '/logout/'
-SSO_CALLBACK_HOST = '{{ kolla_external_fqdn }}'
+AUTHENTICATION_URLS = ['openstack_dashboard.cc_web_sso_urls', 'openstack_auth.urls']
+WEBSSO_DEFAULT_REDIRECT_URL = '{{ horizon_chameleon_websso_host }}/sso/horizon'
+WEBSSO_DEFAULT_REDIRECT_LOGOUT = '{{ horizon_chameleon_websso_host }}/logout'
+# Show users interstitial page upon logout instead of logging them out of Portal immediately
+WEBSSO_DEFAULT_REDIRECT_LOGOUT_CONFIRM = True
+{% endif %}
 {% endif %}
 
 # A dictionary of settings which can be used to provide the default values for

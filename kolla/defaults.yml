@@ -11,6 +11,10 @@ kolla_install_type: source
 virtualenv: /etc/ansible/venv
 
 chameleon_portal_url: https://www.chameleoncloud.org
+chameleon_reference_api_url: https://api.chameleoncloud.org
+# Whether to show a dropdown in the Horizon GUI that provides links to other
+# Chameleon testbed sites.
+enable_chameleon_multisite: yes
 
 enable_mariadb: yes
 enable_chrony: yes
@@ -66,9 +70,12 @@ enable_heat: yes
 # Horizon
 enable_horizon: yes
 enable_horizon_chameleon_websso: yes
+# Keep this to 'no' until we have switched from old multi-region to new
+# multi-keystone model (with federation).
+horizon_use_keystone_internal_url: no
 horizon_help_url: https://chameleoncloud.readthedocs.io/en/latest/technical/baremetal.html
 horizon_redirect_root: /dashboard
-horizon_chameleon_websso_host: https://www.chameleoncloud.org
+horizon_chameleon_websso_host: "{{ chameleon_portal_url }}"
 horizon_regions:
   - region_name: "{{ openstack_region_name }}"
     chameleon_site_name: "{{ chameleon_site_name }}"
@@ -77,6 +84,22 @@ horizon_regions:
     blazar_database_port: "{{ blazar_database_port }}"
     blazar_database_user: "{{ blazar_database_user }}"
     blazar_database_password: "{{ blazar_database_password }}"
+
+# Keystone IdP federation
+identity_provider_url: "{{ keycloak_url }}/auth/realms/{{ keycloak_realm_name }}"
+identity_provider_name: chameleon
+identity_provider_domain_name: chameleon
+keystone_identity_providers:
+  - name: "{{ identity_provider_name }}"
+    protocol: openid
+    identifier: "{{ identity_provider_url }}"
+    public_name: Login with Chameleon
+    client_id: "{{ keystone_idp_client_id }}"
+    client_secret: "{{ keystone_idp_client_secret }}"
+    attribute_mapping: chameleon_mapping
+keystone_identity_mappings:
+  - name: chameleon_mapping
+    file: "{{ node_custom_config }}/keystone/idp_mapping.json"
 
 # Ironic
 enable_ironic: yes
@@ -97,8 +120,12 @@ ironic_pxe_append_params: "nofb nomodeset vga=normal console=tty0 console=ttyS0,
 
 # Keycloak
 enable_keycloak: no
+enable_keycloak_tas_sync: no
 enable_keycloak_external: "{{ enable_keycloak }}"
 enable_keycloak_external_frontend: no
+keycloak_realm_name: chameleon
+keycloak_hostname: auth.chameleoncloud.org
+keycloak_url: "https://{{ keycloak_hostname }}"
 
 # Keystone
 enable_keystone: yes
@@ -140,8 +167,24 @@ nova_admin_endpoint: "{{ admin_protocol }}://{{ kolla_internal_fqdn }}:{{ nova_a
 nova_internal_endpoint: "{{ internal_protocol }}://{{ kolla_internal_fqdn }}:{{ nova_api_port }}/v2.1"
 nova_public_endpoint: "{{ public_protocol }}://{{ kolla_external_fqdn }}:{{ nova_api_port }}/v2.1"
 
+# Portal
+enable_portal: no
+# This should be in defaults b/c it may be used by other roles,
+# not just the portal role
+portal_nginx_conf_dir: /opt/chameleon/conf.d
+# The docker-compose network name for the Portal stack
+portal_network: portal
+chameleon_portal_mysql_host: udcc-db01.tacc.utexas.edu
+chameleon_portal_mysql_user: chameleon_ro
+chameleon_portal_mysql_database: chameleon_prod
+
 # Prometheus
-enable_prometheus: "{{ inventory_hostname in groups['prometheus'] }}"
+enable_prometheus: no
+prometheus_port: "9090"
+prometheus_jupyterhub_exporter_token:
+prometheus_server_external_url: "{{ public_protocol }}://{{ prometheus_external_fqdn }}:{{ prometheus_port }}"
+prometheus_alertmanager_external_url: "{{ public_protocol }}://{{ proemtheus_external_fqdn }}:{{ prometheus_alertmanager_port }}"
+# Legacy chameleon_prometheus role vars
 prometheus_bind_address: "{{ lookup('vars', 'ansible_' + network_interface).ipv4.address }}"
 
 # Redfish Monitor
