@@ -22,7 +22,7 @@ CHAMELEON_SITE_ID = '{{ chameleon_site_name }}'
 # Hide the region dropdown
 OPENSTACK_KEYSTONE_MULTIREGION_SUPPORT = False
 # Show the site dropdown
-CHAMELEON_MULTISITE_SUPPORT = True
+CHAMELEON_MULTISITE_SUPPORT = False
 {% else %}
 CHAMELEON_SITES = {
 {% for conf in horizon_regions %}
@@ -96,7 +96,6 @@ WEBSSO_DEFAULT_REDIRECT = True
 # our configuration.
 WEBSSO_DEFAULT_REDIRECT_REGION = '{{ keystone_public_url }}/v3'
 WEBSSO_DEFAULT_REDIRECT_PROTOCOL = 'openid'
-
 {% if enable_horizon_chameleon_websso | bool %}
 AUTHENTICATION_URLS = ['openstack_dashboard.cc_web_sso_urls', 'openstack_auth.urls']
 WEBSSO_DEFAULT_REDIRECT_URL = '{{ horizon_chameleon_websso_host }}/sso/horizon'
