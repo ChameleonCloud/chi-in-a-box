@@ -18,7 +18,6 @@ clouds:
     auth:
       auth_url: {{ auth_url }}
       username: "{{ user.username }}"
-      user_domain_name: {{ user_domain_name }}
       protocol: openid
 {% endraw %}
       identity_provider: {{ identity_provider_name }}
@@ -44,7 +43,8 @@ clouds:
     interface: {{ interface }}
     identity_api_version: {{ os_identity_api_version }}
     project_name: "{{ project.name }}"
-    {# Assume same domain as user #}
+    {# Assume same domain as user. This maps federated users #}
+    {# to federated projects, and non-federated to non. #}
     project_domain_name: {{ user_domain_name }}
 {% endfor %}
 {% endraw %}
