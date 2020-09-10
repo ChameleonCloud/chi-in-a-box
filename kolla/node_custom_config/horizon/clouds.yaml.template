@@ -11,6 +11,7 @@
 # (or nickname, if set) of your project.
 {% raw -%}
 clouds:
+
 {% for project in projects %}
   "{% if project.nickname %}{{ project.nickname }}{% else %}{{ project.name }}{% endif %}":
   {% if user.is_federated %}
@@ -23,7 +24,7 @@ clouds:
       identity_provider: {{ identity_provider_name }}
       discovery_endpoint: {{ identity_provider_url }}/.well-known/openid-configuration
       client_id: {{ keystone_idp_client_id }}
-{% raw %}
+{%- raw %}
       client_secret: none
   {% else %}
     auth_type: v3password
@@ -46,5 +47,6 @@ clouds:
     {# Assume same domain as user. This maps federated users #}
     {# to federated projects, and non-federated to non. #}
     project_domain_name: {{ user_domain_name }}
+
 {% endfor %}
 {% endraw %}
