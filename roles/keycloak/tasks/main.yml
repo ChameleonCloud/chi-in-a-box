@@ -19,16 +19,7 @@
         name: "{{ keycloak_extension_path }}"
         state: directory
         mode: "0775"  # Keycloak needs to write metadata files to this directory
-    - name: Fetch extension jar files
-      maven_artifact:
-        group_id: "{{ item.group_id }}"
-        artifact_id: "{{ item.artifact_id }}"
-        version: "{{ item.version }}"
-        repository_url: "{{ item.repository_url }}"
-        username: "{{ item.username }}"
-        password: "{{ item.password }}"
-        mode: "0644"
-        dest: "{{ keycloak_extension_path }}/"
+    - include_tasks: install_extension.yml
       loop: "{{ keycloak_extensions }}"
       loop_control:
         label: "{{ item.group_id }}.{{ item.artifact_id }} ({{ item.version }})"
