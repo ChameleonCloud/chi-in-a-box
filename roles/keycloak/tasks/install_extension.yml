@@ -27,4 +27,5 @@
   loop_control:
     # Use different loop var to avoid collision with 'item' already in scope
     loop_var: existing_item
+    label: "{{ existing_item.path }}"
   when: not extension.stat.exists
