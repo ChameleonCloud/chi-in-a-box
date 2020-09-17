@@ -28,13 +28,13 @@ prometheus_services:
     port: 9090
     config_dir: /etc/prometheus
     scrape_target: yes
-#    service_args:
-#      - "--config.file=/etc/prometheus/prometheus.yml"
-#      - "--storage.tsdb.path=/prometheus"
-#      - "--web.console.libraries=/usr/share/prometheus/console_libraries"
-#      - "--web.console.templates=/usr/share/prometheus/consoles"
-#      - "--web.enable-lifecycle"
-#      - "--web.external-url=https://{{ prometheus_server_hostname }}:9090"
+    service_args:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.console.libraries=/usr/share/prometheus/console_libraries"
+      - "--web.console.templates=/usr/share/prometheus/consoles"
+      - "--web.enable-lifecycle"
+      - "--web.external-url=https://{{ prometheus_server_hostname }}:9090"
     volumes:
       - "prometheus-data:/prometheus"
       - "/etc/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml"
@@ -80,7 +80,7 @@ prometheus_services:
         auth_user: "{{ prometheus_alertmanager_user }}"
         auth_pass: "{{ prometheus_alertmanager_password }}"
   jupyterhub-exporter:
-    group: jupyterhub
+    group: prometheus-jupyterhub-exporter
     enabled: true
     port: 8075
     scrape_target: yes
@@ -99,7 +99,6 @@ prometheus_services:
   node-exporter:
     service_name: prometheus_node_exporter
     group: prometheus-node-exporter
-    enabled: true
     restart_handler: restart node exporter
     custom_service: yes
     port: 9100
@@ -110,7 +109,6 @@ prometheus_services:
     service_name: prometheus_openstack_exporter
     image: docker.chameleoncloud.org/chameleoncloud/prometheus-openstack-exporter:latest
     group: prometheus-openstack-exporter
-    enabled: true
     restart_handler: restart openstack exporter
     port: 9103
     config_dir: /etc/prometheus
@@ -135,35 +133,22 @@ prometheus_services:
     image: prom/snmp-exporter:v0.15.0
     generator_image: prom/snmp-generator:master
     group: prometheus-snmp-exporter
-    enabled: true
     restart_handler: restart snmp exporter
     port: 9116
     config_dir: /etc/prometheus/snmp-exporter
     scrape_target: no
     volumes:
      - "/etc/prometheus/snmp-exporter:/etc/snmp_exporter"
-  # The Ceph exporters use the built-in Prometheus metrics agent Ceph provides
-  ceph-exporter:
-    group: prometheus-ceph-exporter
-    enabled: true
-    port: 9283
-    scrape_target: yes
-  push-gateway:
-    service_name: prometheus_pushgateway
-    image: prom/pushgateway:v0.8.0
-    group: prometheus-push-gateway
-    enabled: true
-    restart_handler: restart pushgateway
-    port: 9091
-    config_dir: /etc/prometheus
-    scrape_target: yes
-  precis-event-listener-exporter:
-    group: precis
-    enabled: true
-    port: 8913
-    scrape_target: yes
-  precis-endpoint-exporter:
-    group: precis
-    enabled: true
-    port: 8912
-    scrape_target: yes
+#  # The Ceph exporters use the built-in Prometheus metrics agent Ceph provides
+#  ceph-exporter:
+#    group: prometheus-ceph-exporter
+#    port: 9283
+#    scrape_target: yes
+#  push-gateway:
+#    service_name: prometheus_pushgateway
+#    image: prom/pushgateway:v0.8.0
+#    group: prometheus-push-gateway
+#    restart_handler: restart pushgateway
+#    port: 9091
+#    config_dir: /etc/prometheus
+#    scrape_target: yes
