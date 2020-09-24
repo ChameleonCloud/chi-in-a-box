@@ -11,11 +11,9 @@ docker_registry_readonly_user: registry
 docker_registry_readonly_password: ''
 
 docker_registry_push_users:
-  - awbarnes
   - hammock
   - jakecoll
   - jason_a
-  - priteau
   - rochaa
   - zzhen
   - kolla
