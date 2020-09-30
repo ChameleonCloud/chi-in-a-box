@@ -27,6 +27,7 @@
     "blazar:networks:delete": "rule:admin_or_owner",
     "blazar:networks:get": "rule:admin_or_owner",
     "blazar:networks:update": "rule:admin_or_owner",
+    "blazar:networks:put": "rule:admin_or_owner",
     "blazar:networks:list_allocations": "rule:admin_or_owner",
     "blazar:networks:get_allocations": "rule:admin_or_owner",
     "blazar:networks:get_resource_properties": "@",
