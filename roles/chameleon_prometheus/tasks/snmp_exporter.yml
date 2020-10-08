@@ -5,9 +5,18 @@
     mode: 0600
     dest: "{{ service.config_dir }}/Makefile"
 
-- name: Install 7z support package for making mibs.
+# See https://github.com/prometheus/snmp_exporter/tree/master/generator#building
+- name: Install support packages for making mibs
   package:
-    name: p7zip
+    name: "{{ item }}"
+  loop:
+    - gcc
+    - gcc-g++
+    - make
+    - net-snmp
+    - net-snmp-utils
+    - net-snmp-libs
+    - net-snmp-devel
 
 - name: Make mibs for snmp exporter generator.
   make:
