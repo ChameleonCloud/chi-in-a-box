@@ -66,20 +66,38 @@
     state: started
     enabled: yes
 
-- name: Install garbage collection script.
+- name: Create garbage collection script.
   template:
     src: docker-registry-gc.sh.j2
     dest: /usr/local/sbin/docker-registry-gc
-    mode: '0750'
+    mode: "0700"
+  when:
+    - inventory_hostname in groups[docker_registry_tasks.docker_registry_gc.group]
 
-- name: Install cron job to automatically call garbage collection.
-  cron:
-    # Every tuesday at 5:00am - put it in the middle of the week
-    # so issues can be caught during week.
-    name: Docker registry periodic GC
-    minute: '0'
-    hour: '5'
-    day: '*'
-    month: '*'
-    weekday: '2'
-    job: /usr/local/sbin/docker-registry-gc | logger -t docker-registry-gc
+- name: Pull Docker Registry task images.
+  docker_image:
+    source: pull
+    name: "{{ item.value.docker.image }}"
+    force_source: yes
+  loop: "{{ docker_registry_tasks|dict2items }}"
+  loop_control:
+    label: "{{ (item.value.docker | default({})).image|default(None) }}"
+  when:
+    - item.value.docker is defined
+    - inventory_hostname in groups[item.value.group]
+  tags:
+    - pull
+
+- name: Configure Docker Registry periodic tasks.
+  include_role:
+    name: chameleon.periodic_task
+  vars:
+    task_name: "{{ item.key }}"
+    task_calendar: "{{ item.value.calendar }}"
+    task_command: "{{ item.value.command|default(None) }}"
+    task_docker: "{{ item.value.docker|default(None) }}"
+  loop: "{{ docker_registry_tasks|dict2items }}"
+  loop_control:
+    label: "{{ item.key }}"
+  when:
+    - inventory_hostname in groups[item.value.group]

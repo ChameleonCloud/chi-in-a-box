@@ -28,3 +28,10 @@ docker_registry_swift_tenant: services
 docker_registry_swift_region: CHI@UC
 docker_registry_swift_containername: docker_registry
 docker_registry_swift_endpointtype: internal
+
+docker_registry_tasks:
+  docker_registry_gc:
+    group: docker_registry
+    # Weekly on Tuesday at 5AM; mid-week to allow time to catch issues.
+    calendar: "0 5 * * 2"
+    command: /usr/local/sbin/docker-registry-gc
