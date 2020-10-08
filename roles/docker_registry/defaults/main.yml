@@ -32,6 +32,6 @@ docker_registry_swift_endpointtype: internal
 docker_registry_tasks:
   docker_registry_gc:
     group: docker_registry
-    # Weekly on Tuesday at 5AM; mid-week to allow time to catch issues.
-    calendar: "0 5 * * 2"
+    # Run weekly, mid-week to allow time to catch issues.
+    calendar: "Tue *-*-* 05:00:00"
     command: /usr/local/sbin/docker-registry-gc
