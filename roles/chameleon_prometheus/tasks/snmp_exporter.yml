@@ -5,6 +5,10 @@
     mode: 0600
     dest: "{{ service.config_dir }}/Makefile"
 
+- name: Install 7z support package for making mibs.
+  package:
+    name: p7zip
+
 - name: Make mibs for snmp exporter generator.
   make:
     chdir: "{{ service.config_dir }}"
