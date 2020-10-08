@@ -1,11 +1,4 @@
 ---
-- name: Pull Docker Registry image.
-  docker_image:
-    source: pull
-    name: "{{ docker_registry_image }}"
-  tags:
-    - pull
-
 - name: Create OpenStack user for Swift storage.
   local_action:
     module: os_user
@@ -49,22 +42,26 @@
         src: "config.prod.yml"
         dest: "{{ docker_registry_config_path }}/config.yml"
         state: link
-    - name: Configure Docker Registry systemd service.
-      template:
-        src: docker_registry.service.j2
-        dest: "/etc/systemd/system/{{ docker_registry_service_name }}.service"
-      notify:
-        - restart docker registry
   tags:
     - configuration
 
-- name: Enable Docker Registry service on boot.
-  systemd:
-    service: "{{ docker_registry_service_name }}"
-    # TODO: this is a thorny part of ansible and we shouldn't have to do this ourselves.
-    daemon_reload: yes
-    state: started
-    enabled: yes
+- name: Configure Docker Registry services.
+  include_role:
+    name: chameleon.docker_service
+  vars:
+    service_name: "{{ item.key }}"
+    service_bind_address: "{{ api_interface_address }}"
+    docker_image: "{{ item.value.image }}"
+    docker_network: "{{ item.value.network }}"
+    docker_environment: "{{ item.value.environment }}"
+    docker_mounts: "{{ item.value.mounts }}"
+    docker_ports: "{{ item.value.ports|default([]) }}"
+    docker_command: "{{ item.value.command|default(None) }}"
+  loop: "{{ docker_registry_services|dict2items }}"
+  loop_control:
+    label: "{{ item.key }}"
+  when:
+    - inventory_hostname in groups[item.value.group]
 
 - name: Create garbage collection script.
   template:

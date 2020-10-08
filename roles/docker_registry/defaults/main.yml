@@ -1,20 +1,38 @@
 ---
-docker_registry_image: registry:2
 docker_registry_config_path: /etc/docker/registry
 docker_registry_hostname: docker.chameleoncloud.org
 docker_registry_port: 5000
-docker_registry_debug_port: 5001
 docker_registry_service_name: docker_registry
 docker_registry_docker_network: registry
 docker_registry_docker_network_subnet: 172.18.5.0/29
 docker_registry_readonly_user: registry
 docker_registry_readonly_password: ''
 
+docker_registry_services:
+  docker_registry:
+    group: docker_registry
+    enabled: true
+    image: registry:2
+    network: "{{ docker_registry_docker_network }}"
+    ports:
+      - "{{ docker_registry_port }}:5000"
+    mounts:
+      - type: bind
+        src: "{{ docker_registry_config_path }}"
+        dst: /etc/docker/registry
+        read_only: True
+
+docker_registry_tasks:
+  docker_registry_gc:
+    group: docker_registry
+    # Run weekly, mid-week to allow time to catch issues.
+    calendar: "Tue *-*-* 05:00:00"
+    command: /usr/local/sbin/docker-registry-gc
+
 docker_registry_push_users:
   - hammock
   - jakecoll
   - jason_a
-  - rochaa
   - zzhen
   - kolla
 
@@ -28,10 +46,3 @@ docker_registry_swift_tenant: services
 docker_registry_swift_region: CHI@UC
 docker_registry_swift_containername: docker_registry
 docker_registry_swift_endpointtype: internal
-
-docker_registry_tasks:
-  docker_registry_gc:
-    group: docker_registry
-    # Run weekly, mid-week to allow time to catch issues.
-    calendar: "Tue *-*-* 05:00:00"
-    command: /usr/local/sbin/docker-registry-gc
