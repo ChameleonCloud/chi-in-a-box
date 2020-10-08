@@ -53,7 +53,7 @@
     service_bind_address: "{{ api_interface_address }}"
     docker_image: "{{ item.value.image }}"
     docker_network: "{{ item.value.network }}"
-    docker_environment: "{{ item.value.environment }}"
+    docker_environment: "{{ item.value.environment|default({}) }}"
     docker_mounts: "{{ item.value.mounts }}"
     docker_ports: "{{ item.value.ports|default([]) }}"
     docker_command: "{{ item.value.command|default(None) }}"
