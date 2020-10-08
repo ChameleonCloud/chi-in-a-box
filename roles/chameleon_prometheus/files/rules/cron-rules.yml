@@ -40,6 +40,11 @@ groups:
     expr: 3600 * 24 * 32
     labels:
       name: precis_cleanup
+  - record: periodic_task_last_success_threshold
+    # Weekly job, check every 8 days
+    expr: 3600 * 24 * 8
+    labels:
+      name: docker_registry_gc
 
   - alert: PeriodicTaskNoRecentSuccess
     expr: |
