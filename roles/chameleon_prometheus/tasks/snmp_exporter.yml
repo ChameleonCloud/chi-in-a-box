@@ -16,6 +16,8 @@
     - net-snmp-utils
     - net-snmp-libs
     - net-snmp-devel
+    - p7zip
+    - p7zip-plugins
 
 - name: Make mibs for snmp exporter generator.
   make:
