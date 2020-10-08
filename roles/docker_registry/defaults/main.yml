@@ -20,7 +20,7 @@ docker_registry_services:
       - type: bind
         src: "{{ docker_registry_config_path }}"
         dst: /etc/docker/registry
-        read_only: True
+        readonly: True
 
 docker_registry_tasks:
   docker_registry_gc:
