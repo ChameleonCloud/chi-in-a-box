@@ -96,7 +96,7 @@ WEBSSO_DEFAULT_REDIRECT = True
 # our configuration.
 WEBSSO_DEFAULT_REDIRECT_REGION = '{{ keystone_public_url }}/v3'
 WEBSSO_DEFAULT_REDIRECT_PROTOCOL = 'openid'
-WEBSSO_DEFAULT_REDIRECT_LOGOUT = '{{ identity_provider_url }}/protocol/openid-connect/logout?client_id={{ keystone_idp_client_id }}&redirect_uri={{ identity_provider_url }}/post-logout'
+WEBSSO_DEFAULT_REDIRECT_LOGOUT = '{{ identity_provider_url }}/protocol/openid-connect/logout?client_id={{ keystone_idp_client_id }}&redirect_uri={{ (identity_provider_url ~ "/post-logout?client_id=" ~ keystone_idp_client_id) | urlencode }}'
 
 {% if enable_horizon_chameleon_websso | bool %}
 AUTHENTICATION_URLS = ['openstack_dashboard.cc_web_sso_urls', 'openstack_auth.urls']
