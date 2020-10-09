@@ -119,7 +119,7 @@ LAUNCH_INSTANCE_DEFAULTS = {
     'create_volume': False,
 }
 
-# [2020-02-05 diurnalist]
+# [2020-02-05 jason]
 # TODO: solve the root problem here and re-enable this extension.
 # Turn off SimpleTenantUsage extension, which has caused severe performance
 # penalties in our version of Horizon. This makes the little table on the
