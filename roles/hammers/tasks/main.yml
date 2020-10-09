@@ -47,7 +47,7 @@
 
 - name: Add hammer periodic tasks.
   include_role:
-    name: diurnalist.periodic_task
+    name: chameleon.periodic_task
   vars:
     task_name: "hammer_{{ item.key }}"
     task_command: "/usr/local/sbin/cc-hammer {{ item.value.cmd }}"
