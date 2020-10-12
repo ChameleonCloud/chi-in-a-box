@@ -84,10 +84,21 @@ keystone_identity_mappings:
 
 keystone_oidc_client_id: "keystone-ciab-dev"
 keystone_oidc_client_secret: "public"
-keystone_oidc_provider_metadata_url: "{{ keystone_identity_providers[0].identifier }}/.well-known/openid-configuration"
+identity_provider_url: "{{ keystone_identity_providers[0].identifier }}"
+keystone_oidc_provider_metadata_url: "{{ identity_provider_url }}/.well-known/openid-configuration"
+keystone_federation_oidc_jwks_uri: "{{ identity_provider_url }}/protocol/openid-connect/certs"
 
+# required for horizon logout, must have mod_auth_openidc version >= 4.3.3
+# 1. horizon redirects to keystone with parameter logout=keystone_oidc_logout_payload
+# 2. mod_auth_openidc in keystone clears its local cache, then redirects to the "post-logout" api endpoint in keycloak
+# 3. (our custom) post-logout api endpoint in keycloak ends the active session, then displays a page with links to sign-out of globus and TAS
+keystone_oidc_logout_payload: '{{ (identity_provider_url ~ "/post-logout?client_id=" ~ keystone_oidc_client_id) | urlencode }}'
+keystone_federation_oidc_allowed_redirects:
+  - "^{{ keystone_public_url }}/"
+  - "^{{ identity_provider_url }}/"
+  
 # keystone must support mapping multiple projects or keycloak federation will fail
-keystone_image_full: ghcr.io/chameleoncloud/kolla/ubuntu-source-keystone:77cca74
-keystone_fernet_image_full: ghcr.io/chameleoncloud/kolla/ubuntu-source-keystone-fernet:77cca74
-keystone_ssh_image_full: ghcr.io/chameleoncloud/kolla/ubuntu-source-keystone-ssh:77cca74
-horizon_image_full: ghcr.io/chameleoncloud/kolla/ubuntu-source-horizon:77cca74
+keystone_image_full: ghcr.io/chameleoncloud/kolla/ubuntu-source-keystone:e400612
+keystone_fernet_image_full: ghcr.io/chameleoncloud/kolla/ubuntu-source-keystone-fernet:e400612
+keystone_ssh_image_full: ghcr.io/chameleoncloud/kolla/ubuntu-source-keystone-ssh:e400612
+horizon_image_full: ghcr.io/chameleoncloud/kolla/ubuntu-source-horizon:e400612

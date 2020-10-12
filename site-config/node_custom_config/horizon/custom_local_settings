@@ -120,6 +120,13 @@ WEBSSO_DEFAULT_REDIRECT = True
 WEBSSO_KEYSTONE_URL = "{{ keystone_public_url }}/v3"
 WEBSSO_DEFAULT_REDIRECT_REGION = '{{ keystone_public_url }}/v3'
 WEBSSO_DEFAULT_REDIRECT_PROTOCOL = 'openid'
+# Use mod_auth_openidc's built-in front channel logout support (part of the
+# OpenID spec.) If we make a request to the `OIDCRedirectURI` with a ?logout
+# parameter set to a valid redirect URI, the user's session will be cleared both
+# within the mod_auth_openidc session cache, but also on the authenticating
+# provider itself. We redirect to the custom post-logout page.
+WEBSSO_DEFAULT_REDIRECT_LOGOUT = '{{ keystone_public_url }}/redirect_uri?logout={{ keystone_oidc_logout_payload }}'
+
 {% endif %}
 
 # The OPENSTACK_HEAT_STACK has the only setting available - enable_user_pass,
