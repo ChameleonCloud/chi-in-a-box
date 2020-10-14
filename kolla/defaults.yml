@@ -70,6 +70,7 @@ enable_heat: yes
 # Horizon
 enable_horizon: yes
 enable_horizon_chameleon_websso: yes
+horizon_url: "{{ public_protocol }}://{{ kolla_external_fqdn | put_address_in_context('url') }}"
 # Keep this to 'no' until we have switched from old multi-region to new
 # multi-keystone model (with federation).
 horizon_use_keystone_internal_url: no
@@ -100,6 +101,10 @@ keystone_identity_providers:
 keystone_identity_mappings:
   - name: chameleon_mapping
     file: "{{ node_custom_config }}/keystone/idp_mapping.json"
+keystone_federation_oidc_allowed_redirects:
+  - "^{{ horizon_url }}/"
+  - "^{{ keystone_public_url }}/"
+  - "^{{ identity_provider_url }}/"
 
 # Ironic
 enable_ironic: yes
