@@ -96,12 +96,19 @@ WEBSSO_DEFAULT_REDIRECT = True
 # our configuration.
 WEBSSO_DEFAULT_REDIRECT_REGION = '{{ keystone_public_url }}/v3'
 WEBSSO_DEFAULT_REDIRECT_PROTOCOL = 'openid'
+# Use mod_auth_openidc's built-in front channel logout support (part of the
+# OpenID spec.) If we make a request to the `OIDCRedirectURI` with a ?logout
+# parameter set to a valid redirect URI, the user's session will be cleared both
+# within the mod_auth_openidc session cache, but also on the authenticating
+# provider itself. We redirect to the custom post-logout page.
+WEBSSO_DEFAULT_REDIRECT_LOGOUT = '{{ keystone_public_url }}/redirect_uri?logout={{ (identity_provider_url ~ "/post-logout?client_id=" ~ keystone_idp_client_id) | urlencode }}'
+
 {% if enable_horizon_chameleon_websso | bool %}
 AUTHENTICATION_URLS = ['openstack_dashboard.cc_web_sso_urls', 'openstack_auth.urls']
 WEBSSO_DEFAULT_REDIRECT_URL = '{{ horizon_chameleon_websso_host }}/sso/horizon'
-WEBSSO_DEFAULT_REDIRECT_LOGOUT = '{{ horizon_chameleon_websso_host }}/logout'
 # Show users interstitial page upon logout instead of logging them out of Portal immediately
 WEBSSO_DEFAULT_REDIRECT_LOGOUT_CONFIRM = True
+WEBSSO_DEFAULT_REDIRECT_LOGOUT_CONFIRM_URL = '{{ horizon_chameleon_websso_host }}/logout'
 {% endif %}
 {% endif %}
 
@@ -111,7 +118,7 @@ LAUNCH_INSTANCE_DEFAULTS = {
     'create_volume': False,
 }
 
-# [2020-02-05 diurnalist]
+# [2020-02-05 jason]
 # TODO: solve the root problem here and re-enable this extension.
 # Turn off SimpleTenantUsage extension, which has caused severe performance
 # penalties in our version of Horizon. This makes the little table on the

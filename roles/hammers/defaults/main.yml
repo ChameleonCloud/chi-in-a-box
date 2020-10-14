@@ -7,71 +7,38 @@ hammers_mysql_host: "{{ database_address }}"
 
 hammers:
   floating_ip_reaper:
-    hammer_name: hammers-floatingipreaper
-    cmd: "floatingip-reaper --grace-days 7"
-    cron_times:
-      minute: 20
-      hour: 5
+    cmd: floatingip-reaper --grace-days 7
+    calendar: daily
   conflict_macs:
-    hammer_name: hammers-conflictmacs
-    cmd: "conflict-macs delete"
-    cron_times:
-      minute: 30
-      hour: 5
+    cmd: conflict-macs delete
+    calendar: daily
   undead_instances:
-    hammer_name: hammers-undeadinstances
-    cmd: "undead-instances delete"
-    cron_times:
-      minute: 35
-      hour: 5
+    cmd: undead-instances delete
+    calendar: daily
   dirty_ports:
-    hammer_name: hammers-dirtyports
-    cmd: "dirty-ports clean --multiport"
-    cron_times:
-      minute: 15
+    cmd: dirty-ports clean --multiport
+    calendar: daily
   ironic_error_resetter:
-    hammer_name: hammers-ironicerrorresetter
-    cmd: "ironic-error-resetter reset"
-    cron_times:
-      minute: "*/15"
+    cmd: ironic-error-resetter reset
+    calendar: hourly
   orphan_resource_providers:
-    hammer_name: hammers-orphanresourceproviders
-    cmd: "orphan-resource-providers update"
-    cron_times:
-      minute: 45
-      hour: 5
+    cmd: orphan-resource-providers update
+    calendar: daily
   reservation_usage_notification:
-    hammer_name: hammers-reservationusagenotfication
     cmd: "reservation-usage-notification"
-    cron_times:
-      minute: 0
-      hour: 10
+    calendar: daily
   orphans_detector:
-    hammer_name: hammers-orphansdetector
     cmd: "orphans-detector"
-    cron_times:
-      minute: 45
-      hour: 5
+    calendar: daily
   lease_stacking:
-    hammer_name: hammers-leasestacking
     cmd: "lease-stack-reaper delete"
-    cron_times:
-      minute: 40
-      hour: 5
+    calendar: daily
   clean_old_aggregates:
-    hammer_name: hammers-cleanoldaggregates
     cmd: "clean-old-aggregates"
-    cron_times:
-      minute: 0
-      hour: 1
+    calendar: daily
   unutilized_leases:
-      hammer_name: hammers-unutilizedleases
-      cmd: "unutilized-lease-reaper delete"
-      cron_times:
-          minute: 5
+    cmd: "unutilized-lease-reaper delete"
+    calendar: hourly
   enforce_node_retirement:
-      hammer_name: hammers-enforcenoderetirement
-      cmd: "retirement-enforcer"
-      cron_times:
-          minute: 50
-          hour: 4
+    cmd: "retirement-enforcer"
+    calendar: daily

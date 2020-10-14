@@ -24,6 +24,7 @@ clouds:
       identity_provider: {{ identity_provider_name }}
       discovery_endpoint: {{ identity_provider_url }}/.well-known/openid-configuration
       client_id: {{ keystone_idp_client_id }}
+      access_token_type: access_token
 {%- raw %}
       client_secret: none
   {% else %}

@@ -3,7 +3,7 @@ set -e -u
 
 echo "Marking tags older than most recent 10 for deletion ..."
 docker run --network {{ docker_registry_docker_network }} --rm anoxis/registry-cli \
-  -r http://registry:5000 --delete --num 10
+  -r http://{{ docker_registry_service_name }}:5000 --delete --num 10
 
 # Perform deletion. Need to put registry into read-only mode
 # to avoid corruption.
