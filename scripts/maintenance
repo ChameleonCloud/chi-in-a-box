@@ -7,7 +7,7 @@
 # provides a 'start' and 'end' invocation to begin or end such a maintenance
 # period nicely.
 #
-set -e -u -o pipefail
+set -u -o pipefail
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 pushd $(realpath $DIR/..) >/dev/null
@@ -59,7 +59,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 db_host() {
-  if [[ -n "$DB_HOST" ]]; then
+  if [[ -n "${DB_HOST:-}" ]]; then
     ssh "$DB_HOST" "$@"
   else
     "$@"
@@ -67,7 +67,7 @@ db_host() {
 }
 
 rabbit_host() {
-  if [[ -n "$RABBITMQ_HOST" ]]; then
+  if [[ -n "${RABBITMQ_HOST:-}" ]]; then
     ssh "$RABBITMQ_HOST" "$@"
   else
     "$@"
@@ -75,7 +75,7 @@ rabbit_host() {
 }
 
 redis_host() {
-  if [[ -n "$REDIS_HOST" ]]; then
+  if [[ -n "${REDIS_HOST:-}" ]]; then
     ssh "$REDIS_HOST" "$@"
   else
     "$@"
