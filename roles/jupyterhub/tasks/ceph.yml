@@ -24,6 +24,13 @@
         content: "{{ ceph_client_keyring.stdout }}"
         dest: "/etc/ceph/ceph.{{ jupyterhub_ceph_client }}.keyring"
 
+- name: Load and persist rbd module
+  import_role:
+    role: module-load
+  vars:
+    modules:
+      - {'name': rbd }
+
 - name: Install Docker RBD volume plugin.
   block:
     - name: Checking if plugin already installed.
