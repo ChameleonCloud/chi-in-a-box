@@ -129,3 +129,7 @@ prometheus_services:
     group: precis
     port: 8912
     scrape_target: yes
+  allocations-exporter:
+    group: allocations
+    port: 8916
+    scrape_target: yes

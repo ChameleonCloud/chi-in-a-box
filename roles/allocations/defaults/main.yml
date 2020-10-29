@@ -11,6 +11,8 @@ allocations_api_docker_image: "docker.chameleoncloud.org/allocations/balance-ser
 allocations_api_port: 8080
 # Will be exposed on localhost on host for convenience
 allocations_external_api_port: 8915
+allocations_monitoring_port: 8081
+allocations_external_monitoring_port: 8916
 
 allocations_db_tag: 6
 allocations_db_docker_image: "redis:{{ allocations_db_tag }}"
@@ -35,6 +37,7 @@ allocations_services:
     network: "{{ portal_network }}"
     ports:
       - "{{ allocations_external_api_port }}:{{ allocations_api_port }}/tcp"
+      - "{{ allocations_external_monitoring_port }}:{{ allocations_monitoring_port }}/tcp"
     mounts:
       - type: bind
         src: "{{ allocations_config_path }}/service.conf"
