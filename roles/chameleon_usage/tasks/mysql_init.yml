@@ -1,8 +1,8 @@
----    
+---
 - name: Create MySQL user
   local_action:
     module: mysql_user
-    login_host: "{{ groups.mariadb[0] }}"
+    login_host: "{{ database_address }}"
     login_password: "{{ database_password }}"
     name: "{{ chameleon_usage_mysql_user }}"
     host: "%"
@@ -17,7 +17,7 @@
     - 'chameleon_usage.*:CREATE,SELECT,INSERT,UPDATE,DELETE'
     - 'blazar.*:SELECT'
     - 'ironic.*:SELECT'
-    
+
 - name: Initialize chameleon_usage database
   shell: |
     docker run --rm --net=host \
