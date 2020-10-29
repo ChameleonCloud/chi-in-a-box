@@ -8,7 +8,7 @@
     login_host: "{{ database_address }}"
     login_password: "{{ database_password }}"
     name: "{{ prometheus_mysql_exporter_user }}"
-    host: "{{ prometheus_docker_network_ipv4 | ipaddr('network') }}/{{ prometheus_docker_network_ipv4 | ipaddr('netmask') }}"
+    host: "%"
     password: "{{ prometheus_mysql_exporter_password }}"
     priv: "*.*:PROCESS,REPLICATION CLIENT,SELECT"
 
