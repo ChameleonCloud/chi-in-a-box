@@ -48,6 +48,7 @@ allocations_services:
     enabled: true
     image: "{{ allocations_db_docker_image }}"
     network: "{{ portal_network }}"
+    bind_address: 127.0.0.1
     ports:
       - "{{ allocations_db_port }}:{{ allocations_db_port }}"
     mounts:
