@@ -191,6 +191,9 @@ chameleon_portal_mysql_host: udcc-db01.tacc.utexas.edu
 chameleon_portal_mysql_user: chameleon_ro
 chameleon_portal_mysql_database: chameleon_prod
 
+# Experient Precis
+enable_precis: no
+
 # Prometheus
 enable_prometheus: no
 prometheus_port: "9090"

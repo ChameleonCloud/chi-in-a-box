@@ -20,7 +20,7 @@ rule_files:
 
 scrape_configs:
 {% for name, service in prometheus_services.items() %}
-{% if service.scrape_target | bool and groups[service.group] | length > 0 %}
+{% if service.scrape_target | bool and service.enabled | bool and groups[service.group] | length > 0 %}
 - job_name: '{{ name }}'
 {% if service.scrape_interval is defined %}
   scrape_interval: {{ service.scrape_interval }}
