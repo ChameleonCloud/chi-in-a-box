@@ -36,7 +36,6 @@ allocations_services:
     image: "{{ allocations_api_docker_image }}"
     network: "{{ portal_network }}"
     ports:
-      - "{{ allocations_external_api_port }}:{{ allocations_api_port }}/tcp"
       - "{{ allocations_external_monitoring_port }}:{{ allocations_monitoring_port }}/tcp"
     mounts:
       - type: bind
