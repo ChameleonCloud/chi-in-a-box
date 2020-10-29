@@ -5,7 +5,7 @@
 - name: Create MySQL user.
   local_action:
     module: mysql_user
-    login_host: "{{ groups.mariadb[0] }}"
+    login_host: "{{ database_address }}"
     login_password: "{{ database_password }}"
     name: "{{ prometheus_mysql_exporter_user }}"
     host: "{{ prometheus_docker_network_ipv4 | ipaddr('network') }}/{{ prometheus_docker_network_ipv4 | ipaddr('netmask') }}"
@@ -16,7 +16,5 @@
   template:
     src: mysql_exporter.my.cnf.j2
     dest: "{{ service.config_dir }}/my.cnf"
-  vars:
-    mysql_host: "{{ hostvars[inventory_hostname]['ansible_' + network_interface]['ipv4']['address'] }}"
   notify:
     - restart mysql exporter
