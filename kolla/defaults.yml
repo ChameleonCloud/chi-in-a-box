@@ -23,6 +23,9 @@ enable_memcached: yes
 memcached_max_memory: 2048
 enable_rabbitmq: yes
 
+# Allocations service
+enable_allocations: no
+
 # Blazar
 enable_blazar: yes
 enable_blazar_allocation_enforcement: no
