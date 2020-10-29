@@ -40,4 +40,4 @@ switch_configs:
 # public (gateway) network.
 #blazar_floatingip_reservation_network_id: 687976bc-e93f-4c47-ac21-fbd341313a54
 
-prometheus_alertmanager_hostname: alert.dev.uc.chameleoncloud.org
+prometheus_alertmanager_hostname: "{{ kolla_external_fqdn }}"
