@@ -32,6 +32,7 @@
       },
       {
         "type": "projects",
+        "optional": true,
         "blacklist": {
           "id": [
             ".*-admins$",
@@ -72,6 +73,7 @@
       },
       {
         "type": "OIDC-project_names",
+        "optional": true,
         "blacklist": [
           ".*-admins$",
           ".*-managers$"
