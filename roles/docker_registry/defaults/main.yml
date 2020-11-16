@@ -31,7 +31,6 @@ docker_registry_tasks:
 
 docker_registry_push_users:
   - hammock
-  - jakecoll
   - jason_a
   - zzhen
   - kolla
