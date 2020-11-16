@@ -1,4 +1,0 @@
----
-- hosts: deployment
-  roles:
-    - ansible
