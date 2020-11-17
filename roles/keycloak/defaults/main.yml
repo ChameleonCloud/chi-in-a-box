@@ -87,7 +87,7 @@ keycloak_extension_repository_username: chameleoncloud-ci
 keycloak_extensions:
   - group_id: org.chameleoncloud
     artifact_id: keycloak-chameleon
-    version: "1.3.2"
+    version: "1.3.3"
     username: "{{ keycloak_extension_repository_username }}"
     password: "{{ keycloak_extension_repository_password }}"
     repository_url: https://maven.pkg.github.com/ChameleonCloud/keycloak-chameleon
