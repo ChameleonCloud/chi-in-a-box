@@ -1,6 +1,7 @@
 from os import environ
 
 from django.utils.translation import ugettext_lazy as _
+from openstack_dashboard.settings import HORIZON_CONFIG
 
 # Kolla-ansible defaults this to 'internalURL', which doesn't work when
 # we need to access another region from across the public internet. Need
@@ -34,19 +35,26 @@ CHAMELEON_SITES = {
 
 SITE_BRANDING = 'ChameleonCloud'
 
+# Hide default Help link
+HORIZON_CONFIG['help_url'] = None
+# Add in extra links
 USER_MENU_LINKS = [
+{% if horizon_help_url %}
   {
     'name': _('Help Desk'),
     'icon_classes': ['fa-question-circle'],
-    'url': 'https://www.chameleoncloud.org/user/help/',
+    'url': '{{ horizon_help_url }}',
     'external': True,
   },
+{% endif %}
+{% if horizon_documentation_url %}
   {
     'name': _('Documentation'),
     'icon_classes': ['fa-book'],
-    'url': 'https://chameleoncloud.readthedocs.io/en/latest/technical/gui.html',
+    'url': '{{ horizon_documentation_url }}',
     'external': True,
   },
+{% endif %}
   {
     'name': _('OpenStack RC File'),
     'icon_classes': ['fa-download'],

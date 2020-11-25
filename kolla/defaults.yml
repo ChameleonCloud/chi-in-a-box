@@ -77,7 +77,8 @@ horizon_url: "{{ public_protocol }}://{{ kolla_external_fqdn | put_address_in_co
 # Keep this to 'no' until we have switched from old multi-region to new
 # multi-keystone model (with federation).
 horizon_use_keystone_internal_url: no
-horizon_help_url: https://chameleoncloud.readthedocs.io/en/latest/technical/baremetal.html
+horizon_help_url: https://www.chameleoncloud.org/user/help/
+horizon_documentation_url: https://chameleoncloud.readthedocs.io/en/latest/technical/gui.html
 horizon_redirect_root: /dashboard
 horizon_chameleon_websso_host: "{{ chameleon_portal_url }}"
 horizon_regions:
