@@ -82,12 +82,20 @@ DATABASES = {
 }
 {% endif %}
 
-# Add Chameleon theme; this is the only option because it has some special stuff
-# like custom error pages that are more descriptive than the defaults.
+# Add Chameleon theme and the default theme (which it inherits from), but
+# only allow the user to pick the Chameleon one.
+chameleon_theme = (
+  'chameleoncloud', 'ChameleonCloud',
+  '/etc/openstack-dashboard/themes/chameleoncloud')
 AVAILABLE_THEMES = [
-  ('chameleoncloud', 'ChameleonCloud', '/etc/openstack-dashboard/themes/chameleoncloud'),
+  ('default', 'Default', 'themes/default'),
+  chameleon_theme,
 ]
-DEFAULT_THEME = 'chameleoncloud'
+SELECTABLE_THEMES = [
+  chameleon_theme,
+]
+# Not really needed, but suppresses a spurious warning.
+DEFAULT_THEME = chameleon_theme[0]
 
 # NOTE(jason): This is lifted from local_settings.j2 in Kolla-Ansible; we have
 # to override it to add in a kludgy entry for Portal SSO, which isn't a "true"
