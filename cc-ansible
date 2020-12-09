@@ -106,18 +106,18 @@ edit_passwords() {
   TRAPS+=(_edit_passwords_cleanup)
 
   echo "Decrypting passwords..."
-  ansible-vault \
-    --vault-password-file="$CC_ANSIBLE_VAULT_PASSWORD" \
-    view "$CC_ANSIBLE_SITE/passwords.yml" >"$tmpfile"
+  ansible-vault view \
+    --vault-password-file "$CC_ANSIBLE_VAULT_PASSWORD" \
+    "$CC_ANSIBLE_SITE/passwords.yml" >"$tmpfile"
   ${EDITOR:-vi} "$tmpfile"
   local ret=$?
   if [[ $ret -gt 0 ]]; then exit $ret; fi
   echo "Generating placeholder passwords for any missing values..."
   kolla-genpwd --passwords "$tmpfile"
   echo "Encrypting passwords..."
-  ansible-vault \
-    --vault-password-file="$CC_ANSIBLE_VAULT_PASSWORD" \
-    encrypt "$tmpfile"
+  ansible-vault encrypt
+    --vault-password-file "$CC_ANSIBLE_VAULT_PASSWORD" \
+    "$tmpfile"
   cp "$tmpfile" "$CC_ANSIBLE_SITE/passwords.yml"
 }
 
@@ -127,8 +127,9 @@ decrypt_passwords() {
 }
 
 view_passwords() {
-  ansible-vault --vault-password-file="$CC_ANSIBLE_VAULT_PASSWORD" \
-    view "$CC_ANSIBLE_SITE/passwords.yml"
+  ansible-vault view \
+    --vault-password-file "$CC_ANSIBLE_VAULT_PASSWORD" \
+    "$CC_ANSIBLE_SITE/passwords.yml"
 }
 
 help() {
