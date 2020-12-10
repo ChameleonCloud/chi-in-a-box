@@ -29,14 +29,17 @@
     dest: "{{ hammers_config_path }}/slack.json"
 
 - name: Create MySQL user
-  local_action:
-    module: mysql_user
-    login_host: "{{ database_address }}"
-    login_password: "{{ database_password }}"
-    name: "{{ hammers_mysql_user }}"
-    host: "%"
-    password: "{{ hammers_mysql_password }}"
-    priv: "*.*:SELECT,UPDATE,DELETE"
+  kolla_toolbox:
+    module_name: mysql_user
+    module_args:
+      login_host: "{{ database_address }}"
+      login_password: "{{ database_password }}"
+      name: "{{ hammers_mysql_user }}"
+      host: "%"
+      password: "{{ hammers_mysql_password }}"
+      priv: "*.*:SELECT,UPDATE,DELETE"
+  run_once: True
+  delegate_to: "{{ groups['hammers'][0] }}"
 
 - name: Configure Hammers my.cnf
   template:
