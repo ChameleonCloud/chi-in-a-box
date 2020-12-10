@@ -34,6 +34,7 @@
     module_args:
       login_host: "{{ database_address }}"
       login_password: "{{ database_password }}"
+      login_user: "{{ database_user }}"
       name: "{{ hammers_mysql_user }}"
       host: "%"
       password: "{{ hammers_mysql_password }}"
