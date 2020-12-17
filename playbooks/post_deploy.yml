@@ -67,6 +67,11 @@
   - name: Check state of Glance images.
     os_image_facts:
       auth: "{{ openstack_auth }}"
+      image: "{{ item.name }}"
+    loop: "{{ glance_images }}"
+    loop_control:
+      label: "{{ item.name }}"
+    register: glance_image_facts
     when: enable_ironic | bool
   - name: Download source Glance images.
     get_url:
@@ -76,7 +81,7 @@
     loop_control:
       label: "{{ item.name }}"
     when: enable_ironic | bool and
-         (openstack_image | selectattr('name', 'match', item.name)) | list | length < 1
+         (glance_image_facts.results | selectattr('name', 'match', item.name)) | list | length < 1
   - name: Create Glance images.
     os_image:
       auth: "{{ openstack_auth }}"
