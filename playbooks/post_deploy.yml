@@ -66,7 +66,7 @@
         url: "https://tarballs.opendev.org/openstack/ironic-python-agent/dib/files/ipa-centos7-stable-{{ openstack_release }}.initramfs"
   - name: Check state of Glance images.
     os_image_facts:
-      cloud: "{{ cloud }}"
+      auth: "{{ openstack_auth }}"
     when: enable_ironic | bool
   - name: Download source Glance images.
     get_url:
@@ -79,7 +79,7 @@
          (openstack_image | selectattr('name', 'match', item.name)) | list | length < 1
   - name: Create Glance images.
     os_image:
-      cloud: "{{ cloud }}"
+      auth: "{{ openstack_auth }}"
       state: present
       name: "{{ item.name }}"
       is_public: yes
@@ -93,7 +93,7 @@
     when: enable_ironic | bool
   - name: Create baremetal flavor.
     os_nova_flavor:
-      cloud: "{{ cloud }}"
+      auth: "{{ openstack_auth }}"
       state: present
       name: baremetal
       interface: admin
@@ -111,7 +111,7 @@
     when: enable_ironic | bool
   - name: Create provisioning network.
     local_action:
-      cloud: "{{ cloud }}"
+      auth: "{{ openstack_auth }}"
       module: os_network
       name: "{{ ironic_provisioning_network }}"
       region_name: "{{ openstack_region_name }}"
@@ -123,7 +123,7 @@
           ironic_provisioning_network_vlan is defined
   - name: Create provisioning subnet.
     local_action:
-      cloud: "{{ cloud }}"
+      auth: "{{ openstack_auth }}"
       module: os_subnet
       network_name: "{{ ironic_provisioning_network }}"
       name: "{{ ironic_provisioning_network }}-subnet"
@@ -139,7 +139,7 @@
   # Blazar-related configuration
   - name: Create freepool aggregate.
     os_nova_host_aggregate:
-      cloud: "{{ cloud }}"
+      auth: "{{ openstack_auth }}"
       state: present
       name: freepool
     when: enable_blazar | bool
