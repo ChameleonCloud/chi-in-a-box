@@ -245,6 +245,8 @@ if [[ "$CHECK_UPDATES" == "yes" || "$FORCE_UPDATES" == "yes" ]]; then
   ln -sf "$MITOGEN_INSTALL_DIR" "$VIRTUALENV/lib/mitogen-latest"
 fi
 
+ansible_path="$VIRTUALENV/share/kolla-ansible/ansible"
+
 # Handle subcommands
 if [[ -n $command ]]; then
   $command "$@"
@@ -258,7 +260,6 @@ if [[ -n "${CC_ANSIBLE_PLAYBOOK:-}" ]]; then
   echo "**********************************************************************"
   echo
 
-  ansible_path="$VIRTUALENV/share/kolla-ansible/ansible"
   playbook_file="$ansible_path/$(basename $CC_ANSIBLE_PLAYBOOK)"
 
   # Because we execute within Kolla-Ansible's playbook directory, "magic"
@@ -306,7 +307,6 @@ kolla_args+=(--passwords="$CC_ANSIBLE_SITE/passwords.yml")
 kolla_args+=(--globals="$DIR/kolla/defaults.yml")
 kolla_args+=(--extra "@$CC_ANSIBLE_SITE/globals.yml")
 kolla_args+=(--extra node_custom_config="$DIR/kolla/node_custom_config")
-kolla_args+=(--extra post_deploy_extra_play="$DIR/playbooks/post_deploy.yml")
 kolla_args+=(--extra cc_ansible_site_dir="$CC_ANSIBLE_SITE")
 # Override python interpreter to point to virtualenv (but only if we're
 # not performing the bootstrap, which is responsible for setting up the
@@ -316,6 +316,10 @@ if [[ "${POSARGS[@]}" != *"bootstrap-servers"* ]]; then
   # 'virtualenv' variable, as it can differ by site.
   virtualenv=$(get_defined_var virtualenv)
   kolla_args+=(--extra ansible_python_interpreter="$virtualenv/bin/python")
+fi
+if [[ "${POSARGS[@]}" == *"post-deploy"* ]]; then
+  cp -f "$DIR/playbooks/post_deploy.yml" "$ansible_path/chi_in_a_box_post_deploy.yml"
+  kolla_args+=(--extra post_deploy_extra_play="chi_in_a_box_post_deploy.yml")
 fi
 kolla_args+=("${POSARGS[@]}")
 
