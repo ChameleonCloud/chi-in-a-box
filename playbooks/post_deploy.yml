@@ -42,6 +42,8 @@
       comment: "NAT for {{ item.name }}"
     become: yes
     loop: "{{ corsa_switches }}"
+    loop_control:
+      label: "{{ item.name }}"
     when: corsa_switches is defined and corsa_switches | length > 0
 
 # Call site-specific playbook
@@ -64,15 +66,6 @@
         container_format: aki
         disk_format: aki
         url: "https://tarballs.opendev.org/openstack/ironic-python-agent/dib/files/ipa-centos7-stable-{{ openstack_release }}.initramfs"
-  - name: Check state of Glance images.
-    os_image_facts:
-      auth: "{{ openstack_auth }}"
-      image: "{{ item.name }}"
-    loop: "{{ glance_images }}"
-    loop_control:
-      label: "{{ item.name }}"
-    register: glance_image_facts
-    when: enable_ironic | bool
   - name: Download source Glance images.
     get_url:
       url: "{{ item.url }}"
@@ -80,8 +73,7 @@
     loop: "{{ glance_images }}"
     loop_control:
       label: "{{ item.name }}"
-    when: enable_ironic | bool and
-         (glance_image_facts.results | selectattr('name', 'match', item.name)) | list | length < 1
+    when: enable_ironic | bool
   - name: Create Glance images.
     os_image:
       auth: "{{ openstack_auth }}"
