@@ -166,6 +166,12 @@ neutron_notification_topics:
     enabled: yes
 neutron_type_drivers: flat,vlan
 neutron_tenant_network_types: vlan
+# Only relevant when running in debug mode, but allows
+# debugging the NGS plugin.
+neutron_dev_plugins:
+  - name: networking-generic-switch
+    packages:
+      - networking_generic_switch
 
 # Nova
 enable_nova: yes
