@@ -170,6 +170,8 @@ neutron_tenant_network_types: vlan
 # debugging the NGS plugin.
 neutron_dev_plugins:
   - name: networking-generic-switch
+    git_repository: https://github.com/ChameleonCloud/networking-generic-switch
+    source_version: "chameleoncloud/{{ openstack_release }}"
     packages:
       - networking_generic_switch
 
