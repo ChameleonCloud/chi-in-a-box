@@ -48,9 +48,8 @@ mysqldump --defaults-extra-file=$TMPFILE --opt --flush-logs --single-transaction
 #AWS S3 STUFF cross site backup to tacc.
 # Copy latest backup to /etc/awsconf to mount to container
 S3DIR="{{ mariadb_backup_s3_conf_dir }}"
-LATEST=`ls -rt ${DIR}/${PREFIX}* | tail -1`
 LATEST_FILE=`ls -rt ${DIR} | grep mysql_backup | tail -1`
-cp $LATEST $S3DIR
+cp $DIR/$LATEST_FILE $S3DIR
 
 # Create bucket and copy backup file, cleanup file
 docker run --rm -it -v ${S3DIR}:/root/.aws amazon/aws-cli --profile=ceph --endpoint=https://chi.tacc.chameleoncloud.org:7480 --region=us-east-1 s3 mb s3://{{ mariadb_backup_container_name }}
