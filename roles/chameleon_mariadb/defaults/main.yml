@@ -4,3 +4,5 @@ mariadb_backup_file_age: 29
 mariadb_backup_cron_name: mariadb-backup
 mariadb_backup_file: mariadb-backup
 mariadb_backup_retention: +31
+mariadb_backup_s3_conf_dir: /etc/awsconf
+
