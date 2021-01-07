@@ -19,6 +19,11 @@ neutron_networks:
   physnet2:
     bridge_name: br-em2
     external_interface: em2
+  public:
+    bridge_name: br-ex
+    external_interface: em3
+    # This should be your public IP block assigned to your deployment.
+    cidr: 0.0.0.0/32
 
 ironic_provisioning_network_vlan: 200
 

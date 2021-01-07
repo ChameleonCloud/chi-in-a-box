@@ -54,7 +54,10 @@
 # until here.
 - hosts: deployment
   tasks:
+
+  ##############################
   # Ironic-related configuration
+  ##############################
   - set_fact:
       glance_images_tmp: "/tmp"
       glance_images:
@@ -75,7 +78,8 @@
       label: "{{ item.name }}"
     when: enable_ironic | bool
   - name: Create Glance images.
-    os_image:
+    local_action:
+      module: os_image
       auth: "{{ openstack_auth }}"
       state: present
       name: "{{ item.name }}"
@@ -89,7 +93,8 @@
       label: "{{ item.name }}"
     when: enable_ironic | bool
   - name: Create baremetal flavor.
-    os_nova_flavor:
+    local_action:
+      module: os_nova_flavor
       auth: "{{ openstack_auth }}"
       state: present
       name: baremetal
@@ -108,8 +113,8 @@
     when: enable_ironic | bool
   - name: Create provisioning network.
     local_action:
-      auth: "{{ openstack_auth }}"
       module: os_network
+      auth: "{{ openstack_auth }}"
       name: "{{ ironic_provisioning_network }}"
       region_name: "{{ openstack_region_name }}"
       provider_network_type: vlan
@@ -120,8 +125,8 @@
           ironic_provisioning_network_vlan is defined
   - name: Create provisioning subnet.
     local_action:
-      auth: "{{ openstack_auth }}"
       module: os_subnet
+      auth: "{{ openstack_auth }}"
       network_name: "{{ ironic_provisioning_network }}"
       name: "{{ ironic_provisioning_network }}-subnet"
       cidr: "{{ ironic_provisioning_network_cidr }}"
@@ -133,7 +138,85 @@
     when: enable_ironic | bool and
           ironic_provisioning_network_cidr is defined
 
+  ##########################
+  # Public net configuration
+  ##########################
+  - name: Create public network
+    local_action:
+      module: os_network
+      auth: "{{ openstack_auth }}"
+      name: public
+      provider_network_type: flat
+      provider_physical_network: public
+      external: yes
+      state: present
+  - name: Create public subnet
+    local_action:
+      module: os_subnet
+      auth: "{{ openstack_auth }}"
+      network_name: public
+      name: public-subnet
+      cidr: "{{ neutron_networks.public.cidr }}"
+      allocation_pool_start: "{{ neutron_networks.public.cidr | next_nth_usable(2) }}"
+      allocation_pool_end: "{{ neutron_networks.public.cidr | ipaddr('last_usable') }}"
+      state: present
+
+  #########################
+  # Sharednet configuration
+  #########################
+  - name: Create shared network(s)
+    local_action:
+      module: os_network
+      auth: "{{ openstack_auth }}"
+      name: "{{ (item.value.sharednet | default({})).network_name | default(default_sharednet_name) }}"
+      provider_network_type: vlan
+      # Use the first on-demand VLAN for this network.
+      provider_segmentation_id: "{{ (item.value.on_demand_vlan_ranges[0].split(':')[0] | int) + 1 }}"
+      provider_physical_network: "{{ item.key }}"
+      shared: yes
+      state: present
+    loop: "{{ neutron_networks | dict2items }}"
+    loop_control:
+      label: "{{ item.key }}"
+    vars:
+      default_sharednet_name: sharednet1
+    when:
+      - item.value.on_demand_vlan_ranges is defined
+      - item.value.on_demand_vlan_ranges | length > 0
+      - item.value.sharednet.enabled | default(true) | bool
+  - name: Create shared network subnet(s)
+    local_action:
+      module: os_subnet
+      auth: "{{ openstack_auth }}"
+      network_name: "{{ (item.value.sharednet | default({})).network_name | default(default_sharednet_name) }}"
+      name: "{{ (item.value.sharednet | default({})).network_name | default(default_sharednet_name) }}-subnet"
+      cidr: "{{ (item.value.sharednet | default({})).cidr | default(default_sharednet_cidr) }}"
+      allocation_pool_start: "{{ (item.value.sharednet | default({})).cidr | default(default_sharednet_cidr) | next_nth_usable(2) }}"
+      allocation_pool_end: "{{ (item.value.sharednet | default({})).cidr | default(default_sharednet_cidr) | ipaddr('last_usable') }}"
+    loop: "{{ neutron_networks | dict2items }}"
+    loop_control:
+      label: "{{ item.key }}"
+    vars:
+      default_sharednet_name: sharednet1
+      default_sharednet_cidr: 10.0.0.1/24
+    when:
+      - item.value.on_demand_vlan_ranges is defined
+      - item.value.on_demand_vlan_ranges | length > 0
+      - item.value.sharednet.enabled | default(true) | bool
+    register: sharednet_subnets
+  - name: Create NAT router for shared network(s).
+    local_action:
+      module: os_router
+      auth: "{{ openstack_auth }}"
+      name: sharednet-router
+      interfaces: "{{ sharednet_subnets.results | selectattr('subnet', 'defined') | map(attribute='subnet') | map(attribute='name') | list }}"
+      network: public
+      external_fixed_ips:
+        - subnet: "public-subnet"
+
+  ##############################
   # Blazar-related configuration
+  ##############################
   - name: Create freepool aggregate.
     os_nova_host_aggregate:
       auth: "{{ openstack_auth }}"
