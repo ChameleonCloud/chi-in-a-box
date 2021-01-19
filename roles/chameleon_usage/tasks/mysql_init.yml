@@ -11,7 +11,10 @@
       password: "{{ chameleon_usage_mysql_password }}"
       priv: "{{ all_privileges | join('/') }}"
   run_once: True
-  delegate_to: "{{ groups['chameleon_usage'][0] }}"
+  # Delegate to control node, which we can safely assume is running at least
+  # one Kolla service, and therefore already has the kolla_toolbox container
+  # running on the host.
+  delegate_to: "{{ groups['control'][0] }}"
   vars:
     all_privileges:
       - 'blazar_backup\_%.*:CREATE,DROP,SELECT,INSERT'
