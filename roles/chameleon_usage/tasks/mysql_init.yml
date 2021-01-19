@@ -1,15 +1,19 @@
 ---
 - name: Create MySQL user
-  local_action:
-    module: mysql_user
-    login_host: "{{ database_address }}"
-    login_password: "{{ database_password }}"
-    name: "{{ chameleon_usage_mysql_user }}"
-    host: "%"
-    password: "{{ chameleon_usage_mysql_password }}"
-    priv: "{{ item }}"
-    append_privs: 'yes'
-  with_items:
+  kolla_toolbox:
+    module_name: mysql_user
+    module_args:
+      login_host: "{{ database_address }}"
+      login_password: "{{ database_password }}"
+      login_user: "{{ database_user }}"
+      name: "{{ chameleon_usage_mysql_user }}"
+      host: "%"
+      password: "{{ chameleon_usage_mysql_password }}"
+      priv: "{{ item }}"
+      append_privs: yes
+  run_once: True
+  delegate_to: "{{ groups['hammers'][0] }}"
+  loop:
     - 'blazar_backup\_%.*:CREATE,DROP,SELECT,INSERT'
     - 'keystone_backup\_%.*:CREATE,DROP,SELECT,INSERT'
     - 'nova_backup\_%.*:CREATE,DROP,SELECT,INSERT'
