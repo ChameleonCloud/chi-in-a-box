@@ -14,7 +14,7 @@
   vars:
     task_name: "usage_node"
     task_command: "/usr/local/sbin/chameleon-usage-extract-data"
-    task_calendar: "* 6 * * *"
+    task_calendar: "06:00"
 
 - name: Configure slack webhook file
   template:
@@ -34,4 +34,4 @@
   vars:
     task_name: "usage_node_sanity"
     task_command: "/usr/local/sbin/chameleon-usage-sanity-checks"
-    task_calendar: "0 10 * * *"
+    task_calendar: "10:00"

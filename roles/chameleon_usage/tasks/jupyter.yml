@@ -14,7 +14,10 @@
   vars:
     task_name: "usage_jupyter"
     task_command: "/usr/local/sbin/chameleon-usage-jupyter"
-    task_calendar: "*/5 * * * *"
+    # Run every 5 minutes; this job is cheap and takes state snapshots of
+    # how many active users/containers are on Jupyter, so we need to check
+    # frequently.
+    task_calendar: "*:0/5"
 
 - name: Configure chameleon jupyter usage report cache docker bash wrapper
   template:
@@ -31,4 +34,4 @@
   vars:
     task_name: "usage_jupyter_report_cache"
     task_command: "/usr/local/sbin/chameleon-usage-jupyter-usage-report-cache"
-    task_calendar: "* 6 * * *"
+    task_calendar: "06:00"

@@ -14,4 +14,4 @@
   vars:
     task_name: "usage_heat_template_downloads"
     task_command: "/usr/local/sbin/chameleon-usage-heat-template-downloads"
-    task_calendar: "* 5 * * *"
+    task_calendar: "05:00"
