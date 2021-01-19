@@ -13,12 +13,10 @@
     mode: a+x
     dest: /usr/local/sbin/chameleon-usage-user-project-report
 
-- name: Add glance backup cron jobs.
-  cron:
-    name: "{{ user_project_report_cron_name }}"
-    minute: "0"
-    hour: "3"
-    day: "*"
-    month: "*"
-    weekday: "*"
-    job: "/usr/local/sbin/chameleon-usage-user-project-report | /usr/bin/logger -t \"chameleon_usage_user_project\""
+- name: Set up user/project extract periodic task.
+  include_role:
+    name: chameleon.periodic_task
+  vars:
+    task_name: "usage_user_project"
+    task_command: "/usr/local/sbin/chameleon-usage-user-project-report"
+    task_calendar: "0 3 * * *"

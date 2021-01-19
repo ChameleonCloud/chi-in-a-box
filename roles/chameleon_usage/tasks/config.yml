@@ -9,7 +9,7 @@
   file:
     path: "{{ chameleon_usage_config_dir }}"
     state: directory
-    
+
 - name: Configure my.cnf
   template:
     src: my.cnf.j2
