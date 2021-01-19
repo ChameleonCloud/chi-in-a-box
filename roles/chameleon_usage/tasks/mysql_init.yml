@@ -12,7 +12,7 @@
       priv: "{{ item }}"
       append_privs: yes
   run_once: True
-  delegate_to: "{{ groups['hammers'][0] }}"
+  delegate_to: "{{ groups['chameleon_usage'][0] }}"
   loop:
     - 'blazar_backup\_%.*:CREATE,DROP,SELECT,INSERT'
     - 'keystone_backup\_%.*:CREATE,DROP,SELECT,INSERT'
