@@ -9,18 +9,18 @@
       name: "{{ chameleon_usage_mysql_user }}"
       host: "%"
       password: "{{ chameleon_usage_mysql_password }}"
-      priv: "{{ item }}"
-      append_privs: yes
+      priv: "{{ all_privileges | join('/') }}"
   run_once: True
   delegate_to: "{{ groups['chameleon_usage'][0] }}"
-  loop:
-    - 'blazar_backup\_%.*:CREATE,DROP,SELECT,INSERT'
-    - 'keystone_backup\_%.*:CREATE,DROP,SELECT,INSERT'
-    - 'nova_backup\_%.*:CREATE,DROP,SELECT,INSERT'
-    - 'ironic_backup\_%.*:CREATE,DROP,SELECT,INSERT'
-    - 'chameleon_usage.*:CREATE,SELECT,INSERT,UPDATE,DELETE'
-    - 'blazar.*:SELECT'
-    - 'ironic.*:SELECT'
+  vars:
+    all_privileges:
+      - 'blazar_backup\_%.*:CREATE,DROP,SELECT,INSERT'
+      - 'keystone_backup\_%.*:CREATE,DROP,SELECT,INSERT'
+      - 'nova_backup\_%.*:CREATE,DROP,SELECT,INSERT'
+      - 'ironic_backup\_%.*:CREATE,DROP,SELECT,INSERT'
+      - 'chameleon_usage.*:CREATE,SELECT,INSERT,UPDATE,DELETE'
+      - 'blazar.*:SELECT'
+      - 'ironic.*:SELECT'
 
 - name: Initialize chameleon_usage database
   shell: |
