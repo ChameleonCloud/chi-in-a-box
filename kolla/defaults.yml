@@ -96,6 +96,7 @@ identity_provider_name: chameleon
 identity_provider_domain_name: chameleon
 keystone_identity_providers:
   - name: "{{ identity_provider_name }}"
+    domain_name: "{{ identity_provider_domain_name }}"
     protocol: openid
     identifier: "{{ identity_provider_url }}"
     public_name: Login with Chameleon

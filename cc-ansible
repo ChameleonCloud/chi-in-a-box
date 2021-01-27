@@ -311,7 +311,7 @@ kolla_args+=(--extra cc_ansible_site_dir="$CC_ANSIBLE_SITE")
 # Override python interpreter to point to virtualenv (but only if we're
 # not performing the bootstrap, which is responsible for setting up the
 # virtualenv in the first place!)
-if [[ ! "${POSARGS[@]}" =~ bootstrap-servers|post-deploy ]]; then
+if [[ ! "${POSARGS[@]}" =~ bootstrap-servers ]]; then
   # Run a quick ad-hoc command to figure out the derived value of the
   # 'virtualenv' variable, as it can differ by site.
   virtualenv=$(get_defined_var virtualenv)
