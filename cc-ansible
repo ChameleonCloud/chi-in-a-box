@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
-VIRTUALENV="$(realpath ${VIRTUALENV:-$DIR/venv})"
+VIRTUALENV="$(realpath "${VIRTUALENV:-"$DIR"/venv}")"
 
 FORCE_UPDATES="${FORCE_UPDATES:-no}"
 if [[ ! -d "$VIRTUALENV" ]]; then
@@ -10,7 +10,7 @@ if [[ ! -d "$VIRTUALENV" ]]; then
   FORCE_UPDATES=yes
 fi
 
-source "$VIRTUALENV/bin/activate"
+source "$(realpath "$VIRTUALENV/bin/activate")"
 
 CHECK_UPDATES=yes
 declare -a POSARGS=()
@@ -29,7 +29,7 @@ while [[ $# -gt 0 ]]; do
       shift # Past arg
       ;;
     -s|--site)
-      CC_ANSIBLE_SITE="$(realpath $2)"
+      CC_ANSIBLE_SITE="$(realpath "$2")"
       shift # Past arg
       ;;
     --check)
@@ -70,7 +70,7 @@ init() {
   fi
 
   # Copy files from example
-  mkdir -p "$(dirname $site_config)"
+  mkdir -p "$(dirname "$site_config")"
   cp -a "$DIR/site-config.example/" "$site_config"
 
   local inventory="$site_config/inventory"
@@ -99,7 +99,9 @@ init() {
 }
 
 edit_passwords() {
-  local tmpfile="$(mktemp)"
+  local tmpfile
+
+  tmpfile="$(mktemp)"
   _edit_passwords_cleanup() {
     rm -f "$tmpfile"
   }
@@ -182,7 +184,7 @@ the --site <dir> flag or by setting the CC_ANSIBLE_SITE environment variable.
 Example:
   cc-ansible --site /etc/sites/production
 
-  CC_ANSIBLE_SITE=/etc/sites/production $(basename $0)
+  CC_ANSIBLE_SITE=/etc/sites/production "$(basename "$0")"
 ERRMSG
   exit 1
 fi
@@ -190,7 +192,7 @@ fi
 CC_ANSIBLE_VAULT_PASSWORD="${CC_ANSIBLE_VAULT_PASSWORD:-$CC_ANSIBLE_SITE/vault_password}"
 CC_ANSIBLE_ENV="$CC_ANSIBLE_SITE/.env"
 if [[ -f "$CC_ANSIBLE_ENV" ]]; then
-  set -a; source "$CC_ANSIBLE_ENV"; set +a
+  set -a; source "$(realpath "$CC_ANSIBLE_ENV")"; set +a
 fi
 
 # Automatically update dependencies
@@ -220,17 +222,17 @@ if [[ "$CHECK_UPDATES" == "yes" || "$FORCE_UPDATES" == "yes" ]]; then
   kolla_ansible_egglink="$VIRTUALENV/src/kolla-ansible"
   if [[ "$FORCE_UPDATES" == "yes" || ! -f "$kolla_ansible_gitref" || ! -d "$kolla_ansible_egglink" ]] || \
         ! diff -q >/dev/null \
-          $kolla_ansible_gitref \
-          <(cd $kolla_ansible_egglink; git fetch; git show-ref -s -d origin/$kolla_ansible_checkout); then
-    pushd $VIRTUALENV
-    pip install -e git+$kolla_ansible_remote@$kolla_ansible_checkout#egg=kolla-ansible
-    popd
+          "$kolla_ansible_gitref" \
+          <(cd "$kolla_ansible_egglink"; git fetch; git show-ref -s -d origin/"$kolla_ansible_checkout"); then
+    pushd "$VIRTUALENV" || echo "pushd error!" && exit 1
+    pip install -e git+"$kolla_ansible_remote"@"$kolla_ansible_checkout"#egg=kolla-ansible
+    popd || echo "popd error!" && exit 1
     # [jca 2020-01-30] TODO:
     # Ensure the /share folder is placed; this is not copied when using the "develop" setup.py method.
     # This is a bit weird, perhaps there is some way to pass an additional flag to pip to make it
     # copy this even though it's installing as source. We use source install to keep track of the Git revision.
     mkdir -p "$VIRTUALENV/share" && ln -sf "$kolla_ansible_egglink" "$VIRTUALENV/share/kolla-ansible"
-    (cd $kolla_ansible_egglink; git rev-parse HEAD > $kolla_ansible_gitref)
+    (cd "$kolla_ansible_egglink"; git rev-parse HEAD > "$kolla_ansible_gitref")
   fi
 
   # Update Mitogen
@@ -239,7 +241,7 @@ if [[ "$CHECK_UPDATES" == "yes" || "$FORCE_UPDATES" == "yes" ]]; then
   MITOGEN_INSTALL_DIR="$VIRTUALENV/lib/mitogen-$MITOGEN_VERSION"
   if [[ ! -d "$MITOGEN_INSTALL_DIR" ]]; then
     curl -L -o "$MITOGEN_TARBALL" "https://github.com/dw/mitogen/archive/v$MITOGEN_VERSION.tar.gz" \
-      && tar -xf "$MITOGEN_TARBALL" -C "$(dirname $MITOGEN_INSTALL_DIR)" \
+      && tar -xf "$MITOGEN_TARBALL" -C "$(dirname "$MITOGEN_INSTALL_DIR")" \
       && rm -f "$MITOGEN_TARBALL"
   fi
   ln -sf "$MITOGEN_INSTALL_DIR" "$VIRTUALENV/lib/mitogen-latest"
@@ -260,7 +262,7 @@ if [[ -n "${CC_ANSIBLE_PLAYBOOK:-}" ]]; then
   echo "**********************************************************************"
   echo
 
-  playbook_file="$ansible_path/$(basename $CC_ANSIBLE_PLAYBOOK)"
+  playbook_file="$ansible_path/$(basename "$CC_ANSIBLE_PLAYBOOK")"
 
   # Because we execute within Kolla-Ansible's playbook directory, "magic"
   # paths will not work any more--add our plugins/libraries to Ansible's
@@ -271,7 +273,7 @@ if [[ -n "${CC_ANSIBLE_PLAYBOOK:-}" ]]; then
 
   # Copy the playbook to a new location relative to the Kolla-Ansible installation
   # to allow the group_vars/ in the playbook directory to take effect.
-  cp "$(realpath $CC_ANSIBLE_PLAYBOOK)" "$playbook_file"
+  cp "$(realpath "$CC_ANSIBLE_PLAYBOOK")" "$playbook_file"
   _playbook_override_cleanup() {
     rm -f "$playbook_file"
   }
@@ -317,10 +319,10 @@ if [[ ! "${POSARGS[@]}" =~ bootstrap-servers ]]; then
   virtualenv=$(get_defined_var virtualenv)
   kolla_args+=(--extra ansible_python_interpreter="$virtualenv/bin/python")
 fi
-if [[ "${POSARGS[@]}" =~ post-deploy ]]; then
+if [[ "${POSARGS[*]}" =~ post-deploy ]]; then
   cp -f "$DIR/playbooks/post_deploy.yml" "$ansible_path/chi_in_a_box_post_deploy.yml"
   kolla_args+=(--extra post_deploy_extra_play="chi_in_a_box_post_deploy.yml")
 fi
 kolla_args+=("${POSARGS[@]}")
 
-$VIRTUALENV/bin/kolla-ansible "${kolla_args[@]}"
+"$VIRTUALENV"/bin/kolla-ansible "${kolla_args[@]}"
