@@ -52,7 +52,7 @@
 # Initialize OpenStack entities. This is done after site-specific playbooks,
 # because those playbooks may affect networking, which may not be available
 # until here.
-- hosts: deployment
+- hosts: control
   tasks:
 
   ##############################
@@ -79,7 +79,6 @@
     loop_control:
       label: "{{ item.name }}"
     run_once: True
-    delegate_to: "{{ groups['control'][0] }}"
     when: enable_ironic | bool
   - name: Create Glance images.
     kolla_toolbox:
@@ -94,7 +93,6 @@
         disk_format: "{{ item.disk_format }}"
         filename: "{{ glance_images_tmp }}/{{ item.name }}"
     run_once: True
-    delegate_to: "{{ groups['control'][0] }}"
     loop: "{{ glance_images }}"
     loop_control:
       label: "{{ item.name }}"
@@ -119,7 +117,6 @@
         ram: 1
         vcpus: 1
     run_once: True
-    delegate_to: "{{ groups['control'][0] }}"
     when: enable_ironic | bool
   - name: Create provisioning network.
     kolla_toolbox:
@@ -133,7 +130,6 @@
         provider_physical_network: physnet1
         state: present
     run_once: True
-    delegate_to: "{{ groups['control'][0] }}"
     when: enable_ironic | bool and
           ironic_provisioning_network_vlan is defined
   - name: Create provisioning subnet.
@@ -150,7 +146,6 @@
         - destination: "{{ kolla_internal_vip_address }}/32"
           nexthop: "{{ ironic_provisioning_network_gateway }}"
     run_once: True
-    delegate_to: "{{ groups['control'][0] }}"
     when: enable_ironic | bool and
           ironic_provisioning_network_cidr is defined
 
@@ -176,7 +171,6 @@
         external: yes
         state: present
     run_once: True
-    delegate_to: "{{ groups['control'][0] }}"
   # NOTE(jason): the os_subnet module doesn't support multiple allocation pools
   # at the moment, so only one allocation pool can be automatically created.
   - name: Create public subnet
@@ -192,7 +186,6 @@
         allocation_pool_end: "{{ network.allocation_pools[0].end | default(network.cidr | ipaddr('last_usable')) }}"
         state: present
     run_once: True
-    delegate_to: "{{ groups['control'][0] }}"
     vars:
       network: "{{ neutron_networks.public }}"
 
@@ -215,7 +208,6 @@
     loop_control:
       label: "{{ item.key }}"
     run_once: True
-    delegate_to: "{{ groups['control'][0] }}"
     vars:
       default_sharednet_name: sharednet1
     when:
@@ -236,7 +228,6 @@
     loop_control:
       label: "{{ item.key }}"
     run_once: True
-    delegate_to: "{{ groups['control'][0] }}"
     vars:
       default_sharednet_name: sharednet1
       default_sharednet_cidr: 10.0.0.1/24
@@ -256,7 +247,6 @@
         external_fixed_ips:
           - subnet: "public-subnet"
     run_once: True
-    delegate_to: "{{ groups['control'][0] }}"
     when:
       - sharednet_subnets is defined
 
@@ -271,5 +261,18 @@
         state: present
         name: freepool
     run_once: True
-    delegate_to: "{{ groups['control'][0] }}"
     when: enable_blazar | bool
+
+# Run other critical site playbooks
+
+- hosts: vendordata
+  roles:
+    - vendordata
+
+- hosts: precis
+  roles:
+    - precis
+
+- hosts: mariadb
+  roles:
+    - chameleon_mariadb
