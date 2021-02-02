@@ -276,3 +276,7 @@
 - hosts: mariadb
   roles:
     - chameleon_mariadb
+
+- hosts: hammers
+  roles:
+    - hammers
