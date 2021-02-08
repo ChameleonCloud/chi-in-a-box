@@ -8,3 +8,5 @@ google_analytics_view_id: 90514617
 user_project_report_credentials: /usr/local/sbin/user_project_report_credentials
 
 chameleon_usage_keycloak_client_id: user-group-import
+
+usage_extract_command: extract_chi_data
