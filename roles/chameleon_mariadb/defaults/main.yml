@@ -9,4 +9,8 @@ mariadb_backup_origin_dir: "{{ backup_dir }}"
 mariadb_backup_log_key: chameleon-chi-db-backup
 mariadb_backup_cron_minute: '5'
 mariadb_backup_cron_hour: '23'
+mariadb_backup_cron_day: '*'
+mariadb_backup_cron_month: '*'
+mariadb_backup_cron_weekday: '*'
+
 
