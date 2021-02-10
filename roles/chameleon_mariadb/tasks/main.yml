@@ -10,45 +10,11 @@
     src: mariadb.j2
     mode: 0700
     dest: "{{ mariadb_backup_cron_script }}"
-  when: inventory_hostname_short == "m01-07"
 
-- name: Configure mariadb backup script file without rsync for dev
-  template:
-    src: mariadbdev.j2
-    mode: 0700
-    dest: "{{ mariadb_backup_cron_script }}"
-  when: inventory_hostname_short == "dev"
-
-- name: Create directory to mount to aws-cli docker container for copying config and backup files to container
+- name: Create directory to mount to aws-cli docker container for copying backup files to container
   file:
     path: /etc/awsconf
     state: directory
-  when: inventory_hostname_short == "admin01" or
-        inventory_hostname_short == "admin02"
-
-- name: Configure mariadb backup script file
-  template:
-    src: mariadb_uc.j2
-    mode: 0700
-    dest: "{{ mariadb_backup_cron_script }}"
-  when: inventory_hostname_short == "admin01" or
-        inventory_hostname_short == "admin02"
-
-- name: Configure s3 config file
-  template:
-    src: mariadb_uc_x-site_config.j2
-    mode: 0700
-    dest: "{{ mariadb_backup_s3_conf_dir }}/config"
-  when: inventory_hostname_short == "admin01" or
-        inventory_hostname_short == "admin02"
-
-- name: Configure mariadb backup script file
-  template:
-    src: mariadb_uc_x-site_credentials.j2
-    mode: 0700
-    dest: "{{ mariadb_backup_s3_conf_dir }}/credentials"
-  when: inventory_hostname_short == "admin01" or
-        inventory_hostname_short == "admin02"
 
 - name: Add mariadb backup cron jobs.
   cron:

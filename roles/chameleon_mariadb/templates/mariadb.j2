@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash                                                                                                                                                                                                                                   
 #
 # MySQL Backup Script
 #  Dumps mysql databases to a file for another backup tool to pick up.
@@ -45,14 +45,22 @@ mysqldump --defaults-extra-file=$TMPFILE --opt --flush-logs --single-transaction
  ${ADDITIONAL_OPTIONS} \
  --all-databases | bzcat -zc > ${DIR}/${PREFIX}`date +%Y%m%d-%H%M%S`.sql.bz2
 
+# AWS S3  cross site backup
+# Copy latest backup to /etc/awsconf to mount to container
+S3DIR="{{ mariadb_backup_s3_conf_dir }}"
+LATEST_FILE=`ls -rt ${DIR} | grep mysql_backup | tail -1`
+cp $DIR/$LATEST_FILE $S3DIR
+
+# Create bucket and copy backup file, cleanup file
+docker run -e AWS_ACCESS_KEY_ID="{{ mariadb_backup_s3_key_id }}" -e AWS_SECRET_ACCESS_KEY="{{ mariadb_backup_s3_key }}" --rm -it -v ${S3DIR}:/root/.aws amazon/aws-cli --endpoint="{{ mariadb_backup_s3_endpoint }}" --region=us-east-1 s3 mb s3://{{ mariadb_backup_container_name }}
+docker run -e AWS_ACCESS_KEY_ID="{{ mariadb_backup_s3_key_id }}" -e AWS_SECRET_ACCESS_KEY="{{ mariadb_backup_s3_key }}" --rm -it -v ${S3DIR}:/root/.aws amazon/aws-cli --endpoint="{{ mariadb_backup_s3_endpoint }}" --region=us-east-1 s3 cp /root/.aws/${LATEST_FILE} s3://{{ mariadb_backup_container_name }}
+
+# Remove temporary files
+rm -f $TMPFILE
+rm ${S3DIR}/${LATEST_FILE}
+
+
 if [ $? -eq 0 ] ; then
     cleanup
     touch /tmp/mysqlbackup_success
 fi
-
-rsync -vrlptz ${DIR} "{{ mariadb_backup_destination_host }}":"{{ mariadb_backup_destination_dir }}" 2>&1 | /usr/bin/logger -t "{{ mariadb_backup_log_key }}" && ssh "{{ mariadb_backup_destination_host }}" 'find {{ mariadb_backup_destination_dir }}* -maxdepth 2 -mtime "{{ mariadb_backup_retention }}" -exec rm {} \;'
-
-# Remove temporary file
-rm -f $TMPFILE
-
-
