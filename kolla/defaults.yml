@@ -139,8 +139,6 @@ keycloak_url: "https://{{ keycloak_hostname }}"
 
 # Keystone
 enable_keystone: yes
-use_preconfigured_fernet: yes
-fernet_token_expiry: 604800 # 1 week
 keystone_admin_project: openstack
 # The following are needed for defaults for the Glance/Gnocchi backup roles
 # (site-configs derive from these)
