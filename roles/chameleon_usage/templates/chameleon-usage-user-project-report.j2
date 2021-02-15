@@ -1,6 +1,0 @@
-#! /bin/sh
-
-docker run --rm --net=host \
-    --env-file "{{ chameleon_usage_config_dir }}/user_project_report_credentials" \
-    {{ chameleon_usage_docker_image }} \
-    user_project_report 2>&1

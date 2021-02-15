@@ -2,12 +2,5 @@
 chameleon_usage_docker_image: docker.chameleoncloud.org/chameleon_usage:latest
 chameleon_usage_config_dir: /etc/chameleon_usage
 chameleon_usage_mysql_user: cc_usage
-ga_reporting_private_key_json_location: /root/ga-service-account-private-key.json
-google_analytics_view_id: 90514617
 
-user_project_report_cron_name: user_project_report
-user_project_report_cron_script: /usr/local/sbin/user_project_report.py
-user_project_report_credentials: /usr/local/sbin/user_project_report_credentials
-cron_notification: /usr/local/sbin/notification
-
-chameleon_usage_keycloak_client_id: user-group-import
+usage_extract_command: extract_kvm_data
