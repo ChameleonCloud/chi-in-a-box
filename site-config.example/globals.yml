@@ -19,6 +19,13 @@ kolla_external_vip_address: 100.0.0.1
 kolla_external_fqdn: chi.example.com
 
 
+
+#Uncomment to Disable Federated Auth
+# enable_keystone_federation: no
+# enable_keystone_federation_openid: no
+# keystone_idp_client_id: null
+
+
 # Neutron networks (MANDATORY)
 # Uncomment to enable Neutron Bridge Networks
 # At least one private and one public is required
