@@ -327,9 +327,9 @@ kolla_args+=("${POSARGS[@]}")
 
 #load tags to skip
 ANSIBLE_SKIP_TAGS="$(grep -v "^#" ./kolla-skip-tags | paste -sd ',')"
-if [[ "${ANSIBLE_SKIP_TAGS}" ]]; then
+if [[ -n "${ANSIBLE_SKIP_TAGS}" ]]; then
   kolla_args+=("--skip-tags")
-  kolla_args+=("${ANSIBLE_SKIP_TAGS[@]}")
+  kolla_args+=("${ANSIBLE_SKIP_TAGS}")
 fi
 
 "$VIRTUALENV"/bin/kolla-ansible "${kolla_args[@]}"
