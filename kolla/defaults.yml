@@ -11,6 +11,9 @@ kolla_install_type: source
 # Disable addition of tag for CentOS8
 # Remove this if pulling CentOS8 containers
 openstack_tag_suffix: ''
+# Similarly, remove this override once we have full
+# support for CentOS8 and other distros (like Ubuntu)
+distro_python_version: '2.7'
 
 virtualenv: /etc/ansible/venv
 
