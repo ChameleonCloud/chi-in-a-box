@@ -10,6 +10,8 @@
     - prometheus-redis-exporter
   roles:
     - chameleon_prometheus
+  become: yes
+  become_user: root
   tasks:
     - set_fact:
         prometheus_alertmanager_port: "{{ prometheus_services['alertmanager'].port }}"
@@ -34,6 +36,8 @@
             name: "{{ prometheus_server.prometheus_monitoring_user }}"
             password: "{{ prometheus_monitoring_password }}"
             mode: 0640
+          when:
+            - external_vip_address is defined
         - name: Configure virtual host.
           include_role:
             name: apache
@@ -73,6 +77,8 @@
             path: "/etc/httpd/prometheus_alertmanager.htpasswd"
             name: "{{ prometheus_alertmanager.prometheus_monitoring_user }}"
             password: "{{ prometheus_monitoring_password }}"
+          when:
+            - external_vip_address is defined
         - name: Configure virtual host.
           include_role:
             name: apache

@@ -146,20 +146,31 @@
         - destination: "{{ kolla_internal_vip_address }}/32"
           nexthop: "{{ ironic_provisioning_network_gateway }}"
     run_once: True
-    when: enable_ironic | bool and
-          ironic_provisioning_network_cidr is defined
+    when: 
+      - enable_ironic | bool
+      - ironic_provisioning_network_cidr is defined
+      - ironic_provisioning_network_vlan is defined
 
   ##########################
   # Public net configuration
   ##########################
+  - name: Set fact for public network
+    set_fact:
+      public_network: "{{ public_networks | first }}"
+    vars:
+      public_networks: "{{ neutron_networks | selectattr('name', 'equalto', 'public') | list }}"
+    when:
+      - public_networks | length > 0
   - name: Check public network configuration
     assert:
       that:
-        - neutron_networks.public is defined
-        - neutron_networks.public.cidr is defined
+        - public_network.cidr is defined
+        - public_network.gateway_ip is defined
       fail_msg: |
         No 'public' neutron_network is defined! At least one externally-facing
         network should be defined, and it should be called 'public'.
+    when:
+      - public_network is defined
   - name: Create public network
     kolla_toolbox:
       module_name: os_network
@@ -171,6 +182,8 @@
         external: yes
         state: present
     run_once: True
+    when:
+      - public_network is defined
   # NOTE(jason): the os_subnet module doesn't support multiple allocation pools
   # at the moment, so only one allocation pool can be automatically created.
   - name: Create public subnet
@@ -187,7 +200,9 @@
         state: present
     run_once: True
     vars:
-      network: "{{ neutron_networks.public }}"
+      network: "{{ public_network }}"
+    when:
+      - public_network is defined
 
   #########################
   # Sharednet configuration
@@ -197,44 +212,44 @@
       module_name: os_network
       module_args:
         auth: "{{ openstack_auth }}"
-        name: "{{ (item.value.sharednet | default({})).network_name | default(default_sharednet_name) }}"
+        name: "{{ (item.sharednet | default({})).network_name | default(default_sharednet_name) }}"
         provider_network_type: vlan
         # Use the first on-demand VLAN for this network.
-        provider_segmentation_id: "{{ (item.value.on_demand_vlan_ranges[0].split(':')[0] | int) + 1 }}"
-        provider_physical_network: "{{ item.key }}"
+        provider_segmentation_id: "{{ (item.on_demand_vlan_ranges[0].split(':')[0] | int) + 1 }}"
+        provider_physical_network: "{{ item.name }}"
         shared: yes
         state: present
-    loop: "{{ neutron_networks | dict2items }}"
+    loop: "{{ neutron_networks }}"
     loop_control:
-      label: "{{ item.key }}"
+      label: "{{ item.name }}"
     run_once: True
     vars:
       default_sharednet_name: sharednet1
     when:
-      - item.value.on_demand_vlan_ranges is defined
-      - item.value.on_demand_vlan_ranges | length > 0
-      - item.value.sharednet.enabled | default(true) | bool
+      - item.on_demand_vlan_ranges is defined
+      - item.on_demand_vlan_ranges | length > 0
+      - item.sharednet.enabled | default(true) | bool
   - name: Create shared network subnet(s)
     kolla_toolbox:
       module_name: os_subnet
       module_args:
         auth: "{{ openstack_auth }}"
-        network_name: "{{ (item.value.sharednet | default({})).network_name | default(default_sharednet_name) }}"
-        name: "{{ (item.value.sharednet | default({})).network_name | default(default_sharednet_name) }}-subnet"
-        cidr: "{{ (item.value.sharednet | default({})).cidr | default(default_sharednet_cidr) }}"
-        allocation_pool_start: "{{ (item.value.sharednet | default({})).cidr | default(default_sharednet_cidr) | next_nth_usable(2) }}"
-        allocation_pool_end: "{{ (item.value.sharednet | default({})).cidr | default(default_sharednet_cidr) | ipaddr('last_usable') }}"
-    loop: "{{ neutron_networks | dict2items }}"
+        network_name: "{{ (item.sharednet | default({})).network_name | default(default_sharednet_name) }}"
+        name: "{{ (item.sharednet | default({})).network_name | default(default_sharednet_name) }}-subnet"
+        cidr: "{{ (item.sharednet | default({})).cidr | default(default_sharednet_cidr) }}"
+        allocation_pool_start: "{{ (item.sharednet | default({})).cidr | default(default_sharednet_cidr) | next_nth_usable(2) }}"
+        allocation_pool_end: "{{ (item.sharednet | default({})).cidr | default(default_sharednet_cidr) | ipaddr('last_usable') }}"
+    loop: "{{ neutron_networks }}"
     loop_control:
-      label: "{{ item.key }}"
+      label: "{{ item.name }}"
     run_once: True
     vars:
       default_sharednet_name: sharednet1
       default_sharednet_cidr: 10.0.0.1/24
     when:
-      - item.value.on_demand_vlan_ranges is defined
-      - item.value.on_demand_vlan_ranges | length > 0
-      - item.value.sharednet.enabled | default(true) | bool
+      - item.on_demand_vlan_ranges is defined
+      - item.on_demand_vlan_ranges | length > 0
+      - item.sharednet.enabled | default(true) | bool
     register: sharednet_subnets
   - name: Create NAT router for shared network(s).
     kolla_toolbox:
@@ -249,6 +264,7 @@
     run_once: True
     when:
       - sharednet_subnets is defined
+      - public_network is defined
 
   ##############################
   # Blazar-related configuration
@@ -264,19 +280,33 @@
     when: enable_blazar | bool
 
 # Run other critical site playbooks
-
+  
 - hosts: vendordata
   roles:
+    - vendordata
+  become: yes
+  become_user: root
+  tags:
     - vendordata
 
 - hosts: precis
   roles:
     - precis
+  tags:
+    - precis
 
 - hosts: mariadb
   roles:
     - chameleon_mariadb
+  become: yes
+  become_user: root
+  tags:
+    - mariadb
 
 - hosts: hammers
   roles:
+    - hammers
+  become: yes
+  become_user: root
+  tags:
     - hammers

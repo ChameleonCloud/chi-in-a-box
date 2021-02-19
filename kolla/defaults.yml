@@ -22,6 +22,9 @@ chameleon_reference_api_url: https://api.chameleoncloud.org
 # Whether to show a dropdown in the Horizon GUI that provides links to other
 # Chameleon testbed sites.
 enable_chameleon_multisite: yes
+# Default networking fallbacks
+switch_configs: []
+neutron_networks: []
 
 enable_mariadb: yes
 enable_chrony: yes

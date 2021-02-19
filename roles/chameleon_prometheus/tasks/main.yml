@@ -67,6 +67,7 @@
   when:
     - groups[service.group] is defined
     - inventory_hostname in groups[service.group]
+    - enable_jupyterhub | bool
 
 - include_tasks: mysql_exporter.yml
   vars:

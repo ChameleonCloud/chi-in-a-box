@@ -45,6 +45,7 @@ mysqldump --defaults-extra-file=$TMPFILE --opt --flush-logs --single-transaction
  ${ADDITIONAL_OPTIONS} \
  --all-databases | bzcat -zc > ${DIR}/${PREFIX}`date +%Y%m%d-%H%M%S`.sql.bz2
 
+{% if mariadb_backup_s3_endpoint is defined %}
 # AWS S3  cross site backup
 # Copy latest backup to /etc/awsconf to mount to container
 S3DIR="{{ mariadb_backup_s3_conf_dir }}"
@@ -58,3 +59,4 @@ docker run -e AWS_ACCESS_KEY_ID="{{ mariadb_backup_s3_key_id }}" -e AWS_SECRET_A
 # Remove temporary files
 rm -f $TMPFILE
 rm ${S3DIR}/${LATEST_FILE}
+{% endif %}
