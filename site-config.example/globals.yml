@@ -54,6 +54,7 @@ kolla_external_fqdn: chi.example.com
 
 # Physical Switch config for Neutron-ML2:
 # Uncomment with info for neutron managed switch
+# switch_configs:
 #   - name: leafswitch1
 #     device_type: netmiko_dell_force10
 #     address: 10.0.0.10
@@ -70,6 +71,3 @@ kolla_external_fqdn: chi.example.com
 # this should correspond to the Neutron ID of your
 # public (gateway) network.
 #blazar_floatingip_reservation_network_id: 687976bc-e93f-4c47-ac21-fbd341313a54
-
-# Uncomment to enable prometheus alertmanager
-# prometheus_alertmanager_hostname: "{{ kolla_external_fqdn }}"
