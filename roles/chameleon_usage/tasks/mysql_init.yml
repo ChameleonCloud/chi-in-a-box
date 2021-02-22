@@ -24,6 +24,7 @@
       - 'chameleon_usage.*:CREATE,SELECT,INSERT,UPDATE,DELETE'
       - 'blazar.*:SELECT'
       - 'ironic.*:SELECT'
+      - 'keystone.*:SELECT'
 
 - name: Initialize chameleon_usage database
   shell: |
