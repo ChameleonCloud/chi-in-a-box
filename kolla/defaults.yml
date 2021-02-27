@@ -33,6 +33,9 @@ enable_memcached: yes
 memcached_max_memory: 2048
 enable_rabbitmq: yes
 
+# Automatic backups
+backup_dir: /var/db/backup
+
 # Allocations service
 enable_allocations: no
 
