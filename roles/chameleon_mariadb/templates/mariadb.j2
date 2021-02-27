@@ -50,7 +50,7 @@ _aws() {
     -e AWS_ACCESS_KEY_ID="{{ mariadb_backup_s3_key_id }}" \
     -e AWS_SECRET_ACCESS_KEY="{{ mariadb_backup_s3_key }}" \
     -v "{{ mariadb_backup_s3_conf_dir }}":/root/.aws \
-    -v "$backup_file":/backups/"$backup_file"
+    -v "$backup_file":/backups/"$backup_file" \
     amazon/aws-cli \
     --endpoint="{{ mariadb_backup_s3_endpoint }}" \
     --region=us-east-1 \
