@@ -1,4 +1,4 @@
-#!/bin/bash                                                                                                                                                                                                                                   
+#!/bin/bash
 #
 # MySQL Backup Script
 #  Dumps mysql databases to a file for another backup tool to pick up.
@@ -8,6 +8,7 @@
 # IDENTIFIED BY 'password';
 # FLUSH PRIVILEGES;
 #
+
 ##### START CONFIG ###################################################
 
 USER="{{ mariadb_backup_user }}"
@@ -20,43 +21,41 @@ ROTATE="{{ mariadb_backup_file_age }}"
 TMPFILE=`mktemp /tmp/backup.XXXXXX` || exit 1
 echo -e "[client]\npassword=$PASS\nuser=$USER\nmax_allowed_packet=$MAX_ALLOWED_PACKET" > $TMPFILE
 
-
-# Ensure backup directory exist.
-mkdir -p $DIR
-
 PREFIX=mysql_backup_
 
 ADDITIONAL_OPTIONS="--ignore-table=mysql.event"
 
-
 ##### STOP CONFIG ####################################################
-PATH=/usr/bin:/usr/sbin:/bin:/sbin
-
-
 
 set -o pipefail
 
-cleanup()
-{
-        find "${DIR}/" -maxdepth 1 -type f -name "${PREFIX}*.sql*" -mtime +${ROTATE} -print0 | xargs -0 -r rm -f
-}
+backup_file=${DIR}/${PREFIX}`date +%Y%m%d-%H%M%S`.sql.bz2
 
-mysqldump --defaults-extra-file=$TMPFILE --opt --flush-logs --single-transaction \
+cleanup() {
+  rm -f "$TMPFILE"
+  # Rotate backups
+  find "${DIR}/" -maxdepth 1 -type f -name "${PREFIX}*.sql*" -mtime +${ROTATE} -print0 | xargs -0 -r rm -f
+}
+trap cleanup EXIT
+
+mkdir -p $DIR
+mysqldump --defaults-extra-file="$TMPFILE" --opt --flush-logs --single-transaction \
  ${ADDITIONAL_OPTIONS} \
- --all-databases | bzcat -zc > ${DIR}/${PREFIX}`date +%Y%m%d-%H%M%S`.sql.bz2
+ --all-databases | bzcat -zc > "$backup_file"
 
 {% if mariadb_backup_s3_endpoint is defined %}
-# AWS S3  cross site backup
-# Copy latest backup to /etc/awsconf to mount to container
-S3DIR="{{ mariadb_backup_s3_conf_dir }}"
-LATEST_FILE=`ls -rt ${DIR} | grep mysql_backup | tail -1`
-cp $DIR/$LATEST_FILE $S3DIR
-
-# Create bucket and copy backup file, cleanup file
-docker run -e AWS_ACCESS_KEY_ID="{{ mariadb_backup_s3_key_id }}" -e AWS_SECRET_ACCESS_KEY="{{ mariadb_backup_s3_key }}" --rm -v ${S3DIR}:/root/.aws amazon/aws-cli --endpoint="{{ mariadb_backup_s3_endpoint }}" --region=us-east-1 s3 mb s3://"{{ mariadb_backup_container_name }}"
-docker run -e AWS_ACCESS_KEY_ID="{{ mariadb_backup_s3_key_id }}" -e AWS_SECRET_ACCESS_KEY="{{ mariadb_backup_s3_key }}" --rm -v ${S3DIR}:/root/.aws amazon/aws-cli --endpoint="{{ mariadb_backup_s3_endpoint }}" --region=us-east-1 s3 cp /root/.aws/${LATEST_FILE} s3://"{{ mariadb_backup_container_name }}"
-
-# Remove temporary files
-rm -f $TMPFILE
-rm ${S3DIR}/${LATEST_FILE}
+# Additionally copy backup to S3 bucket
+_aws() {
+  docker run --rm \
+    -e AWS_ACCESS_KEY_ID="{{ mariadb_backup_s3_key_id }}" \
+    -e AWS_SECRET_ACCESS_KEY="{{ mariadb_backup_s3_key }}" \
+    -v "{{ mariadb_backup_s3_conf_dir }}":/root/.aws \
+    -v "$backup_file":/backups/"$backup_file"
+    amazon/aws-cli \
+    --endpoint="{{ mariadb_backup_s3_endpoint }}" \
+    --region=us-east-1 \
+    "$@"
+}
+_aws s3 mb s3://"{{ mariadb_backup_container_name }}"
+_aws s3 cp /backups/"$backup_file" s3://"{{ mariadb_backup_container_name }}"
 {% endif %}
