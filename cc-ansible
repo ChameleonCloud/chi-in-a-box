@@ -124,7 +124,7 @@ edit_passwords() {
   ${EDITOR:-vi} "$tmpfile"
   local ret=$?
   if [[ $ret -gt 0 ]]; then exit $ret; fi
-  if [[ sha256sum --quiet --check "$passwords_file_chksum" ]]; then
+  if sha256sum --quiet --check "$passwords_file_chksum"; then
     echo "No passwords were changed."
     exit 0
   fi
