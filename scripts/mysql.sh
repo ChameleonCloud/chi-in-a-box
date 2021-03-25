@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
-
+# A simple helper to get a MySQL prompt after authenticating as the root user.
+#
+# Usage:
+#   ./scripts/mysql.sh
+#
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 pushd $(realpath $DIR/..) >/dev/null
 
