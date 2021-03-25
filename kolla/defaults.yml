@@ -60,6 +60,9 @@ blazar_email_relay: "{{ kolla_internal_fqdn }}"
 # Cinder
 enable_cinder: no
 
+# Doni
+enable_doni: no
+
 # Glance
 enable_glance: yes
 
