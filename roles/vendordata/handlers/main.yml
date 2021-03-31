@@ -1,9 +1,5 @@
 ---
-- name: "reload systemd daemon"
-  service:
-    daemon_reload: yes
-
 - name: "restart vendordata service"
   service:
-    name: "{{ vendordata_service_name }}"
+    name: "vendordata_api"
     state: restarted

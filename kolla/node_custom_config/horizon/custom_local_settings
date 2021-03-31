@@ -1,5 +1,7 @@
-from openstack_dashboard.settings import HORIZON_CONFIG
 from os import environ
+
+from django.utils.translation import ugettext_lazy as _
+from openstack_dashboard.settings import HORIZON_CONFIG
 
 # Kolla-ansible defaults this to 'internalURL', which doesn't work when
 # we need to access another region from across the public internet. Need
@@ -33,8 +35,33 @@ CHAMELEON_SITES = {
 
 SITE_BRANDING = 'ChameleonCloud'
 
-# Override help menu to point to our docs.
-HORIZON_CONFIG['help_url'] = '{{ horizon_help_url }}'
+# Hide default Help link
+HORIZON_CONFIG['help_url'] = None
+# Add in extra links
+USER_MENU_LINKS = [
+{% if horizon_help_url %}
+  {
+    'name': _('Help Desk'),
+    'icon_classes': ['fa-question-circle'],
+    'url': '{{ horizon_help_url }}',
+    'external': True,
+  },
+{% endif %}
+{% if horizon_documentation_url %}
+  {
+    'name': _('Documentation'),
+    'icon_classes': ['fa-book'],
+    'url': '{{ horizon_documentation_url }}',
+    'external': True,
+  },
+{% endif %}
+  {
+    'name': _('OpenStack RC File'),
+    'icon_classes': ['fa-download'],
+    'url': 'horizon:project:api_access:openrc',
+    'external': False,
+  },
+]
 
 {% if enable_blazar | bool %}
 # Blazar-specific settings
@@ -63,12 +90,20 @@ DATABASES = {
 }
 {% endif %}
 
-# Add default Chameleon theme.
+# Add Chameleon theme and the default theme (which it inherits from), but
+# only allow the user to pick the Chameleon one.
+chameleon_theme = (
+  'chameleoncloud', 'ChameleonCloud',
+  '/etc/openstack-dashboard/themes/chameleoncloud')
 AVAILABLE_THEMES = [
   ('default', 'Default', 'themes/default'),
-  ('chameleoncloud', 'ChameleonCloud', '/etc/openstack-dashboard/themes/chameleoncloud'),
+  chameleon_theme,
 ]
-DEFAULT_THEME = 'chameleoncloud'
+SELECTABLE_THEMES = [
+  chameleon_theme,
+]
+# Not really needed, but suppresses a spurious warning.
+DEFAULT_THEME = chameleon_theme[0]
 
 # NOTE(jason): This is lifted from local_settings.j2 in Kolla-Ansible; we have
 # to override it to add in a kludgy entry for Portal SSO, which isn't a "true"
@@ -101,7 +136,7 @@ WEBSSO_DEFAULT_REDIRECT_PROTOCOL = 'openid'
 # parameter set to a valid redirect URI, the user's session will be cleared both
 # within the mod_auth_openidc session cache, but also on the authenticating
 # provider itself. We redirect to the custom post-logout page.
-WEBSSO_DEFAULT_REDIRECT_LOGOUT = '{{ keystone_public_url }}/redirect_uri?logout={{ (identity_provider_url ~ "/post-logout?client_id=" ~ keystone_idp_client_id) | urlencode }}'
+WEBSSO_DEFAULT_REDIRECT_LOGOUT = '{{ keystone_public_url }}/redirect_uri?logout={{ (identity_provider_url ~ "/post-logout?client_id=" ~ (keystone_idp_client_id|default(none)) ) | urlencode }}'
 
 {% if enable_horizon_chameleon_websso | bool %}
 AUTHENTICATION_URLS = ['openstack_dashboard.cc_web_sso_urls', 'openstack_auth.urls']

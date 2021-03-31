@@ -32,6 +32,7 @@
 - import_role:
     name: service-ks-register
   vars:
+    project_name: jupyterhub
     service_ks_register_auth: "{{ jupyterhub_auth }}"
     service_ks_register_services: "{{ jupyterhub_ks_services }}"
     service_ks_register_users: "{{ jupyterhub_ks_users }}"

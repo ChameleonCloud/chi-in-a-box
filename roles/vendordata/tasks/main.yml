@@ -1,41 +1,41 @@
 ---
-- name: Pull vendordata service container image.
-  docker_image:
-    source: pull
-    name: "{{ vendordata_service_docker_image }}"
-    state: present
-    force_source: yes
+- name: Create config directory.
+  file:
+    path: "{{ vendordata_config_path }}"
+    state: directory
+- name: Create vendordata conf.
+  template:
+    src: "vendordata.conf.j2"
+    mode: 0640
+    dest: "{{ vendordata_config_path }}/vendordata.conf"
   notify:
     - restart vendordata service
-  tags:
-    - pull
+
+- name: Create OpenStack user for service user.
+  kolla_toolbox:
+    module_name: os_user
+    module_args:
+      auth: "{{ openstack_auth }}"
+      name: "{{ instance_metrics_writer_username }}"
+      password: "{{ instance_metrics_writer_password }}"
+      domain: default
+  run_once: True
+  delegate_to: "{{ groups['control'][0] }}"
 
 - name: Configure vendordata services.
-  block:
-    - name: Create config directory.
-      file:
-        path: "{{ vendordata_config_path }}"
-        state: directory
-    - name: Create vendordata conf.
-      template:
-        src: "vendordata.conf.j2"
-        mode: 0640
-        dest: "{{ vendordata_config_path }}/vendordata.conf"
-        owner: "{{ nova_keystone_user }}"
-      notify:
-        - restart vendordata service
-    - name: Configure systemd service.
-      template:
-        src: "chameleon_vendordata.service.j2"
-        dest: "/etc/systemd/system/{{ vendordata_service_name }}.service"
-      notify:
-        - reload systemd daemon
-        - restart vendordata service
-  tags:
-    - configuration
-
-- name: Enable vendordata service on boot.
-  systemd:
-    service: "{{ vendordata_service_name }}"
-    state: started
-    enabled: yes
+  include_role:
+    name: chameleon.docker_service
+  vars:
+    service_name: "{{ item.key }}"
+    service_bind_address: "{{ item.value.bind_address|default(api_interface_address) }}"
+    docker_image: "{{ item.value.image }}"
+    docker_network: "{{ item.value.network|default('bridge') }}"
+    docker_environment: "{{ item.value.environment|default({}) }}"
+    docker_mounts: "{{ item.value.mounts|default([]) }}"
+    docker_ports: "{{ item.value.ports|default([]) }}"
+    docker_command: "{{ item.value.command|default('') }}"
+  loop: "{{ vendordata_services|dict2items }}"
+  loop_control:
+    label: "{{ item.key }}"
+  when:
+    - inventory_hostname in groups[item.value.group]

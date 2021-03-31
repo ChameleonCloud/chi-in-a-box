@@ -59,7 +59,7 @@
     name: chameleon.docker_service
   vars:
     service_name: "{{ item.key }}"
-    service_bind_address: 127.0.0.1
+    service_bind_address: "{{ item.value.bind_address|default(api_interface_address) }}"
     docker_image: "{{ item.value.image }}"
     docker_network: "{{ item.value.network|default('bridge') }}"
     docker_environment: "{{ item.value.environment|default({}) }}"

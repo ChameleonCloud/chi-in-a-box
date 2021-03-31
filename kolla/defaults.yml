@@ -8,6 +8,10 @@ docker_registry: docker.chameleoncloud.org
 kolla_base_distro: centos
 kolla_install_type: source
 
+# Disable addition of tag for CentOS8
+# Remove this if pulling CentOS8 containers
+openstack_tag_suffix: ''
+
 virtualenv: /etc/ansible/venv
 
 chameleon_portal_url: https://www.chameleoncloud.org
@@ -15,6 +19,9 @@ chameleon_reference_api_url: https://api.chameleoncloud.org
 # Whether to show a dropdown in the Horizon GUI that provides links to other
 # Chameleon testbed sites.
 enable_chameleon_multisite: yes
+# Default networking fallbacks
+switch_configs: []
+neutron_networks: []
 
 enable_mariadb: yes
 enable_chrony: yes
@@ -22,6 +29,12 @@ enable_fluentd: yes
 enable_memcached: yes
 memcached_max_memory: 2048
 enable_rabbitmq: yes
+
+# Automatic backups
+backup_dir: /var/db/backup
+
+# Allocations service
+enable_allocations: no
 
 # Blazar
 enable_blazar: yes
@@ -46,6 +59,9 @@ blazar_email_relay: "{{ kolla_internal_fqdn }}"
 
 # Cinder
 enable_cinder: no
+
+# Doni
+enable_doni: no
 
 # Glance
 enable_glance: yes
@@ -74,7 +90,8 @@ horizon_url: "{{ public_protocol }}://{{ kolla_external_fqdn | put_address_in_co
 # Keep this to 'no' until we have switched from old multi-region to new
 # multi-keystone model (with federation).
 horizon_use_keystone_internal_url: no
-horizon_help_url: https://chameleoncloud.readthedocs.io/en/latest/technical/baremetal.html
+horizon_help_url: https://www.chameleoncloud.org/user/help/
+horizon_documentation_url: https://chameleoncloud.readthedocs.io/en/latest/technical/gui.html
 horizon_redirect_root: /dashboard
 horizon_chameleon_websso_host: "{{ chameleon_portal_url }}"
 horizon_regions:
@@ -92,6 +109,7 @@ identity_provider_name: chameleon
 identity_provider_domain_name: chameleon
 keystone_identity_providers:
   - name: "{{ identity_provider_name }}"
+    domain_name: "{{ identity_provider_domain_name }}"
     protocol: openid
     identifier: "{{ identity_provider_url }}"
     public_name: Login with Chameleon
@@ -134,8 +152,6 @@ keycloak_url: "https://{{ keycloak_hostname }}"
 
 # Keystone
 enable_keystone: yes
-use_preconfigured_fernet: yes
-fernet_token_expiry: 604800 # 1 week
 keystone_admin_project: openstack
 # The following are needed for defaults for the Glance/Gnocchi backup roles
 # (site-configs derive from these)
@@ -162,6 +178,14 @@ neutron_notification_topics:
     enabled: yes
 neutron_type_drivers: flat,vlan
 neutron_tenant_network_types: vlan
+# Only relevant when running in debug mode, but allows
+# debugging the NGS plugin.
+neutron_dev_plugins:
+  - name: networking-generic-switch
+    git_repository: https://github.com/ChameleonCloud/networking-generic-switch
+    source_version: "chameleoncloud/{{ openstack_release }}"
+    packages:
+      - networking_generic_switch
 
 # Nova
 enable_nova: yes
@@ -187,6 +211,9 @@ portal_network: portal
 chameleon_portal_mysql_host: udcc-db01.tacc.utexas.edu
 chameleon_portal_mysql_user: chameleon_ro
 chameleon_portal_mysql_database: chameleon_prod
+
+# Experient Precis
+enable_precis: no
 
 # Prometheus
 enable_prometheus: "{{ inventory_hostname in groups['prometheus'] }}"

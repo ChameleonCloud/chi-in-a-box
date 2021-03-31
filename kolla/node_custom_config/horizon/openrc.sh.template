@@ -14,7 +14,7 @@ export OS_PASSWORD=$OS_PASSWORD_INPUT
 {% endraw %}
 export OS_IDENTITY_PROVIDER="{{ identity_provider_name }}"
 export OS_DISCOVERY_ENDPOINT="{{ identity_provider_url }}/.well-known/openid-configuration"
-export OS_CLIENT_ID="{{ keystone_idp_client_id }}"
+export OS_CLIENT_ID="{{ keystone_idp_client_id|default(none) }}"
 export OS_ACCESS_TOKEN_TYPE="access_token"
 {% raw -%}
 export OS_CLIENT_SECRET="none"

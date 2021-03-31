@@ -1,0 +1,3 @@
+{
+  "show_password": "rule:is_admin"
+}

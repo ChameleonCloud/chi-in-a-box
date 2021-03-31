@@ -4,4 +4,4 @@
 - src: chameleon.periodic_task
 
 - src: michaelrigart.interfaces
-  version: v1.2.0
+  version: v1.11.1

@@ -1,8 +1,19 @@
 vendordata_config_path: /etc/vendordata
-vendordata_service_name: chameleon-vendordata
-vendordata_service_docker_image: docker.chameleoncloud.org/chameleon-vendordata-service:latest
 vendordata_config_file: "{{ vendordata_config_path }}/vendordata.conf"
-nova_api_config_file: /etc/kolla/nova-api/nova.conf
-vendordata_nova_config_file: /etc/nova/nova.conf
+
+vendordata_services:
+  vendordata_api:
+    group: vendordata
+    enabled: true
+    image: docker.chameleoncloud.org/chameleon-vendordata-service:latest
+    network: host
+    mounts:
+      - type: bind
+        src: "{{ vendordata_config_file }}"
+        dst: "{{ vendordata_config_file }}"
+      - type: bind
+        src: /etc/kolla/nova-api/nova.conf
+        dst: /etc/nova/nova.conf
+        read_only: True
 
 instance_metrics_writer_username: instance_metrics_writer

@@ -3,20 +3,22 @@
     prometheus_docker_network_ipv4: "{{ prometheus_docker_network_subnet | ipv4('net') }}"
 
 - name: Create MySQL user.
-  local_action:
-    module: mysql_user
-    login_host: "{{ groups.mariadb[0] }}"
-    login_password: "{{ database_password }}"
-    name: "{{ prometheus_mysql_exporter_user }}"
-    host: "{{ prometheus_docker_network_ipv4 | ipaddr('network') }}/{{ prometheus_docker_network_ipv4 | ipaddr('netmask') }}"
-    password: "{{ prometheus_mysql_exporter_password }}"
-    priv: "*.*:PROCESS,REPLICATION CLIENT,SELECT"
+  kolla_toolbox:
+    module_name: mysql_user
+    module_args:
+      login_host: "{{ database_address }}"
+      login_user: "root"
+      login_password: "{{ database_password }}"
+      name: "{{ prometheus_mysql_exporter_user }}"
+      host: "%"
+      password: "{{ prometheus_mysql_exporter_password }}"
+      priv: "*.*:PROCESS,REPLICATION CLIENT,SELECT"
+  delegate_to: "{{ groups['control'][0] }}"
+  run_once: True
 
 - name: Configure MySQL exporter.
   template:
     src: mysql_exporter.my.cnf.j2
     dest: "{{ service.config_dir }}/my.cnf"
-  vars:
-    mysql_host: "{{ hostvars[inventory_hostname]['ansible_' + network_interface]['ipv4']['address'] }}"
   notify:
     - restart mysql exporter

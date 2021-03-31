@@ -10,6 +10,7 @@
 kolla_services=(
   blazar
   cinder
+  doni
   glance
   heat
   horizon

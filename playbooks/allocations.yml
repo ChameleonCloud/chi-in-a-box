@@ -1,4 +1,5 @@
 ---
 - hosts: allocations
   roles:
-    - allocations
+    - name: allocations
+      when: enable_allocations | bool

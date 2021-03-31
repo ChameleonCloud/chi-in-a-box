@@ -8,6 +8,7 @@
 # IDENTIFIED BY 'password';
 # FLUSH PRIVILEGES;
 #
+
 ##### START CONFIG ###################################################
 
 USER="{{ mariadb_backup_user }}"
@@ -20,39 +21,41 @@ ROTATE="{{ mariadb_backup_file_age }}"
 TMPFILE=`mktemp /tmp/backup.XXXXXX` || exit 1
 echo -e "[client]\npassword=$PASS\nuser=$USER\nmax_allowed_packet=$MAX_ALLOWED_PACKET" > $TMPFILE
 
-
-# Ensure backup directory exist.
-mkdir -p $DIR
-
 PREFIX=mysql_backup_
 
 ADDITIONAL_OPTIONS="--ignore-table=mysql.event"
 
-
 ##### STOP CONFIG ####################################################
-PATH=/usr/bin:/usr/sbin:/bin:/sbin
-
-
 
 set -o pipefail
 
-cleanup()
-{
-        find "${DIR}/" -maxdepth 1 -type f -name "${PREFIX}*.sql*" -mtime +${ROTATE} -print0 | xargs -0 -r rm -f
+backup_file=${DIR}/${PREFIX}`date +%Y%m%d-%H%M%S`.sql.bz2
+
+cleanup() {
+  rm -f "$TMPFILE"
+  # Rotate backups
+  find "${DIR}/" -maxdepth 1 -type f -name "${PREFIX}*.sql*" -mtime +${ROTATE} -print0 | xargs -0 -r rm -f
 }
+trap cleanup EXIT
 
-mysqldump --defaults-extra-file=$TMPFILE --opt --flush-logs --single-transaction \
+mkdir -p $DIR
+mysqldump --defaults-extra-file="$TMPFILE" --opt --flush-logs --single-transaction \
  ${ADDITIONAL_OPTIONS} \
- --all-databases | bzcat -zc > ${DIR}/${PREFIX}`date +%Y%m%d-%H%M%S`.sql.bz2
+ --all-databases | bzcat -zc > "$backup_file"
 
-if [ $? -eq 0 ] ; then
-    cleanup
-    touch /tmp/mysqlbackup_success
-fi
-
-rsync -vrlptz ${DIR} "{{ mariadb_backup_destination_host }}":"{{ mariadb_backup_destination_dir }}" 2>&1 | /usr/bin/logger -t "{{ mariadb_backup_log_key }}" && ssh "{{ mariadb_backup_destination_host }}" 'find {{ mariadb_backup_destination_dir }}* -maxdepth 2 -mtime "{{ mariadb_backup_retention }}" -exec rm {} \;'
-
-# Remove temporary file
-rm -f $TMPFILE
-
-
+{% if mariadb_backup_s3_endpoint is defined %}
+# Additionally copy backup to S3 bucket
+_aws() {
+  docker run --rm \
+    -e AWS_ACCESS_KEY_ID="{{ mariadb_backup_s3_key_id }}" \
+    -e AWS_SECRET_ACCESS_KEY="{{ mariadb_backup_s3_key }}" \
+    -v "{{ mariadb_backup_s3_conf_dir }}":/root/.aws \
+    -v "$backup_file":/backups/"$backup_file" \
+    amazon/aws-cli \
+    --endpoint="{{ mariadb_backup_s3_endpoint }}" \
+    --region=us-east-1 \
+    "$@"
+}
+_aws s3 mb s3://"{{ mariadb_backup_container_name }}"
+_aws s3 cp /backups/"$backup_file" s3://"{{ mariadb_backup_container_name }}"
+{% endif %}

@@ -11,7 +11,7 @@
   os_keystone_endpoint:
     service: cep
     auth: "{{ openstack_auth }}"
-    url: "https://{{ precis_server_hostname }}:{{ precis_endpoint_port }}"
+    url: "https://{{ kolla_external_fqdn }}:{{ precis_endpoint_port }}"
     endpoint_interface: public
     region: "{{ openstack_region_name }}"
     region_name: "{{ openstack_region_name }}"

@@ -2,12 +2,12 @@
 - set_fact:
     prometheus_services_list: "{{ prometheus_services | dict2items | map(attribute='value') | list }}"
     prometheus_docker_groups: >-
-      {{ prometheus_services 
-        | dict2items 
-        | map(attribute='value') 
-        | selectattr('image', 'defined') 
+      {{ prometheus_services
+        | dict2items
+        | map(attribute='value')
+        | selectattr('image', 'defined')
         | map(attribute='group') | list }}
-    enable_prometheus_alertmanager: inventory_hostname in groups['prometheus-alertmanager']
+
 
 - name: Create Docker network.
   docker_network:
@@ -26,8 +26,10 @@
   loop: "{{ prometheus_services_list }}"
   loop_control:
     label: "{{ item.image | default('skipped') }}"
-  when: inventory_hostname in groups[item.group] and
-        item.image is defined
+  when:
+    - groups[item.group] is defined
+    - inventory_hostname in groups[item.group]
+    - item.image is defined
   notify:
     - "{{ item.restart_handler }}"
 
@@ -38,54 +40,73 @@
   loop: "{{ prometheus_services_list }}"
   loop_control:
     label: "{{ item.config_dir | default('skipped') }}"
-  when: inventory_hostname in groups[item.group] and
-        item.config_dir is defined
+  when:
+    - groups[item.group] is defined
+    - inventory_hostname in groups[item.group]
+    - item.config_dir is defined
 
 - name: Create secrets directory.
   file:
     name: "/etc/prometheus/secrets"
     state: directory
-  when: inventory_hostname in groups[prometheus_services['prometheus-server'].group]
+  vars:
+    service: "{{ prometheus_services['server'] }}"
+  when:
+    - groups[service.group] is defined
+    - inventory_hostname in groups[service.group]
 
 - include_tasks: alertmanager.yml
   vars:
-    service: "{{ prometheus_services['prometheus-alertmanager'] }}"
-  when: inventory_hostname in groups[service.group]
+    service: "{{ prometheus_services['alertmanager'] }}"
+  when:
+    - groups[service.group] is defined
+    - inventory_hostname in groups[service.group]
 
 - include_tasks: jupyterhub_exporter.yml
   vars:
     service: "{{ prometheus_services['jupyterhub-exporter'] }}"
-  when: inventory_hostname in groups[service.group]
+  when:
+    - groups[service.group] is defined
+    - inventory_hostname in groups[service.group]
+    - enable_jupyterhub | bool
 
 - include_tasks: mysql_exporter.yml
   vars:
     service: "{{ prometheus_services['mysql-exporter'] }}"
-  when: inventory_hostname in groups[service.group]
+  when:
+    - groups[service.group] is defined
+    - inventory_hostname in groups[service.group]
 
 - include_tasks: node_exporter.yml
   vars:
     service: "{{ prometheus_services['node-exporter'] }}"
-  when: inventory_hostname in groups[service.group]
+  when:
+    - groups[service.group] is defined
+    - inventory_hostname in groups[service.group]
 
 - include_tasks: openstack_exporter.yml
   vars:
     service: "{{ prometheus_services['openstack-exporter'] }}"
-  when: inventory_hostname in groups[service.group]
+  when:
+    - groups[service.group] is defined
+    - inventory_hostname in groups[service.group]
 
 - include_tasks: snmp_exporter.yml
   vars:
     service: "{{ prometheus_services['snmp-exporter'] }}"
-  when: inventory_hostname in groups[service.group]
-
-- include_tasks: loadbalancer.yml
+  when:
+    - groups[service.group] is defined
+    - inventory_hostname in groups[service.group]
 
 # Prometheus server task should go last as it may be using
 # credentials generated in above steps.
 
 - include_tasks: server.yml
   vars:
-    service: "{{ prometheus_services['prometheus-server'] }}"
-  when: inventory_hostname in groups[service.group]
+    service: "{{ prometheus_services['server'] }}"
+  when:
+    - groups[service.group] is defined
+    - inventory_hostname in groups[service.group]
 
 - name: Create Docker services.
   template:
@@ -99,9 +120,11 @@
   loop: "{{ prometheus_services_list }}"
   loop_control:
     label: "{{ item.service_name | default('skipped') }}"
-  when: inventory_hostname in groups[item.group] and
-        item.service_name is defined and
-        (item.custom_service is not defined or (not item.custom_service | bool))
+  when:
+    - groups[item.group] is defined
+    - inventory_hostname in groups[item.group]
+    - item.service_name is defined
+    - item.custom_service is not defined or (not item.custom_service | bool)
 
 - name: Create custom services.
   template:
@@ -113,10 +136,11 @@
   loop: "{{ prometheus_services_list }}"
   loop_control:
     label: "{{ item.service_name | default('skipped') }}"
-  when: inventory_hostname in groups[item.group] and
-        item.service_name is defined and
-        item.custom_service is defined and
-        (item.custom_service | bool)
+  when:
+    - groups[item.group] is defined
+    - inventory_hostname in groups[item.group]
+    - item.service_name is defined
+    - item.custom_service is defined and (item.custom_service | bool)
 
 - name: Enable services.
   systemd:
@@ -126,5 +150,7 @@
   loop: "{{ prometheus_services_list }}"
   loop_control:
     label: "{{ item.service_name | default('skipped') }}"
-  when: inventory_hostname in groups[item.group] and
-        item.service_name is defined
+  when:
+    - groups[item.group] is defined
+    - inventory_hostname in groups[item.group]
+    - item.service_name is defined

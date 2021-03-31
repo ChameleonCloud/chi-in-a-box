@@ -28,8 +28,6 @@
         src: config.yml.j2
         dest: "{{ docker_registry_config_path }}/config.prod.yml"
         mode: '0640'
-      notify:
-        - restart docker registry
     - name: Create Docker Registry maintenance config.
       template:
         src: config.yml.j2

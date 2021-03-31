@@ -42,3 +42,5 @@ hammers:
   enforce_node_retirement:
     cmd: "retirement-enforcer"
     calendar: daily
+
+hammers_slack_webhook: "{{ slack_api_url }}"

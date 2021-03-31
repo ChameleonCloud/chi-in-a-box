@@ -1,0 +1,33 @@
+---
+- name: Create MySQL user
+  kolla_toolbox:
+    module_name: mysql_user
+    module_args:
+      login_host: "{{ database_address }}"
+      login_password: "{{ database_password }}"
+      login_user: "{{ database_user }}"
+      name: "{{ chameleon_usage_mysql_user }}"
+      host: "%"
+      password: "{{ chameleon_usage_mysql_password }}"
+      priv: "{{ all_privileges | join('/') }}"
+  run_once: True
+  # Delegate to control node, which we can safely assume is running at least
+  # one Kolla service, and therefore already has the kolla_toolbox container
+  # running on the host.
+  delegate_to: "{{ groups['control'][0] }}"
+  vars:
+    all_privileges:
+      - 'blazar_backup\_%.*:CREATE,DROP,SELECT,INSERT'
+      - 'keystone_backup\_%.*:CREATE,DROP,SELECT,INSERT'
+      - 'nova_backup\_%.*:CREATE,DROP,SELECT,INSERT'
+      - 'ironic_backup\_%.*:CREATE,DROP,SELECT,INSERT'
+      - 'chameleon_usage.*:CREATE,SELECT,INSERT,UPDATE,DELETE'
+      - 'blazar.*:SELECT'
+      - 'ironic.*:SELECT'
+      - 'keystone.*:SELECT'
+
+- name: Initialize chameleon_usage database
+  shell: |
+    docker run --rm --net=host \
+    -v "{{ chameleon_usage_config_dir }}/my.cnf:/etc/mysql/my.cnf" \
+    {{ chameleon_usage_docker_image }} setup_database --mysql-conf /etc/mysql/my.cnf 2>&1
