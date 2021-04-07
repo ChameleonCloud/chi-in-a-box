@@ -256,3 +256,8 @@ enable_ceph: no
 # Chameleon usage
 enable_usage_appliance_report: no
 enable_user_project_report: no
+
+# Container services (Zun and supporting)
+enable_etcd: no
+enable_kuryr: no
+enable_zun: no
