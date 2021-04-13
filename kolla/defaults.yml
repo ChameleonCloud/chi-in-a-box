@@ -55,7 +55,7 @@ blazar_floatingip_billrate: 0.0
 blazar_database_name: blazar
 blazar_database_user: blazar
 blazar_database_port: "{{ database_port }}"
-blazar_email_relay: "{{ kolla_internal_fqdn }}"
+blazar_email_relay: "127.0.0.1"
 
 # Cinder
 enable_cinder: no
