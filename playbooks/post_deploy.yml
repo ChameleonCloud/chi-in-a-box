@@ -146,7 +146,7 @@
         - destination: "{{ kolla_internal_vip_address }}/32"
           nexthop: "{{ ironic_provisioning_network_gateway }}"
     run_once: True
-    when: 
+    when:
       - enable_ironic | bool
       - ironic_provisioning_network_cidr is defined
       - ironic_provisioning_network_vlan is defined
@@ -194,9 +194,9 @@
         network_name: public
         name: public-subnet
         cidr: "{{ network.cidr }}"
-        gateway_ip: "{{ network.gateway_ip }}"
+        gateway_ip: "{{ network.gateway_ip | default(network.cidr | ipaddr('last_usable')) }}"
         allocation_pool_start: "{{ network.allocation_pools[0].start | default(network.cidr | next_nth_usable(2)) }}"
-        allocation_pool_end: "{{ network.allocation_pools[0].end | default(network.cidr | ipaddr('last_usable')) }}"
+        allocation_pool_end: "{{ network.allocation_pools[0].end | default(network.cidr | ipaddr('last_usable') | ipmath(-1)) }}"
         state: present
     run_once: True
     vars:
@@ -280,7 +280,7 @@
     when: enable_blazar | bool
 
 # Run other critical site playbooks
-  
+
 - hosts: vendordata
   roles:
     - vendordata
