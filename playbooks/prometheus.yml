@@ -19,7 +19,7 @@
         prometheus_monitoring_user: "{{ prometheus_monitoring_user }}"
       when: inventory_hostname in groups[prometheus_services['alertmanager'].group]
     - set_fact:
-        prometheus_server_port: "{{ prometheus_services['server'].port }}"
+        prometheus_server_port: "{{ prometheus_services['prometheus-server'].port }}"
         prometheus_server_users: "{{ prometheus_server_users }}"
         prometheus_monitoring_user: "{{ prometheus_monitoring_user }}"
       when: inventory_hostname in groups[prometheus_services['server'].group]

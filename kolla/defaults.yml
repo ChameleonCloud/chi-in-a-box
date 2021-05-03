@@ -216,7 +216,7 @@ chameleon_portal_mysql_database: chameleon_prod
 enable_precis: no
 
 # Prometheus
-enable_prometheus: no
+enable_prometheus: "{{ inventory_hostname in groups['prometheus'] }}"
 prometheus_port: "9090"
 prometheus_jupyterhub_exporter_token:
 prometheus_server_external_url: "{{ public_protocol }}://{{ prometheus_external_fqdn }}:{{ prometheus_port }}"

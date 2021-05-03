@@ -24,7 +24,7 @@ CHAMELEON_SITE_ID = '{{ chameleon_site_name }}'
 # Hide the region dropdown
 OPENSTACK_KEYSTONE_MULTIREGION_SUPPORT = False
 # Show the site dropdown
-CHAMELEON_MULTISITE_SUPPORT = True
+CHAMELEON_MULTISITE_SUPPORT = False
 {% else %}
 CHAMELEON_SITES = {
 {% for conf in horizon_regions %}
@@ -150,12 +150,6 @@ WEBSSO_DEFAULT_REDIRECT_LOGOUT_CONFIRM_URL = '{{ horizon_chameleon_websso_host }
 # A dictionary of settings which can be used to provide the default values for
 # properties found in the Launch Instance modal.
 LAUNCH_INSTANCE_DEFAULTS = {
-    'config_drive': False,
-    'enable_scheduler_hints': True,
-    'disable_image': False,
-    'disable_instance_snapshot': True,
-    'disable_volume': True,
-    'disable_volume_snapshot': True,
     'create_volume': False,
 }
 

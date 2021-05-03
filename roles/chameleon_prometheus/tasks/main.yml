@@ -8,6 +8,7 @@
         | selectattr('image', 'defined')
         | map(attribute='group') | list }}
 
+
 - name: Create Docker network.
   docker_network:
     name: "{{ prometheus_docker_network_name }}"

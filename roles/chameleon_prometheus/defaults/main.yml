@@ -24,7 +24,7 @@ prometheus_services:
     service_name: prometheus_server
     image: prom/prometheus:v2.10.0
     group: prometheus
-    enabled: yes
+    enabled: "{{ enable_prometheus }}"
     restart_handler: restart prometheus
     port: 9090
     config_dir: /etc/prometheus

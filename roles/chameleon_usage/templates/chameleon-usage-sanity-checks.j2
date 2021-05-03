@@ -1,7 +1,0 @@
-#! /bin/sh
-
-docker run --rm --net=host \
-    -v "{{ chameleon_usage_config_dir }}/slack.json:/etc/chameleon_usage/slack.json" \
-    -v "{{ chameleon_usage_config_dir }}/my.cnf:/etc/mysql/my.cnf" \
-    {{ chameleon_usage_docker_image }} \
-    node_usage_sanity_checks --mysql-conf /etc/mysql/my.cnf --slack /etc/chameleon_usage/slack.json 2>&1

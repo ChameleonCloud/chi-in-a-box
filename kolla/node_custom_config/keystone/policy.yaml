@@ -1,0 +1,8 @@
+#identity:change_password: '!'
+#identity:update_user: '!'
+#identity:list_endpoints: role:reader and system_scope:all
+
+#identity:list_roles: 'role:reader and system_scope:all'
+#identity:list_roles: 'role:reader'
+
+#identity:list_services: role:reader and system_scope:all
