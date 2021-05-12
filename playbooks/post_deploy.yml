@@ -216,7 +216,7 @@
         provider_network_type: "{{ item.network_type | default('vlan') }}"
         # Use the first on-demand VLAN for this network.
         provider_segmentation_id: "{{ (item.on_demand_vlan_ranges[0].split(':')[0] | int) + 1 }}"
-        provider_physical_network: "{{ item.name }}"
+        provider_physical_network: "{{ '' if (item.network_type | default('vlan')) == 'vxlan' else item.name }}"
         shared: yes
         state: present
     loop: "{{ neutron_networks }}"
