@@ -5,10 +5,24 @@ modules:
   {% if switch.device_type not in device_types %}
   {{ device_types.append(switch.device_type) }}
   {{ switch.device_type }}:
-    walk:
-      - interfaces
-    version: 1
+    version: 2
     auth:
       community: {{ switch.snmp.community_string }}
+    walk:
+      - system
+      - interfaces
+      - ifXTable
+    lookups:
+      - source_indexes: [ifIndex]
+        lookup: ifName
+    overrides:
+      ifAlias:
+        ignore: true # Lookup metric
+      ifDescr:
+        ignore: true # Lookup metric
+      ifName:
+        ignore: true # Lookup metric
+      ifType:
+        type: EnumAsInfo
   {% endif %}
 {% endfor %}
