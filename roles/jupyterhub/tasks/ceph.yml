@@ -55,5 +55,5 @@
     jupyterhub_environment: >-
       {{ jupyterhub_environment | combine({
         'DOCKER_VOLUME_DRIVER': jupyterhub_ceph_docker_volume_driver_alias,
-        'DOCKER_VOLUME_DRIVER_OPTS': 'size=1024,order=22'
+        'DOCKER_VOLUME_DRIVER_OPTS': 'size=1024,order=22,mkfsOptions="-O ^mmp"'
       }) }}
