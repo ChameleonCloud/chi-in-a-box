@@ -327,6 +327,9 @@ rsync -av "$CC_ANSIBLE_SITE/" "$CONFIG_DIR/"
 if [[ ! -f "$CONFIG_DIR/defaults.yml" ]]; then
   echo -e "---\n" >"$CONFIG_DIR/defaults.yml"
 fi
+if [[ ! -f "$CONFIG_DIR/globals.yml" ]]; then
+  echo -e "---\n_placeholder_for_ansible:" >"$CONFIG_DIR/globals.yml"
+fi
 # 4. Stamp out a group vars file to set defaults for any host in baremetal group
 #    (should be all nodes enrolled with Kolla-Ansible). Doing it this way allows
 #    the site-config to override anything here in host_vars or more specific
