@@ -313,16 +313,24 @@ _lock_cleanup() {
 }
 TRAPS+=(_lock_cleanup)
 
+# Prepare the configuration directory for the Kolla-Ansible invocation:
 CONFIG_DIR="$(mktemp -d)"
 _config_dir_cleanup() {
   rm -rf "$CONFIG_DIR"
 }
 TRAPS+=(_config_dir_cleanup)
-
-cp -r "$CC_ANSIBLE_SITE"/* "$CONFIG_DIR/"
+# 1. Copy base node_custom_config
+rsync -av "$DIR/kolla/node_custom_config" "$CONFIG_DIR/node_custom_config"
+# 2. Copy anything declared in site-config (can override files in node_custom_config)
+rsync -av "$CC_ANSIBLE_SITE/" "$CONFIG_DIR/"
+# 3. Ensure a defaults.yml is defined, if the site-config didn't define it.
 if [[ ! -f "$CONFIG_DIR/defaults.yml" ]]; then
   echo -e "---\n" >"$CONFIG_DIR/defaults.yml"
 fi
+# 4. Stamp out a group vars file to set defaults for any host in baremetal group
+#    (should be all nodes enrolled with Kolla-Ansible). Doing it this way allows
+#    the site-config to override anything here in host_vars or more specific
+#    group_vars files.
 yq eval-all '. as $item ireduce ({}; . * $item )' \
   "$DIR/kolla/defaults.yml" "$CONFIG_DIR/defaults.yml" \
   >"$CONFIG_DIR/inventory/group_vars/baremetal.yml"
@@ -333,7 +341,7 @@ kolla_args+=(--inventory="$CONFIG_DIR/inventory")
 kolla_args+=(--key="$CC_ANSIBLE_VAULT_PASSWORD")
 kolla_args+=(--globals="$CONFIG_DIR/globals.yml")
 kolla_args+=(--passwords="$CONFIG_DIR/passwords.yml")
-kolla_args+=(--extra node_custom_config="$DIR/kolla/node_custom_config")
+kolla_args+=(--extra node_custom_config="$CONFIG_DIR/node_custom_config")
 kolla_args+=(--extra cc_ansible_site_dir="$CONFIG_DIR")
 # Override python interpreter to point to virtualenv (but only if we're
 # not performing the bootstrap, which is responsible for setting up the
