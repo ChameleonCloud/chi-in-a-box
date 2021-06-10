@@ -37,6 +37,10 @@ SITE_BRANDING = 'ChameleonCloud'
 
 # Hide default Help link
 HORIZON_CONFIG['help_url'] = None
+{% if enable_zun | bool and not enable_nova | bool %}
+# Special case when Zun is enabled and Nova is not; change default view from Nova to Zun
+HORIZON_CONFIG['user_home'] = '/project/container/containers'
+{% endif %}
 # Add in extra links
 USER_MENU_LINKS = [
 {% if horizon_help_url %}
