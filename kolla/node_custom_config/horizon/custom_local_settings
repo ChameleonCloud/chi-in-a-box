@@ -76,6 +76,9 @@ OPENSTACK_BLAZAR_FLOATINGIP_RESERVATION = {
   'network_name_regex': '{{ blazar_floatingip_reservation_network_regex }}'
 }
 {% endif %}
+OPENSTACK_BLAZAR_DEVICE_RESERVATION = {
+  'enabled': {{ enable_zun }}
+}
 # Used for Blazar dashboard, which needs to pull data from the MySQL database
 # directly at the moment.
 DATABASES = {
