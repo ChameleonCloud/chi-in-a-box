@@ -1,18 +1,13 @@
 {
     "admin": "is_admin:True or role:admin",
-
-    "admin_or_owner":  "rule:admin or project_id:%(project_id)s",
-
+    "admin_or_owner": "rule:admin or project_id:%(project_id)s",
     "default": "!",
     "admin_api": "role:admin",
-
     "blazar:leases:get": "rule:admin_or_owner",
     "blazar:leases:create": "rule:admin_or_owner",
     "blazar:leases:delete": "rule:admin_or_owner",
     "blazar:leases:update": "rule:admin_or_owner",
-
     "blazar:plugins:get": "@",
-
     "blazar:oshosts:get": "rule:admin_or_owner",
     "blazar:oshosts:create": "rule:admin_api",
     "blazar:oshosts:delete": "rule:admin_api",
@@ -22,14 +17,22 @@
     "blazar:oshosts:reallocate": "rule:admin_api",
     "blazar:oshosts:get_resource_properties": "@",
     "blazar:oshosts:patch_resource_properties": "rule:admin_api",
-
-    "blazar:networks:create": "rule:admin_or_owner",
-    "blazar:networks:delete": "rule:admin_or_owner",
+    "blazar:networks:create": "rule:admin_api",
+    "blazar:networks:delete": "rule:admin_api",
     "blazar:networks:get": "rule:admin_or_owner",
-    "blazar:networks:update": "rule:admin_or_owner",
+    "blazar:networks:update": "rule:admin_api",
     "blazar:networks:put": "rule:admin_or_owner",
     "blazar:networks:list_allocations": "rule:admin_or_owner",
     "blazar:networks:get_allocations": "rule:admin_or_owner",
     "blazar:networks:get_resource_properties": "@",
-    "blazar:networks:patch_resource_properties": "rule:admin_api"
+    "blazar:networks:patch_resource_properties": "rule:admin_api",
+    "blazar:devices:create": "rule:admin_api",
+    "blazar:devices:delete": "rule:admin_api",
+    "blazar:devices:get": "rule:admin_or_owner",
+    "blazar:devices:update": "rule:admin_api",
+    "blazar:devices:put": "rule:admin_api",
+    "blazar:devices:list_allocations": "rule:admin_or_owner",
+    "blazar:devices:get_allocations": "rule:admin_or_owner",
+    "blazar:devices:get_resource_properties": "@",
+    "blazar:devices:patch_resource_properties": "rule:admin_api"
 }
