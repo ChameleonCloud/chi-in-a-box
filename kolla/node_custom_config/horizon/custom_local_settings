@@ -71,13 +71,17 @@ USER_MENU_LINKS = [
 # Blazar-specific settings
 {% if blazar_floatingip_reservation_network_regex is defined %}
 OPENSTACK_BLAZAR_FLOATINGIP_RESERVATION = {
+  'enabled': True,
   # Allow reserving floating IPs on this network
   'enabled': True,
   'network_name_regex': '{{ blazar_floatingip_reservation_network_regex }}'
 }
 {% endif %}
 OPENSTACK_BLAZAR_DEVICE_RESERVATION = {
-  'enabled': {{ enable_zun }}
+  'enabled': {{ enable_zun }},
+}
+OPENSTACK_BLAZAR_HOST_RESERVATION = {
+  'enabled': {{ enable_nova }},
 }
 # Used for Blazar dashboard, which needs to pull data from the MySQL database
 # directly at the moment.
