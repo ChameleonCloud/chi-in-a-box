@@ -320,9 +320,9 @@ _config_dir_cleanup() {
 }
 TRAPS+=(_config_dir_cleanup)
 # 1. Copy base node_custom_config
-rsync -av "$DIR/kolla/node_custom_config" "$CONFIG_DIR/node_custom_config"
+rsync -a "$DIR/kolla/node_custom_config/" "$CONFIG_DIR/node_custom_config/"
 # 2. Copy anything declared in site-config (can override files in node_custom_config)
-rsync -av "$CC_ANSIBLE_SITE/" "$CONFIG_DIR/"
+rsync -a "$CC_ANSIBLE_SITE/" "$CONFIG_DIR/"
 # 3. Ensure a defaults.yml is defined, if the site-config didn't define it.
 if [[ ! -f "$CONFIG_DIR/defaults.yml" ]]; then
   echo -e "---\n" >"$CONFIG_DIR/defaults.yml"
