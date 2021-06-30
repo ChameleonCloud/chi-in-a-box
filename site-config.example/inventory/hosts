@@ -247,7 +247,6 @@ control
 
 [cyborg:children]
 control
-compute
 
 [congress:children]
 control
