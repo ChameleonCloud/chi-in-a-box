@@ -259,6 +259,14 @@ if [[ "$CHECK_UPDATES" == "yes" || "$FORCE_UPDATES" == "yes" ]]; then
       && rm -f "$MITOGEN_TARBALL"
   fi
   ln -sf "$MITOGEN_INSTALL_DIR" "$VIRTUALENV/lib/mitogen-latest"
+
+  # Update/install yq
+  YQ_VERSION=4.9.6
+  if [[ "$(type -t yq)" != "file" ]]; then
+    YQ_BINARY="yq_linux_amd64"
+    wget https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/${YQ_BINARY}.tar.gz -O - \
+      | tar xz && mv ${YQ_BINARY} "$VIRTUALENV/bin/yq"
+  fi
 fi
 
 ansible_path="$VIRTUALENV/share/kolla-ansible/ansible"
