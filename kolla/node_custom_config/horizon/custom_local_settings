@@ -68,6 +68,7 @@ USER_MENU_LINKS = [
 {% if blazar_floatingip_reservation_network_regex is defined %}
 OPENSTACK_BLAZAR_FLOATINGIP_RESERVATION = {
   # Allow reserving floating IPs on this network
+  'enabled': True,
   'network_name_regex': '{{ blazar_floatingip_reservation_network_regex }}'
 }
 {% endif %}
