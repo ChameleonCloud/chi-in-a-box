@@ -855,3 +855,7 @@ doni
 
 [doni-worker:children]
 doni
+
+# OSG
+[osg:children]
+control

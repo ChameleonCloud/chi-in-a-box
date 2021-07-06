@@ -1,0 +1,4 @@
+---
+- hosts: osg
+  roles:
+    - osg

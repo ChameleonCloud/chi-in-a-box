@@ -1,3 +1,4 @@
 {
+  "baremetal:node:get": "role:osg or rule:is_admin",
   "show_password": "rule:is_admin"
 }
