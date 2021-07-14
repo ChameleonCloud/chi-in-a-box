@@ -1,3 +1,4 @@
 ---
 container:create:runtime: rule:admin_or_owner
 container:create:requested_destination: rule:admin_or_owner
+container:delete_force: rule:admin_or_owner
