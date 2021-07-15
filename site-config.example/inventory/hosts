@@ -64,10 +64,6 @@ control
 [vendordata:children]
 control
 
-# Allocation balance service
-[allocations:children]
-control
-
 [keycloak:children]
 control
 

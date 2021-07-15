@@ -33,9 +33,6 @@ enable_rabbitmq: yes
 # Automatic backups
 backup_dir: /var/db/backup
 
-# Allocations service
-enable_allocations: no
-
 # Blazar
 enable_blazar: yes
 enable_blazar_allocation_enforcement: no

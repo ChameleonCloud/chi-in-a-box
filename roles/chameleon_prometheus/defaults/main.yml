@@ -94,19 +94,6 @@ prometheus_services:
     scrape_target: yes
     volumes:
       - "/etc/prometheus/openstack_exporter.yml:/usr/local/bin/exporter/config.yml"
-  redis-exporter:
-    service_name: prometheus_redis_exporter
-    image: oliver006/redis_exporter:latest
-    group: prometheus-redis-exporter
-    enabled: yes
-    restart_handler: restart redis exporter
-    port: 9121
-    scrape_target: yes
-    service_args:
-      # TODO(jason): this is a complete hack and means this configuration is
-      # ONLY valid for the allocations DB. But, it's currently the only place
-      # we use Redis.
-      - "--redis.addr=redis://allocations_db:6379"
   snmp-exporter:
     service_name: prometheus_snmp_exporter
     image: prom/snmp-exporter:v0.15.0
@@ -143,9 +130,4 @@ prometheus_services:
     group: precis
     enabled: "{{ enable_precis }}"
     port: 8912
-    scrape_target: yes
-  allocations-exporter:
-    group: allocations
-    enabled: "{{ enable_allocations }}"
-    port: 8916
     scrape_target: yes

@@ -1,5 +1,0 @@
----
-- name: restart allocations api
-  service:
-    name: allocations_api
-    state: restarted
