@@ -1,0 +1,21 @@
+[DEFAULT]
+debug = False
+
+[chi]
+auth_url = {{ keystone_public_url }}
+site = {{ openstack_region_name }}
+
+[rules]
+{% if osg_enabled_filters is defined %}
+enabled_filters = {{ osg_enabled_filters }}
+{% endif %}
+
+[threading]
+{% if osg_max_threads is defined %}
+max = {{ osg_max_threads }}
+{% endif %}
+
+[node_type_filter]
+{% if osg_node_types is defined %}
+node_types = {{ osg_node_types }}
+{% endif %}
