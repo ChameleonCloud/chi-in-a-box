@@ -181,7 +181,6 @@ get_defined_var() {
   local varname="$1"
   ansible localhost --one-line -m debug -a "var=$varname" \
     --extra-vars="@$DIR/kolla/defaults.yml" \
-    --extra-vars="@$CC_ANSIBLE_SITE/globals.yml" \
     --inventory="$CC_ANSIBLE_SITE/inventory/hosts" 2>/dev/null \
     | sed 's/^.*=> //' \
     | jq -r ".$varname"
@@ -260,6 +259,14 @@ if [[ "$CHECK_UPDATES" == "yes" || "$FORCE_UPDATES" == "yes" ]]; then
       && rm -f "$MITOGEN_TARBALL"
   fi
   ln -sf "$MITOGEN_INSTALL_DIR" "$VIRTUALENV/lib/mitogen-latest"
+
+  # Update/install yq
+  YQ_VERSION=4.9.6
+  if [[ "$(type -t yq)" != "file" ]]; then
+    YQ_BINARY="yq_linux_amd64"
+    wget https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/${YQ_BINARY}.tar.gz -O - \
+      | tar xz && mv ${YQ_BINARY} "$VIRTUALENV/bin/yq"
+  fi
 fi
 
 ansible_path="$VIRTUALENV/share/kolla-ansible/ansible"
@@ -314,17 +321,39 @@ _lock_cleanup() {
 }
 TRAPS+=(_lock_cleanup)
 
+# Prepare the configuration directory for the Kolla-Ansible invocation:
+CONFIG_DIR="$(mktemp -d)"
+_config_dir_cleanup() {
+  rm -rf "$CONFIG_DIR"
+}
+TRAPS+=(_config_dir_cleanup)
+# 1. Copy base node_custom_config
+rsync -a "$DIR/kolla/node_custom_config/" "$CONFIG_DIR/node_custom_config/"
+# 2. Copy anything declared in site-config (can override files in node_custom_config)
+rsync -a "$CC_ANSIBLE_SITE/" "$CONFIG_DIR/"
+# 3. Ensure a defaults.yml is defined, if the site-config didn't define it.
+if [[ ! -f "$CONFIG_DIR/defaults.yml" ]]; then
+  echo -e "---\n" >"$CONFIG_DIR/defaults.yml"
+fi
+if [[ ! -f "$CONFIG_DIR/globals.yml" ]]; then
+  echo -e "---\n_placeholder_for_ansible:" >"$CONFIG_DIR/globals.yml"
+fi
+# 4. Stamp out a group vars file to set defaults for any host in baremetal group
+#    (should be all nodes enrolled with Kolla-Ansible). Doing it this way allows
+#    the site-config to override anything here in host_vars or more specific
+#    group_vars files.
+yq eval-all '. as $item ireduce ({}; . * $item )' \
+  "$DIR/kolla/defaults.yml" "$CONFIG_DIR/defaults.yml" \
+  >"$CONFIG_DIR/inventory/group_vars/baremetal.yml"
+
 declare -a kolla_args=()
-kolla_args+=(--configdir="$CC_ANSIBLE_SITE")
-kolla_args+=(--inventory="$CC_ANSIBLE_SITE/inventory")
+kolla_args+=(--configdir="$CONFIG_DIR")
+kolla_args+=(--inventory="$CONFIG_DIR/inventory")
 kolla_args+=(--key="$CC_ANSIBLE_VAULT_PASSWORD")
-kolla_args+=(--passwords="$CC_ANSIBLE_SITE/passwords.yml")
-# Invoke with ./kolla/defaults.yml as the Kolla-Ansible "globals", then
-# add in site-specific overrides via an additional --extra flag.
-kolla_args+=(--globals="$DIR/kolla/defaults.yml")
-kolla_args+=(--extra "@$CC_ANSIBLE_SITE/globals.yml")
-kolla_args+=(--extra node_custom_config="$DIR/kolla/node_custom_config")
-kolla_args+=(--extra cc_ansible_site_dir="$CC_ANSIBLE_SITE")
+kolla_args+=(--globals="$CONFIG_DIR/globals.yml")
+kolla_args+=(--passwords="$CONFIG_DIR/passwords.yml")
+kolla_args+=(--extra node_custom_config="$CONFIG_DIR/node_custom_config")
+kolla_args+=(--extra cc_ansible_site_dir="$CONFIG_DIR")
 # Override python interpreter to point to virtualenv (but only if we're
 # not performing the bootstrap, which is responsible for setting up the
 # virtualenv in the first place!)

@@ -37,6 +37,10 @@ SITE_BRANDING = 'ChameleonCloud'
 
 # Hide default Help link
 HORIZON_CONFIG['help_url'] = None
+{% if enable_zun | bool and not enable_nova | bool %}
+# Special case when Zun is enabled and Nova is not; change default view from Nova to Zun
+HORIZON_CONFIG['user_home'] = '/project/container/containers'
+{% endif %}
 # Add in extra links
 USER_MENU_LINKS = [
 {% if horizon_help_url %}
@@ -67,11 +71,18 @@ USER_MENU_LINKS = [
 # Blazar-specific settings
 {% if blazar_floatingip_reservation_network_regex is defined %}
 OPENSTACK_BLAZAR_FLOATINGIP_RESERVATION = {
+  'enabled': True,
   # Allow reserving floating IPs on this network
   'enabled': True,
   'network_name_regex': '{{ blazar_floatingip_reservation_network_regex }}'
 }
 {% endif %}
+OPENSTACK_BLAZAR_DEVICE_RESERVATION = {
+  'enabled': {{ enable_zun }},
+}
+OPENSTACK_BLAZAR_HOST_RESERVATION = {
+  'enabled': {{ enable_nova }},
+}
 # Used for Blazar dashboard, which needs to pull data from the MySQL database
 # directly at the moment.
 DATABASES = {
