@@ -213,12 +213,13 @@ chameleon_portal_mysql_database: chameleon_prod
 enable_precis: no
 
 # Prometheus
-enable_prometheus: no
+enable_prometheus: yes
+enable_prometheus_external: no
 prometheus_port: "9090"
 prometheus_jupyterhub_exporter_token:
+# Legacy params
 prometheus_server_external_url: "{{ public_protocol }}://{{ prometheus_external_fqdn }}:{{ prometheus_port }}"
 prometheus_alertmanager_external_url: "{{ public_protocol }}://{{ prometheus_external_fqdn }}:{{ prometheus_alertmanager_port }}"
-# Legacy chameleon_prometheus role vars
 prometheus_bind_address: "{{ lookup('vars', 'ansible_' + network_interface).ipv4.address }}"
 
 # Redfish Monitor
