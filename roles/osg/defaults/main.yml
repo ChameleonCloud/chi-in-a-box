@@ -1,0 +1,4 @@
+---
+osg_service_username: instance_metrics_writer
+osg_config_path: /etc/osg
+osg_deployer_docker_image: docker.chameleoncloud.org/chameleon-osg-deployer:latest
