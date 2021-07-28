@@ -219,7 +219,7 @@ enable_prometheus_external: no
 prometheus_port: "9090"
 prometheus_jupyterhub_exporter_token:
 prometheus_alertmanager_slack_channel: "#notifications"
-prometheus_openstack_exporter_cmdline_extras: >
+prometheus_openstack_exporter_cmdline_extras: >-
   --disable-service.compute
   --disable-service.volume
   --disable-service.load-balancer
