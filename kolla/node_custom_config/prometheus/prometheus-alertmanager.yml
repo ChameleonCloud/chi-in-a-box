@@ -1,0 +1,63 @@
+---
+global:
+{% if prometheus_alertmanager_slack_api_url is defined %}
+  slack_api_url: {{ prometheus_alertmanager_slack_api_url }}
+{% endif %}
+
+templates:
+- '/etc/alertmanager/*.tmpl'
+
+route:
+  receiver: 'default'
+  group_by: ['alertname', 'hostname']
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 3h
+  routes:
+  - receiver: 'fyi'
+    match:
+      can_resolve: no
+
+# Inhibition rules allow to mute a set of alerts given that another alert is
+# firing.
+# We use this to mute any warning-level notifications if the same alert is
+# already critical.
+inhibit_rules:
+- source_match:
+    severity: 'critical'
+  target_match:
+    severity: 'warning'
+  equal: ['alertname', 'hostname']
+
+receivers:
+
+- name: 'default'
+{% if prometheus_alertmanager_slack_api_url is defined %}
+  slack_configs:
+  - channel: '{{ prometheus_alertmanager_slack_channel }}'
+    send_resolved: true
+    title: {% raw %}'{{ template "slack.chameleon.title" . }}'
+{% endraw %}
+    text: {% raw %}'{{ template "slack.chameleon.text" . }}'
+{% endraw %}
+    color: {% raw %}'{{ template "slack.chameleon.color" . }}'
+{% endraw %}
+{% endif %}
+
+# The "FYI" receiver is for alerts that cannot automatically resolve; this is
+# good for things like, something is going wrong that you should look into.
+# Instance launch failure rate is an example of this; if instance launch
+# failures go down it is likely the user just stopped, so we shouldn't consider
+# it really resolved.
+- name: 'fyi'
+{% if prometheus_alertmanager_slack_api_url is defined %}
+  slack_configs:
+  - channel: '{{ prometheus_alertmanager_slack_channel }}'
+    send_resolved: false
+    title: {% raw %}'{{ template "slack.chameleon.title" . }}'
+{% endraw %}
+    text: {% raw %}'{{ template "slack.chameleon.text" . }}'
+{% endraw %}
+    color: {% raw %}'{{ template "slack.chameleon.color" . }}'
+{% endraw %}
+{% endif %}
