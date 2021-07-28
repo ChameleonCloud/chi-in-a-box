@@ -5,7 +5,7 @@ global:
 {% endif %}
 
 templates:
-- '/etc/alertmanager/*.tmpl'
+- '/etc/prometheus/*.tmpl'
 
 route:
   receiver: 'default'
