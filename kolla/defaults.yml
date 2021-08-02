@@ -217,6 +217,7 @@ enable_precis: no
 enable_prometheus: yes
 enable_prometheus_external: no
 prometheus_port: "9090"
+prometheus_user: "prometheus"
 prometheus_jupyterhub_exporter_token:
 prometheus_alertmanager_slack_channel: "#notifications"
 prometheus_openstack_exporter_interval: 5m
