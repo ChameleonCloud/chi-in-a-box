@@ -1,7 +1,7 @@
 {
-  "compute:servers:create:requested_destination": "role:osg or rule:admin",
+  "compute:servers:create:requested_destination": "role:osg or role:admin",
   "os_compute_api:os-aggregates:show": "role:osg or rule:admin_or_owner",
   "os_compute_api:os-extended-server-attributes": "rule:admin_or_owner",
-  "os_compute_api:os-flavor-extra-specs:create": "role:osg or rule:admin",
+  "os_compute_api:os-flavor-extra-specs:create": "role:osg or role:admin",
   "os_compute_api:os-hypervisors": "role:osg or rule:admin_or_owner"
 }
