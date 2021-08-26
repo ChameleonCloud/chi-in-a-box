@@ -19,6 +19,8 @@ prometheus_mysql_exporter_user: mysqld-exporter
 
 prometheus_openstack_exporter_user: admin
 
+prometheus_snmp_exporter_generator_image: prom/snmp-generator:master
+
 prometheus_services:
   server:
     service_name: prometheus_server
@@ -97,7 +99,7 @@ prometheus_services:
   snmp-exporter:
     service_name: prometheus_snmp_exporter
     image: prom/snmp-exporter:v0.15.0
-    generator_image: prom/snmp-generator:master
+    generator_image: {{ prometheus_snmp_exporter_generator_image }}
     group: prometheus-snmp-exporter
     enabled: yes
     restart_handler: restart snmp exporter
