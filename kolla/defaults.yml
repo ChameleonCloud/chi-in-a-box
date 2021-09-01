@@ -53,6 +53,7 @@ blazar_database_name: blazar
 blazar_database_user: blazar
 blazar_database_port: "{{ database_port }}"
 blazar_email_relay: "127.0.0.1"
+blazar_extras: name
 
 # Cinder
 enable_cinder: no
