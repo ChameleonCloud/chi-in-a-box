@@ -1,66 +1,86 @@
 ---
 - name: Create cep service
-  os_keystone_service:
-    name: cep
-    service_type: cep
-    auth: "{{ openstack_auth }}"
-    description: "Chameleon Experiment Precis"
-    region_name: "{{ openstack_region_name }}"
+  kolla_toolbox:
+    module_name: os_keystone_service
+    module_args:
+      name: cep
+      service_type: cep
+      auth: "{{ openstack_auth }}"
+      description: "Chameleon Experiment Precis"
+      region_name: "{{ openstack_region_name }}"
+  delegate_to: "{{ groups['control'][0] }}"
+  run_once: True
 
 - name: Create cep endpoint
-  os_keystone_endpoint:
-    service: cep
-    auth: "{{ openstack_auth }}"
-    url: "https://{{ kolla_external_fqdn }}:{{ precis_endpoint_port }}"
-    endpoint_interface: public
-    region: "{{ openstack_region_name }}"
-    region_name: "{{ openstack_region_name }}"
+  kolla_toolbox:
+    module_name: os_keystone_endpoint
+    module_args:
+      service: cep
+      auth: "{{ openstack_auth }}"
+      url: "https://{{ kolla_external_fqdn }}:{{ precis_endpoint_port }}"
+      endpoint_interface: public
+      region: "{{ openstack_region_name }}"
+      region_name: "{{ openstack_region_name }}"
+  delegate_to: "{{ groups['control'][0] }}"
+  run_once: True
 
 - name: Create RabbitMQ entities.
   block:
     - name: Create RabbitMQ user.
       delegate_to: "{{ groups[precis_rabbitmq_inventory_group][0] }}"
-      rabbitmq_user:
-        user: "{{ precis_rabbitmq_user }}"
-        password: "{{ precis_rabbitmq_password }}"
-        permissions:
-          - vhost: /
-            configure_priv: "^experiment_precis_.*"
-            read_priv: ".*"
-            write_priv: "^experiment_precis_.*|amq.default"
-        state: present
+      run_once: True
+      kolla_toolbox:
+        module_name: rabbitmq_user
+        module_args:
+          user: "{{ precis_rabbitmq_user }}"
+          password: "{{ precis_rabbitmq_password }}"
+          permissions:
+            - vhost: /
+              configure_priv: "^experiment_precis_.*"
+              read_priv: ".*"
+              write_priv: "^experiment_precis_.*|amq.default"
+          state: present
     - name: Create RabbitMQ listener queue.
       delegate_to: "{{ groups[precis_rabbitmq_inventory_group][0] }}"
-      rabbitmq_queue:
-        login_user: "{{ rabbitmq_user }}"
-        login_password: "{{ rabbitmq_password }}"
-        name: "{{ precis_rabbitmq_listener_queue }}"
-        vhost: /
-        durable: yes
-        auto_delete: no
-        state: present
+      run_once: True
+      kolla_toolbox:
+        module_name: rabbitmq_queue
+        module_args:
+          login_user: "{{ rabbitmq_user }}"
+          login_password: "{{ rabbitmq_password }}"
+          name: "{{ precis_rabbitmq_listener_queue }}"
+          vhost: /
+          durable: yes
+          auto_delete: no
+          state: present
     - name: Create RabbitMQ exchange bindings.
       delegate_to: "{{ groups[precis_rabbitmq_inventory_group][0] }}"
-      rabbitmq_binding:
-        login_user: "{{ rabbitmq_user }}"
-        login_password: "{{ rabbitmq_password }}"
-        name: "{{ item }}"
-        destination: "{{ precis_rabbitmq_listener_queue }}"
-        destination_type: queue
-        routing_key: "notifications.*"
-        state: present
-      loop: "{{ precis_rabbitmq_listener_bindings }}"
+      run_once: True
+      kolla_toolbox:
+        module_name: rabbitmq_binding
+        module_args:
+          login_user: "{{ rabbitmq_user }}"
+          login_password: "{{ rabbitmq_password }}"
+          name: "{{ item }}"
+          destination: "{{ precis_rabbitmq_listener_queue }}"
+          destination_type: queue
+          routing_key: "notifications.*"
+          state: present
+        loop: "{{ precis_rabbitmq_listener_bindings }}"
   tags:
     - rabbitmq
 
 - name: Create MySQL user.
   delegate_to: "{{ groups[precis_mysql_inventory_group][0] }}"
-  mysql_user:
-    name: "{{ precis_mysql_user }}"
-    host: "%"
-    password: "{{ precis_mysql_password }}"
-    priv: "{{ precis_mysql_database }}.*:ALL/{{ precis_mysql_external_database_privileges | join('/') }}"
-    state: present
+  run_once: True
+  kolla_toolbox:
+    module_name: mysql_user
+    module_args:
+      name: "{{ precis_mysql_user }}"
+      host: "%"
+      password: "{{ precis_mysql_password }}"
+      priv: "{{ precis_mysql_database }}.*:ALL/{{ precis_mysql_external_database_privileges | join('/') }}"
+      state: present
   tags:
     - mysql
 
@@ -144,11 +164,11 @@
         service_bind_address: "{{ api_interface_address }}"
         docker_image: "{{ item.image }}"
         docker_network: "{{ precis_docker_network }}"
-        docker_mounts: 
+        docker_mounts:
           - type: bind
             src: "{{ precis_config_path }}/{{ item.conf }}"
             dst: "/etc/experiment_precis/{{ item.conf }}"
-        docker_ports: 
+        docker_ports:
           - "{{ api_interface_address }}:{{ item.port }}:8000/tcp"
       loop:
         - image: "{{ precis_event_listener_docker_image }}"
@@ -165,7 +185,7 @@
           port: "{{ precis_generator_prometheus_port }}"
   tags:
     - configuration
-    
+
 - name: Configure haproxy for precis endpoint
   import_role:
     name: haproxy-config
@@ -179,24 +199,16 @@
     -v "{{ precis_config_path }}/init.conf:/etc/experiment_precis/init.conf" \
     {{ precis_init_docker_image }} 2>&1
 
-- name: Include cron notification script
-  include_role:
-    name: chameleon_common
-    tasks_from: cron
-    defaults_from: cron
-
 - name: Configure precis cleanup docker bash wrapper.
   template:
     src: precis_cleanup.j2
     mode: a+x
     dest: /usr/local/sbin/precis_cleanup
 
-- name: Set up precis cleanup cron job.
-  cron:
-    name: "precis_cleaup"
-    minute: "0"
-    hour: "0"
-    day: "1"
-    month: "*"
-    weekday: "*"
-    job: "/usr/local/sbin/precis_cleanup | /usr/bin/logger -t precis_cleanup && {{ cron_notification }} precis_cleanup"
+- name: Set up precis cleanup task.
+  include_role:
+    name: chameleon.periodic_task
+  vars:
+    task_name: "precis_cleanup"
+    task_command: "/usr/local/sbin/precis_cleanup"
+    task_calendar: daily
