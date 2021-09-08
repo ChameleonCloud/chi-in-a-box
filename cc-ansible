@@ -333,10 +333,10 @@ rsync -a "$DIR/kolla/node_custom_config/" "$CONFIG_DIR/node_custom_config/"
 rsync -a "$CC_ANSIBLE_SITE/" "$CONFIG_DIR/"
 # 3. Ensure a defaults.yml is defined, if the site-config didn't define it.
 if [[ ! -f "$CONFIG_DIR/defaults.yml" ]]; then
-  echo -e "---\n" >"$CONFIG_DIR/defaults.yml"
+  echo -e "---\n_placeholder_for_valid_yaml:" >"$CONFIG_DIR/defaults.yml"
 fi
 if [[ ! -f "$CONFIG_DIR/globals.yml" ]]; then
-  echo -e "---\n_placeholder_for_ansible:" >"$CONFIG_DIR/globals.yml"
+  echo -e "---\n_placeholder_for_valid_yaml:" >"$CONFIG_DIR/globals.yml"
 fi
 # 4. Stamp out a group vars file to set defaults for any host in baremetal group
 #    (should be all nodes enrolled with Kolla-Ansible). Doing it this way allows
