@@ -16,6 +16,7 @@ if [[ ! -d "$VIRTUALENV" ]]; then
   FORCE_UPDATES=yes
 fi
 
+# shellcheck disable=1090 # TODO use standard VIRTUAL_ENV and PATH method
 source "$(realpath "$VIRTUALENV/bin/activate")"
 
 CHECK_UPDATES=yes
@@ -211,6 +212,7 @@ fi
 
 CC_ANSIBLE_VAULT_PASSWORD="${CC_ANSIBLE_VAULT_PASSWORD:-$CC_ANSIBLE_SITE/vault_password}"
 CC_ANSIBLE_ENV="$CC_ANSIBLE_SITE/.env"
+# shellcheck disable=1090 # TODO add sample .env file for testing
 if [[ -f "$CC_ANSIBLE_ENV" ]]; then
   set -a; source "$(realpath "$CC_ANSIBLE_ENV")"; set +a
 fi
@@ -350,6 +352,7 @@ mkdir -p "${CONFIG_DIR}/inventory/group_vars/"
 #    (should be all nodes enrolled with Kolla-Ansible). Doing it this way allows
 #    the site-config to override anything here in host_vars or more specific
 #    group_vars files.
+# shellcheck disable=2016 # yq is directly evaluating this string
 yq eval-all '. as $item ireduce ({}; . * $item )' \
   "$DIR/kolla/defaults.yml" "$CONFIG_DIR/defaults.yml" \
   >"$CONFIG_DIR/inventory/group_vars/baremetal.yml"
