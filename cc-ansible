@@ -1,4 +1,10 @@
 #!/usr/bin/env bash
+
+set -o errexit
+set -o nounset
+set -o pipefail
+# set -o xtrace
+
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 VIRTUALENV="$(realpath "${VIRTUALENV:-"$DIR"/venv}")"
 
@@ -272,7 +278,7 @@ fi
 ansible_path="$VIRTUALENV/share/kolla-ansible/ansible"
 
 # Handle subcommands
-if [[ -n $command ]]; then
+if [[ -n "${command:-}" ]]; then
   $command "$@"
   exit $?
 fi
@@ -370,10 +376,11 @@ fi
 kolla_args+=("${POSARGS[@]}")
 
 #load tags to skip
-ANSIBLE_SKIP_TAGS="$(grep -v "^#" ./kolla-skip-tags | paste -sd ',')"
+ANSIBLE_SKIP_TAGS="$(grep -v "^#" ./kolla-skip-tags | paste -sd ',' || true )"
 if [[ -n "${ANSIBLE_SKIP_TAGS}" ]]; then
   kolla_args+=("--skip-tags")
   kolla_args+=("${ANSIBLE_SKIP_TAGS}")
 fi
 
 "$VIRTUALENV"/bin/kolla-ansible "${kolla_args[@]}"
+# set +o xtrace
