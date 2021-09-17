@@ -1,0 +1,22 @@
+---
+name: CI for chi-in-a-box script
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    name: test cc-ansible
+    runs-on: ubuntu-latest
+    env:
+      CC_ANSIBLE_SITE: /opt/site-config
+    steps:
+      - name: Checkout code base
+        uses: actions/checkout@v2
+      - name: test cc-ansible init
+        shell: bash
+        run: "./cc-ansible init"
+      - name: test cc-ansible genconfig
+        shell: bash
+        run: "./cc-ansible genconfig"
