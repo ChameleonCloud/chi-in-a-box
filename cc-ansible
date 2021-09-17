@@ -6,18 +6,18 @@ set -o pipefail
 # set -o xtrace
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
-VIRTUALENV="$(realpath "${VIRTUALENV:-"$DIR"/venv}")"
+VIRTUAL_ENV="$(realpath "${VIRTUAL_ENV:-"$DIR"/.venv}")"
 
 FORCE_UPDATES="${FORCE_UPDATES:-no}"
-if [[ ! -d "$VIRTUALENV" ]]; then
-  echo "Creating virtualenv at $VIRTUALENV ..."
-  python3 -m venv "$VIRTUALENV" --system-site-packages
-  "$VIRTUALENV/bin/pip" install --upgrade pip
+if [[ ! -d "$VIRTUAL_ENV" ]]; then
+  echo "Creating virtualenv at $VIRTUAL_ENV ..."
+  python3 -m venv "$VIRTUAL_ENV" --system-site-packages
+  "$VIRTUAL_ENV/bin/pip" install --upgrade pip
   FORCE_UPDATES=yes
 fi
 
-# shellcheck disable=1090 # TODO use standard VIRTUAL_ENV and PATH method
-source "$(realpath "$VIRTUALENV/bin/activate")"
+export VIRTUAL_ENV
+export PATH="$VIRTUAL_ENV/bin:$PATH"
 
 CHECK_UPDATES=yes
 declare -a POSARGS=()
@@ -221,7 +221,7 @@ fi
 if [[ "$CHECK_UPDATES" == "yes" || "$FORCE_UPDATES" == "yes" ]]; then
   # Update base pip packages
   pip_requirements="$DIR/requirements.txt"
-  pip_requirements_chksum="$VIRTUALENV/requirements.txt.sha256"
+  pip_requirements_chksum="$VIRTUAL_ENV/requirements.txt.sha256"
   if [[ "$FORCE_UPDATES" == "yes" || ! -f "$pip_requirements_chksum" ]] || \
         ! sha256sum --quiet --check "$pip_requirements_chksum"; then
     pip install --upgrade --force-reinstall -r "$pip_requirements"
@@ -231,7 +231,7 @@ if [[ "$CHECK_UPDATES" == "yes" || "$FORCE_UPDATES" == "yes" ]]; then
   # Update Ansible Galaxy roles
   galaxy_role_path="$DIR/roles/galaxy.ansible.com"
   galaxy_role_requirements="$DIR/requirements.yml"
-  galaxy_role_requirements_chksum="$VIRTUALENV/requirements.yml.sha256"
+  galaxy_role_requirements_chksum="$VIRTUAL_ENV/requirements.yml.sha256"
   if [[ "$FORCE_UPDATES" == "yes" || ! -f "$galaxy_role_requirements_chksum" ]] || \
         ! sha256sum --quiet --check "$galaxy_role_requirements_chksum"; then
     ansible-galaxy install --force -p "$galaxy_role_path" -r "$galaxy_role_requirements"
@@ -240,44 +240,44 @@ if [[ "$CHECK_UPDATES" == "yes" || "$FORCE_UPDATES" == "yes" ]]; then
 
   kolla_ansible_remote=https://github.com/chameleoncloud/kolla-ansible.git
   kolla_ansible_checkout=${KOLLA_ANSIBLE_BRANCH:-chameleoncloud/train}
-  kolla_ansible_gitref="$VIRTUALENV/kolla-ansible.gitref"
-  kolla_ansible_egglink="$VIRTUALENV/src/kolla-ansible"
+  kolla_ansible_gitref="$VIRTUAL_ENV/kolla-ansible.gitref"
+  kolla_ansible_egglink="$VIRTUAL_ENV/src/kolla-ansible"
   if [[ "$FORCE_UPDATES" == "yes" || ! -f "$kolla_ansible_gitref" || ! -d "$kolla_ansible_egglink" ]] || \
         ! diff -q >/dev/null \
           "$kolla_ansible_gitref" \
           <(cd "$kolla_ansible_egglink"; git fetch; git show-ref -s -d origin/"$kolla_ansible_checkout"); then
-    pushd "$VIRTUALENV" || ( echo "pushd error!" && exit 1 )
+    pushd "$VIRTUAL_ENV" || ( echo "pushd error!" && exit 1 )
     pip install -e git+"$kolla_ansible_remote"@"$kolla_ansible_checkout"#egg=kolla-ansible
     popd || ( echo "popd error!" && exit 1 )
     # [jca 2020-01-30] TODO:
     # Ensure the /share folder is placed; this is not copied when using the "develop" setup.py method.
     # This is a bit weird, perhaps there is some way to pass an additional flag to pip to make it
     # copy this even though it's installing as source. We use source install to keep track of the Git revision.
-    mkdir -p "$VIRTUALENV/share" && ln -sf "$kolla_ansible_egglink" "$VIRTUALENV/share/kolla-ansible"
+    mkdir -p "$VIRTUAL_ENV/share" && ln -sf "$kolla_ansible_egglink" "$VIRTUAL_ENV/share/kolla-ansible"
     (cd "$kolla_ansible_egglink"; git rev-parse HEAD > "$kolla_ansible_gitref")
   fi
 
   # Update Mitogen
   MITOGEN_VERSION=0.2.8
   MITOGEN_TARBALL=/tmp/mitogen.tar.gz
-  MITOGEN_INSTALL_DIR="$VIRTUALENV/lib/mitogen-$MITOGEN_VERSION"
+  MITOGEN_INSTALL_DIR="$VIRTUAL_ENV/lib/mitogen-$MITOGEN_VERSION"
   if [[ ! -d "$MITOGEN_INSTALL_DIR" ]]; then
     curl -L -o "$MITOGEN_TARBALL" "https://github.com/dw/mitogen/archive/v$MITOGEN_VERSION.tar.gz" \
       && tar -xf "$MITOGEN_TARBALL" -C "$(dirname "$MITOGEN_INSTALL_DIR")" \
       && rm -f "$MITOGEN_TARBALL"
   fi
-  ln -sf "$MITOGEN_INSTALL_DIR" "$VIRTUALENV/lib/mitogen-latest"
+  ln -sf "$MITOGEN_INSTALL_DIR" "$VIRTUAL_ENV/lib/mitogen-latest"
 
   # Update/install yq
   YQ_VERSION=4.9.6
   if [[ "$(type -t yq)" != "file" ]]; then
     YQ_BINARY="yq_linux_amd64"
     wget https://github.com/mikefarah/yq/releases/download/v${YQ_VERSION}/${YQ_BINARY}.tar.gz -O - \
-      | tar xz && mv ${YQ_BINARY} "$VIRTUALENV/bin/yq"
+      | tar xz && mv ${YQ_BINARY} "$VIRTUAL_ENV/bin/yq"
   fi
 fi
 
-ansible_path="$VIRTUALENV/share/kolla-ansible/ansible"
+ansible_path="$VIRTUAL_ENV/share/kolla-ansible/ansible"
 
 # Handle subcommands
 if [[ -n "${command:-}" ]]; then
@@ -387,5 +387,5 @@ if [[ -n "${ANSIBLE_SKIP_TAGS}" ]]; then
   kolla_args+=("${ANSIBLE_SKIP_TAGS}")
 fi
 
-"$VIRTUALENV"/bin/kolla-ansible "${kolla_args[@]}"
+"$VIRTUAL_ENV"/bin/kolla-ansible "${kolla_args[@]}"
 # set +o xtrace
