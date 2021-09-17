@@ -57,7 +57,7 @@ while [[ $# -gt 0 ]]; do
       FORCE_UPDATES=yes
       ;;
     *)
-      POSARGS+=($key)
+      POSARGS+=("$key")
       ;;
   esac
 
