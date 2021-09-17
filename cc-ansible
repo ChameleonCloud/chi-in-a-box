@@ -250,7 +250,7 @@ if [[ "$CHECK_UPDATES" == "yes" || "$FORCE_UPDATES" == "yes" ]]; then
   fi
 
   # Update Mitogen
-  MITOGEN_VERSION=0.2.8
+  MITOGEN_VERSION=0.2.9
   MITOGEN_TARBALL=/tmp/mitogen.tar.gz
   MITOGEN_INSTALL_DIR="$VIRTUALENV/lib/mitogen-$MITOGEN_VERSION"
   if [[ ! -d "$MITOGEN_INSTALL_DIR" ]]; then

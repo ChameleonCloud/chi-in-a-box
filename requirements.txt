@@ -1,4 +1,4 @@
-ansible~=2.8.0
+ansible~=2.9.0
 docker
 openstacksdk
 # See https://github.com/weldr/lorax/commit/c56d57ef7ee1c329161158ea8867064f74c0cffa
