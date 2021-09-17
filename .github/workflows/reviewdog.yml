@@ -1,0 +1,17 @@
+name: reviewdog
+on: [pull_request]
+jobs:
+  shellcheck:
+    name: check cc-ansible
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: shellcheck
+        uses: reviewdog/action-shellcheck@v1
+        with:
+          reporter: github-pr-review # Change reporter.
+          fail_on_error: true
+          filter_mode: file
+          path: "." # Optional.
+          pattern: "cc-ansible" # Optional.
+          exclude: "./.git/*" # Optional.
