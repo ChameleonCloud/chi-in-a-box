@@ -344,7 +344,9 @@ fi
 if [[ ! -f "$CONFIG_DIR/globals.yml" ]]; then
   echo -e "---\n_placeholder_for_valid_yaml:" >"$CONFIG_DIR/globals.yml"
 fi
-# 4. Stamp out a group vars file to set defaults for any host in baremetal group
+# 4. Ensure inventory/group_vars directory exists
+mkdir -p "${CONFIG_DIR}/inventory/group_vars/"
+# 5. Stamp out a group vars file to set defaults for any host in baremetal group
 #    (should be all nodes enrolled with Kolla-Ansible). Doing it this way allows
 #    the site-config to override anything here in host_vars or more specific
 #    group_vars files.
