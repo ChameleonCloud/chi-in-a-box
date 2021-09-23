@@ -96,7 +96,7 @@ jupyterhub_ceph_pool: jupyter-volumes
 jupyterhub_ceph_docker_volume_driver: docker.chameleoncloud.org/wetopi/rbd:latest
 jupyterhub_ceph_docker_volume_driver_alias: rbd
 
-jupyterhub_notebook_tag: e81c8cd
+jupyterhub_notebook_tag: 9e5cdf9
 jupyterhub_notebook_image_full: "docker.chameleoncloud.org/jupyterhub-user:{{ jupyterhub_notebook_tag }}"
 jupyterhub_notebook_workdir: /work
 
