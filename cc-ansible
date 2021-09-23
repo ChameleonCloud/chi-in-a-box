@@ -16,8 +16,10 @@ if [[ ! -d "$VIRTUALENV" ]]; then
   FORCE_UPDATES=yes
 fi
 
+set +o nounset
 # shellcheck disable=1090 # TODO use standard VIRTUAL_ENV and PATH method
 source "$(realpath "$VIRTUALENV/bin/activate")"
+set -o nounset
 
 CHECK_UPDATES=yes
 declare -a POSARGS=()
