@@ -197,6 +197,7 @@
         gateway_ip: "{{ network.gateway_ip | default(network.cidr | ipaddr('last_usable')) }}"
         allocation_pool_start: "{{ network.allocation_pools[0].start | default(network.cidr | next_nth_usable(2)) }}"
         allocation_pool_end: "{{ network.allocation_pools[0].end | default(network.cidr | ipaddr('last_usable') | ipmath(-1)) }}"
+        enable_dhcp: false
         state: present
     run_once: True
     vars:
@@ -215,7 +216,7 @@
         name: "{{ (item.sharednet | default({})).network_name | default(default_sharednet_name) }}"
         provider_network_type: "{{ item.network_type | default('vlan') }}"
         # Use the first on-demand VLAN for this network.
-        provider_segmentation_id: "{{ (item.on_demand_vlan_ranges[0].split(':')[0] | int) + 1 }}"
+        # provider_segmentation_id: "{{ (item.on_demand_vlan_ranges[0].split(':')[0] | int) + 1 }}"
         provider_physical_network: "{{ '' if (item.network_type | default('vlan')) == 'vxlan' else item.name }}"
         shared: yes
         state: present
@@ -226,8 +227,9 @@
     vars:
       default_sharednet_name: sharednet1
     when:
-      - item.on_demand_vlan_ranges is defined
-      - item.on_demand_vlan_ranges | length > 0
+      - item.name != 'public'
+      # - item.on_demand_vlan_ranges is defined
+      # - item.on_demand_vlan_ranges | length > 0
       - item.sharednet.enabled | default(true) | bool
   - name: Create shared network subnet(s)
     kolla_toolbox:
@@ -237,8 +239,8 @@
         network_name: "{{ (item.sharednet | default({})).network_name | default(default_sharednet_name) }}"
         name: "{{ (item.sharednet | default({})).network_name | default(default_sharednet_name) }}-subnet"
         cidr: "{{ (item.sharednet | default({})).cidr | default(default_sharednet_cidr) }}"
-        allocation_pool_start: "{{ (item.sharednet | default({})).cidr | default(default_sharednet_cidr) | next_nth_usable(2) }}"
-        allocation_pool_end: "{{ (item.sharednet | default({})).cidr | default(default_sharednet_cidr) | ipaddr('last_usable') }}"
+        allocation_pool_start: "{{ item.sharednet.allocation_pools[0].start | default(default_sharednet_cidr | next_nth_usable(2)) }}"
+        allocation_pool_end: "{{ item.sharednet.allocation_pools[0].end | default(default_sharednet_cidr | ipaddr('last_usable') | ipmath(-1)) }}"
     loop: "{{ neutron_networks }}"
     loop_control:
       label: "{{ item.name }}"
@@ -247,8 +249,9 @@
       default_sharednet_name: sharednet1
       default_sharednet_cidr: 10.0.0.1/24
     when:
-      - item.on_demand_vlan_ranges is defined
-      - item.on_demand_vlan_ranges | length > 0
+      - item.name != 'public'
+      # - item.on_demand_vlan_ranges is defined
+      # - item.on_demand_vlan_ranges | length > 0
       - item.sharednet.enabled | default(true) | bool
     register: sharednet_subnets
   - name: Create NAT router for shared network(s).
