@@ -1,0 +1,3 @@
+[submodule "site-config.example"]
+	path = site-config.example
+	url = https://github.com/chameleoncloud/site-config-template
