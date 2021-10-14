@@ -1,9 +1,12 @@
 ---
 - name: Create config directory.
+  become: yes
   file:
     path: "{{ vendordata_config_path }}"
     state: directory
+
 - name: Create vendordata conf.
+  become: yes
   template:
     src: "vendordata.conf.j2"
     mode: 0640
