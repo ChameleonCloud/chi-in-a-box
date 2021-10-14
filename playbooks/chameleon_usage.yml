@@ -11,11 +11,11 @@
       vars:
           action: 'node'
     - role: chameleon_usage
-      when: enable_usage_appliance_report
+      when: enable_usage_appliance_report | bool
       vars:
           action: 'heat_template'
     - role: chameleon_usage
-      when: enable_user_project_report
+      when: enable_user_project_report | bool
       vars:
           action: 'user_project'
 
@@ -25,5 +25,6 @@
       vars:
           action: 'config'
     - role: chameleon_usage
+      when: enable_jupyter_report | bool
       vars:
           action: 'jupyter'

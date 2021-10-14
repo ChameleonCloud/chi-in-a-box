@@ -12,23 +12,27 @@
     force_source: yes
 
 - name: Create config directory.
+  become: yes
   file:
     path: "{{ hammers_config_path }}"
     state: directory
 
 - name: Configure Hammers docker bash wrapper
+  become: yes
   template:
     src: cc-hammer.j2
     mode: a+x
     dest: /usr/local/sbin/cc-hammer
 
 - name: Configure Hammers env file
+  become: yes
   template:
     src: hammers.env.j2
     mode: 0600
     dest: "{{ hammers_env_file }}"
 
 - name: Configure slack webhook file
+  become: yes
   template:
     src: slack.json.j2
     mode: 0600
@@ -49,6 +53,7 @@
   delegate_to: "{{ groups['hammers'][0] }}"
 
 - name: Configure Hammers my.cnf
+  become: yes
   template:
     src: my.cnf.j2
     dest: "{{ hammers_config_path }}/my.cnf"

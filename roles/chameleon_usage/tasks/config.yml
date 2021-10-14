@@ -6,11 +6,13 @@
     force_source: yes
 
 - name: Create config directory.
+  become: yes
   file:
     path: "{{ chameleon_usage_config_dir }}"
     state: directory
 
 - name: Configure my.cnf
+  become: yes
   template:
     src: my.cnf.j2
     dest: "{{ chameleon_usage_config_dir }}/my.cnf"

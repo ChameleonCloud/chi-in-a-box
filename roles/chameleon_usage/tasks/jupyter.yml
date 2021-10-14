@@ -1,11 +1,13 @@
 ---
 - name: Configure chameleon jupyter usage docker bash wapper
+  become: yes
   template:
     src:  chameleon-usage-jupyter.j2
     mode: a+x
     dest: /usr/local/sbin/chameleon-usage-jupyter
 
 - name: Fill in current data to chameleon_usage
+  become: yes
   command: "/usr/local/sbin/chameleon-usage-jupyter"
 
 - name: Set up Jupyter usage periodic task
@@ -20,12 +22,14 @@
     task_calendar: "*:0/5"
 
 - name: Configure chameleon jupyter usage report cache docker bash wrapper
+  become: yes
   template:
     src: chameleon-usage-jupyter-usage-report-cache.j2
     mode: a+x
     dest: /usr/local/sbin/chameleon-usage-jupyter-usage-report-cache
 
 - name: Create jupyter usage report cache table and fill in data
+  become: yes
   command: "/usr/local/sbin/chameleon-usage-jupyter-usage-report-cache"
 
 - name: Set up Jupyter usage cache periodic task

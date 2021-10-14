@@ -4,22 +4,27 @@
 #  Dumps mysql databases to a file for another backup tool to pick up.
 #
 # MySQL code:
-# GRANT SELECT, RELOAD, LOCK TABLES ON *.* TO 'user'@'localhost'
-# IDENTIFIED BY 'password';
+# GRANT SELECT, RELOAD, LOCK TABLES ON *.* TO '{{ backup_database_user }}'@'localhost'
+# IDENTIFIED BY '{{ backup_database_password }}';
 # FLUSH PRIVILEGES;
 #
 
 ##### START CONFIG ###################################################
 
-USER="{{ mariadb_backup_user }}"
-PASS="{{ mariadb_backup_pw }}"
+USER="{{ backup_database_user }}"
+PASS="{{ backup_database_password }}"
 MAX_ALLOWED_PACKET="{{ mariadb_backup_max_packet }}"
 DIR="{{ mariadb_backup_origin_dir }}"
 ROTATE="{{ mariadb_backup_file_age }}"
 
 # Create temporary mysql cnf file.
 TMPFILE=`mktemp /tmp/backup.XXXXXX` || exit 1
-echo -e "[client]\npassword=$PASS\nuser=$USER\nmax_allowed_packet=$MAX_ALLOWED_PACKET" > $TMPFILE
+cat >"$TMPFILE" <<EOF
+[client]
+password=$PASS
+user=$USER
+max_allowed_packet=$MAX_ALLOWED_PACKET
+EOF
 
 PREFIX=mysql_backup_
 
@@ -43,7 +48,7 @@ mysqldump --defaults-extra-file="$TMPFILE" --opt --flush-logs --single-transacti
  ${ADDITIONAL_OPTIONS} \
  --all-databases | bzcat -zc > "$backup_file"
 
-{% if mariadb_backup_s3_endpoint is defined %}
+{% if mariadb_backup_s3_endpoint is defined and mariadb_backup_s3_key_id is defined and mariadb_backup_s3_key is defined %}
 # Additionally copy backup to S3 bucket
 _aws() {
   docker run --rm \
