@@ -3,5 +3,5 @@
 # therefore any provisioning can be done locally.
 ansible_connection: local
 
-#network_interface: eth1
-#kolla_external_vip_interface: eth2
+# All services will bind to loopback
+network_interface: lo

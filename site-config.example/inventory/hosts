@@ -1,19 +1,19 @@
 # These initial groups are the only groups required to be modified. The
 # additional groups are for more control of the environment.
 [control]
-<host>
+localhost
 
 [network]
-<host>
+localhost
 
 [compute]
-# No compute node; this is a baremetal-only cluster.
+localhost
 
 [monitoring]
-<host>
+localhost
 
 [storage]
-<host>
+localhost
 
 [deployment]
 localhost ansible_connection=local
