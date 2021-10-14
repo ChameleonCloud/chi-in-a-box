@@ -186,14 +186,6 @@ USAGE
   exit 1
 }
 
-get_defined_var() {
-  local varname="$1"
-  ansible localhost --one-line -m debug -a "var=$varname" \
-    --extra-vars="@$DIR/kolla/defaults.yml" \
-    --inventory="$CC_ANSIBLE_SITE/inventory/hosts" 2>/dev/null \
-    | sed 's/^.*=> //' \
-    | jq -r ".$varname"
-}
 
 # On init, there is no requirement that the site config directory be defined,
 # because one of init's tasks is creating this directory. Set a default.
@@ -367,15 +359,7 @@ kolla_args+=(--globals="$CONFIG_DIR/globals.yml")
 kolla_args+=(--passwords="$CONFIG_DIR/passwords.yml")
 kolla_args+=(--extra node_custom_config="$CONFIG_DIR/node_custom_config")
 kolla_args+=(--extra cc_ansible_site_dir="$CONFIG_DIR")
-# Override python interpreter to point to virtualenv (but only if we're
-# not performing the bootstrap, which is responsible for setting up the
-# virtualenv in the first place!)
-if [[ ! "${POSARGS[*]}" =~ bootstrap-servers ]]; then
-  # Run a quick ad-hoc command to figure out the derived value of the
-  # 'virtualenv' variable, as it can differ by site.
-  virtualenv=$(get_defined_var virtualenv)
-  kolla_args+=(--extra ansible_python_interpreter="$virtualenv/bin/python")
-fi
+
 if [[ "${POSARGS[*]}" =~ post-deploy ]]; then
   cp -f "$DIR/playbooks/post_deploy.yml" "$ansible_path/chi_in_a_box_post_deploy.yml"
   kolla_args+=(--extra post_deploy_extra_play="chi_in_a_box_post_deploy.yml")
