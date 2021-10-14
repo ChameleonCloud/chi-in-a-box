@@ -3,8 +3,3 @@
   roles:
     - chameleon_mariadb
   tags: [ mariadb, all ]
-
-- hosts: gnocchi
-  roles:
-    - chameleon_gnocchi
-  tags: [ gnocchi, all ]

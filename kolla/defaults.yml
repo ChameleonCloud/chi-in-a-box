@@ -267,6 +267,7 @@ enable_ceph: no
 # Chameleon usage
 enable_usage_appliance_report: no
 enable_user_project_report: no
+enable_jupyter_report: "{{ enable_jupyterhub }}"
 
 # Container services (Zun and supporting)
 enable_etcd: no

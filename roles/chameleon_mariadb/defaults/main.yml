@@ -1,19 +1,15 @@
 ---
+backup_database_user: backup
+
 mariadb_backup_cron_script: /usr/local/sbin/mariadb-backup
 mariadb_backup_max_packet: 1M
 mariadb_backup_file_age: 29
-mariadb_backup_cron_name: mariadb-backup
 mariadb_backup_file: mariadb-backup
 mariadb_backup_retention: +31
 mariadb_backup_s3_conf_dir: /etc/awsconf
 mariadb_backup_origin_dir: "{{ backup_dir }}"
 mariadb_backup_log_key: chameleon-chi-db-backup
-mariadb_backup_cron_minute: '5'
-mariadb_backup_cron_hour: '23'
-mariadb_backup_cron_day: '*'
-mariadb_backup_cron_month: '*'
-mariadb_backup_cron_weekday: '*'
-mariadb_backup_user: backup
+
 mariadb_backup_s3_key_id:
-mariadb_backup_container_name: backup
 mariadb_backup_s3_endpoint:
+mariadb_backup_container_name: backup

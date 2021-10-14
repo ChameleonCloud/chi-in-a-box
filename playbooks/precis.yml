@@ -1,5 +1,5 @@
 ---
-- hosts: mysql
+- hosts: mariadb
 
 - hosts: rabbitmq
 

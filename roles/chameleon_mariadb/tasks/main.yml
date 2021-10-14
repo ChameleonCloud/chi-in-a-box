@@ -1,27 +1,36 @@
 ---
-- name: Include cron notification script
-  include_role:
-    name: chameleon_common
-    tasks_from: cron
-    defaults_from: cron
+- name: Create backup user
+  kolla_toolbox:
+    module_name: mysql_user
+    module_args:
+      login_host: "{{ database_address }}"
+      login_user: "root"
+      login_password: "{{ database_password }}"
+      name: "{{ backup_database_user }}"
+      host: "%"
+      password: "{{ backup_database_password }}"
+      priv: "*.*:SELECT,RELOAD,LOCK TABLES"
+  delegate_to: "{{ groups['control'][0] }}"
+  run_once: True
 
 - name: Configure mariadb backup script file
+  become: yes
   template:
     src: mariadb.j2
     mode: 0700
     dest: "{{ mariadb_backup_cron_script }}"
 
 - name: Create directory to mount to aws-cli docker container for copying backup files to container
+  become: yes
+  when: mariadb_backup_s3_key_id is defined
   file:
     path: /etc/awsconf
     state: directory
 
-- name: Add mariadb backup cron jobs.
-  cron:
-    name: "{{ mariadb_backup_cron_name }}"
-    minute: "{{ mariadb_backup_cron_minute }}"
-    hour: "{{ mariadb_backup_cron_hour }}"
-    day: "{{ mariadb_backup_cron_day }}"
-    month: "{{ mariadb_backup_cron_month }}"
-    weekday: "{{ mariadb_backup_cron_weekday }}"
-    job: "{{ mariadb_backup_cron_script }} && {{ cron_notification }} mariadb-backup"
+- name: Add mariadb backup job
+  include_role:
+    name: chameleon.periodic_task
+  vars:
+    task_name: "mariadb_backup"
+    task_command: "{{ mariadb_backup_cron_script }}"
+    task_calendar: daily
