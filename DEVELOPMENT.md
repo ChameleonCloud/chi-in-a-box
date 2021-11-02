@@ -44,3 +44,8 @@ cd vagrant
 ```
 
 **Note**: when working in the Vagrant VM, be careful of what you delete! The host checkout of `chi-in-a-box` is mounted inside the virtual machine, so if it is deleted, you may be losing work-in-progress.
+
+## Using prebuilt image
+
+- Need to update /etc/hosts
+- Need to replace some other host entries
