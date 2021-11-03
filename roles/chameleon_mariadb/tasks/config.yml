@@ -1,0 +1,37 @@
+---
+- name: Create backup user
+  when: enable_mariabackup|bool == false
+  kolla_toolbox:
+    module_name: mysql_user
+    module_args:
+      login_host: "{{ database_address }}"
+      login_user: "root"
+      login_password: "{{ database_password }}"
+      name: "{{ backup_database_user }}"
+      host: "%"
+      password: "{{ backup_database_password }}"
+      priv: "*.*:SELECT,RELOAD,LOCK TABLES"
+  delegate_to: "{{ groups['control'][0] }}"
+  run_once: True
+
+- name: Configure mariadb backup script file
+  become: yes
+  template:
+    src: mariadb.j2
+    mode: 0700
+    dest: "{{ mariadb_backup_cron_script }}"
+
+- name: Create directory to mount to aws-cli docker container for copying backup files to container
+  become: yes
+  when: mariadb_backup_s3_key_id is defined
+  file:
+    path: /etc/awsconf
+    state: directory
+
+- name: Add mariadb backup job
+  include_role:
+    name: chameleon.periodic_task
+  vars:
+    task_name: "mariadb_backup"
+    task_command: "{{ mariadb_backup_cron_script }}"
+    task_calendar: "00:00"
