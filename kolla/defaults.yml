@@ -174,15 +174,10 @@ enable_jupyterhub_external_frontend: "{{ enable_jupyterhub_external }}"
 
 # Neutron
 enable_neutron: yes
-enable_openvswitch: yes
-enable_neutron_fwaas: yes
-neutron_fwaas_version: v2
 # Enable notifications for Experiment Precis
 neutron_notification_topics:
   - name: notifications
     enabled: yes
-neutron_type_drivers: flat,vlan
-neutron_tenant_network_types: vlan
 # Only relevant when running in debug mode, but allows
 # debugging the NGS plugin.
 neutron_dev_plugins:
