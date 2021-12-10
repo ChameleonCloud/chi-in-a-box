@@ -17,7 +17,7 @@ clouds:
   {% if user.is_federated %}
     auth_type: v3oidcpassword
     auth:
-      auth_url: {{ auth_url }}
+      auth_url: {{ auth_url }}/v3
       username: "{{ user.username }}"
       protocol: openid
 {% endraw %}
