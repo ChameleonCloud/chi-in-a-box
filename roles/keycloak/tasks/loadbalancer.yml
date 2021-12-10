@@ -1,7 +1,0 @@
----
-- name: Configure haproxy for Keycloak
-  import_role:
-    name: haproxy-config
-  vars:
-    project_services: "{{ keycloak_services }}"
-  tags: always
