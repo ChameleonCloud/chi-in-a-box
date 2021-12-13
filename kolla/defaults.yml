@@ -39,9 +39,9 @@ enable_blazar_allocation_enforcement: no
 blazar_project_enforcement_id: charge_code
 # When to send lease notification email
 blazar_minutes_before_end_lease: 2880
-#blazar_default_max_lease_duration: {{ 60 * 60 * 24 * 7 }}
+#blazar_default_max_lease_duration: "{{ 60 * 60 * 24 * 7 }}"
 # NOTE(jason): temporary holiday 2-week policy
-blazar_default_max_lease_duration: {{ 60 * 60 * 24 * 14 }}
+blazar_default_max_lease_duration: "{{ 60 * 60 * 24 * 14 }}"
 blazar_default_reservation_extension_window: 172800
 blazar_usage_default_allocated: 20000.0
 # Redis currently binds on public IP, use public FQDN
