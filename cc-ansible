@@ -360,6 +360,16 @@ kolla_args+=(--passwords="$CONFIG_DIR/passwords.yml")
 kolla_args+=(--extra node_custom_config="$CONFIG_DIR/node_custom_config")
 kolla_args+=(--extra cc_ansible_site_dir="$CONFIG_DIR")
 
+# We set ansible ansible_python_interpreter to the virtualenv inside site-config, and override here during bootstrap.
+# Overriding at the CLI here applies to all hosts, including the deploy host.
+# Bootstrap-servers creates a virtualenv at $VIRTUALENV, on all hosts except the deploy host, requiring a special case.
+# The old behavior was to set it here if NOT bootstrapping, but that fails for the deploy-host case.
+
+if [[ "${POSARGS[*]}" =~ bootstrap-servers ]]; then
+  # Assume python3 can be found in $PATH, only used for creating the virtualenv.
+  kolla_args+=(--extra ansible_python_interpreter="python3")
+fi
+
 if [[ "${POSARGS[*]}" =~ post-deploy ]]; then
   cp -f "$DIR/playbooks/post_deploy.yml" "$ansible_path/chi_in_a_box_post_deploy.yml"
   kolla_args+=(--extra post_deploy_extra_play="chi_in_a_box_post_deploy.yml")
