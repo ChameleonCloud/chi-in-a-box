@@ -263,6 +263,8 @@ enable_swift_rgw: no
 # TODO: install ES curator
 enable_central_logging: yes
 es_heap_size: 8G
+# Includes log4j safeguard: https://github.com/elastic/elasticsearch/issues/81618
+es_java_opts: "-Xms{{ es_heap_size }} -Xmx{{ es_heap_size }} -Dlog4j2.formatMsgNoLookups=true"
 es_enable_painless_regex: no
 enable_grafana: no
 
