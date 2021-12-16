@@ -17,7 +17,9 @@ jobs:
     steps:
       - name: Checkout code base
         uses: actions/checkout@v2
-      - run: "./cc-ansible init"
+      - name: init site-config
+        run: "./cc-ansible init"
+        continue-on-error: true
       - run: "./cc-ansible bootstrap-servers"
       - run: "./cc-ansible prechecks"
       - run: "./cc-ansible pull"
