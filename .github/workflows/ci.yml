@@ -3,7 +3,11 @@ name: CI for chi-in-a-box script
 
 on:
   push:
+    branches:
+      - master
   pull_request:
+    branches:
+      - master
 
 jobs:
   test:
