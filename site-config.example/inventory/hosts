@@ -828,6 +828,9 @@ elasticsearch
 [prometheus-blackbox-exporter:children]
 monitoring
 
+[prometheus-ipmi-exporter:children]
+ironic-conductor
+
 [masakari-api:children]
 control
 
