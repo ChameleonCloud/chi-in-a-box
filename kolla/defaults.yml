@@ -10,7 +10,7 @@ kolla_install_type: source
 
 # Disable addition of tag for CentOS8
 # Remove this if pulling CentOS8 containers
-openstack_tag_suffix: ''
+openstack_tag_suffix: ""
 
 # Set according to https://docs.openstack.org/kolla-ansible/latest/user/virtual-environments.html#target-hosts
 # virtualenv specifies the path to the kolla virtualenv, while ansible_python_interpreter must be set explicitly
@@ -43,9 +43,7 @@ enable_blazar_allocation_enforcement: no
 blazar_project_enforcement_id: charge_code
 # When to send lease notification email
 blazar_minutes_before_end_lease: 2880
-#blazar_default_max_lease_duration: "{{ 60 * 60 * 24 * 7 }}"
-# NOTE(jason): temporary holiday 2-week policy
-blazar_default_max_lease_duration: "{{ 60 * 60 * 24 * 14 }}"
+blazar_default_max_lease_duration: "{{ 60 * 60 * 24 * 7 }}"
 blazar_default_reservation_extension_window: 172800
 blazar_usage_default_allocated: 20000.0
 # Redis currently binds on public IP, use public FQDN
@@ -250,7 +248,7 @@ redfish_monitor_openstack_password: "{{ keystone_admin_password }}"
 redfish_monitor_openstack_project_name: "{{ keystone_admin_project }}"
 
 # Swift
-rgw_port: 7480  # Override non-standard KA default of 6780
+rgw_port: 7480 # Override non-standard KA default of 6780
 # Disable complete rgw compatibility for now. If Ceph has these options set,
 # it is considered "compatible":
 #   rgw_swift_url_prefix = "/"
@@ -259,7 +257,7 @@ rgw_port: 7480  # Override non-standard KA default of 6780
 # This just means we expose swift on the /swift path prefix from Ceph, as it
 # is also supporting S3's API on a different path prefix.
 ceph_rgw_compatibility: no
-swift_keystone_user: ceph  # For legacy reasons, this is different than default
+swift_keystone_user: ceph # For legacy reasons, this is different than default
 enable_swift: no
 enable_swift_rgw: no
 
