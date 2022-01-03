@@ -19,7 +19,7 @@ jobs:
     name: test cc-ansible
     runs-on: ${{ matrix.runner }}
     env:
-      CC_ANSIBLE_SITE: /opt/site-config
+      CC_ANSIBLE_SITE: "${RUNNER_TEMP}/site-config"
     defaults:
       run:
         shell: bash
