@@ -26,6 +26,11 @@ jobs:
         uses: actions/checkout@v2
         with:
           submodules: true
+      - name: Install virtualenv and jq
+        run: |
+          sudo apt-get update && sudo apt-get install -f -y \
+          jq \
+          virtualenv
       - name: set site-config path
         run: echo "CC_ANSIBLE_SITE=${{ runner.temp }}/site-config" >> $GITHUB_ENV
       - name: init site-config
