@@ -49,4 +49,4 @@ We hope the above list continues to shrink ;)
 
 ## Getting started
 
-Please refer to the repo [Wiki](https://github.com/ChameleonCloud/ansible-playbooks/wiki) for detailed information on what CHI-in-a-Box is, how it might enable science at your institution, how it works, and how to get started.
+Please refer to the repo [Wiki](https://github.com/ChameleonCloud/chi-in-a-box/wiki) for detailed information on what CHI-in-a-Box is, how it might enable science at your institution, how it works, and how to get started.
