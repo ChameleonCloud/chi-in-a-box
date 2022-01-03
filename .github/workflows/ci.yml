@@ -26,6 +26,8 @@ jobs:
     steps:
       - name: Checkout code base
         uses: actions/checkout@v2
+        with:
+          submodules: true
       - name: init site-config
         run: "./cc-ansible init"
       - run: "./cc-ansible bootstrap-servers"
