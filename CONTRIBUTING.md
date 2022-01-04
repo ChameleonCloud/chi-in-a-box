@@ -1,7 +1,5 @@
 # Contributing to CHI-in-a-box
 
-Thank you! Read on.
-
 ## Code of Conduct
 
 This project and everyone participating in it is governed by the [Code of Conduct](CODE_OF_CONDUCT.md).
