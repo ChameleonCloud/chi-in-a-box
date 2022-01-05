@@ -17,7 +17,7 @@ Before you begin, ensure you have the following, and note which will be used in 
 * [ ] A name for your site
   * [ ] Friendly name, such as `CHI@SITE`: `openstack_region_name`
   * [ ] A short name, such as `site` : `chameleon_site_name`
-* [ ] one or more  [Control Nodes](../../fundamentals/definitions/hardware-requirements.md)
+* [ ] one or more [Control Nodes](broken-reference)
   * [ ] The control node has a linux bridge named `public`: `kolla_external_vip_interface`
     * [ ] bridged to a physical interface
     * [ ] bridged to one half of a veth-pair
@@ -26,14 +26,14 @@ Before you begin, ensure you have the following, and note which will be used in 
       * [ ] Public DNS name for this address: `kolla_external_fqdn`
       * [ ] TLS Certificate for this address and name
     * [ ] in this subnet, reserved (not bound), one public IP per baremetal node and/or isolated network, minimum 1, 20+ recommended
-  * [ ] The control node has a linux bridge  named `internal`: `network_interface`
+  * [ ] The control node has a linux bridge named `internal`: `network_interface`
     * [ ] bridged to a physical interface with a vlan trunk to the dataplane switch
     * [ ] bridged to one half of a veth-pair
     * [ ] With an IP address assigned from a private subnet, referred to as the `internal_subnet`
     * [ ] with a spare (not bound) ip address in `internal_subnet` for the HAProxy VIP: `kolla_internal_vip_address`
-* [ ] **at least** one [Baremetal Node](../../fundamentals/definitions/baremetal-nodes.md)
+* [ ] **at least** one [Baremetal Node](broken-reference)
   * [ ] the out of band interface must be accessible by the controller node
-* [ ] [a managed switch with vlan capability](../../fundamentals/definitions/dataplane-switches.md)
+* [ ] [a managed switch with vlan capability](../../before-you-begin/hardware-requirements/dataplane-switches.md)
   * [ ] Reserved VLANs: 2 minimum, 10+ recommended
     * [ ] Ironic Provisioning
     * [ ] Shared neutron network

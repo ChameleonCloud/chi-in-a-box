@@ -1,14 +1,6 @@
 # Baremetal QuickStart
 
-## Configure networking on the controller node
-
-If you are only using two interfaces, you must do some additional configuration to avoid losing access during install (and other, hard to debug issues)
-
-{% content-ref url="hostnetworking.md" %}
-[hostnetworking.md](hostnetworking.md)
-{% endcontent-ref %}
-
-## Install Dependencies on the _controller node_
+### Install Dependencies on the controller __ node
 
 Commands in this section will use the system package manager, and run with root privileges. It is recommended to use python virtual environments to install chi-in-a-box and kolla-ansible.
 
@@ -18,7 +10,7 @@ Commands in this section will use the system package manager, and run with root 
 
 ```
 sudo apt update && sudo apt install -f -y \
-    python3 python3-virtuaenv virtualenv \
+    python3 python3-virtualenv virtualenv \
     jq
 ```
 
@@ -46,7 +38,7 @@ update-alternatives --install /usr/bin/python python /usr/bin/python3 1
 {% endtab %}
 {% endtabs %}
 
-## Initialize the site configuration
+### Initialize the site configuration
 
 1.  Check out this repository:
 
@@ -54,7 +46,7 @@ update-alternatives --install /usr/bin/python python /usr/bin/python3 1
     git clone https://github.com/ChameleonCloud/chi-in-a-box.git
     cd chi-in-a-box
     ```
-2.  Initialize your [site configuration ](../../reference/the-site-configuration/)by running `./cc-ansible init`. This will place a default site configuration into `../site-config`. You can specify a different location by running
+2.  Initialize your [site configuration ](../../before-you-begin/the-site-configuration/)by running `./cc-ansible init`. This will place a default site configuration into `../site-config`. You can specify a different location by running
 
     ```bash
      ./cc-ansible --site ../site-config init
@@ -80,9 +72,17 @@ update-alternatives --install /usr/bin/python python /usr/bin/python3 1
 
     To override, use `./cc-ansible --site <path/to/site> <command>`
 
-## Site-Specific Configuration
+### Configure networking on the controller node
 
-### `${CC_ANSIBLE_SITE}/inventory/hosts`
+If you are only using two interfaces, you must do some additional configuration to avoid losing access during install (and other, hard to debug issues)
+
+{% content-ref url="hostnetworking.md" %}
+[hostnetworking.md](hostnetworking.md)
+{% endcontent-ref %}
+
+### Site-Specific Configuration
+
+#### `${CC_ANSIBLE_SITE}/inventory/hosts`
 
 *   Edit the [Ansible inventory](https://docs.ansible.com/ansible/latest/user\_guide/intro\_inventory.html) of your site configuration to include the hostname of the node you are installing to. It should look like this:
 
@@ -110,7 +110,7 @@ update-alternatives --install /usr/bin/python python /usr/bin/python3 1
 
     > **Note** If you used `./cc-ansible init` this may have been done automatically for you.
 
-### `${CC_ANSIBLE_SITE}/inventory/host_vars/<hostname>`
+#### `${CC_ANSIBLE_SITE}/inventory/host_vars/<hostname>`
 
 * Update the "[host\_vars](https://docs.ansible.com/ansible/latest/user\_guide/intro\_inventory.html#organizing-host-and-group-variables)" file for your host to include the correct names of the network interfaces you want to use.
 * **network\_interface** should be set to the name of the private interface (or bridge if only two interfaces) you chose
@@ -124,7 +124,7 @@ update-alternatives --install /usr/bin/python python /usr/bin/python3 1
     kolla_external_vip_interface: eno2
     ```
 
-### `${CC_ANSIBLE_SITE}/defaults.yml`
+#### `${CC_ANSIBLE_SITE}/defaults.yml`
 
 1.  The following keys are mandatory for the install to complete. Set the values as appropriate to your setup.
 
@@ -137,7 +137,7 @@ update-alternatives --install /usr/bin/python python /usr/bin/python3 1
     ```
 2.  Provide a certificate matching the hostname, which must resolve to the chosen public IP.
 
-    The certificate must be placed in  `${CC_ANSIBLE_SITE}/certificates/haproxy.pem`
+    The certificate must be placed in `${CC_ANSIBLE_SITE}/certificates/haproxy.pem`
 
     An HAProxy PEM file is a concatenation of the certificate, any intermediate certificates in the chain, and then the private key.
 
@@ -175,7 +175,7 @@ update-alternatives --install /usr/bin/python python /usr/bin/python3 1
     ironic_dnsmasq_dhcp_range: 10.51.0.0/24
     ```
 
-## Bootstrap the _control node_
+### Bootstrap the controller node
 
 1.  Bootstrap your controller node by running `./cc-ansible bootstrap-servers` With the default configuration, it would be:
 
@@ -201,7 +201,7 @@ update-alternatives --install /usr/bin/python python /usr/bin/python3 1
     #cc adm wheel systemd-journal docker
     ```
 
-## Verify Configuration with Pre-Checks
+### Verify Configuration with Pre-Checks
 
 *   kolla-ansible has a set of roles under `prechecks` to ensure that the system configuration is consistent and avoids known edge cases. Run these via the command
 
@@ -211,7 +211,7 @@ update-alternatives --install /usr/bin/python python /usr/bin/python3 1
 * For example, if the subnets configured in `defaults.yml` do not match your interfaces, an error will be thrown here.
 * Similarly, kolla-ansible is not compatible with the service `nscd`, and will require that it be disabled before succeeding.
 
-## Pull container images
+### Pull container images
 
 All Chameleon services are packaged as Docker containers and they need to be downloaded to your host machine(s) as a first step. This will take a while depending on your connection.
 
@@ -227,7 +227,7 @@ All Chameleon services are packaged as Docker containers and they need to be dow
     ./cc-ansible pull
     ```
 
-## Deploy container images
+### Deploy container images
 
 Once the images are pulled, you can run the "deploy" phase, which sets up all the configuration for all the services and deploys them piece by piece.
 
@@ -237,7 +237,7 @@ Once the images are pulled, you can run the "deploy" phase, which sets up all th
 
 > **Note**: if you encounter errors and need to re-run the deploy step, which is expensive, you can skip parts you know have already succeeded. You can watch the Ansible output to see which "role" (service) it is updating. If you know a certain role has completed successfully, you can try skipping it on the next run with the `--skip-tags` option, e.g. `--skip-tags keystone,nova` to skip the Keystone and Nova provisioning. You can persist these by uncommenting their lines in `kolla-skip-tags`
 
-### 6. Run post-deployment configuration
+### Run post-deployment configuration
 
 Once the deployment is complete, there should be a more or less functional OpenStack deployment that you can log in to. The admin credentials can be seen using `./cc-ansible view_passwords` under `keystone`
 
@@ -255,51 +255,78 @@ All of these will be provisioned by running the post-deploy script:
 ./cc-ansible post-deploy
 ```
 
-### 7. Enroll bare metal nodes
+### Install the Openstack Client
 
-To enroll your nodes, we have provided an enrollment script you can run against a configuration of nodes. To use this, first prepare some information about your nodes. You will need to pick a name for the node, know its (existing) IPMI address on the network (and be able to connect to this from the controller node already), its (existing) IPMI password, the MAC address for its NIC, the name of the switch it is connected to (which you have defined in `switch_configs` in your `defaults.yml` file), and which switch port it is connected to. An example is:
+Run the following commands:
 
-```ini
-[node01]
-ipmi_username = root
-ipmi_password = hopefully_not_default
-ipmi_address = 10.10.10.1
-# Optional, defaults to this value.
-ipmi_port = 623
-# Arbitrary terminal port; this is used to plumb a socat process to allow
-# reading and writing to a virtual console. It is just important that it does
-# not conflict with another node or host process.
-ipmi_terminal_port = 30133
-[node01.ports.eno1]
-switch_name = LeafSwitch01
-switch_port_id = Te 1/10/1
-mac_address = 00:00:de:ad:be:ef
+```
+# run this in your home directory
+cd ~
+# create a new virtualenv, and use it
+python3 -m venv .venv
+source .venv/bin/activate
 
-# .. repeat for more nodes.
+# update to a recent version of pip
+pip install --upgrade pip
+
+#install the openstack client libraries
+pip install python-openstackclient python-doniclient
 ```
 
-Once you have this file (let's call it `nodes.conf`), you can kick off the bootstrap script:
+### Set up admin auth
 
-```bash
-chameleon node enroll --node-conf nodes.conf
+`post-deploy` will create a file named `admin-openrc.sh` in your site-config directory. This file shouldn't be checked into source control, as it contains secrets.
+
+To use it, run `source $CC_ANSIBLE_SITE/admin-openrc.sh`
+
+This will set a variety of environment variables, all prefixed with `OS_`
+
+Verify that it works by running `openstack token issue`
+
+### Add federated users to admin group (optional)
+
+It's recommended to use individual user accounts to log in, rather than the built-in superadmin account. You can users to the admin project as follows:
+
+1. Get their UUID from `openstack user show <username>` or look for them in `openstack user list`. They will need to have logged into the site at least once to appear here.
+2. Add them to the openstack project. `openstack role add --user <user_uuid> --project openstack admin`
+
+
+
+### Enroll Baremetal nodes
+
+Create a json file that looks like the following, with one json object per node to enroll. Then, add the nodes by running `openstack hardware import --file <json_file>`
+
+
+
+```
+[
+  {
+    "name": "<node_name_1>",
+    "hardware_type": "baremetal",
+    "properties": {
+      "cpu_arch": "x86_64",
+      "baremetal_capabilities": {"boot_mode": "<bios or uefi>"},
+      "node_type": "<class_for_node>",
+      "interfaces": [
+         { "name": "<eth0>", "mac_address": "<ff:ff:ff:ff:ff:ff>" },
+         { "name": "<eth1>", "mac_address": "<aa:aa:aa:aa:aa:aa>" },
+      ],
+      "ipmi_username": "<USERNAME>",
+      "ipmi_password": "<PASSWORD>",
+      "ipmi_terminal_port": <unique_port_number>,
+      "management_address": "<mgmt_ip_addr>",
+      "baremetal_deploy_kernel_image": "<glance_uuid>",
+      "baremetal_deploy_ramdisk_image": "<glance_uuid>"
+    }
+  },
+  {
+     #node 2 info...
+  }
+]
 ```
 
-This script will enroll each node into Ironic and register its network port(s) (so Neutron can hook it up to networks later), as well as add the node to Blazar to make it reservable.
+Refer to the hardware management page for details.
 
-Once all of this has completed successfully, you should have a working setup capable of performing baremetal provisioning.
-
-> **Note**: This enrollment script is designed to be run multiple times in case you encounter failures; it should be safe to re-run.
-
-## Troubleshooting
-
-### Speeding up repeated runs
-
-Rerunning the install can take a long time. You can speed this up by uncommenting lines in the file `kolla-skip-tags`. Each line corresponds to a tag associated with an ansible task. For example, if the script keeps failing at configuring neutron, then uncomment the lines prior to neutron. Ansible will run the common setup tasks, then skip to the first tag that isn't uncommented.
-
-### Finding out what's failing
-
-Many times a failure is caused by a typo or missing line in defaults.yml or your host configuration. Run `./cc-ansible deploy` with multiple `-v` flags to get line-by-line errors.
-
-For example, on centos8, /etc/modules-load.d may not exist, and you'll get an error like `failed: [shermanm-chibox] (item=ip_vs) => {"ansible_loop_var": "item", "changed": false, "item": {"name": "ip_vs"}, "msg": "Destination /etc/modules does not exist !", "rc": 257}`
-
-running it with `-vvv` will show that it first checked for `/etc/modules-load.d` which also didn't exist.
+{% content-ref url="../../Hardware-management.md" %}
+[Hardware-management.md](../../Hardware-management.md)
+{% endcontent-ref %}
