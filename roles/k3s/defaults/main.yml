@@ -1,0 +1,25 @@
+---
+k3s_version: v1.22.5+k3s1
+k3s_port: 6443
+k3s_server_location: /var/lib/rancher/k3s
+k3s_conf_location: /etc/rancher/k3s
+k3s_systemd_dir: /etc/systemd/system
+k3s_server_ip: "{{ kolla_external_vip_address }}"
+k3s_extra_server_args: ""
+
+k3s_cluster_cidr: "192.168.100.0/22"
+k3s_cluster_node_blocksize: 26
+
+k3s_enable_calico: yes
+
+k3s_services:
+  k3s_server:
+    group: k3s
+    enabled: "{{ enable_k3s }}"
+    haproxy:
+      k3s_server_external:
+        enabled: true
+        external: true
+        mode: "http"
+        port: "{{ k3s_port }}"
+        listen_port: "{{ k3s_port }}"

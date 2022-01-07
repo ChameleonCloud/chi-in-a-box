@@ -1,0 +1,46 @@
+---
+- name: Download Calico operator manifest
+  ansible.builtin.get_url:
+    url: https://docs.projectcalico.org/manifests/tigera-operator.yaml
+    dest: "{{ k3s_conf_location }}/calico-tigera-operator.yaml"
+    force: yes
+    owner: root
+    group: root
+    mode: 0755
+  register: calico_tigera_operator
+
+- name: Create Calico operator
+  ansible.builtin.command: >-
+    kubectl create -f {{ calico_tigera_operator.dest }}
+  when:
+    - calico_tigera_operator.changed
+
+- name: Generate Calico custom resources
+  ansible.builtin.template:
+    src: "calico-custom-resources.yaml.j2"
+    dest: "{{ k3s_conf_location }}/calico-custom-resources.yaml"
+    owner: root
+    group: root
+    mode: 0755
+  register: calico_custom_resources
+
+- name: Create Calico custom resources
+  ansible.builtin.command: >-
+    kubectl create -f {{ calico_custom_resources.dest }}
+  when:
+    - calico_custom_resources.changed
+
+- name: Generate Calico global network policy
+  ansible.builtin.copy:
+    src: "calico-global-networkpolicy-default-deny.yaml"
+    dest: "{{ k3s_conf_location }}/calico-global-networkpolicy-default-deny.yaml"
+    owner: root
+    group: root
+    mode: 0755
+  register: calico_global_networkpolicy
+
+- name: Apply Calico global network policy
+  ansible.builtin.command: >-
+    kubectl apply -f {{ calico_global_networkpolicy.dest }}
+  when:
+    - calico_global_networkpolicy.changed
