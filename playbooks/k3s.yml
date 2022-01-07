@@ -1,0 +1,5 @@
+---
+- hosts: k3s
+  roles:
+    - name: k3s
+      when: enable_k3s | bool
