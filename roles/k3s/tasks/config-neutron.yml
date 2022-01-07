@@ -1,0 +1,36 @@
+---
+- name: Create calico network
+  kolla_toolbox:
+    module_name: os_network
+    module_args:
+      auth: "{{ openstack_auth }}"
+      name: caliconet
+      provider_network_type: flat
+      provider_physical_network: calico
+      shared: yes
+      state: present
+  run_once: true
+  become: yes
+
+- name: Create calico subnet
+  kolla_toolbox:
+    module_name: os_subnet
+    module_args:
+      auth: "{{ openstack_auth }}"
+      network_name: caliconet
+      name: caliconet-subnet
+      cidr: "{{ k3s_cluster_cidr }}"
+      enable_dhcp: no
+  register: sharednet_subnets
+  become: yes
+
+- name: Connect subnet to existing NAT router
+  kolla_toolbox:
+    module_name: os_router
+    module_args:
+      auth: "{{ openstack_auth }}"
+      name: sharednet-router
+      interfaces:
+        - caliconet-subnet
+  run_once: true
+  become: yes
