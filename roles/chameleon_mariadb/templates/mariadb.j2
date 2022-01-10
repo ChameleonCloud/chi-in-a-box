@@ -9,13 +9,17 @@
 # FLUSH PRIVILEGES;
 #
 
+ROTATE="{{ mariadb_backup_file_age }}"
+
+set -o pipefail
+
+{% if not enable_mariabackup %}
 ##### START CONFIG ###################################################
 
 USER="{{ backup_database_user }}"
 PASS="{{ backup_database_password }}"
 MAX_ALLOWED_PACKET="{{ mariadb_backup_max_packet }}"
 DIR="{{ mariadb_backup_origin_dir }}"
-ROTATE="{{ mariadb_backup_file_age }}"
 
 # Create temporary mysql cnf file.
 TMPFILE=`mktemp /tmp/backup.XXXXXX` || exit 1
@@ -32,8 +36,6 @@ ADDITIONAL_OPTIONS="--ignore-table=mysql.event"
 
 ##### STOP CONFIG ####################################################
 
-set -o pipefail
-
 backup_file=${DIR}/${PREFIX}`date +%Y%m%d-%H%M%S`.sql.bz2
 
 cleanup() {
@@ -41,12 +43,27 @@ cleanup() {
   # Rotate backups
   find "${DIR}/" -maxdepth 1 -type f -name "${PREFIX}*.sql*" -mtime +${ROTATE} -print0 | xargs -0 -r rm -f
 }
-trap cleanup EXIT
 
 mkdir -p $DIR
 mysqldump --defaults-extra-file="$TMPFILE" --opt --flush-logs --single-transaction \
  ${ADDITIONAL_OPTIONS} \
  --all-databases | bzcat -zc > "$backup_file"
+{% endif %}
+
+{% if enable_mariabackup %}
+
+PREFIX=mysqlbackup-
+
+cleanup() {
+  # Rotate backups  
+  docker run --rm -v mariadb_backup:/backup "{{ kolla_toolbox_image_full }}" \
+  find /backup -maxdepth 1 -type f -name "${PREFIX}*" -mtime +${ROTATE} -print0 \
+  | xargs -0 -r -rm -f
+}
+
+{% endif %}
+
+trap cleanup EXIT
 
 {% if mariadb_backup_s3_endpoint is defined and mariadb_backup_s3_key_id is defined and mariadb_backup_s3_key is defined %}
 # Additionally copy backup to S3 bucket

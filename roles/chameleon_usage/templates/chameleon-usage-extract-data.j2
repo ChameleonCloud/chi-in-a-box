@@ -4,4 +4,10 @@ docker run --rm --net=host \
     -v "{{ backup_dir }}:{{ backup_dir }}" \
     -v "{{ chameleon_usage_config_dir }}/my.cnf:/etc/mysql/my.cnf" \
     {{ chameleon_usage_docker_image }} \
-    {{ usage_extract_command }} --site {{chameleon_site_name}} --backup-location {{ backup_dir }} --mysql-conf /etc/mysql/my.cnf 2>&1
+    {{ usage_extract_command }} --site {{chameleon_site_name}} --backup-location {{ backup_dir }} \
+    {% if enable_mariabackup %}
+    --backup-type mariabackup \
+    {% else %}
+    --backup-type mysqldump \
+    {% endif %}
+    --mysql-conf /etc/mysql/my.cnf 2>&1
