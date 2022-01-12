@@ -3,6 +3,7 @@
 docker run --rm --net=host \
     -v "{{ backup_dir }}:{{ backup_dir }}" \
     -v "{{ chameleon_usage_config_dir }}/my.cnf:/etc/mysql/my.cnf" \
+    -v "/var/run/docker.sock:/var/run/docker.sock" \
     {{ chameleon_usage_docker_image }} \
     {{ usage_extract_command }} --site {{chameleon_site_name}} --backup-location {{ backup_dir }} \
     {% if enable_mariabackup %}

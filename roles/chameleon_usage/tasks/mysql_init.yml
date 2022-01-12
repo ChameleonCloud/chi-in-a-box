@@ -17,14 +17,15 @@
   delegate_to: "{{ groups['control'][0] }}"
   vars:
     all_privileges:
-      - 'blazar_backup\_%.*:CREATE,DROP,SELECT,INSERT'
-      - 'keystone_backup\_%.*:CREATE,DROP,SELECT,INSERT'
-      - 'nova_backup\_%.*:CREATE,DROP,SELECT,INSERT'
-      - 'ironic_backup\_%.*:CREATE,DROP,SELECT,INSERT'
+      - 'blazar_backup\_%.*:ALTER,CREATE,DROP,SELECT,INSERT'
+      - 'keystone_backup\_%.*:ALTER,CREATE,DROP,SELECT,INSERT'
+      - 'nova_backup\_%.*:ALTER,CREATE,DROP,SELECT,INSERT'
+      - 'ironic_backup\_%.*:ALTER,CREATE,DROP,SELECT,INSERT'
       - 'chameleon_usage.*:CREATE,SELECT,INSERT,UPDATE,DELETE'
       - 'blazar.*:SELECT'
       - 'ironic.*:SELECT'
       - 'keystone.*:SELECT'
+      - 'nova.*:SELECT'
 
 - name: Initialize chameleon_usage database
   shell: |
