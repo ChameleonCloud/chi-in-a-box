@@ -68,7 +68,7 @@
           destination_type: queue
           routing_key: "notifications.*"
           state: present
-        loop: "{{ precis_rabbitmq_listener_bindings }}"
+      loop: "{{ precis_rabbitmq_listener_bindings }}"
   tags:
     - rabbitmq
 
