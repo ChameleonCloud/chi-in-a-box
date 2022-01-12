@@ -60,7 +60,10 @@ blazar_database_user: blazar
 blazar_database_port: "{{ database_port }}"
 blazar_email_relay: "127.0.0.1"
 blazar_api_allocation_extras: user_name
+blazar_host_enable_default_resources: no
 blazar_host_default_resource_properties: '["=", "\$node_type", "compute_skylake"]'
+blazar_network_enable_default_resources: no
+blazar_network_retry_without_default_resources: no
 blazar_network_default_resource_properties: '["=", "\$stitch_provider", "none"]'
 
 # Cinder
