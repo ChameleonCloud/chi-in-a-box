@@ -5,4 +5,5 @@
 
 - hosts: precis
   roles:
-    - precis
+    - role: precis
+      when: enable_precis | bool
