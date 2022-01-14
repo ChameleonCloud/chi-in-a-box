@@ -295,9 +295,18 @@
   tags:
     - precis
 
+- hosts: deployment
+  roles:
+    - role: chameleon_mariadb
+      when: enable_mariabackup | bool
+      vars:
+          action: 'deployment'
+
 - hosts: mariadb
   roles:
-    - chameleon_mariadb
+    - role: chameleon_mariadb
+      vars:
+          action: 'config'
   become: yes
   become_user: root
   tags:
