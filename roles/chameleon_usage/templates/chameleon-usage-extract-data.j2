@@ -6,7 +6,7 @@ docker run --rm --net=host \
     -v "/var/run/docker.sock:/var/run/docker.sock" \
     {{ chameleon_usage_docker_image }} \
     {{ usage_extract_command }} --site {{chameleon_site_name}} --backup-location {{ backup_dir }} \
-    {% if enable_mariabackup %}
+    {% if enable_mariabackup|bool == true %}
     --backup-type mariabackup \
     {% else %}
     --backup-type mysqldump \

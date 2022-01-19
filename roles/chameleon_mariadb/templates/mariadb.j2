@@ -13,7 +13,7 @@ ROTATE="{{ mariadb_backup_file_age }}"
 
 set -o pipefail
 
-{% if not enable_mariabackup %}
+{% if enable_mariabackup|bool == false %}
 ##### START CONFIG ###################################################
 
 USER="{{ backup_database_user }}"
@@ -50,7 +50,7 @@ mysqldump --defaults-extra-file="$TMPFILE" --opt --flush-logs --single-transacti
  --all-databases | bzcat -zc > "$backup_file"
 {% endif %}
 
-{% if enable_mariabackup %}
+{% if enable_mariabackup|bool == true %}
 
 PREFIX=mysqlbackup-
 
