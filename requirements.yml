@@ -1,4 +1,7 @@
 ---
+collections:
+  - name: ansible.posix
+
 roles:
   - name: chameleon.docker_service
     version: master
