@@ -12,6 +12,9 @@ kolla_install_type: source
 # Remove this if pulling CentOS8 containers
 openstack_tag_suffix: ""
 
+# Write admin openRC to the site configuration
+admin_openrc_directory: "{{ cc_ansible_site_dir }}"
+
 # Set according to https://docs.openstack.org/kolla-ansible/latest/user/virtual-environments.html#target-hosts
 # virtualenv specifies the path to the kolla virtualenv, while ansible_python_interpreter must be set explicitly
 # since it cannot be templated. This is overridden during bootstrap by cc-ansible.
