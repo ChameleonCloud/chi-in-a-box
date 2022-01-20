@@ -216,7 +216,7 @@
         name: "{{ (item.sharednet | default({})).network_name | default(default_sharednet_name) }}"
         provider_network_type: "{{ item.network_type | default('vlan') }}"
         # Use the first on-demand VLAN for this network.
-        provider_segmentation_id: "{{ (item.on_demand_vlan_ranges[0].split(':')[0] | int) + 1 }}"
+        provider_segmentation_id: "{{ (item.on_demand_vlan_ranges[0].split(':')[0] | int) + 1 | default(omit) }}"
         provider_physical_network: "{{ '' if (item.network_type | default('vlan')) == 'vxlan' else item.name }}"
         shared: yes
         state: present
@@ -227,8 +227,6 @@
     vars:
       default_sharednet_name: sharednet1
     when:
-      - item.on_demand_vlan_ranges is defined
-      - item.on_demand_vlan_ranges | length > 0
       - item.sharednet.enabled | default(true) | bool
   - name: Create shared network subnet(s)
     kolla_toolbox:
@@ -248,8 +246,6 @@
       default_sharednet_name: sharednet1
       default_sharednet_cidr: 10.0.0.1/24
     when:
-      - item.on_demand_vlan_ranges is defined
-      - item.on_demand_vlan_ranges | length > 0
       - item.sharednet.enabled | default(true) | bool
     register: sharednet_subnets
   - name: Create NAT router for shared network(s).
