@@ -1,17 +1,21 @@
 ---
+- ansible.builtin.file:
+    name: "{{ k3s_conf_location }}/calico"
+    state: directory
+
 - name: Download Calico release
   ansible.builtin.get_url:
     url: "https://github.com/projectcalico/calico/releases/download/{{ k3s_calico_version }}/release-{{ k3s_calico_version }}.tgz"
-    dest: "{{ k3s_conf_location }}/calico-{{ k3s_calico_version }}.tgz"
+    dest: "{{ k3s_conf_location }}/calico/release-{{ k3s_calico_version }}.tgz"
     owner: root
     group: root
     mode: 0755
 
 - name: Unpack Calico release
   ansible.builtin.unarchive:
-    src: "{{ k3s_conf_location }}/calico-{{ k3s_calico_version }}.tgz"
-    dest: "{{ k3s_conf_location }}/calico-{{ k3s_calico_version }}"
-    creates: "{{ k3s_conf_location }}/calico-{{ k3s_calico_version }}"
+    src: "{{ k3s_conf_location }}/calico/release-{{ k3s_calico_version }}.tgz"
+    dest: "{{ k3s_conf_location }}/calico/"
+    creates: "{{ k3s_conf_location }}/calico/release-{{ k3s_calico_version }}"
   register: calico_release
 
 - name: Create Calico operator
