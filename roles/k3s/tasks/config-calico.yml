@@ -1,19 +1,33 @@
 ---
-- name: Download Calico operator manifest
+- name: Download Calico release
   ansible.builtin.get_url:
-    url: https://docs.projectcalico.org/manifests/tigera-operator.yaml
-    dest: "{{ k3s_conf_location }}/calico-tigera-operator.yaml"
-    force: yes
+    url: "https://github.com/projectcalico/calico/releases/download/{{ k3s_calico_version }}/release-{{ k3s_calico_version }}.tgz"
+    dest: "{{ k3s_conf_location }}/calico-{{ k3s_calico_version }}.tgz"
     owner: root
     group: root
     mode: 0755
-  register: calico_tigera_operator
+
+- name: Unpack Calico release
+  ansible.builtin.unarchive:
+    src: "{{ k3s_conf_location }}/calico-{{ k3s_calico_version }}.tgz"
+    dest: "{{ k3s_conf_location }}/calico-{{ k3s_calico_version }}"
+    creates: "{{ k3s_conf_location }}/calico-{{ k3s_calico_version }}"
+  register: calico_release
 
 - name: Create Calico operator
   ansible.builtin.command: >-
-    kubectl create -f {{ calico_tigera_operator.dest }}
+    kubectl apply -f {{ calico_release.dest }}/manifests/tigera-operator.yaml
   when:
-    - calico_tigera_operator.changed
+    - calico_release.changed
+
+- name: Install calicoctl
+  ansible.builtin.copy:
+    # TODO: use facts to optionally install ARM or otherwise
+    src: "{{ calico_release.dest }}/bin/calicoctl/calicoctl-linux-amd64"
+    remote_src: yes
+    dest: /usr/local/bin/kubectl-calico
+  when:
+    - calico_release.changed
 
 - name: Generate Calico custom resources
   ansible.builtin.template:
