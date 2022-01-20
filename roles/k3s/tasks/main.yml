@@ -99,9 +99,9 @@
     mode: "u=rw,g=,o="
 
 - name: Update cluster server address
-  ansible.builtin.command: >-
-    k3s kubectl config set-cluster default \
-      --server=https://{{ k3s_server_ip }}:{{ k3s_port }} \
+  ansible.builtin.command: |
+    k3s kubectl config set-cluster default
+      --server=https://{{ k3s_server_ip }}:{{ k3s_port }}
       --kubeconfig ~{{ ansible_user }}/.kube/config
   changed_when: true
 
