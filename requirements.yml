@@ -1,7 +1,11 @@
 ---
-- src: chameleon.docker_service
+collections:
+  - name: ansible.posix
 
-- src: chameleon.periodic_task
+roles:
+  - src: chameleon.docker_service
 
-- src: michaelrigart.interfaces
-  version: v1.11.1
+  - src: chameleon.periodic_task
+
+  - src: michaelrigart.interfaces
+    version: v1.11.1
