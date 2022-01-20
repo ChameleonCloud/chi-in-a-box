@@ -1,18 +1,18 @@
 ---
-- name: Enable IPv4 forwarding
-  ansible.posix.sysctl:
-    name: net.ipv4.ip_forward
-    value: "1"
-    state: present
-    reload: yes
+# - name: Enable IPv4 forwarding
+#   ansible.posix.sysctl:
+#     name: net.ipv4.ip_forward
+#     value: "1"
+#     state: present
+#     reload: yes
 
-- name: Enable IPv6 forwarding
-  ansible.posix.sysctl:
-    name: net.ipv6.conf.all.forwarding
-    value: "1"
-    state: present
-    reload: yes
-  when: ansible_all_ipv6_addresses
+# - name: Enable IPv6 forwarding
+#   ansible.posix.sysctl:
+#     name: net.ipv6.conf.all.forwarding
+#     value: "1"
+#     state: present
+#     reload: yes
+#   when: ansible_all_ipv6_addresses
 
 - name: Download k3s binary
   ansible.builtin.get_url:
