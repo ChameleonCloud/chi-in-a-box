@@ -1,6 +1,6 @@
 ---
-collections:
-  - name: ansible.posix
+# collections:
+#   - name: ansible.posix
 
 roles:
   - src: chameleon.docker_service
