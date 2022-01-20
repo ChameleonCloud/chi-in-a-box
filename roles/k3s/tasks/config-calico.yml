@@ -44,7 +44,7 @@
 
 - name: Create Calico custom resources
   command: >-
-    kubectl create -f {{ calico_custom_resources.dest }}
+    kubectl apply -f {{ calico_custom_resources.dest }}
   when:
     - calico_custom_resources.changed
 
