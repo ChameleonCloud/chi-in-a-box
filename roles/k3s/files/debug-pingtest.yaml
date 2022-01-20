@@ -29,3 +29,22 @@ spec:
         - name: pingtest
           image: busybox
           command: ["sleep", "infinity"]
+
+---
+# Network policy to allow traffic b/w pods on same namespace
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-allow-local
+spec:
+  podSelector: {}
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: default
+  egress:
+    - {}
+  policyTypes:
+    - Ingress
+    - Egress

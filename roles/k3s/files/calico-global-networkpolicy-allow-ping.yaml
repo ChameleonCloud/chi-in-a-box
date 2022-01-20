@@ -1,0 +1,22 @@
+# https://projectcalico.docs.tigera.io/security/icmp-ping#allow-icmp-ping-all-workloads-and-host-endpoints
+apiVersion: projectcalico.org/v3
+kind: GlobalNetworkPolicy
+metadata:
+  name: allow-ping-policy
+spec:
+  selector: all()
+  types:
+    - Ingress
+  ingress:
+    - action: Allow
+      protocol: ICMP
+      source:
+        selector: all()
+      icmp:
+        type: 8 # Ping request
+    - action: Allow
+      protocol: ICMPv6
+      source:
+        selector: all()
+      icmp:
+        type: 128 # Ping request
