@@ -194,6 +194,7 @@
         network_name: public
         name: public-subnet
         cidr: "{{ network.cidr }}"
+        enable_dhcp: false
         gateway_ip: "{{ network.gateway_ip | default(network.cidr | ipaddr('last_usable')) }}"
         allocation_pool_start: "{{ network.allocation_pools[0].start | default(network.cidr | next_nth_usable(2)) }}"
         allocation_pool_end: "{{ network.allocation_pools[0].end | default(network.cidr | ipaddr('last_usable') | ipmath(-1)) }}"
