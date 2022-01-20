@@ -1,19 +1,37 @@
 ---
-- name: Download Calico operator manifest
+- ansible.builtin.file:
+    name: "{{ k3s_conf_location }}/calico"
+    state: directory
+
+- name: Download Calico release
   ansible.builtin.get_url:
-    url: https://docs.projectcalico.org/manifests/tigera-operator.yaml
-    dest: "{{ k3s_conf_location }}/calico-tigera-operator.yaml"
-    force: yes
+    url: "https://github.com/projectcalico/calico/releases/download/{{ k3s_calico_version }}/release-{{ k3s_calico_version }}.tgz"
+    dest: "{{ k3s_conf_location }}/calico/release-{{ k3s_calico_version }}.tgz"
     owner: root
     group: root
     mode: 0755
-  register: calico_tigera_operator
 
-- name: Create Calico operator
-  ansible.builtin.command: >-
-    kubectl create -f {{ calico_tigera_operator.dest }}
+- name: Unpack Calico release
+  ansible.builtin.unarchive:
+    src: "{{ k3s_conf_location }}/calico/release-{{ k3s_calico_version }}.tgz"
+    dest: "{{ k3s_conf_location }}/calico/"
+    creates: "{{ k3s_conf_location }}/calico/release-{{ k3s_calico_version }}"
+  register: calico_release
+
+- name: Update Calico operator
+  command: >-
+    kubectl apply -f {{ calico_release.dest }}/manifests/tigera-operator.yaml
   when:
-    - calico_tigera_operator.changed
+    - calico_release.changed
+
+- name: Install calicoctl
+  ansible.builtin.copy:
+    # TODO: use facts to optionally install ARM or otherwise
+    src: "{{ calico_release.dest }}/bin/calicoctl/calicoctl-linux-amd64"
+    remote_src: yes
+    dest: /usr/local/bin/kubectl-calico
+  when:
+    - calico_release.changed
 
 - name: Generate Calico custom resources
   ansible.builtin.template:
@@ -25,8 +43,8 @@
   register: calico_custom_resources
 
 - name: Create Calico custom resources
-  ansible.builtin.command: >-
-    kubectl create -f {{ calico_custom_resources.dest }}
+  command: >-
+    kubectl apply -f {{ calico_custom_resources.dest }}
   when:
     - calico_custom_resources.changed
 
@@ -40,7 +58,7 @@
   register: calico_global_networkpolicy
 
 - name: Apply Calico global network policy
-  ansible.builtin.command: >-
+  command: >-
     kubectl apply -f {{ calico_global_networkpolicy.dest }}
   when:
     - calico_global_networkpolicy.changed
