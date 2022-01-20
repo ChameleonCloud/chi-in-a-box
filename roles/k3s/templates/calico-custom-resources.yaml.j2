@@ -23,6 +23,8 @@ spec:
       firstFound: false
       interface: wg-calico
     containerIPForwarding: Enabled
+    # Lower MTU to accommodate Wireguard encapsulation
+    mtu: 1420
 
 ---
 
