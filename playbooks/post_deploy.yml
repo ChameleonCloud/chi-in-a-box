@@ -249,8 +249,8 @@
           network_name: "{{ (item.sharednet | default({})).network_name | default(default_sharednet_name) }}"
           name: "{{ (item.sharednet | default({})).network_name | default(default_sharednet_name) }}-subnet"
           cidr: "{{ (item.sharednet | default({})).cidr | default(default_sharednet_cidr) }}"
-          allocation_pool_start: "{{ (item.sharednet | default({})).cidr | default(default_sharednet_cidr) | next_nth_usable(2) }}"
-          allocation_pool_end: "{{ (item.sharednet | default({})).cidr | default(default_sharednet_cidr) | ipaddr('last_usable') }}"
+          allocation_pool_start: "{{ item.sharednet.allocation_pools[0].start | default(item.sharednet.cidr | next_nth_usable(2)) }}"
+          allocation_pool_end: "{{ item.sharednet.allocation_pools[0].end | default(item.sharednet.cidr | ipaddr('last_usable') | ipmath(-1)) }}"
       loop: "{{ neutron_networks }}"
       loop_control:
         label: "{{ item.name }}"
