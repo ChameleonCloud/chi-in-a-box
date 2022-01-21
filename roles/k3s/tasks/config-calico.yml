@@ -18,7 +18,7 @@
     creates: "{{ k3s_conf_location }}/calico/release-{{ k3s_calico_version }}"
   register: calico_release
 
-- name: Create Calico operator
+- name: Update Calico operator
   command: >-
     kubectl apply -f {{ calico_release.dest }}/manifests/tigera-operator.yaml
   when:
