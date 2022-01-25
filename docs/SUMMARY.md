@@ -50,7 +50,8 @@
 
 * [Hardware management](Hardware-management.md)
 * [Certificate management](Certificate-management.md)
-* [Hammers 🔨](Hammers.md)
+* [Hammers 🔨](operations/hammers/README.md)
+  * [maintenance\_reservation](operations/hammers/maintenance\_reservation.md)
 * [Runbooks](runbooks/README.md)
   * [Cron Job No Recent Success](runbooks/CronJobNoRecentSuccess.md)
   * [Instance Failure](runbooks/instance-failure.md)
