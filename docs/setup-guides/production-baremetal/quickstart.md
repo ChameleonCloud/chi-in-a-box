@@ -1,6 +1,6 @@
 # Baremetal QuickStart
 
-### Install Dependencies on the controller __ node
+### Install Dependencies on the controller \_\_ node
 
 Commands in this section will use the system package manager, and run with root privileges. It is recommended to use python virtual environments to install chi-in-a-box and kolla-ansible.
 
@@ -290,43 +290,6 @@ It's recommended to use individual user accounts to log in, rather than the buil
 1. Get their UUID from `openstack user show <username>` or look for them in `openstack user list`. They will need to have logged into the site at least once to appear here.
 2. Add them to the openstack project. `openstack role add --user <user_uuid> --project openstack admin`
 
-
-
 ### Enroll Baremetal nodes
 
-Create a json file that looks like the following, with one json object per node to enroll. Then, add the nodes by running `openstack hardware import --file <json_file>`
-
-
-
-```
-[
-  {
-    "name": "<node_name_1>",
-    "hardware_type": "baremetal",
-    "properties": {
-      "cpu_arch": "x86_64",
-      "baremetal_capabilities": {"boot_mode": "<bios or uefi>"},
-      "node_type": "<class_for_node>",
-      "interfaces": [
-         { "name": "<eth0>", "mac_address": "<ff:ff:ff:ff:ff:ff>" },
-         { "name": "<eth1>", "mac_address": "<aa:aa:aa:aa:aa:aa>" },
-      ],
-      "ipmi_username": "<USERNAME>",
-      "ipmi_password": "<PASSWORD>",
-      "ipmi_terminal_port": <unique_port_number>,
-      "management_address": "<mgmt_ip_addr>",
-      "baremetal_deploy_kernel_image": "<glance_uuid>",
-      "baremetal_deploy_ramdisk_image": "<glance_uuid>"
-    }
-  },
-  {
-     #node 2 info...
-  }
-]
-```
-
-Refer to the hardware management page for details.
-
-{% content-ref url="../../Hardware-management.md" %}
-[Hardware-management.md](../../Hardware-management.md)
-{% endcontent-ref %}
+Follow the steps in [Hardware-management.md](../../Hardware-management.md "mention") to enroll nodes in your testbed.
