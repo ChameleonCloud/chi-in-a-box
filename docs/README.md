@@ -65,3 +65,9 @@ Chameleon additionally provides a few useful extra pieces for all users of CHI-i
 * Remote block storage integration for bare metal. All bare metal nodes will utilize local storage only. See the [Hardware requirements](https://github.com/ChameleonCloud/chi-in-a-box/wiki/Hardware-requirements) page for more information on what kinds of bare metal hardware configurations are currently supported.
 
 We hope the above list continues to shrink ;)
+
+## Next Steps
+
+* Let us know on our [GitHub discussions board!](https://github.com/ChameleonCloud/chi-in-a-box/discussions)
+* Read through [Broken link](broken-reference "mention")
+* Set up a site with [production-baremetal](setup-guides/production-baremetal/ "mention")
