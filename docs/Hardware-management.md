@@ -134,7 +134,7 @@ In the example below, items enclosed in `<..>` should be replaced by your actual
       "node_type": "<class_for_node>",
       "interfaces": [
          { "name": "<eth0>", "mac_address": "<ff:ff:ff:ff:ff:ff>" },
-         { "name": "<eth1>", "mac_address": "<aa:aa:aa:aa:aa:aa>" },
+         { "name": "<eth1>", "mac_address": "<aa:aa:aa:aa:aa:aa>" }
       ],
       "ipmi_username": "<USERNAME>",
       "ipmi_password": "<PASSWORD>",
