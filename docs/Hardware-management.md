@@ -159,6 +159,23 @@ openstack hardware import \
     --file <json_file>
 ```
 
+`--dry-run` will print the configuration to your terminal, instead of sending the command
+
+`--skip-existing` will, when adding multiple nodes, skip any that have already been enrolled. This allows re-running by appending to the same json file.
+
+#### Watching Progress
+
+After a node has been "enrolled", Doni will synchronize the state for Ironic and Blazar.
+
+Get the UUID with `openstack hardware list`, then get the detailed info with `openstack hardware show <uuid>`. Each worker will eventually transition from `PENDING` to `IN Progress` to `STEADY`.
+
+Afterwards, the node will be visible in the rest of the system.
+
+* in the Horizon Web UI under `leases/host calendar`
+* In the Admin Web UI under `admin/system/ironic-baremetal-provisioning`
+* In the output of `openstack baremetal node list`
+* In the output if `openstack reservation host list`
+
 ### Updating a node's availability
 
 It's possible to "block out" a period of time for a bare metal node so that users cannot reserve it. This can be useful for performing maintenance or managing/accessing the hardware outside of Chameleon. You can update a node's availability by PATCHing its /availability subresource.
