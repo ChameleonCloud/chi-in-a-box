@@ -66,8 +66,8 @@ Chameleon additionally provides a few useful extra pieces for all users of CHI-i
 
 We hope the above list continues to shrink ;)
 
-## How do I get started?
+## Next Steps
 
-Please [submit a Help Desk ticket](https://www.chameleoncloud.org/user/help/ticket/new/) if you are interested in running a Chameleon testbed, whether it be as an independent site or as an associate site.
-
-If you want to learn more about how the process works, please read our [Installation guide](Installation-guide/).
+* Let us know on our [GitHub discussions board!](https://github.com/ChameleonCloud/chi-in-a-box/discussions)
+* Read through [Broken link](broken-reference "mention")
+* Set up a site with [production-baremetal](setup-guides/production-baremetal/ "mention")

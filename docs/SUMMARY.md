@@ -2,40 +2,44 @@
 
 * [What is CHI-in-a-Box?](README.md)
 
+## Before You Begin
+
+* [Openstack Architecture](before-you-begin/openstack-architecture.md)
+  * [Controller Nodes](before-you-begin/hardware-requirements/controller-nodes.md)
+  * [Compute Nodes](before-you-begin/hardware-requirements/compute-nodes.md)
+  * [Baremetal Nodes](before-you-begin/hardware-requirements/baremetal-nodes.md)
+  * [Dataplane Switches](before-you-begin/hardware-requirements/dataplane-switches.md)
+* [Using cc-ansible](before-you-begin/command-line-interface.md)
+* [The site configuration](before-you-begin/the-site-configuration/README.md)
+  * [inventory/](before-you-begin/the-site-configuration/inventory.md)
+  * [defaults.yml](before-you-begin/the-site-configuration/defaults.yml.md)
+  * [passwords.yml](before-you-begin/the-site-configuration/passwords.yml.md)
+  * [certificates/](before-you-begin/the-site-configuration/certificates.md)
+  * [node\_custom\_config/ (optional)](before-you-begin/the-site-configuration/node\_custom\_config.md)
+  * [post-deploy.yml (optional)](before-you-begin/the-site-configuration/post-deploy.yml.md)
+* [Security considerations](before-you-begin/security-considerations.md)
+
 ## Setup Guides
 
 * [Production Baremetal](setup-guides/production-baremetal/README.md)
-  * [Host Networking Configuration](setup-guides/production-baremetal/hostnetworking.md)
   * [Baremetal QuickStart](setup-guides/production-baremetal/quickstart.md)
-
-## Fundamentals
-
-* [Hardware Requirements](fundamentals/definitions/README.md)
-  * [Control Nodes](fundamentals/definitions/hardware-requirements.md)
-  * [Deploy Host (Optional)](fundamentals/definitions/deploy-host-optional.md)
-  * [Compute Nodes (beta)](fundamentals/definitions/compute-nodes-beta.md)
-  * [Baremetal Nodes](fundamentals/definitions/baremetal-nodes.md)
-  * [Dataplane Switches](fundamentals/definitions/dataplane-switches.md)
-* [Security considerations](fundamentals/security-considerations.md)
+  * [Host Networking Configuration](setup-guides/production-baremetal/hostnetworking.md)
+* [Troubleshooting](setup-guides/troubleshooting/README.md)
+  * [Networking](setup-guides/troubleshooting/networking.md)
 
 ## Reference
 
-* [cc-ansible CLI](reference/command-line-interface.md)
-* [The site configuration](reference/the-site-configuration/README.md)
-  * [inventory](reference/the-site-configuration/inventory.md)
-  * [defaults.yml](reference/the-site-configuration/defaults.yml.md)
-  * [passwords.yml](reference/the-site-configuration/passwords.yml.md)
-  * [node\_custom\_config](reference/the-site-configuration/node\_custom\_config.md)
-  * [post-deploy.yml](reference/the-site-configuration/post-deploy.yml.md)
-* [Features](reference/features/README.md)
-  * [Chameleon Identity Federation](reference/features/chameleon-identity-federation.md)
-  * [Baremetal Provisioning](reference/features/baremetal-provisioning.md)
-  * [Multi-Tenant Networking](reference/features/multi-tenant-networking.md)
-  * [Resource Reservation](reference/features/resource-reservation.md)
-  * [SNMP Metrics](reference/features/snmp-metrics.md)
-  * [IPMI Metrics](reference/features/ipmi-metrics.md)
-* [Kolla-Ansible Docs](https://docs.openstack.org/kolla-ansible/train/)
-* [Ansible Docs](https://docs.ansible.com/ansible/2.8/index.html)
+* [Chameleon Identity Federation](reference/chameleon-identity-federation.md)
+* [Baremetal Provisioning](reference/baremetal-provisioning.md)
+* [Multi-Tenant Networking](reference/multi-tenant-networking.md)
+* [Resource Reservation](reference/resource-reservation/README.md)
+  * [Default Resource Properties](reference/resource-reservation/default-resource-properties.md)
+* [Monitoring](reference/monitoring/README.md)
+  * [IPMI Metrics](reference/monitoring/ipmi-metrics.md)
+  * [SNMP Metrics](reference/monitoring/snmp-metrics.md)
+* [Upstream Docs](reference/upstream-docs/README.md)
+  * [Ansible Docs](https://docs.ansible.com/ansible/2.8/index.html)
+  * [Kolla-Ansible Docs](https://docs.openstack.org/kolla-ansible/train/)
 
 ## Example Deployments
 
@@ -46,7 +50,8 @@
 
 * [Hardware management](Hardware-management.md)
 * [Certificate management](Certificate-management.md)
-* [Hammers 🔨](Hammers.md)
+* [Hammers 🔨](operations/hammers/README.md)
+  * [maintenance\_reservation](operations/hammers/maintenance\_reservation.md)
 * [Runbooks](runbooks/README.md)
   * [Cron Job No Recent Success](runbooks/CronJobNoRecentSuccess.md)
   * [Instance Failure](runbooks/instance-failure.md)

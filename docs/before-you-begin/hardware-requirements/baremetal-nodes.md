@@ -1,7 +1,5 @@
 # Baremetal Nodes
 
-A Baremetal node is externally managed by Openstack Ironic, and the entire machine is provided as an instance to a user.
-
 ### Network Boot
 
 All Baremetal nodes must be able to network boot from PXE or iPXE

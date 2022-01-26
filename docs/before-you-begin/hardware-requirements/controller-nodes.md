@@ -1,6 +1,4 @@
-# Control Nodes
-
-In a monolithic installation, the _control node_ runs all of the OpenStack and Chameleon services. If needed, services can be distributed across multiple controller nodes for high availability or scaling purposes.
+# Controller Nodes
 
 ### Supported Operating Systems
 
@@ -37,7 +35,7 @@ We strongly suggest that a management node used to run CHI-in-a-box meet or exce
 
 * Management (Optional): This interface allows SSH access to manage the _controller node_
   * If using a separate _deploy host_, configuration will take place over this interface.
-* Private: This network handles traffic towards the _compute_ and _baremetal_ nodes.
+* Internal: This network handles traffic towards the _compute_ and _baremetal_ nodes.
   * The following services use this interface: RabbitMQ, MariaDB, OpenStack internals, Neutron, IPMI
   * 10G or faster is recommended
   * Assign a private IP to this interface.
@@ -49,5 +47,3 @@ We strongly suggest that a management node used to run CHI-in-a-box meet or exce
   * Choose an address and subnet that allows for communication with your upstream gateway.
   * The hostname of the _controller node_ should resolve to this address.
   * Ensure that at least 2 free IPv4 addresses are available in the same subnet as this assigned Public IP. In production, many more are desired.
-
-###
