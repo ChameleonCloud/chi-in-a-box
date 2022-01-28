@@ -31,7 +31,7 @@
 
 * [Chameleon Identity Federation](reference/chameleon-identity-federation.md)
 * [Baremetal Provisioning](reference/baremetal-provisioning.md)
-* [Multi-Tenant Networking](reference/multi-tenant-networking.md)
+* [Ironic Multi-Tenant Networking](reference/multi-tenant-networking.md)
 * [Resource Reservation](reference/resource-reservation/README.md)
   * [Default Resource Properties](reference/resource-reservation/default-resource-properties.md)
 * [Monitoring](reference/monitoring/README.md)
