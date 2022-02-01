@@ -17,43 +17,20 @@
   when:
     - nvidia_device_plugin_release.changed
 
-- name: Checkout smarter-device device plugin
-  ansible.builtin.git:
-    repo: "https://gitlab.com/arm-research/smarter/smarter-device-manager"
-    dest: "{{ k3s_conf_location }}/smarter-device-manager"
-    version: "{{ k3s_smarter_device_plugin_version }}"
-    update: yes
-    force: yes
-  register: smarter_device_plugin_release
-
-- name: Update smarter-device daemonset
-  ansible.builtin.copy:
-    src: "{{ k3s_conf_location }}/smarter-device-manager/smarter-device-manager-ds.yaml"
-    dest: "{{ k3s_conf_location }}/smarter-device-manager-ds.yaml"
-    remote_src: yes
+- name: Template daemonsets for smarter-device plugins
+  ansible.builtin.template:
+    src: "smarter-device-manager-ds-{{ item }}.yaml.j2"
+    dest: "{{ k3s_conf_location }}/smarter-device-manager-ds-{{ item }}.yaml"
     owner: root
     group: root
     mode: "0644"
-  when:
-    - smarter_device_plugin_release.changed
-
-- name: Replace namespace placeholder for smarter-device daemonset
-  ansible.builtin.replace:
-    path: "{{ k3s_conf_location }}/smarter-device-manager-ds.yaml"
-    regexp: "< Replace with the namespace to use >"
-    replace: "smarter-device-manager-system"
-
-- name: Apply smarter-device device plugin
-  command: >-
-    kubectl apply -f {{ k3s_conf_location }}/smarter-device-manager-ds.yaml
-  when:
-    - smarter_device_plugin_release.changed
+  loop:
+    - jetson
+    - rpi
 
 - name: Apply configsets for rpi and xavier
   command: >-
-    kubectl apply -f {{ k3s_conf_location }}/smarter-device-manager/smarter-device-manager-configmap-{{ item }}.yaml
+    kubectl apply -f {{ k3s_conf_location }}/smarter-device-manager-ds-{{ item }}.yaml
   loop:
+    - jetson
     - rpi
-    - xavier
-  when:
-    - smarter_device_plugin_release.changed
