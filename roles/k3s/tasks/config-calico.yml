@@ -39,7 +39,7 @@
     dest: "{{ k3s_conf_location }}/calico-custom-resources.yaml"
     owner: root
     group: root
-    mode: 0755
+    mode: 0644
   register: calico_custom_resources
 
 - name: Create Calico custom resources
@@ -54,7 +54,7 @@
     dest: "{{ k3s_conf_location }}/calico-global-networkpolicy-default-deny.yaml"
     owner: root
     group: root
-    mode: 0755
+    mode: 0644
   register: calico_global_networkpolicy
 
 - name: Apply Calico global network policy

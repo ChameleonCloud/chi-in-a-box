@@ -132,3 +132,5 @@
 
 - include_tasks: config-neutron.yml
   when: enable_neutron | bool
+
+- include_tasks: config-device-plugins.yml

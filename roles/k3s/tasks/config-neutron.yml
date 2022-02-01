@@ -21,7 +21,6 @@
       name: caliconet-subnet
       cidr: "{{ k3s_cluster_cidr }}"
       enable_dhcp: no
-  register: sharednet_subnets
   become: yes
 
 - name: Connect subnet to existing NAT router
@@ -32,5 +31,18 @@
       name: sharednet-router
       interfaces:
         - caliconet-subnet
+  register: calico_router
   run_once: true
   become: yes
+
+- name: Generate Calico/Neutron connection script
+  ansible.builtin.template:
+    src: neutron-calico-connect.j2
+    dest: "{{ k3s_conf_location }}/neutron-calico-connect.sh"
+    owner: root
+    group: root
+    mode: "0700"
+  vars:
+    neutron_router_id: "{{ calico_router.router.id }}"
+  when:
+    - k3s_enable_calico | bool
