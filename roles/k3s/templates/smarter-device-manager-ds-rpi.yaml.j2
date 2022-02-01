@@ -1,0 +1,111 @@
+# {{ ansible_managed }}
+# This file is a synthesis of smarter-device-manager-configmap-rpi.yaml and smarter-device-manager-ds.yaml
+# from the smarter-device-manager repo[0].
+# [0]: https://gitlab.com/arm-research/smarter/smarter-device-manager/
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: smarter-device-manager-system
+  labels:
+    name: smarter-device-manager-system
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: smarter-device-manager-rpi
+data:
+  conf.yaml: |
+    - devicematch: ^snd$
+      nummaxdevices: 20
+    - devicematch: ^gpiomem$
+      nummaxdevices: 40
+    - devicematch: ^gpiochip[0-9]*$
+      nummaxdevices: 20
+    - devicematch: ^hci[0-9]*$
+      nummaxdevices: 1
+    - devicematch: ^i2c-[0-9]*$
+      nummaxdevices: 1
+    - devicematch: ^rtc0$
+      nummaxdevices: 20
+    - devicematch: ^video[0-9]*$
+      nummaxdevices: 20
+    - devicematch: ^vchiq$
+      nummaxdevices: 20
+    - devicematch: ^vcsm.*$
+      nummaxdevices: 20
+    - devicematch: ^ttyUSB[0-9]*$
+      nummaxdevices: 1
+    - devicematch: ^ttyACM[0-9]*$
+      nummaxdevices: 1
+    - devicematch: ^ttyTHS[0-9]*$
+      nummaxdevices: 1
+    - devicematch: ^ttyS[0-9]*$
+      nummaxdevices: 1
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  namespace: smarter-device-manager-system
+  name: smarter-device-manager-rpi
+  labels:
+    # FIXME: not sure if labels.name is also needed if we already have 'name' above
+    name: smarter-device-manager-rpi
+    role: agent
+spec:
+  selector:
+    matchLabels:
+      smarter-device-manager/configmap: rpi
+  updateStrategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        smarter-device-manager/configmap: rpi
+      annotations:
+        node.kubernetes.io/bootstrap-checkpoint: "true"
+    spec:
+      nodeSelector:
+        smarter-device-manager: enabled
+        smarter-device-manager/configmap: rpi
+      priorityClassName: "system-node-critical"
+      hostname: smarter-device-management
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      containers:
+        - name: smarter-device-manager
+          image: registry.gitlab.com/arm-research/smarter/smarter-device-manager:{{ k3s_smarter_device_plugin_version }}
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+          resources:
+            limits:
+              cpu: 100m
+              memory: 15Mi
+            requests:
+              cpu: 10m
+              memory: 15Mi
+          volumeMounts:
+            - name: device-plugin
+              mountPath: /var/lib/kubelet/device-plugins
+            - name: dev-dir
+              mountPath: /dev
+            - name: sys-dir
+              mountPath: /sys
+            - name: config
+              mountPath: /root/config
+      volumes:
+        - name: device-plugin
+          hostPath:
+            path: /var/lib/kubelet/device-plugins
+        - name: dev-dir
+          hostPath:
+            path: /dev
+        - name: sys-dir
+          hostPath:
+            path: /sys
+        - name: config
+          configMap:
+            name: smarter-device-manager-rpi
+      terminationGracePeriodSeconds: 30
