@@ -69,5 +69,4 @@ We hope the above list continues to shrink ;)
 ## Next Steps
 
 * Let us know on our [GitHub discussions board!](https://github.com/ChameleonCloud/chi-in-a-box/discussions)
-* Read through [Broken link](broken-reference "mention")
-* Set up a site with [production-baremetal](setup-guides/production-baremetal/ "mention")
+* [Check out the docs!](https://chameleoncloud.gitbook.io/chi-in-a-box)

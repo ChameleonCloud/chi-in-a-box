@@ -67,6 +67,4 @@ Each network interface on a node must have metadata about which switch and switc
         "switch_port_id": "1/1/19:2"
     }
 ],
-
 ```
-
