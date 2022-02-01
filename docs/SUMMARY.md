@@ -4,7 +4,7 @@
 
 ## Before You Begin
 
-* [Openstack Architecture](before-you-begin/openstack-architecture.md)
+* [OpenStack Architecture](before-you-begin/openstack-architecture.md)
   * [Controller Nodes](before-you-begin/hardware-requirements/controller-nodes.md)
   * [Compute Nodes](before-you-begin/hardware-requirements/compute-nodes.md)
   * [Baremetal Nodes](before-you-begin/hardware-requirements/baremetal-nodes.md)
@@ -77,5 +77,5 @@
 
 ## Development
 
-* [Developing Openstack Services](Developing-Openstack-Services.md)
+* [Developing OpenStack Services](Developing-Openstack-Services.md)
 * [Dev-in-a-box](development/dev-in-a-box.md)

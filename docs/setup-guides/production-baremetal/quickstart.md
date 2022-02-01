@@ -255,7 +255,7 @@ All of these will be provisioned by running the post-deploy script:
 ./cc-ansible post-deploy
 ```
 
-### Install the Openstack Client
+### Install the OpenStack Client
 
 Run the following commands:
 
