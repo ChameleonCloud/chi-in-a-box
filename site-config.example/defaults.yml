@@ -69,5 +69,5 @@ kolla_external_fqdn: chi.example.com
 
 # If you are allowing users to reserve public IPs,
 # this should correspond to the Neutron ID of your
-# public (gateway) network.
-#blazar_floatingip_reservation_network_id: 687976bc-e93f-4c47-ac21-fbd341313a54
+# public (gateway) network. It defaults to allowing public/Public
+# blazar_floatingip_reservation_network_regex: "[pP]ublic"
