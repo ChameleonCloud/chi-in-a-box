@@ -42,6 +42,6 @@
 
 - name: Apply smarter-device device plugin
   command: >-
-    kubectl apply -f {{ k3s_conf_location }}/smarter-device-manager/smarter-device-manager-ds.yaml
+    kubectl apply -f {{ k3s_conf_location }}/smarter-device-manager-ds.yaml
   when:
     - smarter_device_plugin_release.changed
