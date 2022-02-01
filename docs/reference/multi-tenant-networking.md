@@ -2,7 +2,15 @@
 
 ### Overview
 
-### Requirements
+This is our default deployment method. To enable multi-tenant networking with Ironic, baremetal nodes must be connected to a vlan-capable switch, and those vlans managed by neutron.
+
+### Baremetal Node Requirements
+
+* Ensure that reservable nodes have an IPMI-capable out of band (OOB) baseboard management controller (BMC). E.g. Dell iDRAC
+* Ensure that the private interface has connectivity to the BMC network interface of each node.
+* Ensure that credentials and access are configured to allow IPMI management of the BMC settings.
+
+### Controller Node Requirements
 
 * Ensure that the private interface has connectivity to the out of band interface of any managed switches
 * Ensure that SSH access is configured to administrate any managed switches
@@ -10,8 +18,6 @@
 * Ensure that switches have been configured with a range of "Trunked VLANs" for usage by neutron.
 
 ### Configuration
-
-
 
 #### networking-generic-switch
 
