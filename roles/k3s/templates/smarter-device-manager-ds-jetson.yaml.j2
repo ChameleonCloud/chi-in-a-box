@@ -56,13 +56,13 @@ metadata:
 spec:
   selector:
     matchLabels:
-      smarter-device-manager/configmap: Jetson
+      smarter-device-manager/configmap: jetson
   updateStrategy:
     type: RollingUpdate
   template:
     metadata:
       labels:
-        name: smarter-device-manager
+        smarter-device-manager/configmap: jetson
       annotations:
         node.kubernetes.io/bootstrap-checkpoint: "true"
     spec:
