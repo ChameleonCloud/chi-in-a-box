@@ -13,6 +13,9 @@ k3s_cluster_node_blocksize: 26
 k3s_enable_calico: yes
 k3s_calico_version: v3.20.3
 
+k3s_nvidia_device_plugin_version: "v0.10.0"
+k3s_smarter_device_plugin_version: "v1.20.7"
+
 k3s_services:
   k3s_server:
     group: k3s

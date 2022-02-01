@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+# {{ ansible_managed }}
+#
+# Bridges Neutron to the Calico network for the purposes of assigning Floating IP
+# addresses to pods running on K3s.
+
+calico_cidr="{{ k3s_cluster_cidr }}"
+bridge_addr="192.168.99.1/24"
+ns_addr="192.168.99.2/24"
+
+neutron_ns=qrouter-"{{ neutron_router_id }}"
+
+# Create bridge and veth pair to connect Neutron router ns to default ns
+ip link show br-calico >/dev/null || ip link add br-calico type bridge
+ip link show veth-cali0 >/dev/null || ip link add veth-cali0 type veth peer veth-caliN
+
+ip link set veth-cali0 master br-calico up
+ip addr add "$bridge_addr" br-calico
+ip link set br-calico up
+
+ip link set veth-caliN ns "$neutron_ns" up
+ip netns exec "$neutron_ns" ip addr add "$ns_addr"
+
+# Allow traffic from Neutron router ns to travel through default ns for Calico subnet
+ip netns exec "$neutron_ns" ip route add "$calico_cidr" via "$bridge_addr"
+
+# Required for any traffic going over IPIP tunnel to other Calico nodes
+iptables -t nat -S | grep -q neutron-calico-connect:01 || {
+  iptables -t nat -A POSTROUTING -o tunl0 -j MASQUERADE \
+    -m comment --comment "(neutron-calico-connect:01) bridge Neutron floating IPs to K3s"
+}
+# Floating IPs normally do DNAT, which does not change the source address. This breaks
+# Calico, which does not understand how to return the packets.
+iptables -t nat -S | grep -q neutron-calico-connect:02 || {
+  ip netns exec "$neutron_ns" iptables -t nat -A POSTROUTING -o veth-caliN -J MASQUERADE \
+    -m comment --comment "(neutron-calico-connect:02) rewrite source for Calico-bound packets"
+}
