@@ -1,4 +1,7 @@
 ---
+# FUTURE NOTE: change all the kubectl invocations to use the kubernetes.core.k8s collection!
+# This will make detecting changes way easier and more reliable.
+
 - name: Checkout NVIDIA device plugin
   ansible.builtin.git:
     repo: "https://github.com/NVIDIA/k8s-device-plugin"
@@ -43,5 +46,14 @@
 - name: Apply smarter-device device plugin
   command: >-
     kubectl apply -f {{ k3s_conf_location }}/smarter-device-manager-ds.yaml
+  when:
+    - smarter_device_plugin_release.changed
+
+- name: Apply configsets for rpi and xavier
+  command: >-
+    kubectl apply -f {{ k3s_conf_location }}/smarter-device-manager/smarter-device-manager-configmap-{{ item }}.yaml
+  loop:
+    - rpi
+    - xavier
   when:
     - smarter_device_plugin_release.changed
