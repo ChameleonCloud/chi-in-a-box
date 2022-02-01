@@ -1,6 +1,7 @@
 ---
 # collections:
 #   - name: ansible.posix
+#   - name: openstack.cloud
 
 # roles:
 - src: chameleon.docker_service

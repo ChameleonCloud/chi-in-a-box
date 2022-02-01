@@ -23,13 +23,22 @@
     force: yes
   register: smarter_device_plugin_release
 
-- name: Replace namespace placeholder for smarter-device daemonset
-  ansible.builtin.replace:
-    path: "{{ k3s_conf_location }}/smarter-device-manager/smarter-device-manager-ds.yaml"
-    regexp: "< Replace with the namespace to use >"
-    replace: "smarter-device-manager-system"
+- name: Update smarter-device daemonset
+  ansible.builtin.copy:
+    src: "{{ k3s_conf_location }}/smarter-device-manager/smarter-device-manager-ds.yaml"
+    dest: "{{ k3s_conf_location }}/smarter-device-manager-ds.yaml"
+    remote_src: yes
+    owner: root
+    group: root
+    mode: "0644"
   when:
     - smarter_device_plugin_release.changed
+
+- name: Replace namespace placeholder for smarter-device daemonset
+  ansible.builtin.replace:
+    path: "{{ k3s_conf_location }}/smarter-device-manager-ds.yaml"
+    regexp: "< Replace with the namespace to use >"
+    replace: "smarter-device-manager-system"
 
 - name: Apply smarter-device device plugin
   command: >-
