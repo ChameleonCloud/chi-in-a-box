@@ -23,14 +23,17 @@
       enable_dhcp: no
   become: yes
 
-- name: Connect subnet to existing NAT router
+# FIXME(jason): this doesn't actually add the subnet to the router!
+# When we have updated to a later Ansible we can potentially fetch the router's
+# interfaces with routers_info and then merge this interface into the list?
+- name: Fetch existing NAT router
   kolla_toolbox:
     module_name: os_router
     module_args:
       auth: "{{ openstack_auth }}"
       name: sharednet-router
-      interfaces:
-        - caliconet-subnet
+      # interfaces:
+      #   - caliconet-subnet
   register: calico_router
   run_once: true
   become: yes
