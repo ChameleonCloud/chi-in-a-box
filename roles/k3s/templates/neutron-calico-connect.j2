@@ -15,11 +15,11 @@ ip link show br-calico >/dev/null || ip link add br-calico type bridge
 ip link show veth-cali0 >/dev/null || ip link add veth-cali0 type veth peer veth-caliN
 
 ip link set veth-cali0 master br-calico up
-ip addr add "$bridge_addr" br-calico
+ip addr replace "$bridge_addr" br-calico
 ip link set br-calico up
 
 ip link set veth-caliN ns "$neutron_ns" up
-ip netns exec "$neutron_ns" ip addr add "$ns_addr"
+ip netns exec "$neutron_ns" ip addr replace "$ns_addr"
 
 # Allow traffic from Neutron router ns to travel through default ns for Calico subnet
 ip netns exec "$neutron_ns" ip route add "$calico_cidr" via "$bridge_addr"
