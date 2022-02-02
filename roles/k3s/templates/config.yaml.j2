@@ -1,6 +1,7 @@
 ---
 bind-address: {{ kolla_external_vip_address }}
 node-external-ip: {{ kolla_external_vip_address }}
+secrets-encryption: True
 {% if k3s_enable_calico | bool %}
 flannel-backend: none
 disable-network-policy: True
