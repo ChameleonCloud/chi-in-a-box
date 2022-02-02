@@ -48,17 +48,20 @@
   when:
     - calico_custom_resources.changed
 
-- name: Generate Calico global network policy
+- name: Generate Calico global network policies
   ansible.builtin.copy:
-    src: "calico-global-networkpolicy-default-deny.yaml"
-    dest: "{{ k3s_conf_location }}/calico-global-networkpolicy-default-deny.yaml"
+    src: "calico-global-networkpolicy-{{ item }}.yaml"
+    dest: "{{ k3s_conf_location }}/calico-global-networkpolicy-{{ item }}.yaml"
     owner: root
     group: root
     mode: 0644
-  register: calico_global_networkpolicy
+  loop:
+    - default-deny
+    - allow-ping
 
-- name: Apply Calico global network policy
+- name: Apply Calico global network policies
   command: >-
-    kubectl apply -f {{ calico_global_networkpolicy.dest }}
-  when:
-    - calico_global_networkpolicy.changed
+    kubectl apply -f {{ k3s_conf_location }}/calico-global-networkpolicy-{{ item }}.yaml
+  loop:
+    - default-deny
+    - allow-ping
