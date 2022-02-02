@@ -61,7 +61,7 @@
 
 - name: Apply Calico global network policies
   command: >-
-    kubectl apply -f {{ k3s_conf_location }}/calico-global-networkpolicy-{{ item }}.yaml
+    kubectl calico apply -f {{ k3s_conf_location }}/calico-global-networkpolicy-{{ item }}.yaml
   loop:
     - default-deny
     - allow-ping
