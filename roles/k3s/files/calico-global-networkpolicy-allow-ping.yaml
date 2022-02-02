@@ -2,21 +2,18 @@
 apiVersion: projectcalico.org/v3
 kind: GlobalNetworkPolicy
 metadata:
-  name: allow-ping-policy
+  name: allow-ping
 spec:
   selector: all()
   types:
     - Ingress
   ingress:
+    # Allow ICMP echo (ping) over IPv4 and IPv6
     - action: Allow
       protocol: ICMP
-      source:
-        selector: all()
       icmp:
-        type: 8 # Ping request
+        type: 8
     - action: Allow
       protocol: ICMPv6
-      source:
-        selector: all()
       icmp:
-        type: 128 # Ping request
+        type: 128
