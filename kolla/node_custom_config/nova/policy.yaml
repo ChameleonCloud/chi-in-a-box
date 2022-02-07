@@ -1,0 +1,58 @@
+# Show details for an aggregate
+# GET  /os-aggregates/{aggregate_id}
+# Intended scope(s): system
+"os_compute_api:os-aggregates:show": "role:osg or rule:admin_or_owner"
+
+# Return extended attributes for server.
+#
+# This rule will control the visibility for a set of servers
+# attributes:
+#
+# - ``OS-EXT-SRV-ATTR:host`` - ``OS-EXT-SRV-ATTR:instance_name`` -
+# ``OS-EXT-SRV-ATTR:reservation_id`` (since microversion 2.3) - ``OS-
+# EXT-SRV-ATTR:launch_index`` (since microversion 2.3) - ``OS-EXT-SRV-
+# ATTR:hostname`` (since microversion 2.3) - ``OS-EXT-SRV-
+# ATTR:kernel_id`` (since microversion 2.3) - ``OS-EXT-SRV-
+# ATTR:ramdisk_id`` (since microversion 2.3) - ``OS-EXT-SRV-
+# ATTR:root_device_name`` (since microversion 2.3) - ``OS-EXT-SRV-
+# ATTR:user_data`` (since microversion 2.3)
+#
+# Microvision 2.75 added the above attributes in the ``PUT
+# /servers/{server_id}`` and ``POST /servers/{server_id}/action
+# (rebuild)`` API responses which are also controlled by this policy
+# rule, like the ``GET /servers*`` APIs.
+#
+# Microversion 2.90 made the ``OS-EXT-SRV-ATTR:hostname`` attribute
+# available to all users, so this policy has no effect on that field
+# for microversions 2.90 and greater. Controlling the visibility of
+# this attribute for all microversions is therefore deprecated and
+# will be removed in a future release.
+# GET  /servers/{id}
+# GET  /servers/detail
+# PUT  /servers/{server_id}
+# POST  /servers/{server_id}/action (rebuild)
+# Intended scope(s): system, project
+"os_compute_api:os-extended-server-attributes": "rule:admin_or_owner"
+
+# Create extra specs for a flavor
+# POST  /flavors/{flavor_id}/os-extra_specs/
+# Intended scope(s): system
+"os_compute_api:os-flavor-extra-specs:create": "role:osg or role:admin"
+
+# Create a server on the requested compute service host and/or
+# hypervisor_hostname.
+#
+# In this case, the requested host and/or hypervisor_hostname is
+# validated by the scheduler filters unlike the
+# ``os_compute_api:servers:create:forced_host`` rule.
+# POST  /servers
+# Intended scope(s): system, project
+"compute:servers:create:requested_destination": "role:osg or role:admin"
+
+"os_compute_api:os-hypervisors:list": "role:osg or rule:admin_or_owner"
+"os_compute_api:os-hypervisors:list-detail": "role:osg or rule:admin_or_owner"
+"os_compute_api:os-hypervisors:statistics": "role:osg or rule:admin_or_owner"
+"os_compute_api:os-hypervisors:show": "role:osg or rule:admin_or_owner"
+"os_compute_api:os-hypervisors:uptime": "role:osg or rule:admin_or_owner"
+"os_compute_api:os-hypervisors:search": "role:osg or rule:admin_or_owner"
+"os_compute_api:os-hypervisors:servers": "role:osg or rule:admin_or_owner"

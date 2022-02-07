@@ -1,3 +1,0 @@
-{
-    "resource_types:OS::Neutron::ProviderNet": "rule:allow_everybody"
-}
