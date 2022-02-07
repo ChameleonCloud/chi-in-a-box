@@ -1,0 +1,104 @@
+# Default rule for most Admin APIs.
+#"admin": "is_admin:True or role:admin"
+
+# Default rule for most non-Admin APIs.
+"admin_or_owner": "rule:admin or project_id:%(project_id)s"
+
+# Policy rule for List/Show Lease(s) API.
+# GET  /{api_version}/leases
+# GET  /{api_version}/leases/{lease_id}
+#"blazar:leases:get": "rule:admin_or_owner"
+
+# Policy rule for Delete Lease API.
+# DELETE  /{api_version}/leases/{lease_id}
+#"blazar:leases:delete": "rule:admin_or_owner"
+
+# Policy rule for List/Show Host(s) API.
+# GET  /{api_version}/os-hosts
+# GET  /{api_version}/os-hosts/{host_id}
+"blazar:oshosts:get": "rule:admin_or_owner"
+
+# Policy rule for Delete Host API.
+# DELETE  /{api_version}/os-hosts/{host_id}
+"blazar:oshosts:delete": "rule:admin_api"
+
+# Policy rule for List/Get Host(s) Allocations API.
+# GET  /{api_version}/os-hosts/allocations
+# GET  /{api_version}/os-hosts/{host_id}/allocation
+"blazar:oshosts:get_allocations": "rule:admin_or_owner"
+
+# Policy rule for Reallocate Host API.
+# PUT  /{api_version}/os-hosts/{host_id}/allocation
+"blazar:oshosts:reallocate": "rule:admin_api"
+
+# Policy rule for Resource Properties API.
+# GET  /{api_version}/os-hosts/resource_properties
+"blazar:oshosts:get_resource_properties": "@"
+
+# Policy rule for Resource Properties API.
+# PATCH  /{api_version}/os-hosts/resource_properties/{property_name}
+"blazar:oshosts:patch_resource_properties": "rule:admin_api"
+
+# Policy rule for List/Show Network(s) API.
+# GET  /{api_version}/networks
+# GET  /{api_version}/networks/{network_id}
+"blazar:networks:get": "rule:admin_or_owner"
+
+# Policy rule for Delete Network API.
+# DELETE  /{api_version}/networks/{network_id}
+"blazar:networks:delete": "rule:admin_api"
+
+# Policy rule for List/Get Network(s) Allocations API.
+# GET  /{api_version}/networks/allocations
+# GET  /{api_version}/networks/{network_id}/allocation
+"blazar:networks:get_allocations": "rule:admin_or_owner"
+
+# Policy rule for Resource Properties API.
+# GET  /{api_version}/networks/resource_properties
+"blazar:networks:get_resource_properties": "@"
+
+# Policy rule for Resource Properties API.
+# PATCH  /{api_version}/networks/resource_properties/{property_name}
+"blazar:networks:patch_resource_properties": "rule:admin_api"
+
+# Policy rule for List/Show Device(s) API.
+# GET  /{api_version}/devices
+# GET  /{api_version}/devices/{device_id}
+"blazar:devices:get": "rule:admin_or_owner"
+
+# Policy rule for Update Host API.
+# PUT  /{api_version}/devices/{device_id}
+"blazar:devices:put": "rule:admin_api"
+
+# Policy rule for Delete Device API.
+# DELETE  /{api_version}/devices/{device_id}
+"blazar:devices:delete": "rule:admin_api"
+
+# Policy rule for List/Get Device(s) Allocations API.
+# GET  /{api_version}/devices/allocations
+# GET  /{api_version}/devices/{device_id}/allocation
+"blazar:devices:get_allocations": "rule:admin_or_owner"
+
+# Policy rule for Resource Properties API.
+# GET  /{api_version}/devices/resource_properties
+"blazar:devices:get_resource_properties": "@"
+
+# Policy rule for Resource Properties API.
+# PATCH  /{api_version}/devices/resource_properties/{property_name}
+"blazar:devices:patch_resource_properties": "rule:admin_api"
+
+"default": "!"
+"admin_api": "role:admin"
+"blazar:leases:create": "rule:admin_or_owner"
+"blazar:leases:update": "rule:admin_or_owner"
+"blazar:plugins:get": "@"
+"blazar:oshosts:create": "rule:admin_api"
+"blazar:oshosts:update": "rule:admin_api"
+"blazar:oshosts:list_allocations": "rule:admin_or_owner"
+"blazar:networks:create": "rule:admin_api"
+"blazar:networks:update": "rule:admin_api"
+"blazar:networks:put": "rule:admin_or_owner"
+"blazar:networks:list_allocations": "rule:admin_or_owner"
+"blazar:devices:create": "rule:admin_api"
+"blazar:devices:update": "rule:admin_api"
+"blazar:devices:list_allocations": "rule:admin_or_owner"
