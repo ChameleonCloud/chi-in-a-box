@@ -289,6 +289,7 @@ enable_jupyter_report: "{{ enable_jupyterhub }}"
 enable_k3s: no
 enable_zun: no
 enable_zun_compute_k8s: "{{ enable_zun | bool and enable_k3s | bool }}"
+blazar_enable_device_plugin_k8s: "{{ enable_k3s | bool }}"
 # If not running K3s, can run standard Zun deploy w/ etcd and kuryr
 enable_etcd: "{{ enable_zun | bool and not enable_k3s | bool }}"
 enable_kuryr: "{{ enable_zun | bool and not enable_k3s | bool }}"
