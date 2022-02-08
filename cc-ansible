@@ -251,17 +251,6 @@ if [[ "$CHECK_UPDATES" == "yes" || "$FORCE_UPDATES" == "yes" ]]; then
     (cd "$kolla_ansible_egglink"; git rev-parse HEAD > "$kolla_ansible_gitref")
   fi
 
-  # Update Mitogen
-  MITOGEN_VERSION=0.2.8
-  MITOGEN_TARBALL=/tmp/mitogen.tar.gz
-  MITOGEN_INSTALL_DIR="$VIRTUALENV/lib/mitogen-$MITOGEN_VERSION"
-  if [[ ! -d "$MITOGEN_INSTALL_DIR" ]]; then
-    curl -L -o "$MITOGEN_TARBALL" "https://github.com/dw/mitogen/archive/v$MITOGEN_VERSION.tar.gz" \
-      && tar -xf "$MITOGEN_TARBALL" -C "$(dirname "$MITOGEN_INSTALL_DIR")" \
-      && rm -f "$MITOGEN_TARBALL"
-  fi
-  ln -sf "$MITOGEN_INSTALL_DIR" "$VIRTUALENV/lib/mitogen-latest"
-
   # Update/install yq
   YQ_VERSION=4.9.6
   if [[ "$(type -t yq)" != "file" ]]; then
