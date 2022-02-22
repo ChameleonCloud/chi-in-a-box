@@ -21,7 +21,7 @@ spec:
     # Ensure calico uses the last Wireguard interface
     nodeAddressAutodetectionV4:
       firstFound: false
-      interface: wg-calico
+      interface: wg-.*
     containerIPForwarding: Enabled
     # Lower MTU to accommodate Wireguard encapsulation; Calico uses IPIP encapsulation
     # which adds a 20-byte overhead. The underlying Wireguard interface has an MTU of
