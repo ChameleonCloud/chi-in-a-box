@@ -77,10 +77,10 @@ OPENSTACK_BLAZAR_FLOATINGIP_RESERVATION = {
 }
 {% endif %}
 OPENSTACK_BLAZAR_DEVICE_RESERVATION = {
-  'enabled': {{ enable_zun }},
+  'enabled': {{ enable_zun | bool }},
 }
 OPENSTACK_BLAZAR_HOST_RESERVATION = {
-  'enabled': {{ enable_nova }},
+  'enabled': {{ enable_nova | bool }},
 {% if blazar_host_url_format is defined %}
   'url_format': '{{ blazar_host_url_format }}}',
 {% endif %}
