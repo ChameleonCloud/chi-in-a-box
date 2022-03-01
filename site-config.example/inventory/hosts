@@ -50,9 +50,6 @@ control
 [chameleon_usage:children]
 mariadb
 
-[chameleon_usage_jupyter:children]
-jupyterhub
-
 # Experiment precis service(s)
 [precis:children]
 control

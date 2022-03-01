@@ -1,7 +1,0 @@
-#! /bin/sh
-
-docker run --rm --net=host \
-    -v "/var/run/docker.sock:/var/run/docker.sock" \
-    -v "{{ chameleon_usage_config_dir }}/my.cnf:/etc/mysql/my.cnf" \
-    {{ chameleon_usage_docker_image }} \
-    jupyter_usage --mysql-conf /etc/mysql/my.cnf 2>&1

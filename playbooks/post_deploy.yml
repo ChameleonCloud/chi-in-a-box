@@ -323,6 +323,13 @@
   tags:
     - mariadb
 
+- hosts: mariadb
+  roles:
+    - role: chameleon_usage
+      when: enable_mariabackup | bool
+  become: yes
+  become_user: root
+
 - hosts: hammers
   roles:
     - hammers
