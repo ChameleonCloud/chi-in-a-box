@@ -14,10 +14,10 @@ neutron_ns=qrouter-"{{ neutron_router_id }}"
 ip link show veth-cali0 >/dev/null || ip link add veth-cali0 type veth peer veth-caliN
 
 ip link set veth-cali0 up
-ip addr replace "$host_addr" veth-cali0
+ip addr replace "$host_addr" dev veth-cali0
 
 ip link set veth-caliN netns "$neutron_ns" up
-ip netns exec "$neutron_ns" ip addr replace "$ns_addr"
+ip netns exec "$neutron_ns" ip addr replace "$ns_addr" dev veth-caliN
 
 # Allow traffic from Neutron router ns to travel through default ns for Calico subnet
 ip netns exec "$neutron_ns" ip route add "$calico_cidr" via "${host_addr%%/24}"
