@@ -25,6 +25,9 @@
     group: root
     mode: 0600
 
+- set_fact:
+    kolla_external_vip_address_family: ipv4
+
 - name: Copy K3s config file
   ansible.builtin.template:
     src: "config.yaml.j2"
@@ -32,6 +35,10 @@
     owner: root
     group: root
     mode: 0644
+  vars:
+    # This _address_family var is not set by default; this is just to make kolla_address
+    # happy when it tries to template the primary address of the VIP interface.
+    kolla_external_vip_address_family: ipv4
 
 - name: Enable and check K3s service
   systemd:
