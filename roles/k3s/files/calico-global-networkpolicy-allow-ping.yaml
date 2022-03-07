@@ -4,7 +4,7 @@ kind: GlobalNetworkPolicy
 metadata:
   name: allow-ping
 spec:
-  selector: all()
+  namespaceSelector: has(kubernetes.io/metadata.name) && kubernetes.io/metadata.name not in {"kube-system", "calico-apiserver", "calico-system"}
   types:
     - Ingress
   ingress:
