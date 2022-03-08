@@ -2,20 +2,20 @@
 # FUTURE NOTE: change all the kubectl invocations to use the kubernetes.core.k8s collection!
 # This will make detecting changes way easier and more reliable.
 
-- name: Checkout NVIDIA device plugin
-  ansible.builtin.git:
-    repo: "https://github.com/NVIDIA/k8s-device-plugin"
-    dest: "{{ k3s_conf_location }}/nvidia-device-plugin"
-    version: "{{ k3s_nvidia_device_plugin_version }}"
-    update: yes
-    force: yes
-  register: nvidia_device_plugin_release
+- name: Copy nvidia device plugin daemonset config
+  ansible.builtin.copy:
+    src: nvidia-device-plugin.yaml
+    dest: "{{ k3s_conf_locagion/nvidia-device-plugin.yaml"
+    owner: root
+    group: root
+    mode: "0644"
+  register: nvidia_device_plugin
 
-- name: Update Calico operator
+- name: Update nvidia device plugin daemonset
   command: >-
-    kubectl apply -f {{ k3s_conf_location }}/nvidia-device-plugin/nvidia-device-plugin.yml
+    kubectl apply -f {{ k3s_conf_location }}/nvidia-device-plugin.yaml
   when:
-    - nvidia_device_plugin_release.changed
+    - nvidia_device_plugin.changed
 
 - name: Template daemonsets for smarter-device plugins
   ansible.builtin.template:
