@@ -81,6 +81,7 @@ OPENSTACK_BLAZAR_DEVICE_RESERVATION = {
 }
 OPENSTACK_BLAZAR_HOST_RESERVATION = {
   'enabled': {{ enable_nova | bool }},
+  'url_format': '{{ blazar_host_url_format }}',
 }
 # Used for Blazar dashboard, which needs to pull data from the MySQL database
 # directly at the moment.
