@@ -64,7 +64,7 @@
   become: yes
   template:
     src: chameleon-usage-extract-data.j2
-    mode: a+x
+    mode: 0700
     dest: /usr/local/sbin/chameleon-usage-extract-chi-data
 
 - name: Fill in up-to-date data to chameleon_usage
@@ -74,6 +74,8 @@
 - name: Set up node data extract periodic task
   include_role:
     name: chameleon.periodic_task
+    apply:
+      become: yes
   vars:
     task_name: "usage_node"
     task_command: "/usr/local/sbin/chameleon-usage-extract-chi-data"
@@ -91,12 +93,14 @@
   become: yes
   template:
     src: chameleon-usage-sanity-checks.j2
-    mode: a+x
+    mode: 0700
     dest: /usr/local/sbin/chameleon-usage-sanity-checks
 
 - name: Set up node data sanity check periodic task
   include_role:
     name: chameleon.periodic_task
+    apply:
+      become: yes
   vars:
     task_name: "usage_node_sanity"
     task_command: "/usr/local/sbin/chameleon-usage-sanity-checks"
