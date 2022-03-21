@@ -10,6 +10,7 @@
 #
 
 ROTATE="{{ mariadb_backup_file_age }}"
+DIR="{{ backup_location }}"
 
 set -o pipefail
 
@@ -19,7 +20,6 @@ set -o pipefail
 USER="{{ backup_database_user }}"
 PASS="{{ backup_database_password }}"
 MAX_ALLOWED_PACKET="{{ mariadb_backup_max_packet }}"
-DIR="{{ mariadb_backup_origin_dir }}"
 
 # Create temporary mysql cnf file.
 TMPFILE=`mktemp /tmp/backup.XXXXXX` || exit 1
@@ -35,8 +35,8 @@ PREFIX=mysql_backup_
 ADDITIONAL_OPTIONS="--ignore-table=mysql.event"
 
 ##### STOP CONFIG ####################################################
-
-backup_file=${DIR}/${PREFIX}`date +%Y%m%d-%H%M%S`.sql.bz2
+backup_file_name=`date +%Y%m%d-%H%M%S`.sql.bz2
+backup_file=${DIR}/${PREFIX}${backup_file_name}
 
 cleanup() {
   rm -f "$TMPFILE"
@@ -53,12 +53,14 @@ mysqldump --defaults-extra-file="$TMPFILE" --opt --flush-logs --single-transacti
 {% if enable_mariabackup|bool == true %}
 
 PREFIX=mysqlbackup-
+backup_file_name=$(docker run --rm -v ${DIR}:/backups "{{ kolla_toolbox_image_full }}" /bin/bash -c "ls -Art /backups/${PREFIX}* | tail -n 1")
+backup_file_name=$(basename $backup_file_name)
 
 cleanup() {
   # Rotate backups  
-  docker run --rm -v mariadb_backup:/backup "{{ kolla_toolbox_image_full }}" \
-  find /backup -maxdepth 1 -type f -name "${PREFIX}*" -mtime +${ROTATE} -print0 \
-  | xargs -0 -r -rm -f
+  docker run -u 0 --rm -v ${DIR}:/backup "{{ kolla_toolbox_image_full }}" \
+  /bin/bash -c \
+  "find /backup -maxdepth 1 -type f -name "${PREFIX}*" -mtime +${ROTATE} -print0 | xargs -0 -r rm -f"
 }
 
 {% endif %}
@@ -72,12 +74,12 @@ _aws() {
     -e AWS_ACCESS_KEY_ID="{{ mariadb_backup_s3_key_id }}" \
     -e AWS_SECRET_ACCESS_KEY="{{ mariadb_backup_s3_key }}" \
     -v "{{ mariadb_backup_s3_conf_dir }}":/root/.aws \
-    -v "$backup_file":/backups/"$backup_file" \
+    -v ${DIR}:/backups \
     amazon/aws-cli \
     --endpoint="{{ mariadb_backup_s3_endpoint }}" \
     --region=us-east-1 \
     "$@"
 }
 _aws s3 mb s3://"{{ mariadb_backup_container_name }}"
-_aws s3 cp /backups/"$backup_file" s3://"{{ mariadb_backup_container_name }}"
+_aws s3 cp /backups/"$backup_file_name" s3://"{{ mariadb_backup_container_name }}"
 {% endif %}

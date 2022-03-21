@@ -1,4 +1,8 @@
 ---
+# this depends on the location of chi-in-a-box and site-config directories, and will break if they're moved.
+# to check on the success of the backup, login to the mariadb host and check if the backups are in the
+# mariadb_backup docker volume.
+# if it breaks because of moving directories, simply re-run post-deploy.
 - name: Add mariadb backup job
   include_role:
     name: chameleon.periodic_task

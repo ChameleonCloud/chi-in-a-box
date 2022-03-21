@@ -359,6 +359,8 @@ kolla_args+=(--globals="$CONFIG_DIR/globals.yml")
 kolla_args+=(--passwords="$CONFIG_DIR/passwords.yml")
 kolla_args+=(--extra node_custom_config="$CONFIG_DIR/node_custom_config")
 kolla_args+=(--extra cc_ansible_site_dir="$CONFIG_DIR")
+kolla_args+=(--extra deployment_dir="$DIR")
+kolla_args+=(--extra site_config_dir="$CC_ANSIBLE_SITE")
 
 # We set ansible ansible_python_interpreter to the virtualenv inside site-config, and override here during bootstrap.
 # Overriding at the CLI here applies to all hosts, including the deploy host.
