@@ -21,9 +21,6 @@ spec:
   selector:
     matchLabels:
       name: nvidia-device-plugin-ds
-  nodeSelector:
-    matchLabels:
-      nvidia-device-plugin/enabled: true
   updateStrategy:
     type: RollingUpdate
   template:
@@ -35,6 +32,9 @@ spec:
       labels:
         name: nvidia-device-plugin-ds
     spec:
+      nodeSelector:
+        matchLabels:
+          nvidia-device-plugin/enabled: true
       tolerations:
         # This toleration is deprecated. Kept here for backward compatibility
         # See https://kubernetes.io/docs/tasks/administer-cluster/guaranteed-scheduling-critical-addon-pods/
