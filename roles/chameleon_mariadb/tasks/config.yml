@@ -31,6 +31,8 @@
 - name: Add mariadb backup job
   include_role:
     name: chameleon.periodic_task
+    apply:
+      become: yes
   vars:
     task_name: "mariadb_backup"
     task_command: "{{ mariadb_backup_cron_script }}"

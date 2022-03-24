@@ -326,7 +326,7 @@
 - hosts: mariadb
   roles:
     - role: chameleon_usage
-      when: enable_mariabackup | bool
+      when: enable_usage_reporting | bool
   become: yes
   become_user: root
 

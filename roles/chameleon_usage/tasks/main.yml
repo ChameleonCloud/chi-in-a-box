@@ -67,10 +67,6 @@
     mode: 0700
     dest: /usr/local/sbin/chameleon-usage-extract-chi-data
 
-- name: Fill in up-to-date data to chameleon_usage
-  become: yes
-  command: "/usr/local/sbin/chameleon-usage-extract-chi-data"
-
 - name: Set up node data extract periodic task
   include_role:
     name: chameleon.periodic_task

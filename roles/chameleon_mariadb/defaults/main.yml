@@ -10,7 +10,6 @@ mariadb_backup_file_age: 29
 mariadb_backup_file: mariadb-backup
 mariadb_backup_retention: +31
 mariadb_backup_s3_conf_dir: /etc/awsconf
-mariadb_backup_origin_dir: "{{ backup_dir }}"
 mariadb_backup_log_key: chameleon-chi-db-backup
 
 mariadb_backup_s3_key_id:
