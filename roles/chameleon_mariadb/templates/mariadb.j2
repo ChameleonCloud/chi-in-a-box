@@ -1,12 +1,6 @@
 #!/bin/bash
 #
 # MySQL Backup Script
-#  Dumps mysql databases to a file for another backup tool to pick up.
-#
-# MySQL code:
-# GRANT SELECT, RELOAD, LOCK TABLES ON *.* TO '{{ backup_database_user }}'@'localhost'
-# IDENTIFIED BY '{{ backup_database_password }}';
-# FLUSH PRIVILEGES;
 #
 
 ROTATE="{{ mariadb_backup_file_age }}"
@@ -15,6 +9,7 @@ DIR="{{ backup_location }}"
 set -o pipefail
 
 {% if enable_mariabackup|bool == false %}
+#  Dumps mysql databases to a file
 ##### START CONFIG ###################################################
 
 USER="{{ backup_database_user }}"
@@ -51,6 +46,7 @@ mysqldump --defaults-extra-file="$TMPFILE" --opt --flush-logs --single-transacti
 {% endif %}
 
 {% if enable_mariabackup|bool == true %}
+# mariadb backup is handled by kolla. just do cleanups here.
 
 PREFIX=mysqlbackup-
 backup_file_name=$(docker run --rm -v ${DIR}:/backups "{{ kolla_toolbox_image_full }}" /bin/bash -c "ls -Art /backups/${PREFIX}* | tail -n 1")
