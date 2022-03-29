@@ -83,6 +83,17 @@ enable_doni: yes
 
 # Glance
 enable_glance: yes
+glance_file_datadir_volume: /var/lib/glance
+glance_backend_file: yes
+glance_backend_swift: "{{ enable_swift }}"
+# TODO: remove glance_backends after upgrade kolla-ansible to xena
+glance_backends:
+  - name: file
+    type: file
+    enabled: "{{ glance_backend_file | bool }}"
+  - name: "swift"
+    type: "swift"
+    enabled: "{{ glance_backend_swift | bool }}"
 
 # Gnocchi
 enable_gnocchi: yes
