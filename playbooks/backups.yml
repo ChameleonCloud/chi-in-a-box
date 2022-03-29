@@ -2,7 +2,7 @@
 - hosts: deployment
   roles:
     - role: chameleon_mariadb
-      when: enable_mariabackup | bool
+      when: hostvars[groups['mariadb'][0]]['enable_mariabackup'] | bool
       vars:
           action: 'deployment'
 
