@@ -1,0 +1,17 @@
+---
+- name: Configure chameleon image cleaner docker bash wrapper
+  become: yes
+  template:
+    src: chameleon-image-clean.j2
+    mode: 0700
+    dest: /usr/local/sbin/chameleon-image-clean
+
+- name: Set up image cleaner periodic task
+  include_role:
+    name: chameleon.periodic_task
+    apply:
+      become: yes
+  vars:
+    task_name: "image_clean"
+    task_command: "/usr/local/sbin/chameleon-image-clean"
+    task_calendar: "daily"

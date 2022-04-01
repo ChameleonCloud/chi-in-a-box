@@ -1,0 +1,6 @@
+#! /bin/sh
+
+docker run --rm --net=host \
+    -v "{{ chameleon_image_tools_config_dir }}/site.yaml:/etc/chameleon_image_tools/site.yaml" \
+    {{ chameleon_image_tools_docker_image }} \
+    clean --site-yaml /etc/chameleon_usage/site.yaml 2>&1

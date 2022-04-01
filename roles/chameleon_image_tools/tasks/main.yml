@@ -1,0 +1,20 @@
+---
+- name: Pull Docker image
+  docker_image:
+    source: pull
+    name: "{{ chameleon_image_tools_docker_image }}"
+    force_source: yes
+
+- name: Create config directory
+  become: yes
+  file:
+    path: "{{ chameleon_image_tools_config_dir }}"
+    state: directory
+    
+- name: Configure site.yaml
+  become: yes
+  template:
+    src: site.yaml.j2
+    dest: "{{ chameleon_image_tools_config_dir }}/site.yaml"
+
+- include_tasks: "{{ action }}.yml"
