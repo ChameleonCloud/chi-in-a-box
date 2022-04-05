@@ -4,7 +4,7 @@
 
 ## Before You Begin
 
-* [Openstack Architecture](before-you-begin/openstack-architecture.md)
+* [OpenStack Architecture](before-you-begin/openstack-architecture.md)
   * [Controller Nodes](before-you-begin/hardware-requirements/controller-nodes.md)
   * [Compute Nodes](before-you-begin/hardware-requirements/compute-nodes.md)
   * [Baremetal Nodes](before-you-begin/hardware-requirements/baremetal-nodes.md)
@@ -30,8 +30,8 @@
 ## Reference
 
 * [Chameleon Identity Federation](reference/chameleon-identity-federation.md)
-* [Baremetal Provisioning](reference/baremetal-provisioning.md)
-* [Multi-Tenant Networking](reference/multi-tenant-networking.md)
+* [Ironic Flat Networking](reference/ironic-flat-networking.md)
+* [Ironic Multi-Tenant Networking](reference/multi-tenant-networking.md)
 * [Resource Reservation](reference/resource-reservation/README.md)
   * [Default Resource Properties](reference/resource-reservation/default-resource-properties.md)
 * [Monitoring](reference/monitoring/README.md)
@@ -77,5 +77,5 @@
 
 ## Development
 
-* [Developing Openstack Services](Developing-Openstack-Services.md)
+* [Developing OpenStack Services](Developing-Openstack-Services.md)
 * [Dev-in-a-box](development/dev-in-a-box.md)

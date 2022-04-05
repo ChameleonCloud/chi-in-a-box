@@ -40,6 +40,7 @@ In this scenario a provider wants to create a testbed that is in every way separ
 * Gnocchi (timeseries storage for experiment metrics)
 * Keystone (authentication and authorization)
 * Heat (orchestration)
+* [Python-CHI](https://github.com/ChameleonCloud/python-chi): User-Friendly Python client library with Jupyter Integration
 
 Chameleon additionally provides a few useful extra pieces for all users of CHI-in-a-Box associate sites:
 
@@ -52,6 +53,8 @@ Chameleon additionally provides a few useful extra pieces for all users of CHI-i
 * [Prometheus](https://prometheus.io) monitoring and custom operational alerts, for insight into overall system health.
 * [Centralized searchable system logs](https://docs.openstack.org/kolla-ansible/latest/reference/logging-and-monitoring/central-logging-guide.html) with Kibana visualizations, for when you need to find something specific.
 * [Hammers](https://github.com/chameleoncloud/hammers): automated sanity checks and maintenance scripts, for those inevitable yet easily fixable issues.
+* [Doni](https://github.com/ChameleonCloud/doni): OpenStack Service to coordinate device enrollment and part-time availability.
+* Smoke Tests: Automated end-to-end testing (Currently operated centrally, open sourced soon)
 * HA-ready setup using HAProxy/keepalived for redundancy, for when uptime is a primary concern (requires multi-node deployment).
 * Automated backups of important data (Glance images, MySQL databases), for a better night's rest.
 * Integrate with Chameleon's existing user and allocation management system to remove the need to operate your own user workflow, authentication, and authorization systems.
