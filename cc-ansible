@@ -326,6 +326,7 @@ TRAPS+=(_lock_cleanup)
 # Prepare the configuration directory for the Kolla-Ansible invocation:
 CONFIG_DIR="$(mktemp -d)"
 _config_dir_cleanup() {
+  cp -n -v "$CONFIG_DIR/admin-openrc.sh" "$CC_ANSIBLE_SITE/admin-openrc.sh"
   rm -rf "$CONFIG_DIR"
 }
 TRAPS+=(_config_dir_cleanup)
