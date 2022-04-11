@@ -31,4 +31,8 @@ kolla_external_fqdn: chi.example.com
 # enable_keystone_federation: no
 # enable_keystone_federation_openid: no
 keystone_idp_client_id: null
+
+# This is used for glance file backend
+# ref: https://docs.openstack.org/kolla-ansible/train/reference/shared-services/glance-guide.html#file-backend
+glance_file_datadir_volume: /var/lib/glance
 ```

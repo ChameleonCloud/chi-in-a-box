@@ -18,7 +18,9 @@ kolla_external_vip_address: 100.0.0.1
 # This should resolve to the external_vip and match the TLS Cert
 kolla_external_fqdn: chi.example.com
 
-
+# This is used for glance file backend
+# ref: https://docs.openstack.org/kolla-ansible/train/reference/shared-services/glance-guide.html#file-backend
+glance_file_datadir_volume: /var/lib/glance
 
 #Uncomment to Disable Federated Auth
 # enable_keystone_federation: no
