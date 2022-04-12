@@ -1,75 +1,103 @@
 ---
-# This file contains an example site configuration.
-# To enable features, each section MUST be customized to you needs.
+# /opt/chi-in-a-box/site-config/defaults.yml 
+# This file defines your basic site configuration
+# IMPORTANT: You MUST provide valid values for items marked "MANDATORY"
+# Some sections may be further customized to your needs
 
-# Associate Site Name (MANDATORY)
-openstack_region_name: CHI@XYZ
-# Site name, similar to region but used for out-of-band inventory management
-chameleon_site_name: xyz
+# MANDATORY: Define your Region name
+# Specified as a string of all-uppercase characters, starting with "CHI@"
+# Example: CHI@XYZ
+##openstack_region_name: CHI@XYZ
 
-# HAProxy Config (MANDATORY)
-enable_haproxy: yes
-# Provide a full TLS chain in /etc/kolla/haproxy/certs.d/
-kolla_enable_tls_external: yes
-# Set to a "spare" address in the "internal" subnet
-kolla_internal_vip_address: 10.0.0.1
-# Set to a "spare" address in the "public" subnet
-kolla_external_vip_address: 100.0.0.1
-# This should resolve to the external_vip and match the TLS Cert
-kolla_external_fqdn: chi.example.com
+# MANDATORY: Define your Chameleon site name
+# Specified as a string of lower-case characters; by convention, this
+#   should match the portion of the "openstack_region_name" after the "@"
+# This is used for out-of-band inventory management
+##chameleon_site_name: xyz
 
-# This is used for glance file backend
-# ref: https://docs.openstack.org/kolla-ansible/train/reference/shared-services/glance-guide.html#file-backend
-glance_file_datadir_volume: /var/lib/glance
+# MANDATORY: Enable/disable HP Proxy configuration
+# Specified as "yes" or "no"
+##enable_haproxy: yes
 
-#Uncomment to Disable Federated Auth
-# enable_keystone_federation: no
-# enable_keystone_federation_openid: no
-# keystone_idp_client_id: null
+# What is the base Linux distro for your install?
+# Valid Values:
+#   centos = (DEFAULT) Assumes CentOS7
+#   ubuntu = Assumes Ubuntu 18.04
+##kolla_base_distro: {centos|ubuntu}
 
+# MANDATORY: Should Kolla be configured to utilize TLS encryption?
+# Valid Values:
+#   no = Do not utilize TLS (you can still add it later)
+#   yes = Use TLS; all of the files needed for the full TLS chain
+#       must already be present in /etc/kolla/haproxy/certs.d/
+# NOTE: If set to "yes", then the FQDN defined in kolla_external_fqdn
+#       MUST match the FQDN specified in the certificate
+##kolla_enable_tls_external: no
 
-# Neutron networks (MANDATORY)
-# Uncomment to enable Neutron Bridge Networks
-# At least one private and one public is required
-# neutron_networks:
-#   - name: physnet1
-#     on_demand_vlan_ranges:
-#       - 200:250
-#     reservable_vlan_ranges:
-#       - 250:300
-#     bridge_name: br-em1
-#     external_interface: em1
-#   - name: physnet2
-#     bridge_name: br-em2
-#     external_interface: em2
-#   - name: public
-#     bridge_name: br-ex
-#     external_interface: em3
-#     # This should be your public IP block assigned to your deployment.
-#     cidr: 0.0.0.0/32
+# MANDATORY: Define IPv4 network address for Ironic's internal
+#   provisioning subnet; this should be an address in the same
+#   network assigned to "eno3" but NOT be the same as any address
+#   the OS configuration actually binds to the NIC
+# NOTE: This IP must reside in the same subnet as defined in
+#   ironic_dnsmasq_dhcp_range
+##kolla_internal_vip_address: 172.16.0.10
 
+###########################################################################
+# IMPORTANT: For the next two items, the IP address should reverse-resolve
+#   to the FQDN, and the FQDN should resolve to the IP
 
-# Ironic network config
-# Uncomment to enable provisioning vlan for Ironic
-# ironic_provisioning_network_vlan: 200
-# ironic_dnsmasq_dhcp_range: 10.51.0.0/24
+# MANDATORY: Define IPv4 network address for Chameleon's public
+#   web interface; this should be an address in the same network
+#   assigned to "eno1", but should NOT be the same as any address
+#   the OS configuration actually binds to the NIC
+##kolla_external_vip_address: 1.2.3.4
 
-# Physical Switch config for Neutron-ML2:
-# Uncomment with info for neutron managed switch
-# switch_configs:
-#   - name: leafswitch1
-#     device_type: netmiko_dell_force10
-#     address: 10.0.0.10
-#     auth:
-#       username: chameleon
-#       password: "{{ dell_switch_password }}"
-#     snmp:
-#       community_string: "{{ dell_switch_community_string }}"
-#     ngs_config:
-#       persist_changes: False
-#       fast_cli: True
+# MANDATORY: Define the FQDN of the Chameleon host
+# NOTE: If using TLS, then this must match the FQDN of the certificate
+##kolla_external_fqdn: chi-xyz.example.tld
+###########################################################################
 
-# If you are allowing users to reserve public IPs,
-# this should correspond to the Neutron ID of your
-# public (gateway) network. It defaults to allowing public/Public
-# blazar_floatingip_reservation_network_regex: "[pP]ublic"
+###########################################################################
+# Identity Federation Settings
+# If you are operating Chameleon as an Independent Testbed, then leave the
+#   following settings unchanged
+# Otherwise, enable the appropriate federation service
+enable_keystone_federation: no
+enable_keystone_federation_openid: no
+keystone_idp_client_id: null
+###########################################################################
+
+###########################################################################
+# MANDATORY: Neutron networks
+# At minimum, you MUST define:
+#   0) A "public" network, corresponding to "eno1"
+#   1) A private network, corresponding to "eno4"
+#neutron_networks:
+#    - name: physnet1
+#      on_demand_vlan_ranges:
+#        - 1001:1020
+#      reservable_vlan_ranges:
+#        - 2001:2020
+#      bridge_name: br-em1
+#      external_interface: eno4
+#    - name: public
+#      bridge_name: br-ex
+#      external_interface: eno1
+#      # The following two items should reside in the same network
+#      #   assigned to "eno1", but should NOT be the same as any address
+#      #   the OS configuration actually binds to the NIC
+#      cidr: 1.2.3.0/25
+#      gateway_ip: 1.2.3.1
+
+###########################################################################
+# Ironic network config - required for using ironic
+# A single VLAN, in one of the VLAN ranges associated to your private
+#   network (as defined above), must be used for baremetal provisioning
+##ironic_provisioning_network_vlan: 2020
+
+# Define an RFC 1918 IPv4 subnet for use within the provisioning network
+# This must be the same network in which the IP address defined by
+#   kolla_internal_vip_address above resides
+##ironic_dnsmasq_dhcp_range: 172.16.0.0/12
+
+# End of /opt/chi-in-a-box/site-config/defaults.yml 
