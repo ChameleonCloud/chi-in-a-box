@@ -10,6 +10,7 @@
       region_name: "{{ openstack_region_name }}"
   delegate_to: "{{ groups['control'][0] }}"
   run_once: True
+  when: enable_precis | bool
 
 - name: Create cep endpoint
   kolla_toolbox:
@@ -23,6 +24,7 @@
       region_name: "{{ openstack_region_name }}"
   delegate_to: "{{ groups['control'][0] }}"
   run_once: True
+  when: enable_precis | bool
 
 - name: Create RabbitMQ entities.
   block:
@@ -69,6 +71,7 @@
           routing_key: "notifications.*"
           state: present
       loop: "{{ precis_rabbitmq_listener_bindings }}"
+  when: enable_precis | bool
   tags:
     - rabbitmq
 
@@ -86,6 +89,7 @@
       password: "{{ precis_mysql_password }}"
       priv: "{{ precis_mysql_database }}.*:ALL/{{ precis_mysql_external_database_privileges | join('/') }}"
       state: present
+  when: enable_precis | bool
   tags:
     - mysql
 
@@ -100,6 +104,7 @@
     - "{{ precis_event_listener_docker_image }}"
     - "{{ precis_endpoint_docker_image }}"
     - "{{ precis_generator_docker_image }}"
+  when: enable_precis | bool
   tags:
     - pull
 
@@ -109,7 +114,9 @@
     ipam_config:
       - subnet: "{{ precis_docker_network_subnet }}"
     state: present
-  when: precis_docker_network != "host"
+  when:
+    - precis_docker_network != "host"
+    - enable_precis | bool
 
 - name: Configure precis services.
   block:
@@ -190,6 +197,7 @@
           port: "{{ precis_generator_prometheus_port }}"
   become: true
   become_user: root
+  when: enable_precis | bool
   tags:
     - configuration
 
@@ -198,13 +206,16 @@
     name: haproxy-config
   vars:
     project_services: "{{ precis_services }}"
-  when: enable_haproxy | bool
+  when:
+    - enable_haproxy | bool
+    - enable_precis | bool
 
 - name: Create precis database
   shell: |
     docker run --rm --net={{ precis_docker_network }} \
     -v "{{ precis_config_path }}/init.conf:/etc/experiment_precis/init.conf" \
     {{ precis_init_docker_image }} 2>&1
+  when: enable_precis | bool
 
 - name: Configure cleanup task
   block:
@@ -222,5 +233,6 @@
         task_calendar: daily
   become: true
   become_user: root
+  when: enable_precis | bool
   tags:
     - configuration
