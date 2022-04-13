@@ -1,9 +1,7 @@
 ---
-- hosts: mariadb
-
-- hosts: rabbitmq
-
-- hosts: precis
+- name: Install and configure services for Precis
+  hosts: precis
   roles:
     - role: precis
-      when: enable_precis | bool
+      tags:
+        - "precis"
