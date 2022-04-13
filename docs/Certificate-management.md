@@ -1,13 +1,16 @@
+# Certificate management
+
 All CHI-in-a-Box APIs and application endpoints are exposed over the public Internet via TLS-encrypted proxies served by HAProxy. A valid SSL certificate is needed for the `kolla_external_fqdn` you provide. You can use either an automated LetsEncrypt workflow or provide a certificate you have obtained from another certificate authority (by default, this will be, relative to your site configuration directory, `./certificates/haproxy.pem`).
 
-## LetsEncrypt
+### LetsEncrypt
 
-### Setup
+#### Setup
 
 In order to use the LetsEncrypt method, you must first enable the LetsEncrypt agents for your deployment:
 
 ```yaml
 enable_letsencrypt: yes
+letsencrypt_email: <email_addr@for.cert.renewals>
 letsencrypt_domains:
   - "{{ kolla_external_fqdn }}"
 ```
@@ -15,31 +18,41 @@ letsencrypt_domains:
 Ensure the agents are deployed before proceeding:
 
 ```shell
-./cc-ansible deploy --tags letsencrypt
+./cc-ansible deploy --tags letsencrypt,haproxy,horizon
 ```
 
-### Initial certificate generation
+At this point, verify that the ACME server is running by visiting: `http://<kolla_external_fqdn>/.well-known/acme-challenge/`
 
-Currently, the initial certificate generation is not yet automated ([https://github.com/ChameleonCloud/chi-in-a-box/issues/116](#116)). You must perform the following steps:
+If everything has gone well, you'll get a 404 from nginx.
+
+#### Initial certificate generation
+
+Currently, the initial certificate generation is not yet automated ([https://github.com/ChameleonCloud/chi-in-a-box/issues/116](Certificate-management.md#116)). You must perform the following steps:
 
 ```shell
-# Stop the haproxy container (this will bring down all HTTP services temporarily).
-# This needs to happen to allow the HTTP-01 ACME check to pass for domain verification.
-docker stop haproxy
+# Make a directory for your certs
+docker exec -it letsencrypt_certbot mkdir -p /www/data/<kolla_external_fqdn>/
 # Request the initial certificate
-docker exec -it letsencrypt_certbot certbot certonly -d <domain> --agree-tos
+docker exec -it letsencrypt_certbot certbot certonly --noninteractive --agree-tos
 # If all goes well, restart haproxy
 docker restart haproxy
 ```
 
-### Certificate renewal
+Finally, enable external TLS in your defaults.yml
 
-Any LetsEncrypt certificates will be automatically renewed. **However**, HAProxy will not automatically restart when this happens, meaning it will not detect or pick up the new certificates (see [https://github.com/ChameleonCloud/chi-in-a-box/issues/125](#125)). For the time being, you may wish to set up a periodic task to restart HAProxy every few weeks.
+```
+kolla_enable_tls_external: true
+```
 
-## Bring your own certificate
+And reconfigure `./cc-ansible reconfigure --tags haproxy`
 
-When providing your own certificate file, care must be taken to format it for HAProxy.
-HAProxy requires a PEM file with the following information, concatenated in order:
+#### Certificate renewal
+
+Any LetsEncrypt certificates will be automatically renewed. **However**, HAProxy will not automatically restart when this happens, meaning it will not detect or pick up the new certificates (see [https://github.com/ChameleonCloud/chi-in-a-box/issues/125](Certificate-management.md#125)). For the time being, you may wish to set up a periodic task to restart HAProxy every few weeks.
+
+### Bring your own certificate
+
+When providing your own certificate file, care must be taken to format it for HAProxy. HAProxy requires a PEM file with the following information, concatenated in order:
 
 1. Your private key
 2. Your public certificate
@@ -73,6 +86,6 @@ Place your PEM file in `$site_config/certificates/haproxy.pem` (or whatever the 
 ./cc-ansible reconfigure --tags haproxy
 ```
 
-## Debugging certificates
+### Debugging certificates
 
 If you're having trouble with your certs failing verification, [What's my Chain Cert?](https://whatsmychaincert.com) is an excellent debugging tool and can help pinpoint issues such as an expired intermediate certificate.
