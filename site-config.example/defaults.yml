@@ -55,6 +55,9 @@ glance_file_datadir_volume: /var/lib/glance
 # Ironic network config
 # Uncomment to enable provisioning vlan for Ironic
 # ironic_provisioning_network_vlan: 200
+# Subnet for ironic-provisioning
+# ironic_provisioning_network_cidr: 10.51.0.0/24
+# DHCP range used for ironic provisioning
 # ironic_dnsmasq_dhcp_range: 10.51.0.0/24
 
 # Physical Switch config for Neutron-ML2:
