@@ -7,6 +7,9 @@ openstack_region_name: CHI@XYZ
 # Site name, similar to region but used for out-of-band inventory management
 chameleon_site_name: xyz
 
+# Set to match the OS of your controller node(s)
+kolla_base_distro: ubuntu
+
 # HAProxy Config (MANDATORY)
 enable_haproxy: yes
 # Provide a full TLS chain in /etc/kolla/haproxy/certs.d/
