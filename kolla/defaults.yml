@@ -5,7 +5,7 @@ cloud: envvars
 docker_namespace: kolla
 docker_registry_username: registry
 docker_registry: docker.chameleoncloud.org
-kolla_base_distro: centos
+kolla_base_distro: ubuntu
 kolla_install_type: source
 
 # Disable addition of tag for CentOS8
@@ -308,4 +308,3 @@ enable_osg: no
 
 # usage reporting
 enable_usage_reporting: no
-
