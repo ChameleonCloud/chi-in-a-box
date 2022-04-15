@@ -308,3 +308,7 @@ enable_osg: no
 
 # usage reporting
 enable_usage_reporting: no
+
+# image tools
+enable_image_deployer: no
+enable_image_cleaner: no

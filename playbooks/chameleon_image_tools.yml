@@ -1,0 +1,11 @@
+---
+- hosts: chameleon-image-tools
+  roles:
+    - role: chameleon_image_tools
+      when: enable_image_deployer | bool
+      vars:
+          action: 'deploy'
+    - role: chameleon_image_tools
+      when: enable_image_cleaner | bool
+      vars:
+          action: 'clean'
