@@ -227,6 +227,8 @@
     - name: Set up precis cleanup task.
       include_role:
         name: chameleon.periodic_task
+        apply:
+          become: yes
       vars:
         task_name: "precis_cleanup"
         task_command: "/usr/local/sbin/precis_cleanup"

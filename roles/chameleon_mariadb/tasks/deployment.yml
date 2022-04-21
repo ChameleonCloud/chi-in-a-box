@@ -6,6 +6,8 @@
 - name: Add mariadb backup job
   include_role:
     name: chameleon.periodic_task
+    apply:
+      become: yes
   vars:
     task_name: "mariadb_backup_{{ mariadb_backup_timer_suffix }}"
     task_command: "{{ deployment_dir }}/cc-ansible --site {{ deployment_site_config_dir }} mariadb_backup"

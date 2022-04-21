@@ -3,14 +3,14 @@
   os_keystone_role:
     auth: "{{ openstack_auth }}"
     name: osg
-    
+
 - name: Create osg role
   kolla_toolbox:
     module_name: os_keystone_role
     module_args:
       name: osg
       auth: "{{ openstack_auth }}"
-    
+
 - name: Add service user to osg project as osg
   kolla_toolbox:
     module_name: os_user_role
@@ -19,7 +19,7 @@
       user: "{{ osg_service_username }}"
       role: osg
       project: "{{ osg_project_name }}"
-    
+
 - name: Pull Docker image
   docker_image:
     source: pull
@@ -42,7 +42,7 @@
     src: "osg.env.j2"
     mode: 0640
     dest: "{{ osg_config_path }}/osg.env"
-    
+
 - name: Create openstack env file
   template:
     src: "openstack.env.j2"
@@ -58,12 +58,14 @@
 - name: Set up osg deployer periodic task
   include_role:
     name: chameleon.periodic_task
+    apply:
+      become: yes
   vars:
     task_name: "osg_deployer"
     task_command: "/usr/local/sbin/osg-deployer"
     task_calendar: "*:0/30"
   when: enable_osg | bool
-  
+
 - name: Check if osg timer exists
   stat: path=/etc/init.d/osg_deployer
   register: timer_status

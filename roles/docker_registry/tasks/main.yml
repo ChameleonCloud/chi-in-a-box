@@ -27,12 +27,12 @@
       template:
         src: config.yml.j2
         dest: "{{ docker_registry_config_path }}/config.prod.yml"
-        mode: '0640'
+        mode: "0640"
     - name: Create Docker Registry maintenance config.
       template:
         src: config.yml.j2
         dest: "{{ docker_registry_config_path }}/config.maintenance.yml"
-        mode: '0640'
+        mode: "0640"
       vars:
         maintenance: yes
     - name: Create symbolic link for production config.
@@ -86,6 +86,8 @@
 - name: Configure Docker Registry periodic tasks.
   include_role:
     name: chameleon.periodic_task
+    apply:
+      become: yes
   vars:
     task_name: "{{ item.key }}"
     task_calendar: "{{ item.value.calendar }}"
