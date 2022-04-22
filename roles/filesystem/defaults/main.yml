@@ -1,0 +1,6 @@
+---
+filesystem_address_scope: filesystem-address-scope
+filesystem_subnet_pool: filesystem-subnet-pool
+filesystem_ganesha_network: filesystem-ganesha
+filesystem_ganesha_router: filesystem-ganesha-router
+enable_manila_nfs_ganesha_service: "{{ enable_manila_backend_cephfs_nfs | bool }}"

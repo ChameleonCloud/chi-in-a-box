@@ -35,3 +35,8 @@
 - name: Install and configure services for Precis
   hosts: precis
   roles: [precis]
+
+- hosts: manila-nfs-ganesha
+  roles:
+    - role: filesystem
+      when: enable_manila | bool
