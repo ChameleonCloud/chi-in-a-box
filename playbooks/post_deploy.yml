@@ -341,3 +341,8 @@
 - hosts: chameleon-image-tools
   roles:
     - chameleon_image_tools
+
+- hosts: manila-nfs-ganesha
+  roles:
+    - role: filesystem
+      when: enable_manila | bool

@@ -1,0 +1,3 @@
+---
+filesystem_ganesha_network: filesystem-ganesha
+enable_manila_nfs_ganesha_service: "{{ enable_manila_backend_cephfs_nfs | bool }}"
