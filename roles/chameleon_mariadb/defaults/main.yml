@@ -7,13 +7,7 @@ mariadb_backup_timer_suffix: "{{ site_config_dir | basename }}"
 mariadb_backup_cron_script: /usr/local/sbin/mariadb-backup
 mariadb_backup_max_packet: 1M
 mariadb_backup_file_age: 29
-mariadb_backup_file: mariadb-backup
-mariadb_backup_retention: +31
 mariadb_backup_s3_conf_dir: /etc/awsconf
-mariadb_backup_log_key: chameleon-chi-db-backup
-
-mariadb_backup_s3_key_id:
-mariadb_backup_s3_endpoint:
 mariadb_backup_container_name: backup
 
 kolla_toolbox_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ kolla_install_type }}-kolla-toolbox"

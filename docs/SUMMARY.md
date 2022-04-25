@@ -52,6 +52,8 @@
 * [Certificate management](Certificate-management.md)
 * [Hammers 🔨](operations/hammers/README.md)
   * [maintenance\_reservation](operations/hammers/maintenance\_reservation.md)
+* [Image tools](operations/image-tools/README.md)
+* [Usage reporting](operations/usage-reporting/README.md)
 * [Runbooks](runbooks/README.md)
   * [Cron Job No Recent Success](runbooks/CronJobNoRecentSuccess.md)
   * [Instance Failure](runbooks/instance-failure.md)
