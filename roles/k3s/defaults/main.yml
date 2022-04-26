@@ -7,8 +7,8 @@ k3s_systemd_dir: /etc/systemd/system
 k3s_server_ip: "{{ kolla_external_vip_address }}"
 k3s_extra_server_args: ""
 
-k3s_cluster_cidr: "192.168.100.0/22"
-k3s_cluster_node_blocksize: 26
+k3s_cluster_cidr: "192.168.64.0/18"
+k3s_cluster_node_blocksize: 28
 
 k3s_enable_calico: yes
 k3s_calico_version: v3.20.3
