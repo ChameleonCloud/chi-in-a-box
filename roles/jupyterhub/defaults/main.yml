@@ -44,6 +44,7 @@ jupyterhub_environment:
   ARTIFACT_SHARING_SWIFT_CONTAINER: "{{ jupyterhub_artifact_sharing_container }}"
   ARTIFACT_SHARING_SWIFT_TEMP_URL_KEY: "{{ jupyterhub_artifact_sharing_swift_temp_url_key }}"
   ARTIFACT_SHARING_TRUST_PROJECT_NAME: "{{ jupyterhub_artifact_sharing_keystone_trust_project_name }}"
+  TROVI_URL: "https://trovi.chameleoncloud.org"
 
 jupyterhub_services:
   jupyterhub:
