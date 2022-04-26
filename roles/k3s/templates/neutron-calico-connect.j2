@@ -5,8 +5,8 @@
 # addresses to pods running on K3s.
 
 calico_cidr="{{ k3s_cluster_cidr }}"
-host_addr="192.168.99.1/24"
-ns_addr="192.168.99.2/24"
+host_addr="192.168.150.1/24"
+ns_addr="192.168.150.2/24"
 
 neutron_ns=qrouter-"{{ neutron_router_id }}"
 
@@ -20,7 +20,9 @@ ip link set veth-caliN netns "$neutron_ns" up
 ip netns exec "$neutron_ns" ip addr replace "$ns_addr" dev veth-caliN
 
 # Allow traffic from Neutron router ns to travel through default ns for Calico subnet
-ip netns exec "$neutron_ns" ip route add "$calico_cidr" via "${host_addr%%/24}"
+# Also ensure we delete Neutron's default route it adds due to the subnet having a
+# router interface.
+ip netns exec "$neutron_ns" ip route replace "$calico_cidr" via "${host_addr%%/24}"
 
 # Required for any traffic going over IPIP tunnel to other Calico nodes
 iptables -t nat -S | grep -q neutron-calico-connect:01 || {
