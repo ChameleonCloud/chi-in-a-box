@@ -17,4 +17,40 @@
     src: site.yaml.j2
     dest: "{{ chameleon_image_tools_config_dir }}/site.yaml"
 
-- include_tasks: "{{ action }}.yml"
+- name: Configure chameleon image deployer docker bash wrapper
+  become: yes
+  template:
+    src: chameleon-image-deploy.j2
+    mode: 0700
+    dest: /usr/local/sbin/chameleon-image-deploy
+  when: enable_image_deployer | bool
+
+- name: Set up image deployer periodic task
+  include_role:
+    name: chameleon.periodic_task
+    apply:
+      become: yes
+  vars:
+    task_name: "image_deploy"
+    task_command: "/usr/local/sbin/chameleon-image-deploy"
+    task_calendar: "daily"
+  when: enable_image_deployer | bool
+
+- name: Configure chameleon image cleaner docker bash wrapper
+  become: yes
+  template:
+    src: chameleon-image-clean.j2
+    mode: 0700
+    dest: /usr/local/sbin/chameleon-image-clean
+  when: enable_image_cleaner | bool
+
+- name: Set up image cleaner periodic task
+  include_role:
+    name: chameleon.periodic_task
+    apply:
+      become: yes
+  vars:
+    task_name: "image_clean"
+    task_command: "/usr/local/sbin/chameleon-image-clean"
+    task_calendar: "daily"
+  when: enable_image_cleaner | bool

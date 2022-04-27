@@ -40,7 +40,7 @@ enable_rabbitmq: yes
 # Automatic backups
 # automatic backup is enabled by default using kolla mariadb backup and restore
 # ref: https://docs.openstack.org/kolla-ansible/latest/admin/mariadb-backup-and-restore.html
-enable_mariabackup: yes
+enable_mariabackup: "{{ enable_mariadb }}"
 mariabackup_location: mariadb_backup
 mysqldump_location: /var/db/backup
 backup_location: "{{ mariabackup_location if enable_mariabackup | bool else mysqldump_location }}"

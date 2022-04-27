@@ -337,3 +337,7 @@
   become_user: root
   tags:
     - hammers
+
+- hosts: chameleon-image-tools
+  roles:
+    - chameleon_image_tools
