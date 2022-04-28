@@ -168,7 +168,7 @@ If you are only using two interfaces, you must do some additional configuration 
         # This should be your public IP block assigned to your deployment.
         cidr: 0.0.0.0/32
     ```
-5.  To enable bare metal provisioning, provide a vlan and subnet for ironic to use. This vlan should be included in the neutron on_demand_vlan_range above.
+5.  To enable bare metal provisioning, provide a vlan and subnet for ironic to use. This vlan should be included in the neutron `on_demand_vlan_range` above.
 
     ```yaml
     ironic_provisioning_network_vlan: 200
