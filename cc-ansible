@@ -96,8 +96,9 @@ init() {
 
   # Generate passwords
   kolla-genpwd --passwords "$site_config/passwords.yml"
-  ansible-vault --vault-password-file "$site_config/vault_password" \
-    encrypt "$site_config/passwords.yml"
+  ansible-vault encrypt \
+    --vault-password-file "$site_config/vault_password" \
+    "$site_config/passwords.yml"
 
   echo "The beginnings of your site configuration were installed to $site_config."
   echo "To use this site configuration automatically for future commands, you can"
