@@ -1,5 +1,5 @@
 ---
-openstack_release: train
+openstack_release: xena
 cloud: envvars
 
 docker_namespace: kolla
