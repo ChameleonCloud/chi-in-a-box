@@ -233,7 +233,7 @@ if [[ "$CHECK_UPDATES" == "yes" || "$FORCE_UPDATES" == "yes" ]]; then
   fi
 
   kolla_ansible_remote=https://github.com/chameleoncloud/kolla-ansible.git
-  kolla_ansible_checkout=${KOLLA_ANSIBLE_BRANCH:-chameleoncloud/train}
+  kolla_ansible_checkout=${KOLLA_ANSIBLE_BRANCH:-chameleoncloud/xena}
   kolla_ansible_gitref="$VIRTUALENV/kolla-ansible.gitref"
   kolla_ansible_egglink="$VIRTUALENV/src/kolla-ansible"
   if [[ "$FORCE_UPDATES" == "yes" || ! -f "$kolla_ansible_gitref" || ! -d "$kolla_ansible_egglink" ]] || \
