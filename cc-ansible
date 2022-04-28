@@ -45,7 +45,7 @@ while [[ $# -gt 0 ]]; do
       # Add proper flag support for --check as an option for dry-runs
       export EXTRA_OPTS="${EXTRA_OPTS:-} --check"
       ;;
-    decrypt_passwords|edit_passwords|help|init|view_passwords)
+    decrypt_passwords|edit_passwords|help|init|view_passwords|update_passwords)
       # Special subcommand!
       command="$key"
       ;;
@@ -145,6 +145,43 @@ edit_passwords() {
     --vault-password-file "$CC_ANSIBLE_VAULT_PASSWORD" \
     "$tmpfile"
   cp "$tmpfile" "$CC_ANSIBLE_SITE/passwords.yml"
+}
+
+update_passwords() {
+  local upstream_passwords_file="${DIR}/site-config.example/passwords.yml"
+  local site_passwords_file="$CC_ANSIBLE_SITE/passwords.yml"
+
+  decrypted_site_passwords_file="$(mktemp)"
+  merged_passwords_file="$(mktemp)"
+
+  _edit_passwords_cleanup() {
+    rm -f "${decrypted_site_passwords_file}"
+    rm -f "${merged_passwords_file}"
+  }
+  TRAPS+=(_edit_passwords_cleanup)
+
+  echo "decrypting passwords file"
+  ansible-vault view \
+    --vault-password-file "$CC_ANSIBLE_VAULT_PASSWORD" \
+    "${site_passwords_file}" >"${decrypted_site_passwords_file}"
+
+  kolla-mergepwd \
+    --old "${decrypted_site_passwords_file}" \
+    --new "${upstream_passwords_file}" \
+    --final "${merged_passwords_file}"
+
+  echo "found the following entries to add."
+  diff $decrypted_site_passwords_file "$merged_passwords_file" || true
+
+  echo "updating passwords file with new entries"
+  kolla-genpwd --passwords "$merged_passwords_file"
+
+  echo "Encrypting passwords..."
+  ansible-vault encrypt \
+    --vault-password-file "$CC_ANSIBLE_VAULT_PASSWORD" \
+    "$merged_passwords_file"
+  cp "$merged_passwords_file" "$CC_ANSIBLE_SITE/passwords.yml"
+
 }
 
 # Deprecated function name
