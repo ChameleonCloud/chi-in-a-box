@@ -1,6 +1,6 @@
 # Baremetal QuickStart
 
-### Install Dependencies on the controller \_\_ node
+### Install Dependencies on the controller node
 
 Commands in this section will use the system package manager, and run with root privileges. It is recommended to use python virtual environments to install chi-in-a-box and kolla-ansible.
 
@@ -10,7 +10,7 @@ Commands in this section will use the system package manager, and run with root 
 
 ```
 sudo apt update && sudo apt install -f -y \
-    python3 python3-virtualenv virtualenv \
+    python3 python3-virtualenv python3-venv virtualenv \
     jq
 ```
 
@@ -84,7 +84,7 @@ If you are only using two interfaces, you must do some additional configuration 
 
 #### `${CC_ANSIBLE_SITE}/inventory/hosts`
 
-*   Edit the [Ansible inventory](https://docs.ansible.com/ansible/latest/user\_guide/intro\_inventory.html) of your site configuration to include the hostname of the node you are installing to. It should look like this:
+*   Edit the [Ansible inventory](https://docs.ansible.com/ansible/latest/user\_guide/intro\_inventory.html) of your site configuration to include the hostname of the node you are installing to. By default, the controller node can also be network, monitoring, and storage. It should look like this:
 
     ```ini
     # These initial groups are the only groups required to be modified. The
@@ -157,7 +157,7 @@ If you are only using two interfaces, you must do some additional configuration 
     neutron_networks:
       - name: physnet1
         on_demand_vlan_ranges:
-          - 200:250
+          - 200:249
         reservable_vlan_ranges:
           - 250:300
         bridge_name: br-eth1
@@ -168,7 +168,7 @@ If you are only using two interfaces, you must do some additional configuration 
         # This should be your public IP block assigned to your deployment.
         cidr: 0.0.0.0/32
     ```
-5.  To enable bare metal provisioning, provide a vlan and subnet for ironic to use.
+5.  To enable bare metal provisioning, provide a vlan and subnet for ironic to use. This vlan should be included in the neutron `on_demand_vlan_range` above.
 
     ```yaml
     ironic_provisioning_network_vlan: 200
