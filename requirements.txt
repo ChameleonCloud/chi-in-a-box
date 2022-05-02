@@ -7,3 +7,8 @@ lxml
 openstacksdk
 # See https://github.com/weldr/lorax/commit/c56d57ef7ee1c329161158ea8867064f74c0cffa
 future
+
+# Client Tools
+python-openstackclient
+python-doniclient
+python-ironicclient
