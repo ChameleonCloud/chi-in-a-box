@@ -259,7 +259,7 @@ All of these will be provisioned by running the post-deploy script:
 
 Run the following commands:
 
-```
+```shell
 # run this in your home directory
 cd ~
 # create a new virtualenv, and use it
@@ -269,8 +269,8 @@ source .venv/bin/activate
 # update to a recent version of pip
 pip install --upgrade pip
 
-#install the openstack client libraries
-pip install python-openstackclient python-doniclient
+# install the openstack client libraries
+pip install python-openstackclient python-doniclient python-ironicclient
 ```
 
 ### Set up admin auth
