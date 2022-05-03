@@ -1,0 +1,9 @@
+---
+ironic_provisioning_network_cidr: 10.51.0.0/24
+ironic_provisioning_network_gateway: "{{ ironic_provisioning_network_cidr | next_nth_usable(1) }}"
+ironic_provisioning_allocation_pool_start: "{{ ironic_provisioning_network_cidr | next_nth_usable(2) }}"
+ironic_provisioning_allocation_pool_end: "{{ ironic_provisioning_network_cidr | ipaddr('last_usable') }}"
+# ironic_dnsmasq_dhcp_range: 10.51.0.0/24
+
+ironic_gateway_interface: "{{ network_interface | replace('_', '-') }}.{{ ironic_provisioning_network_vlan }}"
+manage_ironic_gateway_interface: false

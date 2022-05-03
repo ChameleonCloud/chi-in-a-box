@@ -1,0 +1,62 @@
+---
+- name: set facts for glance images
+  set_fact:
+    glance_images_tmp: "/tmp"
+    glance_images:
+      - name: pxe_deploy_kernel
+        container_format: aki
+        disk_format: aki
+        url: "https://tarballs.opendev.org/openstack/ironic-python-agent/dib/files/ipa-centos7-stable-{{ openstack_release }}.kernel"
+      - name: pxe_deploy_ramdisk
+        container_format: aki
+        disk_format: aki
+        url: "https://tarballs.opendev.org/openstack/ironic-python-agent/dib/files/ipa-centos7-stable-{{ openstack_release }}.initramfs"
+- name: Download source Glance images.
+  kolla_toolbox:
+    module_name: get_url
+    module_args:
+      url: "{{ item.url }}"
+      dest: "{{ glance_images_tmp }}/{{ item.name }}"
+  loop: "{{ glance_images }}"
+  loop_control:
+    label: "{{ item.name }}"
+  run_once: True
+  when: enable_ironic | bool
+- name: Create Glance images.
+  kolla_toolbox:
+    module_name: os_image
+    module_args:
+      auth: "{{ openstack_auth }}"
+      state: present
+      name: "{{ item.name }}"
+      is_public: yes
+      interface: admin
+      container_format: "{{ item.container_format }}"
+      disk_format: "{{ item.disk_format }}"
+      filename: "{{ glance_images_tmp }}/{{ item.name }}"
+  run_once: True
+  loop: "{{ glance_images }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when: enable_ironic | bool
+- name: Create baremetal flavor.
+  kolla_toolbox:
+    module_name: os_nova_flavor
+    module_args:
+      auth: "{{ openstack_auth }}"
+      state: present
+      name: baremetal
+      interface: admin
+      is_public: yes
+      extra_specs:
+        "resources:CUSTOM_BAREMETAL": 1
+        "resources:VCPU": 0
+        "resources:MEMORY_MB": 0
+        "resources:DISK_GB": 0
+      # Needs to be greater than largest expected disk image, yet smaller than
+      # actual node capacity; we guess a low value.
+      disk: 20
+      ram: 1
+      vcpus: 1
+  run_once: True
+  when: enable_ironic | bool

@@ -24,12 +24,10 @@ kolla_external_fqdn: chi.example.com
 # This is used for glance file backend
 # ref: https://docs.openstack.org/kolla-ansible/train/reference/shared-services/glance-guide.html#file-backend
 glance_file_datadir_volume: /var/lib/glance
-
 #Uncomment to Disable Federated Auth
 # enable_keystone_federation: no
 # enable_keystone_federation_openid: no
 # keystone_idp_client_id: null
-
 
 # Neutron networks (MANDATORY)
 # Uncomment to enable Neutron Bridge Networks
@@ -51,14 +49,29 @@ glance_file_datadir_volume: /var/lib/glance
 #     # This should be your public IP block assigned to your deployment.
 #     cidr: 0.0.0.0/32
 
+##########################
+# Ironic networking config
+##########################
 
-# Ironic network config
-# Uncomment to enable provisioning vlan for Ironic
-# ironic_provisioning_network_vlan: 200
-# Subnet for ironic-provisioning
+# ironic will use this vlan on sharednet1 to netboot nodes
+ironic_provisioning_network_vlan: 200
+
+# Uncomment to customize provisioning subnet
 # ironic_provisioning_network_cidr: 10.51.0.0/24
-# DHCP range used for ironic provisioning
-# ironic_dnsmasq_dhcp_range: 10.51.0.0/24
+
+# Uncomment to modify address used for provisioning network gateway.
+# The ironic provisioning subnet must be able to reach `kolla_internal_vip_address`
+# ironic_provisioning_network_gateway: "{{ ironic_provisioning_network_cidr | next_nth_usable(1) }}"
+
+# Uncomment to customize dhcp range used for ironic-provisioning
+# ironic_provisioning_allocation_pool_start: "{{ ironic_provisioning_network_cidr | next_nth_usable(2) }}"
+# ironic_provisioning_allocation_pool_end: "{{ ironic_provisioning_network_cidr | ipaddr('last_usable') }}"
+
+# uncomment to specify an interface to use as the ironic network gateway
+# ironic_gateway_interface: "{{ network_interface | replace('_', '-') }}.{{ ironic_provisioning_network_vlan }}"
+
+# uncomment to create an interface for the ironic network gateway
+# manage_ironic_gateway_interface: true
 
 # Physical Switch config for Neutron-ML2:
 # Uncomment with info for neutron managed switch

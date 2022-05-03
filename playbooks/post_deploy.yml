@@ -2,15 +2,6 @@
 - hosts: control
 
   pre_tasks:
-    - name: Set facts for Ironic interfaces.
-      set_fact:
-        ironic_interfaces:
-          - device: "{{ network_interface | replace('_', '-') }}.{{ ironic_provisioning_network_vlan }}"
-            bootproto: static
-            address: "{{ ironic_provisioning_network_gateway }}"
-            netmask: "{{ ironic_provisioning_network_cidr | ipaddr('netmask') }}"
-      when: enable_ironic | bool and
-        ironic_provisioning_network_vlan is defined
     - name: Set facts for Corsa interfaces.
       set_fact:
         corsa_nat_interfaces:
@@ -19,12 +10,11 @@
             address: "{{ corsa_nat_network_gateway }}"
             netmask: "{{ corsa_nat_network_cidr | ipaddr('netmask') }}"
       when: corsa_nat_network_cidr is defined
-
   roles:
-    - name: michaelrigart.interfaces
-      interfaces_ether_interfaces: >
-        {{ (ironic_interfaces | default([])) +
-           (corsa_nat_interfaces | default([])) }}
+    - name: Create Corsa Interface
+      michaelrigart.interfaces:
+        interfaces_ether_interfaces: >
+          {{ (corsa_nat_interfaces | default([])) }}
       become: True
 
   tasks:
@@ -48,108 +38,14 @@
 
 # Call site-specific playbook
 - import_playbook: "{{ cc_ansible_site_dir }}/post_deploy.yml"
-
 # Initialize OpenStack entities. This is done after site-specific playbooks,
 # because those playbooks may affect networking, which may not be available
 # until here.
-- hosts: control
-  tasks:
-    ##############################
-    # Ironic-related configuration
-    ##############################
-    - set_fact:
-        glance_images_tmp: "/tmp"
-        glance_images:
-          - name: pxe_deploy_kernel
-            container_format: aki
-            disk_format: aki
-            url: "https://tarballs.opendev.org/openstack/ironic-python-agent/dib/files/ipa-centos7-stable-{{ openstack_release }}.kernel"
-          - name: pxe_deploy_ramdisk
-            container_format: aki
-            disk_format: aki
-            url: "https://tarballs.opendev.org/openstack/ironic-python-agent/dib/files/ipa-centos7-stable-{{ openstack_release }}.initramfs"
-    - name: Download source Glance images.
-      kolla_toolbox:
-        module_name: get_url
-        module_args:
-          url: "{{ item.url }}"
-          dest: "{{ glance_images_tmp }}/{{ item.name }}"
-      loop: "{{ glance_images }}"
-      loop_control:
-        label: "{{ item.name }}"
-      run_once: True
-      when: enable_ironic | bool
-    - name: Create Glance images.
-      kolla_toolbox:
-        module_name: os_image
-        module_args:
-          auth: "{{ openstack_auth }}"
-          state: present
-          name: "{{ item.name }}"
-          is_public: yes
-          interface: admin
-          container_format: "{{ item.container_format }}"
-          disk_format: "{{ item.disk_format }}"
-          filename: "{{ glance_images_tmp }}/{{ item.name }}"
-      run_once: True
-      loop: "{{ glance_images }}"
-      loop_control:
-        label: "{{ item.name }}"
-      when: enable_ironic | bool
-    - name: Create baremetal flavor.
-      kolla_toolbox:
-        module_name: os_nova_flavor
-        module_args:
-          auth: "{{ openstack_auth }}"
-          state: present
-          name: baremetal
-          interface: admin
-          is_public: yes
-          extra_specs:
-            "resources:CUSTOM_BAREMETAL": 1
-            "resources:VCPU": 0
-            "resources:MEMORY_MB": 0
-            "resources:DISK_GB": 0
-          # Needs to be greater than largest expected disk image, yet smaller than
-          # actual node capacity; we guess a low value.
-          disk: 20
-          ram: 1
-          vcpus: 1
-      run_once: True
-      when: enable_ironic | bool
-    - name: Create provisioning network.
-      kolla_toolbox:
-        module_name: os_network
-        module_args:
-          auth: "{{ openstack_auth }}"
-          name: "{{ ironic_provisioning_network }}"
-          region_name: "{{ openstack_region_name }}"
-          provider_network_type: vlan
-          provider_segmentation_id: "{{ ironic_provisioning_network_vlan }}"
-          provider_physical_network: physnet1
-          state: present
-      run_once: True
-      when: enable_ironic | bool and
-        ironic_provisioning_network_vlan is defined
-    - name: Create provisioning subnet.
-      kolla_toolbox:
-        module_name: os_subnet
-        module_args:
-          auth: "{{ openstack_auth }}"
-          network_name: "{{ ironic_provisioning_network }}"
-          name: "{{ ironic_provisioning_network }}-subnet"
-          cidr: "{{ ironic_provisioning_network_cidr }}"
-          allocation_pool_start: "{{ ironic_provisioning_network_cidr | next_nth_usable(2) }}"
-          allocation_pool_end: "{{ ironic_provisioning_network_cidr | ipaddr('last_usable') }}"
-          host_routes:
-            - destination: "{{ kolla_internal_vip_address }}/32"
-              nexthop: "{{ ironic_provisioning_network_gateway }}"
-      run_once: True
-      when:
-        - enable_ironic | bool
-        - ironic_provisioning_network_cidr is defined
-        - ironic_provisioning_network_vlan is defined
 
+- hosts: control
+  roles:
+    - post_ironic
+  tasks:
     ##########################
     # Public net configuration
     ##########################
