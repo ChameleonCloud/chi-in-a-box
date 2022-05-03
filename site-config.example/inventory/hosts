@@ -76,7 +76,7 @@ keycloak
 # You can explicitly specify which hosts run each project by updating the
 # groups in the sections below. Common services are grouped together.
 [chrony-server:children]
-haproxy
+loadbalancer
 
 [chrony:children]
 control
@@ -120,7 +120,7 @@ storage
 [elasticsearch:children]
 control
 
-[haproxy:children]
+[loadbalancer:children]
 network
 
 [hyperv]
@@ -789,7 +789,7 @@ baremetal
 mariadb
 
 [prometheus-haproxy-exporter:children]
-haproxy
+loadbalancer
 
 [prometheus-memcached-exporter:children]
 memcached
@@ -838,7 +838,7 @@ control
 compute
 
 [letsencrypt:children]
-haproxy
+loadbalancer
 
 [letsencrypt-acme:children]
 letsencrypt
