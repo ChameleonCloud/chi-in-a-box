@@ -41,9 +41,13 @@ num_nova_fake_per_node: 5 # Number of fake hypervisors to create
 
 Then run `./cc-ansible --tags nova reconfigure`.
 
+You might also have to run `cp /opt/chi-in-a-box/kolla/node_custom_config/nova/policy.json /etc/kolla/nova-compute-fake-5/` since the fake hypervisors require the policy.json file, but it is not in the correct volume.
+
 ### Create a blazar host
 
 Get the name of a hypervisor, and then run `openstack reservation host create <NAME>`
+
+If that doesn't work, you may need to install [blazar client](https://github.com/ChameleonCloud/python-blazarclient) and/or run `blazar host-create <NAME>`
 
 ### Create a server on a fake hypervisor
 
