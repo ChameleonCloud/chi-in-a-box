@@ -44,7 +44,8 @@
 
 - hosts: control
   roles:
-    - post_ironic
+    - role: post_ironic
+      when: enable_ironic | bool
   tasks:
     ##########################
     # Public net configuration
