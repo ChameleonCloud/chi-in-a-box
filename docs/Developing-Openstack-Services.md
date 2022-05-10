@@ -59,6 +59,27 @@ Create a reservation for a host, as normal using blazar. Get the reservation ID.
 
 Create the server: `openstack --os-compute-api-version 2.37 server create --image test-image --flavor mini my_server --hint reservation=<RES_ID> --network none`
 
+### Creating a network&#x20;
+
+For some services, it may be useful to create a network on your development instance. Here is an example network that can help with certain tasks.
+
+```
+# Create network
+openstack network create \
+    --provider-network-type flat \
+    --provider-physical-network public \
+    my-network
+
+# Create subnet
+openstack subnet create \
+    --network my-network \
+    --allocation-pool start=10.0.0.2,end=10.0.0.254 \
+    --subnet-range 10.0.0.0/24 \
+    my-subnet
+```
+
+After this is created, you can use the network ID when creating a Floating IP, for instance.
+
 ## Running tests
 
 Openstack testing frameworks do not show the output from `LOG` statements. To see this output, modify the root logger:
