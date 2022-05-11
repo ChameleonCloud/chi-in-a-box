@@ -26,6 +26,7 @@
   * [Host Networking Configuration](setup-guides/production-baremetal/hostnetworking.md)
 * [Troubleshooting](setup-guides/troubleshooting/README.md)
   * [Networking](setup-guides/troubleshooting/networking.md)
+* [Verification Checklist](setup-guides/verification-checklist.md)
 
 ## Reference
 
