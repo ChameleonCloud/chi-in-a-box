@@ -77,6 +77,7 @@
   * [Known issues](operations/troubleshooting/known-issues.md)
   * [Instance networking diagnostics](operations/troubleshooting/instance-networking-diagnostics.md)
   * [Security incident triage](operations/troubleshooting/security-incident-triage.md)
+  * [Troublesome Hardware](operations/troubleshooting/troublesome-hardware.md)
 
 ## Development
 
