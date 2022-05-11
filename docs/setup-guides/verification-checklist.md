@@ -16,6 +16,8 @@ The following verification checklist are _user operations_ that should work. Thi
 * [ ] Navigate to the Images view in the GUI and ensure there are some images for users to leverage.
 * [ ] Navigate to the Compute -> Key Pairs section and add a Key Pair, if you have not done so already.
 * [ ] Navigate to the API Access menu and download an Open RC file. Try to use this file to authenticate with the OpenStack CLI and obtain a token with `openstack token issue`. It should return a token.
+* [ ] _If providing isolated network capability_, navigate to the Network menu and create a new network with a subnet of any CIDR. Enable DHCP on the subnet. Ensure that it is created successfully.
+  * [ ] Attach the new network to a router that is configured with an external gateway and ensure this works as well. Instances connected to this new network should have egress to the Internet.
 
 ### Bare-metal-specific
 
