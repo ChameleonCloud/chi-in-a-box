@@ -1,30 +1,19 @@
-# This spec will launch some number of pods (see "replicas") on as many hosts
-# in the cluster as possible.
+# Launch a pod on every node in the cluster with the debug=pingtest label
 apiVersion: apps/v1
-kind: Deployment
+kind: DaemonSet
 metadata:
   name: pingtest
 spec:
   selector:
     matchLabels:
-      app: pingtest
-  replicas: 3
+      name: pingtest
   template:
     metadata:
       labels:
-        app: pingtest
+        name: pingtest
     spec:
-      affinity:
-        # Try to schedule on as many nodes as possible
-        podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            - labelSelector:
-                matchExpressions:
-                  - key: app
-                    operator: In
-                    values:
-                      - pingtest
-              topologyKey: "kubernetes.io/hostname"
+      nodeSelector:
+        debug: pingtest
       containers:
         - name: pingtest
           image: busybox
