@@ -51,7 +51,7 @@ If that doesn't work, you may need to install [blazar client](https://github.com
 
 ### Create a server on a fake hypervisor
 
-First, you must have an image created. You can download the lightweight test image cirros from [here](http://download.cirros-cloud.net) and then run `openstack image create test-image --file cirros-0.5.2-x86_64-disk.img --disk-format qcow2`.
+First, you must have an image created. You can download the lightweight test image cirros from [here](http://download.cirros-cloud.net/) and then run `openstack image create test-image --file cirros-0.5.2-x86_64-disk.img --disk-format qcow2`.
 
 Check `openstack image list` to ensure the image was created.
 
