@@ -23,6 +23,8 @@ ansible_python_interpreter: /etc/ansible/venv/bin/python
 
 chameleon_portal_url: https://www.chameleoncloud.org
 chameleon_reference_api_url: https://api.chameleoncloud.org
+# this needs to match the uid for your site at https://api.chameleoncloud.org/sites.json
+chameleon_site_name: localhost
 # Whether to show a dropdown in the Horizon GUI that provides links to other
 # Chameleon testbed sites.
 enable_chameleon_multisite: yes
