@@ -20,14 +20,15 @@
 
 - name: Update Calico operator
   command: >-
-    kubectl apply -f {{ calico_release.dest }}/manifests/tigera-operator.yaml
+    kubectl apply -f {{ k3s_conf_location }}/calico/release-{{ k3s_calico_version }}/manifests/tigera-operator.yaml
   when:
     - calico_release.changed
+    - not (k3s_dry_run | bool)
 
 - name: Install calicoctl
   ansible.builtin.copy:
     # TODO: use facts to optionally install ARM or otherwise
-    src: "{{ calico_release.dest }}/bin/calicoctl/calicoctl-linux-amd64"
+    src: "{{ k3s_conf_location }}/calico/release-{{ k3s_calico_version }}/bin/calicoctl/calicoctl-linux-amd64"
     remote_src: yes
     dest: /usr/local/bin/kubectl-calico
   when:
@@ -47,6 +48,7 @@
     kubectl apply -f {{ calico_custom_resources.dest }}
   when:
     - calico_custom_resources.changed
+    - not (k3s_dry_run | bool)
 
 - name: Generate Calico global network policies
   ansible.builtin.copy:
@@ -65,3 +67,5 @@
   loop:
     - default-deny
     - allow-ping
+  when:
+    - not (k3s_dry_run | bool)
