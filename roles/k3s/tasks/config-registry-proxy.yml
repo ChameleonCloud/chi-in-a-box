@@ -1,0 +1,14 @@
+---
+- name: Template deployment for registry proxy
+  ansible.builtin.template:
+    src: "docker-registry-deployment.yaml.j2"
+    dest: "{{ k3s_conf_location }}/docker-registry-deployment.yaml"
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Apply deployment for registry proxy
+  command: >-
+    kubectl apply -f {{ k3s_conf_location }}/docker-registry-deployment.yaml
+  when:
+    - not (k3s_dry_run | bool)
