@@ -12,17 +12,6 @@ Openstack, and CHI-in-a-Box, have very specific requirements of the host network
 Note that there are 4+ interfaces here! These can be separate physical interfaces, but must at least be separate logical interfaces.
 {% endhint %}
 
-## Handling ARP with Multiple Interfaces
-
-For the public network in particular, issues can arise when multiple interfaces are connected to the same L2 segment. The default behavior in linux is to ARP from any interface on that segment, rather than only the interface with an assigned IP address.
-
-This can be changed by setting the following in /etc/sysctl.conf
-
-```
-net.ipv4.conf.all.arp_ignore=1
-net.ipv4.conf.all.arp_announce=2
-```
-
 ## Separate Physical Interfaces
 
 This has the most physical complexity, but least logical complexity. Assuming the host has 4 interfaces:
@@ -101,7 +90,7 @@ Example configurations are below for each supported OS, but you're free to use y
 
 {% tabs %}
 {% tab title="Ubuntu 18.04" %}
-#### Create veth pairs
+**Create veth pairs**
 
 First, we'll make two pairs of virtual interfaces. These will be used to connect the host network to the neutron networks.
 
@@ -127,7 +116,7 @@ Kind=veth
 Name=veth-privateb
 ```
 
-#### Create Linux Bridges
+**Create Linux Bridges**
 
 Ubuntu 18.04 is using Netplan for configuration. Your netplan config file should contain the following (although it can have more, of course.)
 
@@ -173,7 +162,7 @@ network:
 Warning, centos seems to have MANY edge cases here due to incomplete support for veths in NetworkManager or network-scripts. Use with caution.
 {% endhint %}
 
-#### /etc/NetworkManager/NetworkManager.conf
+**/etc/NetworkManager/NetworkManager.conf**
 
 Networkmanager must have its default configuration modified to support autoconnection of veth devices. Add the following at the end of your NetworkManager.conf file
 
@@ -191,7 +180,7 @@ keep-configuration=no
 
 This overrides a udev rule that would otherwise prevent networkmanager from controlling these
 
-#### Create Bridges
+**Create Bridges**
 
 ```
 sudo nmcli connection add type bridge \
@@ -203,7 +192,7 @@ sudo nmcli connection add type bridge \
     ipv4.method manual ipv4.addresses <internal_bind_address>
 ```
 
-#### Create the veth connection profiles:
+**Create the veth connection profiles:**
 
 ```
 #Public Veth Pair
