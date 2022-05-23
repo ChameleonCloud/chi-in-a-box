@@ -150,13 +150,6 @@ WEBSSO_DEFAULT_REDIRECT_PROTOCOL = 'openid'
 # provider itself. We redirect to the custom post-logout page.
 WEBSSO_DEFAULT_REDIRECT_LOGOUT = '{{ keystone_public_url }}/redirect_uri?logout={{ (identity_provider_url ~ "/post-logout?client_id=" ~ (keystone_idp_client_id|default(none)) ) | urlencode }}'
 
-{% if enable_horizon_chameleon_websso | bool %}
-AUTHENTICATION_URLS = ['openstack_dashboard.cc_web_sso_urls', 'openstack_auth.urls']
-WEBSSO_DEFAULT_REDIRECT_URL = '{{ horizon_chameleon_websso_host }}/sso/horizon'
-# Show users interstitial page upon logout instead of logging them out of Portal immediately
-WEBSSO_DEFAULT_REDIRECT_LOGOUT_CONFIRM = True
-WEBSSO_DEFAULT_REDIRECT_LOGOUT_CONFIRM_URL = '{{ horizon_chameleon_websso_host }}/logout'
-{% endif %}
 {% endif %}
 
 # A dictionary of settings which can be used to provide the default values for

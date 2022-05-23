@@ -114,7 +114,6 @@ enable_heat: yes
 
 # Horizon
 enable_horizon: yes
-enable_horizon_chameleon_websso: yes
 horizon_url: "{{ public_protocol }}://{{ kolla_external_fqdn | put_address_in_context('url') }}"
 # Keep this to 'no' until we have switched from old multi-region to new
 # multi-keystone model (with federation).
@@ -122,7 +121,6 @@ horizon_use_keystone_internal_url: no
 horizon_help_url: https://www.chameleoncloud.org/user/help/
 horizon_documentation_url: https://chameleoncloud.readthedocs.io/en/latest/technical/gui.html
 horizon_redirect_root: /dashboard
-horizon_chameleon_websso_host: "{{ chameleon_portal_url }}"
 horizon_regions:
   - region_name: "{{ openstack_region_name }}"
     chameleon_site_name: "{{ chameleon_site_name }}"
