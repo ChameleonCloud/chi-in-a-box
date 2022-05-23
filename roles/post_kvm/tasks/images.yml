@@ -1,0 +1,27 @@
+---
+- name: set facts for glance images
+  set_fact:
+    glance_images_tmp: "/tmp"
+- name: Download source Glance images.
+  kolla_toolbox:
+    module_name: get_url
+    module_args:
+      url: "{{ item.url }}"
+      dest: "{{ glance_images_tmp }}/{{ item.name }}"
+  run_once: True
+  when: enable_kvm | bool
+
+- name: Create Glance images.
+  kolla_toolbox:
+    module_name: openstack.cloud.image
+    module_args:
+      auth: "{{ project_auth }}"
+      state: present
+      name: "{{ item.name }}"
+      is_public: yes
+      interface: admin
+      container_format: "{{ item.container_format }}"
+      disk_format: "{{ item.disk_format }}"
+      filename: "{{ glance_images_tmp }}/{{ item.name }}"
+  run_once: True
+  when: enable_kvm | bool

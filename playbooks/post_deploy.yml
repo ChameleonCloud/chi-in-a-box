@@ -2,6 +2,8 @@
 - hosts: control
   roles:
     - role: post_networking
+    - role: post_kvm
+      when: enable_kvm
     - role: post_ironic
       when: enable_ironic
 

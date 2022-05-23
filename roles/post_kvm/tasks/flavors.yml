@@ -1,0 +1,31 @@
+---
+- name: Create Admin-Only KVM flavors
+  kolla_toolbox:
+    module_name: openstack.cloud.compute_flavor
+    module_args:
+      auth: "{{ project_auth }}"
+      state: present
+      name: "{{ item.name }}"
+      interface: admin
+      is_public: "{{ item.is_public }}"
+      disk: "{{ item.disk }}"
+      ram: "{{ item.ram }}"
+      vcpus: "{{ item.vcpus }}"
+  run_once: True
+  when:
+    - enable_nova | bool
+    - enable_kvm | bool
+- name: Add flavor access to openstack project
+  kolla_toolbox:
+    module_name: openstack.cloud.project_access
+    module_args:
+      auth: "{{ project_auth }}"
+      state: present
+      resource_name: "{{ item.name }}"
+      resource_type: 'nova_flavor'
+      target_project_id: "{{ admin_project.openstack_projects[0].id }}"
+  run_once: True
+  when:
+    - enable_nova | bool
+    - enable_kvm | bool
+

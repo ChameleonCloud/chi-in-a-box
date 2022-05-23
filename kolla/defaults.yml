@@ -225,7 +225,7 @@ neutron_dev_plugins:
 # Nova
 enable_nova: yes
 enable_nova_serialconsole_proxy: yes
-nova_compute_virt_type: none
+nova_compute_virt_type: kvm
 # We are not using any VNC consoles; the serialproxy is not considered a 'nova_console'
 nova_console: none
 # We override the endpoints to not include %(tenant_id)s placeholder.
