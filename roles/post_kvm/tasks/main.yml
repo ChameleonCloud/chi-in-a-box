@@ -1,0 +1,14 @@
+---
+# Gather information about a previously created project by name
+- kolla_toolbox:
+    module_name: openstack.cloud.project_info
+    module_args:
+      auth: "{{ project_auth }}"
+      name: "{{ keystone_admin_project }}"
+  register: admin_project
+
+- include_tasks: flavors.yml
+  loop: "{{ kvm_flavors }}"
+
+- include_tasks: images.yml
+  loop: "{{ kvm_glance_images }}"
