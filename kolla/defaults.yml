@@ -97,8 +97,25 @@ glance_backends:
     type: "swift"
     enabled: "{{ glance_backend_swift | bool }}"
 
+# Default images to download during post-deploy
+glance_images_tmp: "/tmp"
+glance_images:
+  - name: pxe_deploy_kernel
+    container_format: aki
+    disk_format: aki
+    url: "https://tarballs.opendev.org/openstack/ironic-python-agent/dib/files/ipa-centos8-stable-{{ openstack_release }}.kernel"
+  - name: pxe_deploy_ramdisk
+    container_format: aki
+    disk_format: aki
+    url: "https://tarballs.opendev.org/openstack/ironic-python-agent/dib/files/ipa-centos8-stable-{{ openstack_release }}.initramfs"
+  - name: cirros
+    container_format: bare
+    disk_format: qcow2
+    url: "http://download.cirros-cloud.net/0.5.1/cirros-0.5.1-x86_64-disk.img"
+
+
 # Gnocchi
-enable_gnocchi: yes
+enable_gnocchi: no
 
 # Hammers
 hammers_openstack_user: admin
@@ -138,7 +155,9 @@ identity_provider_url: "{{ keycloak_url }}/auth/realms/{{ keycloak_realm_name }}
 identity_provider_name: chameleon
 identity_provider_domain_name: chameleon
 keystone_idp_client_id: null
-enable_keystone_federation_openid: "{{ (keystone_idp_client_id | bool) and (kolla_enable_tls_external | bool) }}"
+enable_keystone_federation: "false"
+# enable_keystone_federation_openid: "{{ (keystone_idp_client_id | bool) and (kolla_enable_tls_external | bool) }}"
+# keystone_enable_federation_openid: "{{ (keystone_idp_client_id | bool) and (kolla_enable_tls_external | bool) }}"
 keystone_identity_providers:
   - name: "{{ identity_provider_name }}"
     openstack_domain: "{{ identity_provider_domain_name }}"
