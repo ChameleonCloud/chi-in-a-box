@@ -63,6 +63,12 @@ keycloak
 [keycloak_tas_sync:children]
 keycloak
 
+# This group is used to ensure that the defaults.yml group_vars apply to
+# all nodes, including the deploy host, without running other roles.
+[defaults:children]
+deployment
+common
+
 # You can explicitly specify which hosts run each project by updating the
 # groups in the sections below. Common services are grouped together.
 
