@@ -1,14 +1,21 @@
+---
+description: Percussive maintenance
+---
+
+# Hammers 🔨
+
 CHI-in-a-Box comes with several automated periodic tasks called "hammers", which are intended to "whack" (technical term) precise parts of the system back in to place, typically to resolve issues of state disagreements between some of the distributed services. Hammers also are and can be used for policy enforcement, e.g., terminating leases that are made but then never utilized.
 
 The [hammers](https://github.com/chameleoncloud/hammers) repository goes into more detail about what each of these hammers does, and why they exist.
 
-## Listing all hammers
+### Listing all hammers
 
 Hammers are by default installed onto the `control` node in the site configuration Ansible inventory. This is usually the node that runs the bulk of the services. You can list all the installed hammers by enumerating the systemd [timers](https://wiki.archlinux.org/index.php/Systemd/Timers).
 
 ```shell
 systemctl list-timers 'hammer_*'
 ```
+
 ```
 NEXT                         LEFT          LAST                         PASSED   UNIT                                        ACTIVATES
 Thu 2020-10-08 20:02:09 CDT  47min left    Thu 2020-10-08 19:08:34 CDT  5min ago hammer_unutilized_leases.timer              hammer_unutilized_leases.service
@@ -25,7 +32,7 @@ Fri 2020-10-09 02:39:30 CDT  7h left       n/a                          n/a     
 Fri 2020-10-09 02:57:16 CDT  7h left       n/a                          n/a      hammer_enforce_node_retirement.timer        hammer_enforce_node_retirement.service
 ```
 
-## Inspecting hammer output
+### Inspecting hammer output
 
 The hammers will generally output information about what they have done to stdout. This is captured by the systemd journal, so you can track down events that may be of interest.
 
