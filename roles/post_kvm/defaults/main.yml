@@ -1,0 +1,28 @@
+---
+kvm_images: []
+kvm_flavors:
+  - name: m1.tiny
+    vcpus: 1
+    ram: 1
+    disk: 1
+    is_public: no
+  - name: m1.small
+    vcpus: 1
+    ram: 2
+    disk: 10
+    is_public: no
+  - name: m1.medium
+    vcpus: 2
+    ram: 4
+    disk: 20
+    is_public: no
+  - name: m1.large
+    vcpus: 4
+    ram: 8
+    disk: 20
+    is_public: no
+  - name: m1.xlarge
+    vcpus: 8
+    ram: 16
+    disk: 20
+    is_public: no

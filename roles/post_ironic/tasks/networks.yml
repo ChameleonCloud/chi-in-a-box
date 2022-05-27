@@ -1,0 +1,50 @@
+---
+- name: Set facts for Ironic interfaces.
+  set_fact:
+    ironic_interfaces:
+      - device: "{{ ironic_gateway_interface }}"
+        bootproto: static
+        address: "{{ ironic_provisioning_network_gateway }}"
+        netmask: "{{ ironic_provisioning_network_cidr | ipaddr('netmask') }}"
+  when: enable_ironic | bool and
+    ironic_provisioning_network_vlan is defined
+
+- name: create interface for ironic gateway
+  michaelrigart.interfaces:
+    interfaces_ether_interfaces: >
+      {{ (ironic_interfaces | default([])) }}
+  become: True
+  when:
+    - manage_ironic_gateway_interface | bool
+    - enable_ironic | bool
+    - ironic_gateway_interface | is_defined
+
+- name: Create provisioning network.
+  kolla_toolbox:
+    module_name: os_network
+    module_args:
+      auth: "{{ openstack_auth }}"
+      name: "{{ ironic_provisioning_network }}"
+      region_name: "{{ openstack_region_name }}"
+      provider_network_type: vlan
+      provider_segmentation_id: "{{ ironic_provisioning_network_vlan }}"
+      provider_physical_network: physnet1
+      state: present
+  run_once: True
+  when: enable_ironic | bool and
+    ironic_provisioning_network_vlan is defined
+- name: Create provisioning subnet.
+  kolla_toolbox:
+    module_name: os_subnet
+    module_args:
+      auth: "{{ openstack_auth }}"
+      network_name: "{{ ironic_provisioning_network }}"
+      name: "{{ ironic_provisioning_network }}-subnet"
+      cidr: "{{ ironic_provisioning_network_cidr }}"
+      allocation_pool_start: "{{ ironic_provisioning_allocation_pool_start }}"
+      allocation_pool_end: "{{ ironic_provisioning_allocation_pool_end }}"
+  run_once: True
+  when:
+    - enable_ironic | bool
+    - ironic_provisioning_network_cidr is defined
+    - ironic_provisioning_network_vlan is defined
