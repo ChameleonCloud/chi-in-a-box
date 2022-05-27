@@ -128,7 +128,6 @@ case "${POSARGS[0]}" in
     redis_host systemctl restart redis
 
     echo "Starting custom infrastructure"
-    ./cc-ansible --playbook playbooks/docker_registry.yml
     ./cc-ansible --playbook playbooks/prometheus.yml
     systemctl restart 'experiment-precis-*'
     systemctl restart chameleon-vendordata

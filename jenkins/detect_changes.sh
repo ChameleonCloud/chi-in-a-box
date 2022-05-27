@@ -30,7 +30,6 @@ done | sort | uniq)"
 [[ -n "$matched_kolla_services" ]] && echo "$matched_kolla_services"
 
 playbooks=(
-  docker_registry
   frontends
   jupyterhub
   metric_collector

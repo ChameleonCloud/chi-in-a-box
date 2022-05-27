@@ -1,63 +1,56 @@
 groups:
-- name: cron
-  rules:
+  - name: cron
+    rules:
+      - record: cron_last_success_threshold
+        expr: 3600 * 24 * 2
+        labels:
+          name: gnocchi_backup
+      - record: cron_last_success_threshold
+        # This job runs once a month, check that it has run in last 32 days.
+        expr: 3600 * 24 * 32
+        labels:
+          name: precis_cleanup
 
-  - record: cron_last_success_threshold
-    expr: 3600 * 24 * 2
-    labels:
-      name: gnocchi_backup
-  - record: cron_last_success_threshold
-    # This job runs once a month, check that it has run in last 32 days.
-    expr: 3600 * 24 * 32
-    labels:
-      name: precis_cleanup
+      - alert: CronJobNoRecentSuccess
+        expr: |
+          time() - cron_last_success
+          > on (name) group_left() (
+            cron_last_success_threshold
+            or on (name) (
+              count by (name)(cron_last_success) * 0 + (3600 * 25)
+            )
+          )
+        labels:
+          severity: critical
+        annotations:
+          summary: "{{ $labels.name }} cron job has not succeeded in more than 24 hours."
+          description: "{{ $labels.name }} last succeeded {{ humanizeDuration $value }} ago and is likely failing."
+          runbook: https://github.com/ChameleonCloud/chi-in-a-box/wiki/%5BRunbook%5D-CronJobNoRecentSuccess
 
-  - alert: CronJobNoRecentSuccess
-    expr: |
-      time() - cron_last_success
-      > on (name) group_left() (
-        cron_last_success_threshold
-        or on (name) (
-          count by (name)(cron_last_success) * 0 + (3600 * 25)
-        )
-      )
-    labels:
-      severity: critical
-    annotations:
-      summary: "{{ $labels.name }} cron job has not succeeded in more than 24 hours."
-      description: "{{ $labels.name }} last succeeded {{ humanizeDuration $value }} ago and is likely failing."
-      runbook: https://github.com/ChameleonCloud/chi-in-a-box/wiki/%5BRunbook%5D-CronJobNoRecentSuccess
+  - name: periodic_task
+    rules:
+      - record: periodic_task_last_success_threshold
+        expr: 3600 * 24 * 2
+        labels:
+          name: gnocchi_backup
+      - record: periodic_task_last_success_threshold
+        # This job runs once a month, check that it has run in last 32 days.
+        expr: 3600 * 24 * 32
+        labels:
+          name: precis_cleanup
 
-- name: periodic_task
-  rules:
-
-  - record: periodic_task_last_success_threshold
-    expr: 3600 * 24 * 2
-    labels:
-      name: gnocchi_backup
-  - record: periodic_task_last_success_threshold
-    # This job runs once a month, check that it has run in last 32 days.
-    expr: 3600 * 24 * 32
-    labels:
-      name: precis_cleanup
-  - record: periodic_task_last_success_threshold
-    # Weekly job, check every 8 days
-    expr: 3600 * 24 * 8
-    labels:
-      name: docker_registry_gc
-
-  - alert: PeriodicTaskNoRecentSuccess
-    expr: |
-      time() - periodic_task_last_success
-      > on (name) group_left() (
-        periodic_task_last_success_threshold
-        or on (name) (
-          count by (name)(periodic_task_last_success) * 0 + (3600 * 25)
-        )
-      )
-    labels:
-      severity: critical
-    annotations:
-      summary: "{{ $labels.name }} periodic task has not succeeded in more than 24 hours."
-      description: "{{ $labels.name }} last succeeded {{ humanizeDuration $value }} ago and is likely failing."
-      runbook: https://github.com/ChameleonCloud/chi-in-a-box/wiki/%5BRunbook%5D-PeriodicTaskNoRecentSuccess
+      - alert: PeriodicTaskNoRecentSuccess
+        expr: |
+          time() - periodic_task_last_success
+          > on (name) group_left() (
+            periodic_task_last_success_threshold
+            or on (name) (
+              count by (name)(periodic_task_last_success) * 0 + (3600 * 25)
+            )
+          )
+        labels:
+          severity: critical
+        annotations:
+          summary: "{{ $labels.name }} periodic task has not succeeded in more than 24 hours."
+          description: "{{ $labels.name }} last succeeded {{ humanizeDuration $value }} ago and is likely failing."
+          runbook: https://github.com/ChameleonCloud/chi-in-a-box/wiki/%5BRunbook%5D-PeriodicTaskNoRecentSuccess

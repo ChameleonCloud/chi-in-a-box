@@ -32,9 +32,6 @@ monitoring
 [hammers:children]
 control
 
-[docker_registry:children]
-control
-
 [frontends:children]
 control
 
