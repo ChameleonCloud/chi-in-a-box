@@ -8,16 +8,14 @@
     module_args:
       url: "{{ item.url }}"
       dest: "{{ glance_images_tmp }}/{{ item.name }}"
-  loop: "{{ ironic_glance_images }}"
-  loop_control:
-    label: "{{ item.name }}"
   run_once: True
-  when: enable_ironic | bool
+  when: enable_kvm | bool
+
 - name: Create Glance images.
   kolla_toolbox:
-    module_name: os_image
+    module_name: openstack.cloud.image
     module_args:
-      auth: "{{ openstack_auth }}"
+      auth: "{{ project_auth }}"
       state: present
       name: "{{ item.name }}"
       is_public: yes
@@ -26,7 +24,4 @@
       disk_format: "{{ item.disk_format }}"
       filename: "{{ glance_images_tmp }}/{{ item.name }}"
   run_once: True
-  loop: "{{ ironic_glance_images }}"
-  loop_control:
-    label: "{{ item.name }}"
-  when: enable_ironic | bool
+  when: enable_kvm | bool

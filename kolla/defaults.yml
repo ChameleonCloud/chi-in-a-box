@@ -98,20 +98,20 @@ glance_backends:
     enabled: "{{ glance_backend_swift | bool }}"
 
 # Default images to download during post-deploy
-glance_images_tmp: "/tmp"
-glance_images:
-  - name: pxe_deploy_kernel
-    container_format: aki
-    disk_format: aki
-    url: "https://tarballs.opendev.org/openstack/ironic-python-agent/dib/files/ipa-centos8-stable-{{ openstack_release }}.kernel"
-  - name: pxe_deploy_ramdisk
-    container_format: aki
-    disk_format: aki
-    url: "https://tarballs.opendev.org/openstack/ironic-python-agent/dib/files/ipa-centos8-stable-{{ openstack_release }}.initramfs"
-  - name: cirros
-    container_format: bare
-    disk_format: qcow2
-    url: "http://download.cirros-cloud.net/0.5.1/cirros-0.5.1-x86_64-disk.img"
+# glance_images_tmp: "/tmp"
+# glance_images:
+#   - name: pxe_deploy_kernel
+#     container_format: aki
+#     disk_format: aki
+#     url: "https://tarballs.opendev.org/openstack/ironic-python-agent/dib/files/ipa-centos8-stable-{{ openstack_release }}.kernel"
+#   - name: pxe_deploy_ramdisk
+#     container_format: aki
+#     disk_format: aki
+#     url: "https://tarballs.opendev.org/openstack/ironic-python-agent/dib/files/ipa-centos8-stable-{{ openstack_release }}.initramfs"
+#   - name: cirros
+#     container_format: bare
+#     disk_format: qcow2
+#     url: "http://download.cirros-cloud.net/0.5.1/cirros-0.5.1-x86_64-disk.img"
 
 
 # Gnocchi
