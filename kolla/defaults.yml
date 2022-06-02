@@ -99,7 +99,8 @@ glance_backends:
 enable_gnocchi: yes
 
 # Hammers
-hammers_openstack_user: admin
+hammers_openstack_user: "{{ keystone_admin_user }}"
+hammers_openstack_password: "{{ keystone_admin_password }}"
 hammers_openstack_project_name: "{{ keystone_admin_project }}"
 
 # HAProxy
