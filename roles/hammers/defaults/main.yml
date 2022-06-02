@@ -6,41 +6,60 @@ hammers_mysql_user: cc_hammers
 hammers_mysql_host: "{{ database_address }}"
 
 hammers:
+  # Networking/Neutron
   floating_ip_reaper:
     cmd: floatingip-reaper --grace-days 7
     calendar: daily
+    enabled: "{{ enable_neutron | bool }}"
   conflict_macs:
     cmd: conflict-macs delete
     calendar: daily
+    enabled: "{{ enable_neutron | bool }}"
+
+  # Compute/Nova
   undead_instances:
     cmd: undead-instances delete
     calendar: daily
+    enabled: "{{ enable_nova | bool }}"
+
+  # Bare metal/Ironic
   dirty_ports:
     cmd: dirty-ports clean --multiport
     calendar: daily
+    enabled: "{{ enable_ironic | bool }}"
   ironic_error_resetter:
     cmd: ironic-error-resetter reset
     calendar: hourly
-  orphan_resource_providers:
-    cmd: orphan-resource-providers update
-    calendar: daily
-  reservation_usage_notification:
-    cmd: "reservation-usage-notification"
-    calendar: daily
-  orphans_detector:
-    cmd: "orphans-detector"
-    calendar: daily
-  lease_stacking:
-    cmd: "lease-stack-reaper delete"
-    calendar: daily
-  clean_old_aggregates:
-    cmd: "clean-old-aggregates"
-    calendar: daily
-  unutilized_leases:
-    cmd: "unutilized-lease-reaper delete"
-    calendar: hourly
+    enabled: "{{ enable_ironic | bool }}"
   enforce_node_retirement:
     cmd: "retirement-enforcer"
     calendar: daily
+    enabled: "{{ enable_ironic | bool }}"
+
+  # Reservation/Blazar
+  orphan_resource_providers:
+    cmd: orphan-resource-providers update
+    calendar: daily
+    enabled: "{{ enable_blazar | bool }}"
+  reservation_usage_notification:
+    cmd: "reservation-usage-notification"
+    calendar: daily
+    enabled: "{{ enable_blazar | bool }}"
+  orphans_detector:
+    cmd: "orphans-detector"
+    calendar: daily
+    enabled: "{{ enable_blazar | bool }}"
+  lease_stacking:
+    cmd: "lease-stack-reaper delete"
+    calendar: daily
+    enabled: "{{ enable_blazar | bool }}"
+  clean_old_aggregates:
+    cmd: "clean-old-aggregates"
+    calendar: daily
+    enabled: "{{ enable_blazar | bool }}"
+  unutilized_leases:
+    cmd: "unutilized-lease-reaper delete"
+    calendar: hourly
+    enabled: "{{ enable_blazar | bool }}"
 
 hammers_slack_webhook: "{{ slack_api_url }}"

@@ -72,3 +72,5 @@
   loop: "{{ hammers | dict2items }}"
   loop_control:
     label: "{{ item.key }}"
+  when:
+    - "{{ item.enabled | bool }}"
