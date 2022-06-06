@@ -1,0 +1,6 @@
+{
+  "share:allow_access": "role:admin",
+  "share:deny_access": "role:admin",
+  "share_network:create": "role:admin",
+  "security_service:create": "role:admin"
+}

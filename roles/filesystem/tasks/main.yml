@@ -1,0 +1,96 @@
+---
+- name: Create default share type
+  become: true
+  command: >
+    docker exec kolla_toolbox openstack
+    --os-interface internal
+    --os-auth-url {{ openstack_auth.auth_url }}
+    --os-identity-api-version 3
+    --os-project-domain-name {{ openstack_auth.domain_name }}
+    --os-project-name {{ openstack_auth.project_name }}
+    --os-username {{ openstack_auth.username }}
+    --os-password {{ openstack_auth.password }}
+    --os-user-domain-name {{ openstack_auth.user_domain_name }}
+    --os-region-name {{ openstack_region_name }}
+    share type create {{ default_share_type }} false
+    --extra-specs vendor_name=Ceph storage_protocol=NFS
+  register: manila_default_share_type
+  changed_when: manila_default_share_type is success
+  failed_when:
+    - manila_default_share_type.rc != 0
+    - manila_default_share_type.stderr.find('already') == -1
+  run_once: True
+  when:
+    - default_share_type is defined
+
+- name: Create filesystem-ganesha network
+  kolla_toolbox:
+    module_name: os_network
+    module_args:
+      auth: "{{ openstack_auth }}"
+      name: "{{ filesystem_ganesha_network }}"
+      region_name: "{{ openstack_region_name }}"
+      provider_network_type: vlan
+      provider_segmentation_id: "{{ filesystem_ganesha_network_vlan }}"
+      provider_physical_network: physnet1
+      external: false
+      shared: false
+      port_security_enabled: true
+      state: present
+  run_once: True
+  when:
+    - enable_manila_nfs_ganesha_service | bool
+    - filesystem_ganesha_network_vlan is defined
+
+- name: Create filesystem-ganesha subnet.
+  kolla_toolbox:
+    module_name: os_subnet
+    module_args:
+      auth: "{{ openstack_auth }}"
+      network_name: "{{ filesystem_ganesha_network }}"
+      name: "{{ filesystem_ganesha_network }}-subnet"
+      cidr: "{{ filesystem_ganesha_network_cidr }}"
+      enable_dhcp: false
+      no_gateway_ip: true
+      state: present
+  run_once: True
+  when:
+    - enable_manila_nfs_ganesha_service | bool
+    - filesystem_ganesha_network_vlan is defined
+    - filesystem_ganesha_network_cidr is defined
+    
+- name: Gather information about keystone admin project
+  kolla_toolbox:
+    module_name: os_project_facts
+    module_args:
+      auth: "{{ openstack_auth }}"
+      name: "{{ keystone_admin_project_name }}"
+  register: admin_project
+  
+- name: Gather information about filesystem-ganesha network
+  kolla_toolbox:
+    module_name: os_networks_facts
+    module_args:
+      auth: "{{ openstack_auth }}"
+      name: "{{ filesystem_ganesha_network }}"
+  register: ganesha_network
+  when:
+    - enable_manila_nfs_ganesha_service | bool
+    - filesystem_ganesha_network_vlan is defined
+
+- name: Create filesystem-ganesha network RBAC policy
+  kolla_toolbox:
+    module_name: openstack.cloud.neutron_rbac_policy
+    module_args:
+      auth: "{{ openstack_auth }}"
+      object_id: "{{ ganesha_network['openstack_networks'][0].id }}"
+      object_type: "network"
+      action: "access_as_external"
+      target_project_id: "{{ admin_project['openstack_projects'][0].id }}"
+      project_id: "{{ admin_project['openstack_projects'][0].id }}"
+      state: present
+  run_once: True
+  when:
+    - enable_manila_nfs_ganesha_service | bool
+    - filesystem_ganesha_network_vlan is defined
+    - filesystem_ganesha_network_cidr is defined
