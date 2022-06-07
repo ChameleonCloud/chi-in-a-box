@@ -95,9 +95,6 @@ glance_backends:
     type: "swift"
     enabled: "{{ glance_backend_swift | bool }}"
 
-# Gnocchi
-enable_gnocchi: yes
-
 # Hammers
 hammers_openstack_user: "{{ keystone_admin_user }}"
 hammers_openstack_password: "{{ keystone_admin_password }}"
@@ -182,7 +179,7 @@ keycloak_url: "https://{{ keycloak_hostname }}"
 # Keystone
 enable_keystone: yes
 keystone_admin_project: openstack
-# The following are needed for defaults for the Glance/Gnocchi backup roles
+# The following are needed for defaults for the Glance backup roles
 # (site-configs derive from these)
 keystone_admin_username: admin
 keystone_admin_project_name: "{{ keystone_admin_project }}"
@@ -260,7 +257,6 @@ prometheus_openstack_exporter_cmdline_extras: >-
   --disable-service.volume
   --disable-service.load-balancer
   --disable-service.dns
-  --disable-service.gnocchi
 # Legacy params
 prometheus_server_external_url: "{{ public_protocol }}://{{ prometheus_external_fqdn }}:{{ prometheus_port }}"
 prometheus_alertmanager_external_url: "{{ public_protocol }}://{{ prometheus_external_fqdn }}:{{ prometheus_alertmanager_port }}"

@@ -37,7 +37,6 @@ In this scenario a provider wants to create a testbed that is in every way separ
   * Including custom vendordata service for automatic experiment metrics collection
 * Neutron (networking)
 * Glance (disk image storage)
-* Gnocchi (timeseries storage for experiment metrics)
 * Keystone (authentication and authorization)
 * Heat (orchestration)
 * [Python-CHI](https://github.com/ChameleonCloud/python-chi): User-Friendly Python client library with Jupyter Integration

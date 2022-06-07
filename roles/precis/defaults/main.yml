@@ -31,7 +31,6 @@ precis_mysql_external_database_privileges:
   - neutron.*:SELECT
   - nova.*:SELECT
   - nova_api.*:SELECT
-  - gnocchi.*:SELECT
 
 precis_init_docker_image: docker.chameleoncloud.org/experiment-precis/init:latest
 
