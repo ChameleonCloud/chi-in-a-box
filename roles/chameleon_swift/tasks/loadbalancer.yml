@@ -1,7 +1,0 @@
----
-- name: Configure haproxy for Swift via Ceph RADOS gateway
-  import_role:
-    name: haproxy-config
-  vars:
-    project_services: "{{ chameleon_swift_services }}"
-  when: enable_haproxy | bool
