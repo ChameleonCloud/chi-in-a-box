@@ -244,9 +244,6 @@ control
 [panko:children]
 control
 
-[gnocchi:children]
-control
-
 [tacker:children]
 control
 
@@ -644,16 +641,6 @@ congress
 # Panko
 [panko-api:children]
 panko
-
-# Gnocchi
-[gnocchi-api:children]
-gnocchi
-
-[gnocchi-statsd:children]
-gnocchi
-
-[gnocchi-metricd:children]
-gnocchi
 
 # Trove
 [trove-api:children]
