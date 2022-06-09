@@ -102,7 +102,6 @@ hammers_openstack_project_name: "{{ keystone_admin_project }}"
 
 # HAProxy
 enable_haproxy: yes
-kolla_enable_tls_external: yes
 haproxy_listen_neutron_server_extra: ["timeout server 15m"]
 haproxy_service_template: "haproxy_single_service_split.cfg.j2"
 kolla_external_fqdn_cert: "{{ cc_ansible_site_dir }}/certificates/haproxy.pem"
