@@ -1,4 +1,7 @@
 ---
 - hosts: vendordata
-  roles:
+  roles: [vendordata]
+  become: true
+  become_user: root
+  tags:
     - vendordata
