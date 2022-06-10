@@ -364,8 +364,9 @@ if [[ "${POSARGS[*]}" =~ bootstrap-servers ]]; then
 fi
 
 if [[ "${POSARGS[*]}" =~ post-deploy ]]; then
-  cp -f "$DIR/playbooks/post_deploy.yml" "$ansible_path/chi_in_a_box_post_deploy.yml"
-  kolla_args+=(--extra post_deploy_extra_play="chi_in_a_box_post_deploy.yml")
+  # Important that the destination does not having a trailing `/`
+  cp -r "$DIR/playbooks/" "$ansible_path/chi"
+  kolla_args+=(--extra post_deploy_extra_play="chi/post_deploy.yml")
 fi
 kolla_args+=("${POSARGS[@]}")
 

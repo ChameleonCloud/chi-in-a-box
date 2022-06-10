@@ -1,14 +1,17 @@
 ---
+# This role runs on the deploy host, as it executes cc-ansible on a timer
 - hosts: deployment
   roles:
     - role: chameleon_mariadb
       when: hostvars[groups['mariadb'][0]]['enable_mariabackup'] | bool
       vars:
-          action: 'deployment'
+        action: "deployment"
 
+# This one runs on the host where mariadb is deployed
 - hosts: mariadb
+  become: true
   roles:
     - role: chameleon_mariadb
       vars:
-          action: 'config'
-  tags: [ mariadb, all ]
+        action: "config"
+  tags: mariadb
