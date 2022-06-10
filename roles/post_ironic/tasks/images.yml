@@ -1,0 +1,32 @@
+---
+- name: set facts for glance images
+  set_fact:
+    glance_images_tmp: "/tmp"
+- name: Download source Glance images.
+  kolla_toolbox:
+    module_name: get_url
+    module_args:
+      url: "{{ item.url }}"
+      dest: "{{ glance_images_tmp }}/{{ item.name }}"
+  loop: "{{ ironic_glance_images }}"
+  loop_control:
+    label: "{{ item.name }}"
+  run_once: True
+  when: enable_ironic | bool
+- name: Create Glance images.
+  kolla_toolbox:
+    module_name: os_image
+    module_args:
+      auth: "{{ openstack_auth }}"
+      state: present
+      name: "{{ item.name }}"
+      is_public: yes
+      interface: admin
+      container_format: "{{ item.container_format }}"
+      disk_format: "{{ item.disk_format }}"
+      filename: "{{ glance_images_tmp }}/{{ item.name }}"
+  run_once: True
+  loop: "{{ ironic_glance_images }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when: enable_ironic | bool
