@@ -1,0 +1,19 @@
+---
+ironic_provisioning_network_cidr: 10.51.0.0/24
+ironic_provisioning_network_gateway: "{{ ironic_provisioning_network_cidr | next_nth_usable(1) }}"
+ironic_provisioning_allocation_pool_start: "{{ ironic_provisioning_network_cidr | next_nth_usable(2) }}"
+ironic_provisioning_allocation_pool_end: "{{ ironic_provisioning_network_cidr | ipaddr('last_usable') }}"
+ironic_dnsmasq_dhcp_range: "{{ ironic_provisioning_allocation_pool_start }},{{ ironic_provisioning_allocation_pool_end }}"
+
+ironic_gateway_interface: "{{ network_interface | replace('_', '-') }}.{{ ironic_provisioning_network_vlan }}"
+manage_ironic_gateway_interface: false
+
+ironic_glance_images:
+  - name: pxe_deploy_kernel
+    container_format: aki
+    disk_format: aki
+    url: "https://tarballs.opendev.org/openstack/ironic-python-agent/dib/files/ipa-centos8-stable-{{ openstack_release }}.kernel"
+  - name: pxe_deploy_ramdisk
+    container_format: aki
+    disk_format: aki
+    url: "https://tarballs.opendev.org/openstack/ironic-python-agent/dib/files/ipa-centos8-stable-{{ openstack_release }}.initramfs"

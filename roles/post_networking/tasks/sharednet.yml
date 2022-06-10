@@ -1,0 +1,67 @@
+---
+- name: Set fact for sharednet segmentation id
+  set_fact:
+    sharednet_segmentation_id: "{{ (shared_network.on_demand_vlan_ranges[0].split(':')[0] | int) + 1 }}"
+  when:
+    - shared_network.on_demand_vlan_ranges is defined
+    - shared_network.on_demand_vlan_ranges | length > 0
+
+- name: Create shared network(s)
+  kolla_toolbox:
+    module_name: os_network
+    module_args:
+      auth: "{{ openstack_auth }}"
+      project: "{{ keystone_admin_project }}"
+      name: "{{ item.sharednet.name | default(default_sharednet_name) }}"
+      provider_network_type: "{{ item.network_type | default('vlan') }}"
+      # Use the first on-demand VLAN for this network.
+      provider_segmentation_id: "{{ sharednet_segmentation_id | default(omit) }}"
+      provider_physical_network: "{{ '' if (item.network_type | default('vlan')) == 'vxlan' else item.name }}"
+      shared: yes
+      state: present
+  loop: "{{ neutron_networks }}"
+  loop_control:
+    label: "{{ item.name }}"
+  run_once: True
+  when:
+    - item.sharednet is defined
+
+- name: Create shared network subnet(s)
+  kolla_toolbox:
+    module_name: os_subnet
+    module_args:
+      auth: "{{ openstack_auth }}"
+      project: "{{ keystone_admin_project }}"
+      network_name: "{{ item.sharednet.name | default(default_sharednet_name) }}"
+      name: "{{ item.sharednet.name | default(default_sharednet_name) }}-subnet"
+      cidr: "{{ cidr }}"
+      allocation_pool_start: "{{ item.sharednet.allocation_pools[0].start | default(cidr | next_nth_usable(2)) }}"
+      allocation_pool_end: "{{ item.sharednet.allocation_pools[0].end | default(cidr | ipaddr('last_usable') | ipmath(-1)) }}"
+  vars:
+    cidr: "{{ item.sharednet.cidr | default(default_sharednet_cidr) }}"
+  loop: "{{ neutron_networks }}"
+  loop_control:
+    label: "{{ item.name }}"
+  run_once: True
+  when:
+    - item.sharednet is defined
+    - item.sharednet.enabled | default(true) | bool
+  register: sharednet_subnets
+
+- name: Create NAT router for shared network(s).
+  kolla_toolbox:
+    module_name: os_router
+    module_args:
+      auth: "{{ openstack_auth }}"
+      project: "{{ keystone_admin_project }}"
+      name: sharednet-router
+      interfaces: "{{ sharednet_subnets.results | selectattr('subnet', 'defined') | map(attribute='subnet') | map(attribute='name') | list }}"
+      network: "{{ public_network.name }}"
+      external_fixed_ips:
+        - subnet: "public-subnet"
+  run_once: True
+  when:
+    - sharednet_subnets is defined
+    - public_network is defined
+    - public_network.name is defined
+    - public_network.cidr is defined

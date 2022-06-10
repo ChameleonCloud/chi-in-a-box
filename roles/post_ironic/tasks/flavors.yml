@@ -1,0 +1,22 @@
+---
+- name: Create baremetal flavor.
+  kolla_toolbox:
+    module_name: os_nova_flavor
+    module_args:
+      auth: "{{ openstack_auth }}"
+      state: present
+      name: baremetal
+      interface: admin
+      is_public: yes
+      extra_specs:
+        "resources:CUSTOM_BAREMETAL": 1
+        "resources:VCPU": 0
+        "resources:MEMORY_MB": 0
+        "resources:DISK_GB": 0
+      # Needs to be greater than largest expected disk image, yet smaller than
+      # actual node capacity; we guess a low value.
+      disk: 20
+      ram: 1
+      vcpus: 1
+  run_once: True
+  when: enable_ironic | bool

@@ -1,0 +1,11 @@
+public_networks: "{{ neutron_networks | selectattr('public', 'defined') | list }}"
+# This is added for backwards compatibility
+named_public_networks: "{{ neutron_networks | selectattr('name', 'equalto', 'public') | list }}"
+all_public_networks: "{{ public_networks + named_public_networks }}"
+public_network: "{{ all_public_networks[0] if all_public_networks }}"
+
+shared_networks: "{{ neutron_networks | selectattr('sharednet', 'defined') | list }}"
+shared_network: "{{ shared_networks[0] if shared_networks }}"
+
+default_sharednet_name: sharednet1
+default_sharednet_cidr: 10.0.0.1/24
