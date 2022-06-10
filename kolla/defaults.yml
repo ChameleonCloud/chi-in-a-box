@@ -130,18 +130,22 @@ horizon_regions:
     blazar_database_password: "{{ blazar_database_password }}"
 
 # Keystone IdP federation
+identity_provider_key: "{{ 'EABNO4wxhX0ZOryErTXnWPUkCAcWxTFHwZ6f_zjDHLg' if keycloak_hostname == 'auth.dev.chameleoncloud.org' else '02GplnOEWB4gwqrZDyyiaNdIrhgdinNnObXcPHy2RTo' }}"
 identity_provider_url: "{{ keycloak_url }}/auth/realms/{{ keycloak_realm_name }}"
 identity_provider_name: chameleon
 identity_provider_domain_name: chameleon
+keystone_idp_client_id: null
+enable_keystone_federation: "{{ keystone_idp_client_id is truthy }}"
+keystone_enable_federation_openid: "{{ enable_keystone_federation }}"
 keystone_identity_providers:
   - name: "{{ identity_provider_name }}"
-    domain_name: "{{ identity_provider_domain_name }}"
+    openstack_domain: "{{ identity_provider_domain_name }}"
     protocol: openid
     identifier: "{{ identity_provider_url }}"
     public_name: Login with Chameleon
-    client_id: "{{ keystone_idp_client_id }}"
-    client_secret: "{{ keystone_idp_client_secret }}"
     attribute_mapping: chameleon_mapping
+    metadata_folder: "{{ node_custom_config }}/keystone/federation/metadata"
+    certificate_file: "{{ node_custom_config }}/keystone/federation/{{ identity_provider_key }}.pem"
 keystone_identity_mappings:
   - name: chameleon_mapping
     file: "{{ node_custom_config }}/keystone/idp_mapping.json"
