@@ -1,7 +1,8 @@
 ---
-- src: chameleon.docker_service
-
-- src: chameleon.periodic_task
-
-- src: michaelrigart.interfaces
-  version: v1.11.1
+roles:
+  - name: chameleon.docker_service
+    version: master
+  - name: chameleon.periodic_task
+    version: master
+  - name: michaelrigart.interfaces
+    version: v1.11.1

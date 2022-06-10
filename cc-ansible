@@ -229,7 +229,7 @@ if [[ "$CHECK_UPDATES" == "yes" || "$FORCE_UPDATES" == "yes" ]]; then
   galaxy_role_requirements_chksum="$VIRTUALENV/requirements.yml.sha256"
   if [[ "$FORCE_UPDATES" == "yes" || ! -f "$galaxy_role_requirements_chksum" ]] || \
         ! sha256sum --quiet --check "$galaxy_role_requirements_chksum"; then
-    ansible-galaxy install --force -p "$galaxy_role_path" -r "$galaxy_role_requirements"
+    ansible-galaxy role install --force -p "$galaxy_role_path" -r "$galaxy_role_requirements"
     sha256sum "$galaxy_role_requirements" > "$galaxy_role_requirements_chksum"
   fi
 
