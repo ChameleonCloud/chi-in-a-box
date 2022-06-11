@@ -18,13 +18,6 @@
 [deployment]
 localhost ansible_connection=local
 
-[baremetal:children]
-control
-network
-compute
-storage
-monitoring
-
 ######################################
 # Custom Ansible playbooks
 ######################################
@@ -72,10 +65,8 @@ keycloak
 
 # You can explicitly specify which hosts run each project by updating the
 # groups in the sections below. Common services are grouped together.
-[chrony-server:children]
-haproxy
 
-[chrony:children]
+[common:children]
 control
 network
 compute
@@ -85,23 +76,19 @@ monitoring
 [collectd:children]
 compute
 
+[baremetal:children]
+control
+
+[tls-backend:children]
+control
+
 [grafana:children]
 monitoring
 
 [etcd:children]
 control
-compute
-
-[influxdb:children]
-monitoring
-
-[prometheus:children]
-monitoring
 
 [kafka:children]
-control
-
-[karbor:children]
 control
 
 [kibana:children]
@@ -117,18 +104,14 @@ storage
 [elasticsearch:children]
 control
 
-[haproxy:children]
+[hacluster:children]
+control
+
+[hacluster-remote:children]
+compute
+
+[loadbalancer:children]
 network
-
-[hyperv]
-#hyperv_host
-
-[hyperv:vars]
-#ansible_user=user
-#ansible_password=password
-#ansible_port=5986
-#ansible_connection=winrm
-#ansible_winrm_server_cert_validation=ignore
 
 [mariadb:children]
 control
@@ -155,9 +138,6 @@ monitoring
 [storm:children]
 monitoring
 
-[mongodb:children]
-control
-
 [keystone:children]
 control
 
@@ -174,9 +154,6 @@ network
 network
 compute
 manila-share
-
-[opendaylight:children]
-network
 
 [cinder:children]
 control
@@ -205,28 +182,31 @@ control
 [murano:children]
 control
 
-[solum:children]
-control
-
 [ironic:children]
 control
 
-[ceph:children]
-storage
+[influxdb:children]
+monitoring
+
+[prometheus:children]
+monitoring
 
 [magnum:children]
 control
 
-[qinling:children]
+[sahara:children]
 control
 
-[sahara:children]
+[solum:children]
 control
 
 [mistral:children]
 control
 
 [manila:children]
+control
+
+[gnocchi:children]
 control
 
 [ceilometer:children]
@@ -237,20 +217,12 @@ control
 
 [cyborg:children]
 control
-
-[congress:children]
-control
-
-[panko:children]
-control
+compute
 
 [tacker:children]
 control
 
-[trove:children]
-control
-
-[tempest:children]
+[vitrage:children]
 control
 
 [senlin:children]
@@ -259,16 +231,10 @@ control
 [vmtp:children]
 control
 
-[vitrage:children]
+[trove:children]
 control
 
 [watcher:children]
-control
-
-[rally:children]
-control
-
-[searchlight:children]
 control
 
 [octavia:children]
@@ -304,6 +270,23 @@ control
 # Word of caution: Some services are required to run on the same host to
 # function appropriately. For example, neutron-metadata-agent must run on the
 # same host as the l3-agent and (depending on configuration) the dhcp-agent.
+
+# Common
+[cron:children]
+common
+
+[fluentd:children]
+common
+
+[kolla-logs:children]
+common
+
+[kolla-toolbox:children]
+common
+
+# Elasticsearch Curator
+[elasticsearch-curator:children]
+elasticsearch
 
 # Glance
 [glance-api:children]
@@ -347,6 +330,9 @@ neutron
 [neutron-metadata-agent:children]
 neutron
 
+[neutron-ovn-metadata-agent:children]
+compute
+
 [neutron-bgp-dragent:children]
 neutron
 
@@ -359,25 +345,6 @@ neutron
 [ironic-neutron-agent:children]
 neutron
 
-# Ceph
-[ceph-mds:children]
-ceph
-
-[ceph-mgr:children]
-ceph
-
-[ceph-nfs:children]
-ceph
-
-[ceph-mon:children]
-ceph
-
-[ceph-rgw:children]
-ceph
-
-[ceph-osd:children]
-storage
-
 # Cinder
 [cinder-api:children]
 cinder
@@ -389,7 +356,7 @@ storage
 cinder
 
 [cinder-volume:children]
-cinder
+storage
 
 # Cloudkitty
 [cloudkitty-api:children]
@@ -412,19 +379,7 @@ storage
 ironic
 
 [tgtd:children]
-compute
 storage
-ironic
-
-# Karbor
-[karbor-api:children]
-karbor
-
-[karbor-protection:children]
-karbor
-
-[karbor-operationengine:children]
-karbor
 
 # Manila
 [manila-api:children]
@@ -462,6 +417,16 @@ barbican
 [barbican-worker:children]
 barbican
 
+# Trove
+[trove-api:children]
+trove
+
+[trove-conductor:children]
+trove
+
+[trove-taskmanager:children]
+trove
+
 # Heat
 [heat-api:children]
 heat
@@ -493,12 +458,6 @@ monasca-agent
 monasca
 
 [monasca-grafana:children]
-monasca
-
-[monasca-log-api:children]
-monasca
-
-[monasca-log-transformer:children]
 monasca
 
 [monasca-log-persister:children]
@@ -546,20 +505,6 @@ magnum
 [magnum-conductor:children]
 magnum
 
-# Qinling
-[qinling-api:children]
-qinling
-
-[qinling-engine:children]
-qinling
-
-# Sahara
-[sahara-api:children]
-sahara
-
-[sahara-engine:children]
-sahara
-
 # Solum
 [solum-api:children]
 solum
@@ -592,19 +537,6 @@ mistral
 [mistral-event-engine:children]
 mistral
 
-# Ceilometer
-[ceilometer-central:children]
-ceilometer
-
-[ceilometer-notification:children]
-ceilometer
-
-[ceilometer-compute:children]
-compute
-
-[ceilometer-ipmi:children]
-compute
-
 # Aodh
 [aodh-api:children]
 aodh
@@ -628,29 +560,39 @@ compute
 [cyborg-conductor:children]
 cyborg
 
-# Congress
-[congress-api:children]
-congress
+# Gnocchi
+[gnocchi-api:children]
+gnocchi
 
-[congress-datasource:children]
-congress
+[gnocchi-statsd:children]
+gnocchi
 
-[congress-policy-engine:children]
-congress
-
-# Panko
-[panko-api:children]
-panko
+[gnocchi-metricd:children]
+gnocchi
 
 # Trove
 [trove-api:children]
 trove
 
-[trove-conductor:children]
-trove
+# Sahara
+[sahara-api:children]
+sahara
 
-[trove-taskmanager:children]
-trove
+[sahara-engine:children]
+sahara
+
+# Ceilometer
+[ceilometer-central:children]
+ceilometer
+
+[ceilometer-notification:children]
+ceilometer
+
+[ceilometer-compute:children]
+compute
+
+[ceilometer-ipmi:children]
+compute
 
 # Multipathd
 [multipathd:children]
@@ -671,18 +613,20 @@ watcher
 [senlin-api:children]
 senlin
 
+[senlin-conductor:children]
+senlin
+
 [senlin-engine:children]
 senlin
 
-# Searchlight
-[searchlight-api:children]
-searchlight
-
-[searchlight-listener:children]
-searchlight
+[senlin-health-manager:children]
+senlin
 
 # Octavia
 [octavia-api:children]
+octavia
+
+[octavia-driver-agent:children]
 octavia
 
 [octavia-health-manager:children]
@@ -730,6 +674,9 @@ zun
 [zun-compute:children]
 compute
 
+[zun-cni-daemon:children]
+compute
+
 # Skydive
 [skydive-analyzer:children]
 skydive
@@ -758,6 +705,9 @@ vitrage
 [vitrage-ml:children]
 vitrage
 
+[vitrage-persistor:children]
+vitrage
+
 # Blazar
 [blazar-api:children]
 blazar
@@ -767,13 +717,17 @@ blazar
 
 # Prometheus
 [prometheus-node-exporter:children]
-baremetal
+monitoring
+control
+compute
+network
+storage
 
 [prometheus-mysqld-exporter:children]
 mariadb
 
 [prometheus-haproxy-exporter:children]
-haproxy
+loadbalancer
 
 [prometheus-memcached-exporter:children]
 memcached
@@ -788,19 +742,7 @@ storage
 [prometheus-alertmanager:children]
 monitoring
 
-[prometheus-ceph-exporter:children]
-ceph-mgr
-
 [prometheus-openstack-exporter:children]
-monitoring
-
-[prometheus-pushgateway:children]
-monitoring
-
-[prometheus-redis-exporter:children]
-redis
-
-[prometheus-snmp-exporter:children]
 monitoring
 
 [prometheus-elasticsearch-exporter:children]
@@ -809,8 +751,20 @@ elasticsearch
 [prometheus-blackbox-exporter:children]
 monitoring
 
+[prometheus-libvirt-exporter:children]
+compute
+
+[prometheus-pushgateway:children]
+monitoring
+
+[prometheus-snmp-exporter:children]
+monitoring
+
 [prometheus-ipmi-exporter:children]
 ironic-conductor
+
+[prometheus-redis-exporter:children]
+redis
 
 [masakari-api:children]
 control
@@ -818,11 +772,36 @@ control
 [masakari-engine:children]
 control
 
-[masakari-monitors:children]
+[masakari-hostmonitor:children]
+control
+
+[masakari-instancemonitor:children]
 compute
 
+[ovn-controller:children]
+ovn-controller-compute
+ovn-controller-network
+
+[ovn-controller-compute:children]
+compute
+
+[ovn-controller-network:children]
+network
+
+[ovn-database:children]
+control
+
+[ovn-northd:children]
+ovn-database
+
+[ovn-nb-db:children]
+ovn-database
+
+[ovn-sb-db:children]
+ovn-database
+
 [letsencrypt:children]
-haproxy
+loadbalancer
 
 [letsencrypt-acme:children]
 letsencrypt
@@ -838,6 +817,12 @@ doni
 
 [doni-worker:children]
 doni
+
+[tunelo:children]
+control
+
+[tunelo-api:children]
+tunelo
 
 # OSG
 [osg:children]

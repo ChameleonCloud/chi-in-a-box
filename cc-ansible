@@ -339,7 +339,7 @@ mkdir -p "${CONFIG_DIR}/inventory/group_vars/"
 # shellcheck disable=2016 # yq is directly evaluating this string
 yq eval-all '. as $item ireduce ({}; . * $item )' \
   "$DIR/kolla/defaults.yml" "$CONFIG_DIR/defaults.yml" \
-  >"$CONFIG_DIR/inventory/group_vars/baremetal.yml"
+  >"$CONFIG_DIR/inventory/group_vars/common.yml"
 
 declare -a kolla_args=()
 kolla_args+=(--configdir="$CONFIG_DIR")
