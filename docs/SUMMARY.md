@@ -21,6 +21,8 @@
 
 ## Setup Guides
 
+* [Evaluation Site](setup-guides/evaluation-site/README.md)
+  * [Bring up the Control Plane](setup-guides/evaluation-site/bring-up-the-control-plane.md)
 * [Production Baremetal](setup-guides/production-baremetal/README.md)
   * [Baremetal QuickStart](setup-guides/production-baremetal/quickstart.md)
   * [Host Networking Configuration](setup-guides/production-baremetal/hostnetworking.md)
