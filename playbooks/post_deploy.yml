@@ -2,26 +2,36 @@
 - hosts: control
   roles:
     - role: post_networking
-    - role: post_kvm
-      when: enable_kvm
     - role: post_ironic
       when: enable_ironic
 
-# Run other critical site playbooks
-- name: Set up vendordata metadata for instances (critical)
-  import_playbook: vendordata.yml
+- hosts: vendordata
+  roles: [vendordata]
 
-- name: Set up Hammers (periodic fix-it tasks)
-  import_playbook: hammers.yml
+- hosts: hammers
+  roles: [hammers]
 
-- name: Set up Chameleon image download tools
-  import_playbook: chameleon_image_tools.yml
+- hosts: chameleon-image-tools
+  roles: [chameleon_image_tools]
 
-- name: Set up mariadb automatic backups
-  import_playbook: backups.yml
+- hosts: deployment
+  roles:
+    - role: chameleon_mariadb
+      when: hostvars[groups['mariadb'][0]]['enable_mariabackup'] | bool
+      vars:
+        action: "deployment"
+- hosts: mariadb
+  roles:
+    - role: chameleon_mariadb
+      vars:
+        action: "config"
+  tags: mariadb
 
-- name: Set up Chameleon usage reporting
-  import_playbook: chameleon_usage.yml
+- hosts: chameleon_usage
+  roles:
+    - role: chameleon_usage
+      when: enable_usage_reporting | bool
 
-- name: Set up Precis
-  import_playbook: precis.yml
+- name: Install and configure services for Precis
+  hosts: precis
+  roles: [precis]
