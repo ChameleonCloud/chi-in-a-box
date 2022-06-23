@@ -10,10 +10,10 @@
     ironic_provisioning_network_vlan is defined
 
 - name: create interface for ironic gateway
-  michaelrigart.interfaces:
-    interfaces_ether_interfaces: >
-      {{ (ironic_interfaces | default([])) }}
-  become: True
+  include_role:
+    name: michaelrigart.interfaces
+  vars:
+    interfaces_ether_interfaces: "{{ (ironic_interfaces | default([])) }}"
   when:
     - manage_ironic_gateway_interface | bool
     - enable_ironic | bool
