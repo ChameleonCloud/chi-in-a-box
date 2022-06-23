@@ -1,4 +1,10 @@
 ---
+- name: Authenticate to Docker registry
+  docker_login:
+    registry_url: "{{ docker_registry }}"
+    username: "{{ docker_registry_username }}"
+    password: "{{ docker_registry_password }}"
+
 - name: Pull Docker image
   docker_image:
     source: pull
@@ -10,7 +16,7 @@
   file:
     path: "{{ chameleon_image_tools_config_dir }}"
     state: directory
-    
+
 - name: Configure site.yaml
   become: yes
   template:
