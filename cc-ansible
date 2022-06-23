@@ -8,10 +8,10 @@ set -o pipefail
 # Set Globals
 FORCE_UPDATES="${FORCE_UPDATES:-no}"
 CHECK_UPDATES=yes
-DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
+CIAB_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 
 setup_venv() {
-	local venv_path="${VIRTUAL_ENV:-"${DIR}"/"venv"}"
+	local venv_path="${VIRTUAL_ENV:-"${CIAB_DIR}"/"venv"}"
 	VIRTUAL_ENV=$(realpath "${venv_path}")
 
 	if [[ ! -d ${VIRTUAL_ENV} ]]; then
@@ -30,7 +30,7 @@ setup_venv() {
 
 update_python_packages() {
 	# Update base pip packages
-	pip_requirements="${DIR}/requirements.txt"
+	pip_requirements="${CIAB_DIR}/requirements.txt"
 	pip_requirements_chksum="${VIRTUAL_ENV}/requirements.txt.sha256"
 	if [[ ${FORCE_UPDATES} == "yes" || ! -f ${pip_requirements_chksum} ]] ||
 		! sha256sum --quiet --check "${pip_requirements_chksum}"; then
@@ -41,8 +41,8 @@ update_python_packages() {
 
 update_ansible_galaxy() {
 	# Update Ansible Galaxy roles
-	galaxy_role_path="${DIR}/roles/galaxy.ansible.com"
-	galaxy_role_requirements="${DIR}/requirements.yml"
+	galaxy_role_path="${CIAB_DIR}/roles/galaxy.ansible.com"
+	galaxy_role_requirements="${CIAB_DIR}/requirements.yml"
 	galaxy_role_requirements_chksum="${VIRTUAL_ENV}/requirements.yml.sha256"
 	if [[ ${FORCE_UPDATES} == "yes" || ! -f ${galaxy_role_requirements_chksum} ]] ||
 		! sha256sum --quiet --check "${galaxy_role_requirements_chksum}"; then
@@ -173,7 +173,7 @@ init() {
 
 	# Copy files from example
 	mkdir -p "$(dirname "${site_config}")"
-	cp -a "${DIR}/site-config.example/" "${site_config}"
+	cp -a "${CIAB_DIR}/site-config.example/" "${site_config}"
 
 	local inventory="${site_config}/inventory"
 
@@ -283,7 +283,7 @@ USAGE
 # On init, there is no requirement that the site config directory be defined,
 # because one of init's tasks is creating this directory. Set a default.
 if [[ ${command:-} == "init" ]]; then
-	CC_ANSIBLE_SITE="${CC_ANSIBLE_SITE:-${DIR}/site-config}"
+	CC_ANSIBLE_SITE="${CC_ANSIBLE_SITE:-${CIAB_DIR}/site-config}"
 elif [[ -z ${CC_ANSIBLE_SITE:-} ]]; then
 	cat <<ERRMSG
 Error: no site specified! Please specify which site to execute under with either
@@ -326,9 +326,9 @@ if [[ -n ${CC_ANSIBLE_PLAYBOOK:-} ]]; then
 	# Because we execute within Kolla-Ansible's playbook directory, "magic"
 	# paths will not work any more--add our plugins/libraries to Ansible's
 	# search path directly.
-	export ANSIBLE_ACTION_PLUGINS="${DIR}/playbooks/action_plugins"
-	export ANSIBLE_LIBRARY="${DIR}/playbooks/library"
-	export ANSIBLE_TEMPLATES="${DIR}/playbooks/templates"
+	export ANSIBLE_ACTION_PLUGINS="${CIAB_DIR}/playbooks/action_plugins"
+	export ANSIBLE_LIBRARY="${CIAB_DIR}/playbooks/library"
+	export ANSIBLE_TEMPLATES="${CIAB_DIR}/playbooks/templates"
 
 	# Copy the playbook to a new location relative to the Kolla-Ansible installation
 	# to allow the group_vars/ in the playbook directory to take effect.
@@ -365,7 +365,7 @@ _config_dir_cleanup() {
 }
 TRAPS+=(_config_dir_cleanup)
 # 1. Copy base node_custom_config
-rsync -a "${DIR}/kolla/node_custom_config/" "${CONFIG_DIR}/node_custom_config/"
+rsync -a "${CIAB_DIR}/kolla/node_custom_config/" "${CONFIG_DIR}/node_custom_config/"
 # 2. Copy anything declared in site-config (can override files in node_custom_config)
 rsync -a "${CC_ANSIBLE_SITE}/" "${CONFIG_DIR}/"
 # 3. Ensure a defaults.yml is defined, if the site-config didn't define it.
@@ -383,7 +383,7 @@ mkdir -p "${CONFIG_DIR}/inventory/group_vars/"
 #    group_vars files.
 # shellcheck disable=2016 # yq is directly evaluating this string
 yq eval-all '. as $item ireduce ({}; . * $item )' \
-	"${DIR}/kolla/defaults.yml" "${CONFIG_DIR}/defaults.yml" \
+	"${CIAB_DIR}/kolla/defaults.yml" "${CONFIG_DIR}/defaults.yml" \
 	>"${CONFIG_DIR}/inventory/group_vars/defaults.yml"
 
 declare -a kolla_args=()
@@ -395,7 +395,7 @@ kolla_args+=(--passwords="${CONFIG_DIR}/passwords.yml")
 kolla_args+=(--extra PASSWORDS_FILE="${CONFIG_DIR}/passwords.yml")
 kolla_args+=(--extra node_custom_config="${CONFIG_DIR}/node_custom_config")
 kolla_args+=(--extra cc_ansible_site_dir="${CONFIG_DIR}")
-kolla_args+=(--extra deployment_dir="${DIR}")
+kolla_args+=(--extra deployment_dir="${CIAB_DIR}")
 kolla_args+=(--extra site_config_dir="${CC_ANSIBLE_SITE}")
 
 # We set ansible ansible_python_interpreter to the virtualenv inside site-config, and override here during bootstrap.
@@ -411,7 +411,7 @@ fi
 
 if [[ ${POSARGS[*]} =~ post-deploy ]]; then
 	# Important that the destination does not having a trailing `/`
-	cp -r "${DIR}/playbooks/" "${ansible_path}/chi"
+	cp -r "${CIAB_DIR}/playbooks/" "${ansible_path}/chi"
 	kolla_args+=(--extra post_deploy_extra_play="chi/post_deploy.yml")
 fi
 kolla_args+=("${POSARGS[@]}")
