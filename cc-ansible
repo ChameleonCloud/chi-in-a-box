@@ -364,9 +364,15 @@ if [[ "${POSARGS[*]}" =~ bootstrap-servers ]]; then
 fi
 
 if [[ "${POSARGS[*]}" =~ post-deploy ]]; then
+  post_deploy_play="$ansible_path/ciab_post_deploy.yml"
+  _post_override_cleanup() {
+    rm -f "$post_deploy_play"
+  }
+  TRAPS+=(_post_override_cleanup)
+
   # Important that the destination does not having a trailing `/`
-  cp -r "$DIR/playbooks/" "$ansible_path/chi"
-  kolla_args+=(--extra post_deploy_extra_play="chi/post_deploy.yml")
+  cp -f "$DIR/playbooks/post_deploy.yml" "$post_deploy_play"
+  kolla_args+=(--extra post_deploy_extra_play="ciab_post_deploy.yml")
 fi
 kolla_args+=("${POSARGS[@]}")
 
