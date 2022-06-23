@@ -25,6 +25,26 @@
   run_once: True
   delegate_to: "{{ groups['control'][0] }}"
 
+
+- name: download vendordata container
+  block:
+    - name: login to chameleon docker registry
+      community.docker.docker_login:
+        registry_url: "{{ docker_registry }}"
+        username: "{{ docker_registry_username }}"
+        password: "{{ docker_registry_password }}"
+    - name: Pull Docker image
+      community.general.docker_image:
+        source: pull
+        name: "{{ vendordata_services.vendordata_api.image }}"
+        force_source: yes
+    - name: Log out of chameleon docker registry
+      community.docker.docker_login:
+        registry_url: "{{ docker_registry }}"
+        state: absent
+  when:
+  - inventory_hostname in groups["vendordata"]
+
 - name: Configure vendordata services.
   include_role:
     name: chameleon.docker_service
