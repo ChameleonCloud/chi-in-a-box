@@ -1,0 +1,119 @@
+# handle subcommands for cc-ansible
+
+init() {
+    # Template site-config directory
+	local site_config="${CC_ANSIBLE_SITE}"
+
+	if [[ -d ${site_config} ]]; then
+		echo "Site config already exists at ${site_config}! Aborting."
+		return 1
+	fi
+
+	# Copy files from example
+	mkdir -p "$(dirname "${site_config}")"
+	cp -a "${CIAB_DIR}/site-config.example/" "${site_config}"
+
+	local inventory="${site_config}/inventory"
+
+	# Do some simple hostname guessing
+	this_host=$(hostname -s)
+	sed -i.bak "s/<host>/${this_host}/g" "${inventory}/hosts" &&
+		rm -f "${inventory}/hosts.bak"
+	mv "${inventory}/host_vars/<host>" "${inventory}/host_vars/${this_host}"
+
+	# Generate vault password
+	openssl rand -base64 2048 >"${site_config}/vault_password" &&
+		chmod 400 "${site_config}/vault_password"
+
+	# Generate passwords
+	kolla-genpwd --passwords "${site_config}/passwords.yml"
+	ansible-vault encrypt \
+		--vault-password-file "${site_config}/vault_password" \
+		"${site_config}/passwords.yml"
+
+	echo "The beginnings of your site configuration were installed to ${site_config}."
+	echo "To use this site configuration automatically for future commands, you can"
+	echo "set an environment variable:"
+	echo
+	echo -e "\texport CC_ANSIBLE_SITE=${site_config}"
+	echo
+}
+
+edit_passwords() {
+	local tmpfile
+	local passwords_file="${CC_ANSIBLE_SITE}/passwords.yml"
+	local passwords_file_chksum="${passwords_file}.sha256"
+
+	tmpfile="$(mktemp)"
+	_edit_passwords_cleanup() {
+		rm -f "${tmpfile}"
+		rm -f "${passwords_file_chksum}"
+	}
+	TRAPS+=(_edit_passwords_cleanup)
+
+	echo "Decrypting passwords..."
+	ansible-vault view \
+		--vault-password-file "${CC_ANSIBLE_VAULT_PASSWORD}" \
+		"${CC_ANSIBLE_SITE}/passwords.yml" >"${tmpfile}"
+
+	if [[ ! -s ${tmpfile} ]]; then
+		echo "Failed to decrypt ${passwords_file} with vault token."
+		exit 1
+	fi
+
+	sha256sum "${tmpfile}" >"${passwords_file_chksum}"
+	${EDITOR:-vi} "${tmpfile}"
+	local ret=$?
+	if [[ ${ret} -gt 0 ]]; then exit "${ret}"; fi
+	if sha256sum --quiet --check "${passwords_file_chksum}"; then
+		echo "No passwords were changed."
+		exit 0
+	fi
+
+	echo "Generating placeholder passwords for any missing values..."
+	kolla-genpwd --passwords "${tmpfile}"
+	echo "Encrypting passwords..."
+	ansible-vault encrypt \
+		--vault-password-file "${CC_ANSIBLE_VAULT_PASSWORD}" \
+		"${tmpfile}"
+	cp "${tmpfile}" "${CC_ANSIBLE_SITE}/passwords.yml"
+}
+
+# Deprecated function name
+decrypt_passwords() {
+	view_passwords
+}
+
+view_passwords() {
+	ansible-vault view \
+		--vault-password-file "${CC_ANSIBLE_VAULT_PASSWORD}" \
+		"${CC_ANSIBLE_SITE}/passwords.yml"
+}
+
+help() {
+	cat <<USAGE
+Usage: cc-ansible [-s|--site SITE]
+                  [subcommand|--playbook PLAYBOOK]
+                  ARGS
+
+Subcommands:
+  view_passwords: View the contents of the encrypted password file.
+  edit_passwords: Update an encrypted passwords file for the given environment.
+                  Opens an interactive editor and saves the results back out as
+                  en encrypted file.
+
+Examples:
+  # Run the 'deploy' step for Kolla-Ansible in a 'production' site
+  cc-ansible -s /path/to/sites/production deploy
+
+  # Run the 'upgrade' step for only Ironic tags
+  cc-ansible upgrade --tags ironic
+
+  # Run an external playbook
+  cc-ansible --playbook path/to/playbook.yml
+
+  # Update the passwords file for the environment
+  cc-ansible edit_passwords
+USAGE
+	exit 1
+}
