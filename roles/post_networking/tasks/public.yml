@@ -3,17 +3,17 @@
 # Public net configuration
 ##########################
 
-- name: Check public network configuration
-  assert:
-    that:
-      - public_network is not false
-      - public_network.cidr is defined
-      - public_network.gateway_ip is defined
-    fail_msg: |
-      No 'public' neutron_network is defined! At least one externally-facing
-      network should be defined, and it should be called 'public'.
-  when:
-    - public_network is defined
+# - name: Check public network configuration
+#   assert:
+#     that:
+#       - public_network is not false
+#       - public_network.cidr is defined
+#       - public_network.gateway_ip is defined
+#     fail_msg: |
+#       No 'public' neutron_network is defined! At least one externally-facing
+#       network should be defined, and it should be called 'public'.
+#   when:
+#     - public_network is defined
 
 - name: Create public network
   kolla_toolbox:
@@ -36,6 +36,7 @@
     public_allocation_pool_end: "{{ public_network.allocation_pools[0].end | default(public_network.cidr | ipaddr('last_usable') | ipmath(-1)) }}"
   when:
     - public_network.cidr is defined
+    - public_network is defined
 
 # NOTE(jason): the os_subnet module doesn't support multiple allocation pools
 # at the moment, so only one allocation pool can be automatically created.
@@ -57,4 +58,5 @@
   vars:
     network: "{{ public_network }}"
   when:
+    - public_network.cidr is defined
     - public_network is defined
