@@ -24,6 +24,7 @@
     module_name: os_network
     module_args:
       auth: "{{ openstack_auth }}"
+      project: "{{ keystone_admin_project }}"
       name: "{{ ironic_provisioning_network }}"
       region_name: "{{ openstack_region_name }}"
       provider_network_type: vlan
@@ -31,6 +32,7 @@
       provider_physical_network: physnet1
       state: present
   run_once: True
+  become: True
   when: enable_ironic | bool and
     ironic_provisioning_network_vlan is defined
 - name: Create provisioning subnet.
@@ -44,6 +46,7 @@
       allocation_pool_start: "{{ ironic_provisioning_allocation_pool_start }}"
       allocation_pool_end: "{{ ironic_provisioning_allocation_pool_end }}"
   run_once: True
+  become: True
   when:
     - enable_ironic | bool
     - ironic_provisioning_network_cidr is defined
