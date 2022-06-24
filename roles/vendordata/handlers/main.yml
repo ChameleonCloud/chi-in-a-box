@@ -3,4 +3,4 @@
   service:
     name: "vendordata_api"
     state: restarted
-    become: yes
+  become: yes
