@@ -22,6 +22,7 @@
   loop: "{{ neutron_networks }}"
   loop_control:
     label: "{{ item.name }}"
+  become: true
   run_once: True
   when:
     - item.sharednet is defined
@@ -42,6 +43,7 @@
   loop: "{{ neutron_networks }}"
   loop_control:
     label: "{{ item.name }}"
+  become: true
   run_once: True
   when:
     - item.sharednet is defined
@@ -59,6 +61,7 @@
       network: "{{ public_network.name }}"
       external_fixed_ips:
         - subnet: "public-subnet"
+  become: true
   run_once: True
   when:
     - sharednet_subnets is defined
