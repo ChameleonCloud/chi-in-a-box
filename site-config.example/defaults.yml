@@ -1,6 +1,15 @@
 ---
-# This file contains an example site configuration.
-# To enable features, each section MUST be customized to you needs.
+# You can use this file to override _any_ variable throughout Kolla.
+# Configuration is read from the following locations, with entries
+# lower in the list overriding those above.
+# - 'chi-in-a-box/venv/src/kolla-ansible/ansible/group_vars/all.yml' # Don't edit this
+# - 'chi-in-a-box/kolla/defaults.yml' # Don't edit this
+# - 'site-config/defaults.yml'
+# - 'site-config/inventory/group_vars/<group_name>.yml' # Scoped to group
+# - 'site-config/inventory/host_vars/<hostname>.yml' # Scoped to host
+# Prefer editing site-config/defaults.yml (this file) for site-wide configuration
+# And editing a host_vars file for host-specific overrides
+
 
 # Associate Site Name (MANDATORY)
 openstack_region_name: CHI@XYZ
