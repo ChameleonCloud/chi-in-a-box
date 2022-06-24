@@ -19,4 +19,5 @@
       ram: 1
       vcpus: 1
   run_once: True
+  become: True
   when: enable_ironic | bool

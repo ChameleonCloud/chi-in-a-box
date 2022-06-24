@@ -11,6 +11,7 @@
   loop: "{{ ironic_glance_images }}"
   loop_control:
     label: "{{ item.name }}"
+  become: True
   run_once: True
   when: enable_ironic | bool
 - name: Create Glance images.
@@ -25,6 +26,7 @@
       container_format: "{{ item.container_format }}"
       disk_format: "{{ item.disk_format }}"
       filename: "{{ glance_images_tmp }}/{{ item.name }}"
+  become: True
   run_once: True
   loop: "{{ ironic_glance_images }}"
   loop_control:

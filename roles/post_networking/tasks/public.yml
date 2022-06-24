@@ -26,6 +26,7 @@
       provider_physical_network: public
       external: yes
       state: present
+  become: true
   run_once: True
   when:
     - public_network is defined
@@ -54,6 +55,7 @@
       allocation_pool_start: "{{ public_allocation_pool_start }}"
       allocation_pool_end: "{{ public_allocation_pool_end }}"
       state: present
+  become: true
   run_once: True
   vars:
     network: "{{ public_network }}"

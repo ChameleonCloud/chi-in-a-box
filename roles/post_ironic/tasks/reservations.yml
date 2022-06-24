@@ -6,5 +6,6 @@
       auth: "{{ openstack_auth }}"
       state: present
       name: freepool
+  become: True
   run_once: True
   when: enable_blazar | bool
