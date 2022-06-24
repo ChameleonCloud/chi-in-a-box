@@ -40,6 +40,7 @@
     module_name: os_subnet
     module_args:
       auth: "{{ openstack_auth }}"
+      project: "{{ keystone_admin_project }}"
       network_name: "{{ ironic_provisioning_network }}"
       name: "{{ ironic_provisioning_network }}-subnet"
       cidr: "{{ ironic_provisioning_network_cidr }}"
