@@ -1,64 +1,195 @@
 ---
-# This file contains an example site configuration.
-# To enable features, each section MUST be customized to you needs.
+# You can use this file to override _any_ variable throughout Kolla.
+# Configuration is read from the following locations, with entries
+# lower in the list overriding those above.
+# - 'chi-in-a-box/venv/src/kolla-ansible/ansible/group_vars/all.yml' # Don't edit this
+# - 'chi-in-a-box/kolla/defaults.yml' # Don't edit this
+# - 'site-config/defaults.yml'
+# - 'site-config/inventory/group_vars/<group_name>.yml' # Scoped to group
+# - 'site-config/inventory/host_vars/<hostname>.yml' # Scoped to host
+# Prefer editing site-config/defaults.yml (this file) for site-wide configuration
+# And editing a host_vars file for host-specific overrides
 
-# Associate Site Name (MANDATORY)
-openstack_region_name: CHI@XYZ
-# Site name, similar to region but used for out-of-band inventory management
-chameleon_site_name: xyz
 
-# Set to match the OS of your controller node(s)
+# Deploying this configuration
+# The values here set ansible variables, which are used to template the runtime configuration into /etc/kolla/<service_name>
+# on the controller nodes(s)
+# Use the command `cc-ansible deploy` to update these templated files, and to redeploy containers to load the new files.
+
+####################
+# Base Configuration
+####################
+
+# You must rerun `cc-ansible bootstrap-servers` after modifying entries in this section.
+# This must be done before re-running `cc-ansible deploy`
+# The values represent the minimal values needed to bring up the control-plane and API interfaces
+
+# Set to match the OS running on your controller node
+# Valid options are ['ubuntu']
 kolla_base_distro: ubuntu
 
-# HAProxy Config (MANDATORY)
-enable_haproxy: yes
-# Provide a full TLS chain in /etc/kolla/haproxy/certs.d/
-kolla_enable_tls_external: yes
-# Set to a "spare" address in the "internal" subnet
-kolla_internal_vip_address: 10.0.0.1
-# Set to a "spare" address in the "public" subnet
-kolla_external_vip_address: 100.0.0.1
-# This should resolve to the external_vip and match the TLS Cert
-kolla_external_fqdn: chi.example.com
+# All API services will listen on this interface by default.
+# There must be an IP address bound to the interface, separate from `kolla_internal_vip_address` described below.
+# It is possible for hosts to have non-matching names of interfaces - these can
+# be set in an inventory file per host or per group or stored separately, see
+#     http://docs.ansible.com/ansible/intro_inventory.html
+network_interface: "eth0"
 
-# This is used for glance file backend
-# ref: https://docs.openstack.org/kolla-ansible/train/reference/shared-services/glance-guide.html#file-backend
-glance_file_datadir_volume: /var/lib/glance
+# These can be adjusted for even more customization. The default is the same as the 'network_interface'.
+# To use a separate interface for public-facing APIs, configure the `kolla_external_vip_interface`. This must be done if
+# enabling TLS, as only HAProxy will listen on the external interface, and terminate TLS for services listening on
+# the `api_interface`. As above, it must have an IP address bound, separate from the `kolla_external_vip_address`.
+# kolla_external_vip_interface: "{{ network_interface }}"
+# api_interface: "{{ network_interface }}"
 
-#Uncomment to Disable Federated Auth
-# enable_keystone_federation: no
-# enable_keystone_federation_openid: no
-# keystone_idp_client_id: null
+# This should be a VIP, an unused IP on your network that will float between
+# the hosts running keepalived for high-availability. Set this to a second IP
+# address in the same subnet as the the IP address on `network_interface`, above
+# This must be done even in the case of a single controller node, as HAProxy is still used.
+kolla_internal_vip_address: "10.10.10.254"
+# This is the DNS name that maps to the kolla_internal_vip_address VIP. By
+# default it is the same as kolla_internal_vip_address.
+#kolla_internal_fqdn: "{{ kolla_internal_vip_address }}"
+
+# This should be a VIP, an unused IP on your network that will float between
+# the hosts running keepalived for high-availability. It defaults to the
+# kolla_internal_vip_address, allowing internal and external communication to
+# share the same address.  Specify a kolla_external_vip_address to separate
+# internal and external requests between two VIPs.
+#kolla_external_vip_address: "{{ kolla_internal_vip_address }}"
+
+# The Public address used to communicate with OpenStack as set in the public_url
+# for the endpoints that will be created. This DNS name should map to
+# kolla_external_vip_address.
+#kolla_external_fqdn: "{{ kolla_external_vip_address }}"
+
+# Arbitrary unique number from 0..255
+# This should be changed from the default in the event of a multi-region deployment
+# where the VIPs of different regions reside on a common subnet.
+#keepalived_virtual_router_id: "51"
+
+###################
+# TLS Configuration
+###################
+
+# To provide encryption and authentication on the kolla_external_vip_interface, TLS can be enabled.
+# Before enabling TLS, place a certificate chain in 'site-config/certificates/haproxy.pem'
+# The certificate chain must be the concatenation of a "fullchain.pem" and the private_key
+# You must also configure `kolla_external_vip_interface`, `kolla_external_vip_address`, and `kolla_external_fqdn`
+#kolla_enable_tls_external: "yes"
+
+########################################
+# Chameleon Associate Site Configuration
+########################################
+
+# These options are required for Chameleon Associate sites, but can be ignored for Independent Testbeds.
+# If you're setting up an associate site, the values will be provided to you.
+
+# Region name, used to distinguish multiple regions at a single site.
+# openstack_region_name: CHI@in-a-box
+
+# Site name, similar to region but used for inventory management
+# chameleon_site_name: <chameleon_reference_api_site_name>
+
+# Client credential name for chameleon IDP federation
+# keystone_idp_client_id: <provided_by_chameleon>
+
+#################################
+# Tenant Networking Configuration
+#################################
+
+# This section is used to configure the mapping of neutron "phyical_networks" to interfaces
+# on the controller node. These should be separate interfaces from those used for the API
+# interfaces above.
+# In the default configuration, you must define separate physical networks for external traffic, and internal tenant vlans.
+# It is possible to use the same physical network for both, but outside the scope of this document.
+
+# Two logical networks must be defined as well. The Public network (distict from the public physical network) is used for
+# router external interfaces, and floating IP addresses. It defaults to the untagged vlan on the public physical network.
+
+# In addition, two logical networks must be defined, `public` and `sharednet`. During post-deploy, neutron networks will
+# be created for each, and attached to the physical_networks defined here.
+
+# Explanation of fields:
+# name: name of the neutron physical network to create
+# bridge_name: name of openvswitch bridge mapped to the physical network
+# external_interface: what interface on the host to attach to the ovs bridge
+
+# cidr: the address and netmask for the subnet to be associated with the network.
+#   If using a gateway, it must match the configuration for that gateway.
+# Gateway IP: IP address of external router
+# allocation_pools: Define the address range(s) to hand out on this network.
+#   For the public network, ensure this does NOT overlap with your API addresses defined above!
+
+# on_demand_vlan_ranges: list of vlan IDs that can be automatically assigned on network creation
+# reservable_vlan_ranges: list of vlan IDs that can be reserved via Blazar. it should NOT overlap with
+#   the on_demand_vlan_ranges. Currently a placeholder, as reservable vlans are still created manually.
+
+# sharednet: l3 tenant network used as the "default", for users who don't need isolation.
+#   post-deploy will create a neutron router attached to this network, and NAT traffic from it to the public network.
+
+neutron_networks:
+- name: public
+  bridge_name: br-ex
+  # external_interface: <neutron_public_physnet_interface>
+  # cidr: 192.5.87.0/24
+  # gateway_ip: 192.5.87.1
+  # allocation_pools:
+  #   - start: 192.5.87.10
+  #     end: 192.5.87.250
+- name: physnet1
+  bridge_name: br-physnet1
+  # external_interface: <neutron_tenant_physnet_interface>
+  on_demand_vlan_ranges:
+    - 200:250
+  reservable_vlan_ranges:
+    - 251:300
+  sharednet:
+    # cidr: 10.200.10.0/22
+    # allocation_pools:
+    #   - start: 10.200.10.20
+    #     end: 10.200.12.21
 
 
-# Neutron networks (MANDATORY)
-# Uncomment to enable Neutron Bridge Networks
-# At least one private and one public is required
-# neutron_networks:
-#   - name: physnet1
-#     on_demand_vlan_ranges:
-#       - 200:250
-#     reservable_vlan_ranges:
-#       - 250:300
-#     bridge_name: br-em1
-#     external_interface: em1
-#   - name: physnet2
-#     bridge_name: br-em2
-#     external_interface: em2
-#   - name: public
-#     bridge_name: br-ex
-#     external_interface: em3
-#     # This should be your public IP block assigned to your deployment.
-#     cidr: 0.0.0.0/32
 
+#######################
+# Storage Configuration
+#######################
 
-# Ironic network config
-# Uncomment to enable provisioning vlan for Ironic
+# The Image service (Glance) must store disk images somewhere. This is used both for Chameleon-provided images, as well as
+# the images that users save with the cc-snapshot tool.
+# By default, glance will mount the directory {{ glance_file_datadir_volume }} from the host into the glance_api container.
+# Further Reading: https://docs.openstack.org/kolla-ansible/train/reference/shared-services/glance-guide.html#file-backend
+# glance_file_datadir_volume: /var/lib/glance
+
+######################
+# Ironic configuration
+######################
+
+# The Ironic Provisioning network is a Neutron network used to netboot nodes and load images onto them.
+# During post-deploy, it will be created with the subnet `ironic_provisioning_network_cidr`, on physnet1, with the vlan
+# `ironic_provisioning_network_vlan`. This vlan can be inside or outside the `on_demand_vlan_ranges` defined above,
+# but should NOT conflict with the `reservable_vlan_ranges`. The `ironic_provisioning_network_vlan` must be valid on
+# the tenant network switch, as it will be set as an access vlan during provisoning.
+
 # ironic_provisioning_network_vlan: 200
-# Subnet for ironic-provisioning
+
+# The ironic provisioning subnet MUST be able to route to the `kolla_internal_vip_address`. This can be done either through
+# configuring routing on your switch, or by adding a vlan subinterface to your `network_interface` to act as a gateway for
+# the network. If this is the case, ensure that the `ironic_provisioning_network_vlan` is trunked on that interface.
+
 # ironic_provisioning_network_cidr: 10.51.0.0/24
-# DHCP range used for ironic provisioning
-# ironic_dnsmasq_dhcp_range: 10.51.0.0/24
+
+
+################################
+# Baremetal switch configuration
+################################
+# To use isolated tenant networks with baremetal nodes, neutron must be able to set the access vlan
+# on the switchport where each node is connected. Add an entry below for each switch to be managed by neutron.
+# The `device_type` must be set corresponding to the switch operating system, valid values can be found here:
+# https://github.com/ChameleonCloud/networking-generic-switch/blob/chameleoncloud/xena/setup.cfg#L34-L51
+# Recently tested values include [netmiko_dell_os10, netmiko_dell_force10, netmiko_dell_powerconnect]
+# If in doubt, try `netmiko_cisco_ios`, as many switches are compatible with Cisco's syntax.
 
 # Physical Switch config for Neutron-ML2:
 # Uncomment with info for neutron managed switch
@@ -72,10 +203,4 @@ glance_file_datadir_volume: /var/lib/glance
 #     snmp:
 #       community_string: "{{ dell_switch_community_string }}"
 #     ngs_config:
-#       persist_changes: False
 #       fast_cli: True
-
-# If you are allowing users to reserve public IPs,
-# this should correspond to the Neutron ID of your
-# public (gateway) network. It defaults to allowing public/Public
-# blazar_floatingip_reservation_network_regex: "[pP]ublic"
