@@ -64,6 +64,7 @@
       - 'nova.*:SELECT'
 
 - name: Initialize chameleon_usage database
+  become: true
   command: |
     docker run --rm --net=host \
     -v "{{ chameleon_usage_config_dir }}/my.cnf:/etc/mysql/my.cnf" \
