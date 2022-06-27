@@ -98,11 +98,71 @@ kolla_internal_vip_address: "10.10.10.254"
 # Tenant Networking Configuration
 #################################
 
+#                                              ┌─────────────┐
+#                                              │Public Gatway│
+#                                              └──────────┬──┘
+#                                                         │
+#                                                    ┌────┴──┐
+#                                                    │Tenant │
+#                             Public API             │Network│
+#               ┌────────────────────────────────────┤Switch │
+#               │                                    │       │
+#       ┌───────┴──┐                                 │       │
+#       │Controller│Provisioning Vlan + Internal API │       │
+# ┌─────┤   Node   ├─────────────────────────────────┤       │
+# │     │          │                                 │       │
+# │     └───────┬──┘                                 │       │
+# │             │             Tenant Vlans           │       │
+# │             └────────────────────────────────────┤       │
+# │                                                  │       │
+# │                                                  │       │
+# │     ┌──────────────┐      Tenant Vlans           │       │
+# │     │Baremetal Node├─────────────────────────────┤       │
+# │     └────┬─────────┘                             │       │
+# │          │                                       │       │
+# │          │IPMI                                   │       │
+# │     ┌────┴─────────────┐   SSH to Mgmt Iface     │       │
+# └─────┤Out-of-band Switch├─────────────────────────┤       │
+#       └──────────────────┘                         │       │
+#                                                    └───────┘
+
+
+
+
 # This section is used to configure the mapping of neutron "phyical_networks" to interfaces
 # on the controller node. These should be separate interfaces from those used for the API
 # interfaces above.
 # In the default configuration, you must define separate physical networks for external traffic, and internal tenant vlans.
 # It is possible to use the same physical network for both, but outside the scope of this document.
+
+
+
+
+# This configures the mapping of physical interface -> openvswitch bridge -> neutron "physical network"
+# Physical networks are of type [flat, vlan, vxlan], and vlan and vxlan networks support "segmentation ids" to separate
+# multiple logical networks. The physical networks are used to define where logical networks are valid, e.g. which networking
+# service is local to the segment, and which baremetal switches can assign them.
+# Each neutron logical network is a L2 object, and is mapped to one physical network, optionally with a segmentation ID.
+
+# name: name of the physical network in neutron
+# bridge_name: name of the openvswitch bridge to create, this will default to br-<name>
+# external interface: what interface on the host to attach to the openvswitch bridge. Any IP addresses configured on this
+#   interface will not be functional, so do NOT use one of your API interfaces, or the interface you're using for SSH access.
+# on_demand_vlan_ranges: Neutron will assign vlan IDs from this range when users create networks on the physnet. The Admin
+#   user is able to manually specify segmentation ID during network creation, and can ignore this range.
+# reservable_vlan_ranges: list of vlan IDs that can be reserved via Blazar. it should NOT overlap with
+#   the on_demand_vlan_ranges. Currently a placeholder, as reservable vlans are still created manually.
+
+neutron_physnets:
+- name: physnet1
+  bridge_name: br-physnet1
+  external_interface: eno_something
+  on_demand_vlan_ranges:
+    - 200:250
+  reservable_vlan_ranges:
+    - 251:300
+
+
 
 # Two logical networks must be defined as well. The Public network (distict from the public physical network) is used for
 # router external interfaces, and floating IP addresses. It defaults to the untagged vlan on the public physical network.
@@ -110,10 +170,9 @@ kolla_internal_vip_address: "10.10.10.254"
 # In addition, two logical networks must be defined, `public` and `sharednet`. During post-deploy, neutron networks will
 # be created for each, and attached to the physical_networks defined here.
 
-# Explanation of fields:
-# name: name of the neutron physical network to create
-# bridge_name: name of openvswitch bridge mapped to the physical network
-# external_interface: what interface on the host to attach to the ovs bridge
+
+# sharednet: l3 tenant network used as the "default", for users who don't need isolation.
+#   post-deploy will create a neutron router attached to this network, and NAT traffic from it to the public network.
 
 # cidr: the address and netmask for the subnet to be associated with the network.
 #   If using a gateway, it must match the configuration for that gateway.
@@ -121,36 +180,24 @@ kolla_internal_vip_address: "10.10.10.254"
 # allocation_pools: Define the address range(s) to hand out on this network.
 #   For the public network, ensure this does NOT overlap with your API addresses defined above!
 
-# on_demand_vlan_ranges: list of vlan IDs that can be automatically assigned on network creation
-# reservable_vlan_ranges: list of vlan IDs that can be reserved via Blazar. it should NOT overlap with
-#   the on_demand_vlan_ranges. Currently a placeholder, as reservable vlans are still created manually.
+default_public_network:
+  physical_network: physnet1
+  cidr: 192.5.87.0/24
+  gateway_ip: 192.5.87.1
+  allocation_pools:
+  - start: 192.5.87.10
+    end: 192.5.87.250
 
-# sharednet: l3 tenant network used as the "default", for users who don't need isolation.
-#   post-deploy will create a neutron router attached to this network, and NAT traffic from it to the public network.
+default_shared_network:
+  physical_network: physnet1
+  cidr: 192.5.87.0/24
+  gateway_ip: 192.5.87.1
+  allocation_pools:
+  - start: 192.5.87.10
+    end: 192.5.87.250
 
-neutron_networks:
-- name: public
-  bridge_name: br-ex
-  # external_interface: <neutron_public_physnet_interface>
-  # cidr: 192.5.87.0/24
-  # gateway_ip: 192.5.87.1
-  # allocation_pools:
-  #   - start: 192.5.87.10
-  #     end: 192.5.87.250
-- name: physnet1
-  bridge_name: br-physnet1
-  # external_interface: <neutron_tenant_physnet_interface>
-  on_demand_vlan_ranges:
-    - 200:250
-  reservable_vlan_ranges:
-    - 251:300
-  sharednet:
-    # cidr: 10.200.10.0/22
-    # allocation_pools:
-    #   - start: 10.200.10.20
-    #     end: 10.200.12.21
-
-
+ironic_provisioning_network:
+  physical_network: physnet1
 
 #######################
 # Storage Configuration
