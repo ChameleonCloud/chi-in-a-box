@@ -191,3 +191,15 @@ OPENSTACK_IMAGE_BACKEND = {
 OPENSTACK_HEAT_STACK = {
     'enable_user_pass': False
 }
+
+# The OPENSTACK_MANILA_FEATURES settings can be used to enable or disable
+# the UI for the various services provided by Manila.
+OPENSTACK_MANILA_FEATURES = {
+    'enable_share_groups': False,
+    'enable_replication': False,
+    'enable_migration': False,
+    'enable_public_share_type_creation': False,
+    'enable_public_share_group_type_creation': False,
+    'enable_public_shares': True,
+    'enabled_share_protocols': ['NFS'],
+}

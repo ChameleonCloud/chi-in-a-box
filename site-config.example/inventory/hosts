@@ -400,6 +400,9 @@ network
 [manila-data:children]
 manila
 
+[manila-nfs-ganesha:children]
+manila
+
 # Swift
 [swift-proxy-server:children]
 swift

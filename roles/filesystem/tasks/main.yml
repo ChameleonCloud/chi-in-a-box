@@ -1,0 +1,128 @@
+---
+- name: Create default share type
+  become: true
+  command: >
+    docker exec kolla_toolbox openstack
+    --os-interface internal
+    --os-auth-url {{ openstack_auth.auth_url }}
+    --os-identity-api-version 3
+    --os-project-domain-name {{ openstack_auth.user_domain_name }}
+    --os-project-name {{ keystone_admin_project }}
+    --os-username {{ keystone_admin_user }}
+    --os-password {{ keystone_admin_password }}
+    --os-user-domain-name {{ openstack_auth.user_domain_name }}
+    --os-region-name {{ openstack_region_name }}
+    share type create {{ default_share_type }} false
+    --extra-specs vendor_name=Ceph storage_protocol=NFS
+  register: manila_default_share_type
+  changed_when: manila_default_share_type is success
+  failed_when:
+    - manila_default_share_type.rc != 0
+    - manila_default_share_type.stderr.find('already') == -1
+  run_once: True
+  when:
+    - default_share_type is defined
+    
+- name: Create filesystem address scope
+  kolla_toolbox:
+    module_name: openstack.cloud.address_scope
+    module_args:
+      auth: "{{ openstack_auth }}"
+      state: present
+      name: "{{ filesystem_address_scope }}"
+      ip_version: 4
+      shared: true
+      project: "{{ keystone_admin_project }}"
+  run_once: True
+  become: True
+  when:
+    - enable_manila_nfs_ganesha_service | bool
+
+- name: Create filesystem subnet pool
+  kolla_toolbox:
+    module_name: openstack.cloud.subnet_pool
+    module_args:
+      auth: "{{ openstack_auth }}"
+      state: present
+      name: "{{ filesystem_subnet_pool }}"
+      prefixes: "{{ filesystem_subnet_pool_prefixes }}"
+      address_scope: "{{ filesystem_address_scope }}"
+      default_prefix_length: 28
+      is_default: true
+      maximum_prefix_length: 32
+      minimum_prefix_length: 26
+      shared: true
+      project: "{{ keystone_admin_project }}"
+  run_once: True
+  become: True
+  when:
+    - enable_manila_nfs_ganesha_service | bool
+    - filesystem_subnet_pool_prefixes is defined   
+
+- name: Create filesystem-ganesha network
+  kolla_toolbox:
+    module_name: os_network
+    module_args:
+      auth: "{{ openstack_auth }}"
+      name: "{{ filesystem_ganesha_network }}"
+      region_name: "{{ openstack_region_name }}"
+      provider_network_type: vlan
+      provider_segmentation_id: "{{ filesystem_ganesha_network_vlan }}"
+      provider_physical_network: physnet1
+      external: false
+      shared: false
+      port_security_enabled: true
+      project: "{{ keystone_admin_project }}"
+      state: present
+  run_once: True
+  become: True
+  when:
+    - enable_manila_nfs_ganesha_service | bool
+    - filesystem_ganesha_network_vlan is defined
+
+- name: Create filesystem-ganesha subnet
+  kolla_toolbox:
+    module_name: os_subnet
+    module_args:
+      auth: "{{ openstack_auth }}"
+      network_name: "{{ filesystem_ganesha_network }}"
+      name: "{{ filesystem_ganesha_network }}-subnet"
+      use_default_subnetpool: true
+      enable_dhcp: true
+      ip_version: 4
+      project: "{{ keystone_admin_project }}"
+      state: present
+  run_once: True
+  become: True
+  when:
+    - enable_manila_nfs_ganesha_service | bool
+    - filesystem_ganesha_network_vlan is defined
+    
+- name: Check if filesystem-ganesha router exists
+  kolla_toolbox:
+    module_name: openstack.cloud.routers_info
+    module_args:
+      auth: "{{ openstack_auth }}"
+      name: "{{ filesystem_ganesha_router }}"
+  become: True
+  register: ganesha_router
+
+- name: Create filesystem-ganesha router
+  kolla_toolbox:
+    module_name: os_router
+    module_args:
+      auth: "{{ openstack_auth }}"
+      name: "{{ filesystem_ganesha_router }}"
+      network: public
+      admin_state_up: true
+      enable_snat: true
+      project: "{{ keystone_admin_project }}"
+      interfaces:
+        - "{{ filesystem_ganesha_network }}-subnet"
+      state: present
+  run_once: True
+  become: True
+  when:
+    - ganesha_router.openstack_routers | length==0
+    - enable_manila_nfs_ganesha_service | bool
+    - filesystem_ganesha_network_vlan is defined
