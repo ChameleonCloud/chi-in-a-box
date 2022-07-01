@@ -180,6 +180,12 @@ neutron_networks:
 
 # ironic_provisioning_network_cidr: 10.51.0.0/24
 
+# For provisioning, nodes netboot a kernel and ramdisk with the ironic-python-agent. These images are added to glance
+# during post-deploy. The values below will be used by default, but can be overridden on specific nodes if needed. This may
+# need to be done to handle other architectures, such as ARM64, or for other cases with specialized hardware.
+# deploy_kernel = "<deploy_kernel_glance_uuid>"
+# deploy_ramdisk = "<deploy_ramdisk_glance_uuid>"
+
 
 ################################
 # Baremetal switch configuration
