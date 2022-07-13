@@ -5,29 +5,13 @@
 Commands in this section will use the system package manager, and run with root privileges. It is recommended to use python virtual environments to install chi-in-a-box and kolla-ansible.
 
 {% tabs %}
-{% tab title="Ubuntu 18.04" %}
+{% tab title="Ubuntu 20.04" %}
 * Install Python dependencies and [jq](https://stedolan.github.io/jq/)
 
 ```
 sudo apt update && sudo apt install -f -y \
     python3 python3-virtualenv python3-venv virtualenv \
     jq
-```
-
-* Ensure `/usr/bin/python` links to `python3`
-
-```
-update-alternatives --install /usr/bin/python python /usr/bin/python3 1
-```
-{% endtab %}
-
-{% tab title="Centos8" %}
-* Install Python dependencies and [jq](https://stedolan.github.io/jq/)
-
-```
-sudo dnf install \
-    python3-devel python3-libselinux python3-virtualenv \
-    libffi-devel openssl-devel gcc jq
 ```
 
 * Ensure `/usr/bin/python` links to `python3`

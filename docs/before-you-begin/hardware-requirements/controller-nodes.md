@@ -2,13 +2,9 @@
 
 ### Supported Operating Systems
 
-The Controller Node should have one of the following operating systems installed
+The Controller Node should have **Ubuntu 20.04** installed.
 
-* Ubuntu 18.04 X86\_64
-* Ubuntu 20.04: X86\__64 (Coming Soon)_
-* Centos7 X86\_64 (being deprecated soon, do not use for new deployments)
-* Centos8 X86\_64
-* Centos Stream 8: X86\_64 (Coming Soon)
+Centos Stream8 is on our roadmap, but not yet supported.
 
 ### OS Configuration
 
