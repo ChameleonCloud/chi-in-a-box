@@ -162,8 +162,9 @@ ironic_provisioning_network_cidr: 10.51.0.0/24
 ironic_provisioning_network_gateway: "{{ ironic_provisioning_network_cidr | ipaddr('next_usable') }}"
 ironic_cleaning_network: "{{ ironic_provisioning_network }}"
 ironic_image_cache_size: 20480 # MB
+ironic_console_serial_speed: 115200n8
 encoded_ironic_pxe_root_password: "{{ ironic_pxe_root_password | password_hash('md5') |  regex_replace( '(\\$)', '$\\1') }}"
-ironic_pxe_append_params: nofb nomodeset vga=normal console=tty0 console=ttyS0,9600 systemd.journald.forward_to_console=yes rootpwd="{{ encoded_ironic_pxe_root_password }}"
+ironic_pxe_append_params: nofb nomodeset vga=normal console=tty0 console=ttyS0,{{ ironic_console_serial_speed }} systemd.journald.forward_to_console=yes rootpwd="{{ encoded_ironic_pxe_root_password }}"
 
 # Defaults for inspection network, currently unused
 ironic_dnsmasq_dhcp_range: "10.52.0.10,10.52.0.200,255.255.255.0"
