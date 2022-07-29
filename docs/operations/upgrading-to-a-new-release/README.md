@@ -19,21 +19,13 @@ On the Deploy node, back up the following:
 
 ### Clean up the controller nodes
 
-#### Centos7 (unsupported)
-
-This will be a bit annoying, as centos7 is not quite supported in xena.
-
-Run the following, AFTER MAKING A BACKUP#
+#### Ubuntu 20.04
 
 ```
 # Run these on your controller node, after making a backup.
 rm -rf /etc/ansible
-yum install -y libselinux-python3
+rm -rf /etc/kolla
 ```
-
-Then update centos7 -> centos8
-
-Then update centos8 -> centos-stream8
 
 ### Check out new chi-in-a-box
 
