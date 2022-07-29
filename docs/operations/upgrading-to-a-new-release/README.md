@@ -100,4 +100,19 @@ cp $CHI_IN_A_BOX/site-config.example/inventory/hosts \
    $SITE_CONFIG/inventory/hosts
 
 # edit the groups at the top to put your controller node back
+vim $SITE_CONFIG/inventory/hosts
+```
+
+### Get new containers, and deploy services
+
+```
+cd $CHI_IN_A_BOX
+# Recreate the virtualenv, now that we've updated inventory/hosts
+./cc-ansible bootstrap-servers
+
+# pull new containers
+./cc-ansible pull
+
+# deploy the updated containers
+./cc-ansible deploy
 ```
