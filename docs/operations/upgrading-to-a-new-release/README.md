@@ -50,6 +50,7 @@ Once you've backed up your `chi-in-a-box` directory, run the following commands 
 ```
 # Run this in your chi-in-a-box directory, AFTER MAKING A BACKUP!
 cd </path/to/chi-in-a-box>
+git fetch
 git checkout stable/xena
 rm -rf venv
 rm -rf .facts
@@ -59,16 +60,29 @@ rm -rf .facts
 #### Update passwords.yml
 
 ```
-cp site-config/passwords.yml site-config/passwords.yml.bak
+# backup your passwords.yml file
+cp $SITE_CONFIG/passwords.yml $SITE_CONFIG/passwords.yml.bak
 
-chi-in-a-box/venv/bin/ansible-vault decrypt \
+$CHI_IN_A_BOX/venv/bin/ansible-vault decrypt \
   --vault-password-file /site-config/vault_password \
   site-config/passwords.yml
-  
-chi-in-a-box/venv/bin/kolla-mergepwd \
-  --old site-config/passwords.yml \
-  --new chi-in-a-box/site-config.example/passwords.yml \
-  --final site-config/new_passwords.yml
+
+# merge new passwords that are needed    
+$CHI_IN_A_BOX/venv/bin/kolla-mergepwd \
+  --old $SITE_CONFIG/passwords.yml \
+  --new $CHI_IN_A_BOX/site-config.example/passwords.yml \
+  --final $SITE_CONFIG/new_passwords.yml
+ 
+# if the new file looks ok, run:
+mv $SITE_CONFIG/new_passwords.yml $SITE_CONFIG/passwords.yml
+$CHI_IN_A_BOX/venv/bin/ansible-vault encrypt \
+  --vault-password-file /site-config/vault_password \
+  site-config/passwords.yml
+
+# Finally, edit the resulting file to replace "null" with "".
+# The empty values will be auto-populated.
+cd $CHI_IN_A_BOX
+./cc-ansible edit_passwords
 ```
 
 #### Update inventory/hosts
