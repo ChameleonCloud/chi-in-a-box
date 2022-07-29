@@ -14,6 +14,8 @@ On the controller node, back up the following.
 
 #### mariadb
 
+[https://docs.openstack.org/kolla-ansible/latest/admin/mariadb-backup-and-restore.html](https://docs.openstack.org/kolla-ansible/latest/admin/mariadb-backup-and-restore.html#full)
+
 ```
 ./cc-ansible mariadb_backup
 docker run --rm -it \
