@@ -66,8 +66,8 @@ We need to set some new passwords that the new version requires. The `kolla-merg
 cp $SITE_CONFIG/passwords.yml $SITE_CONFIG/passwords.yml.bak
 
 $CHI_IN_A_BOX/venv/bin/ansible-vault decrypt \
-  --vault-password-file /site-config/vault_password \
-  site-config/passwords.yml
+  --vault-password-file $SITE_CONFIG/vault_password \
+  $SITE_CONFIG/passwords.yml
 
 # merge new passwords that are needed    
 $CHI_IN_A_BOX/venv/bin/kolla-mergepwd \
@@ -80,7 +80,7 @@ mv $SITE_CONFIG/new_passwords.yml $SITE_CONFIG/passwords.yml
 
 $CHI_IN_A_BOX/venv/bin/ansible-vault encrypt \
   --vault-password-file $SITE_CONFIG/vault_password \
-  site-config/passwords.yml
+  $SITE_CONFIG/passwords.yml
 
 # Finally, edit the resulting file to replace "null" with "".
 # The empty values will be auto-populated.
