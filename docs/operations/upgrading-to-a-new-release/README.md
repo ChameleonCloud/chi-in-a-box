@@ -39,8 +39,8 @@ On the Deploy node, back up the following:
 
 ```
 # Run these on your controller node, after making a backup.
-rm -rf /etc/ansible
-rm -rf /etc/kolla
+mv /etc/ansible /etc/ansible.bak
+mv /etc/kolla /etc/kolla.bak
 ```
 
 ### Check out new chi-in-a-box
@@ -49,12 +49,26 @@ Once you've backed up your `chi-in-a-box` directory, run the following commands 
 
 ```
 # Run this in your chi-in-a-box directory, AFTER MAKING A BACKUP!
+cd </path/to/chi-in-a-box>
 git checkout stable/xena
 rm -rf venv
 rm -rf .facts
 ./cc-ansible bootstrap-servers
-./cc-ansible pull
-./cc-ansible upgrade
 ```
 
-###
+#### Update passwords.yml
+
+```
+cp site-config/passwords.yml site-config/passwords.yml.bak
+
+chi-in-a-box/venv/bin/ansible-vault decrypt \
+  --vault-password-file /site-config/vault_password \
+  site-config/passwords.yml
+  
+chi-in-a-box/venv/bin/kolla-mergepwd \
+  --old site-config/passwords.yml \
+  --new chi-in-a-box/site-config.example/passwords.yml \
+  --final site-config/new_passwords.yml
+```
+
+#### Update inventory/hosts
