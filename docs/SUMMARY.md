@@ -86,6 +86,8 @@
   * [Provider Conflict](runbooks/provider-conflict.md)
   * [Runbook Template](runbooks/Template.md)
 * [User support guide](operations/user-support-guide.md)
+* [Upgrading to a new Release](operations/upgrading-to-a-new-release/README.md)
+  * [Train -> Xena](operations/upgrading-to-a-new-release/train-greater-than-xena.md)
 
 ## Development
 

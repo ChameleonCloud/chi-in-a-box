@@ -100,19 +100,19 @@ We need somewhere to run the tools, and an account to run them as. We recommend 
 
 ```
 # Create and join deploy-group
-[deploy-user@dev01 ~]$ sudo groupadd deploy-group
-[deploy-user@dev01 ~]$ sudo usermod -a -G deploy-group deploy-user
+[deploy-user@dev01 ~]$ sudo groupadd <deploy-group>
+[deploy-user@dev01 ~]$ sudo usermod -a -G <deploy-group> <deploy-user>
 
 # Create and join docker group
 [deploy-user@dev01 ~]$ sudo groupadd docker
-[deploy-user@dev01 ~]$ sudo usermod -a -G docker deploy-user
+[deploy-user@dev01 ~]$ sudo usermod -a -G docker <deploy-user>
 ```
 
 Log out and back in to refresh group membership, then verify.
 
 ```
 [deploy-user@dev01 ~]$ groups
-... deploy-group docker
+... <deploy-group> docker
 ```
 
 #### Set directory permissions
@@ -120,7 +120,7 @@ Log out and back in to refresh group membership, then verify.
 For this example, we'll be putting files into `/opt/`, so we need to ensure that it can be read and written by members of `deploy-group`
 
 ```
-[deploy-user@dev01 ~]$ sudo chown root:deploy-group /opt
+[deploy-user@dev01 ~]$ sudo chown root:<deploy-group> /opt
 [deploy-user@dev01 ~]$ sudo chmod g+rw /opt
 ```
 
