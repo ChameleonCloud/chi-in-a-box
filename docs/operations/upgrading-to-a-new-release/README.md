@@ -59,6 +59,8 @@ rm -rf .facts
 
 #### Update passwords.yml
 
+We need to set some new passwords that the new version requires. The `kolla-mergepwd` command will pull in values that are set in `site-config.example`, but missing from your passwords file.
+
 ```
 # backup your passwords.yml file
 cp $SITE_CONFIG/passwords.yml $SITE_CONFIG/passwords.yml.bak
@@ -75,8 +77,9 @@ $CHI_IN_A_BOX/venv/bin/kolla-mergepwd \
  
 # if the new file looks ok, run:
 mv $SITE_CONFIG/new_passwords.yml $SITE_CONFIG/passwords.yml
+
 $CHI_IN_A_BOX/venv/bin/ansible-vault encrypt \
-  --vault-password-file /site-config/vault_password \
+  --vault-password-file $SITE_CONFIG/vault_password \
   site-config/passwords.yml
 
 # Finally, edit the resulting file to replace "null" with "".
