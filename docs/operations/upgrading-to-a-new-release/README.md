@@ -88,4 +88,16 @@ cd $CHI_IN_A_BOX
 ./cc-ansible edit_passwords
 ```
 
+each line that looks like: `key: null` should be modified to look like `key:`
+
 #### Update inventory/hosts
+
+```
+# make a backup of your inventory
+mv $SITE_CONFIG/inventory/hosts $SITE_CONFIG/inventory/hosts.bak
+
+cp $CHI_IN_A_BOX/site-config.example/inventory/hosts \
+   $SITE_CONFIG/inventory/hosts
+
+# edit the groups at the top to put your controller node back
+```
