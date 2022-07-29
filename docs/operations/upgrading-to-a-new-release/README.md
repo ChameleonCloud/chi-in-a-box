@@ -12,6 +12,20 @@ On the controller node, back up the following.
 * `/etc/kolla`
 * your mysql DB
 
+#### mariadb
+
+```
+./cc-ansible mariadb_backup
+docker run --rm -it \
+  -v mariadb_backup:/mariadb_backup:ro \
+  -v tmp/backup:/backup \
+  ubuntu:latest bash
+  
+# copy the latest backup from `/mariadb_backup to /backup`
+```
+
+
+
 On the Deploy node, back up the following:
 
 * your git checkout of `chi-in-a-box`
