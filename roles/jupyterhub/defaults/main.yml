@@ -1,7 +1,7 @@
 ---
 jupyterhub_config_path: /etc/jupyterhub
 jupyterhub_crypt_key:
-jupyterhub_tag: 44a173e 
+jupyterhub_tag: 44a173e
 jupyterhub_image_full: "docker.chameleoncloud.org/jupyterhub:{{ jupyterhub_tag }}"
 jupyterhub_docker_network: jupyterhub
 jupyterhub_docker_network_subnet: 172.18.20.0/24
@@ -13,9 +13,13 @@ jupyterhub_auth: "{{ openstack_auth }}"
 jupyterhub_db_user: jupyterhub
 jupyterhub_db_db: jupyterhub
 
+jupyterhub_live_certs_dir: "/etc/letsencrypt/live/{{ jupyterhub_hostname }}"
+jupyterhub_archive_certs_dir: "/etc/letsencrypt/archive/{{ jupyterhub_hostname }}"
+
 # NOTE(jason): this is declared separately because additional optional keys
 # are added during the configuration task.
 jupyterhub_environment:
+  DEBUG: true
   JUPYTERHUB_PUBLIC_URL: "https://{{ jupyterhub_hostname }}/"
   JUPYTERHUB_CRYPT_KEY: "{{ jupyterhub_crypt_key }}"
   DOCKER_NETWORK_NAME: "{{ jupyterhub_docker_network }}"
@@ -53,12 +57,21 @@ jupyterhub_services:
     image: "{{ jupyterhub_image_full }}"
     network: "{{ jupyterhub_docker_network }}"
     environment: "{{ jupyterhub_environment }}"
+    command: "jupyterhub --ssl-key {{jupyterhub_live_certs_dir}}/privkey.pem --ssl-cert {{jupyterhub_live_certs_dir}}/fullchain.pem"
     ports:
       - "{{ jupyterhub_port }}:8000"
     mounts:
       - type: bind
         src: /var/run/docker.sock
         dst: /var/run/docker.sock
+      - type: bind
+        src: "{{ jupyterhub_live_certs_dir }}"
+        dst: "{{ jupyterhub_live_certs_dir }}"
+        readonly: true
+      - type: bind
+        src: "{{ jupyterhub_archive_certs_dir }}"
+        dst: "{{ jupyterhub_archive_certs_dir }}"
+        readonly: true
       - type: volume
         src: jupyterhub-storage
         dst: /data
@@ -97,7 +110,7 @@ jupyterhub_ceph_pool: jupyter-volumes
 jupyterhub_ceph_docker_volume_driver: docker.chameleoncloud.org/wetopi/rbd:latest
 jupyterhub_ceph_docker_volume_driver_alias: rbd
 
-jupyterhub_notebook_tag: 44a173e 
+jupyterhub_notebook_tag: 44a173e
 jupyterhub_notebook_image_full: "docker.chameleoncloud.org/jupyterhub-user:{{ jupyterhub_notebook_tag }}"
 jupyterhub_notebook_workdir: /work
 

@@ -4,32 +4,20 @@
     path: /etc/ceph
     state: directory
 
-- name: Copy global Ceph configuration.
-  block:
-    - slurp:
-        src: /etc/ceph/ceph.conf
-      delegate_to: "{{ groups.ceph[0] }}"
-      register: ceph_conf
-    - copy:
-        content: "{{ ceph_conf['content'] | b64decode }}"
-        dest: /etc/ceph/ceph.conf
-
-- name: Copy Ceph client keyring.
-  block:
-    - command: "ceph auth get {{ jupyterhub_ceph_client }}"
-      register: ceph_client_keyring
-      delegate_to: "{{ groups.ceph[0] }}"
-      changed_when: False
-    - copy:
-        content: "{{ ceph_client_keyring.stdout }}"
-        dest: "/etc/ceph/ceph.{{ jupyterhub_ceph_client }}.keyring"
-
 - name: Load and persist rbd module
   import_role:
     role: module-load
   vars:
     modules:
-      - {'name': rbd }
+      - { "name": rbd }
+
+- name: login to chameleon docker registry
+  community.docker.docker_login:
+    registry_url: "{{ docker_registry }}"
+    username: "{{ docker_registry_username }}"
+    password: "{{ docker_registry_password }}"
+  tags:
+    - pull
 
 - name: Install Docker RBD volume plugin.
   block:
@@ -49,6 +37,15 @@
           RBD_CONF_CLUSTER="{{ jupyterhub_ceph_cluster }}" \
           RBD_CONF_KEYRING_USER="{{ jupyterhub_ceph_client }}"
       when: docker_plugin_list.stdout | join ('') is not search(jupyterhub_ceph_docker_volume_driver_alias)
+  tags:
+    - pull
+
+- name: Log out of chameleon docker registry
+  community.docker.docker_login:
+    registry_url: "{{ docker_registry }}"
+    state: absent
+  tags:
+    - pull
 
 - name: Configure JupyterHub for Ceph.
   set_fact:
