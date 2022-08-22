@@ -166,6 +166,11 @@ ironic_console_serial_speed: 115200n8
 encoded_ironic_pxe_root_password: "{{ ironic_pxe_root_password | password_hash('md5') |  regex_replace( '(\\$)', '$\\1') }}"
 ironic_pxe_append_params: nofb nomodeset vga=normal console=tty0 console=ttyS0,{{ ironic_console_serial_speed }} systemd.journald.forward_to_console=yes rootpwd="{{ encoded_ironic_pxe_root_password }}"
 
+# number of times to retry failed neutron api requests
+# will use exponential backoff from 0.5s up to 60s, or
+# will use ironic_neutron_status_code_retry_delay if set
+ironic_neutron_status_code_retries: 10
+
 # Defaults for inspection network, currently unused
 ironic_dnsmasq_dhcp_range: "10.52.0.10,10.52.0.200,255.255.255.0"
 
