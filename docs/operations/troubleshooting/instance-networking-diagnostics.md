@@ -1,4 +1,6 @@
-## Instance unreachable over floating IP
+# Instance networking diagnostics
+
+### Instance unreachable over floating IP
 
 1. **Check connectivity over the private IP**. Get the network(s) associated with the instance, then try to ping or otherwise test that a port (like SSH) is open from within the namespace.
 
@@ -19,7 +21,7 @@ xargs sh -c 'ip netns exec qdhcp-$0 nc -z -w2 $1 22 || echo $1 unreachable' <<<"
 
 If connectivity works over the private IP, then the problem likely exists somewhere in Neutron's IPTables, or in OpenVSwitch.
 
-2. **Check IPTables rules on public network router**. This router is usually called "admin-router" and is owned by the `opentstack` admin project.
+1. **Check IPTables rules on public network router**. This router is usually called "admin-router" and is owned by the `opentstack` admin project.
 
 ```shell
 public_router_id=$(openstack router show admin-router -f value -c id)
@@ -41,7 +43,7 @@ Chain neutron-l3-agent-float-snat (1 references)
 
 If there are no rules here for your floating IP or for your static IP assignment, it may help to restart the neutron-l3-agent via `docker restart neutron_l3_agent`. This agent takes a while to restart; you will have to be patient while it re-syncs the state of all the IPTables rules in all the network namespaces maintained by Neutron.
 
-## Instance unreachable over private IP
+### Instance unreachable over private IP
 
 1. **Check the node console**. It could be that the node failed to boot (this is the most likely culprit). If the node console cannot be read via the web interface, then you can try attaching via `ipmiconsole` from a control node on the provisioning network.
 
@@ -56,9 +58,9 @@ ipmi_address=$(openstack baremetal node show -f json $node_id | jq -r .driver_in
 ipmiconsole -h $ipmi_address -u root -P
 ```
 
-Try logging in to the node via the console and seeing its IP address assignments using `ip addr`. If it does not have the static IP assigned, it is likely that DHCP failed when the node was booting. Check the Neutron DHCP agent for errors. It may also help to simply kill the dnsmasq process for the network in question (they typically have the network UUID as part of their `ps` entry), or restart the entire DHCP agent, which should kill and restart all dnsmasq processes.
+Try logging in to the node via the console and seeing its IP address assignments using `ip addr`. If it does not have the static IP assigned, it is likely that DHCP failed when the node was booting. Check the Neutron DHCP agent for errors. It may also help to simply kill the dnsmasq process for the network in question (they typically have the network UUID as part of their `ps` entry), or restart the entire DHCP agent, which should kill and restart all dnsmasq processes. To check that the node is able to network at all, you can try manually assigning an IP address using `ip addr add <ip> dev <interface>` with an IP address that is unused. The IP should be in the same subnet as the one assigned to the instance by neutron. You can find the interface to use by looking at the output of `ip addr`.
 
-2. **Check that the node's switch port has the right VLAN assigned.** If the instance hasn't been deleted, any switch configurations related to the instance should still be active. You will first need to figure out which switch the instance's node is physically connected to, and on which switchport. This can be figured out via Ironic. Once you know the switch port, you can check the switch to see if the Neutron network's VLAN is assigned to that switch port. If this is not the case, it is likely that the node has no connectivity.
+1. **Check that the node's switch port has the right VLAN assigned.** If the instance hasn't been deleted, any switch configurations related to the instance should still be active. You will first need to figure out which switch the instance's node is physically connected to, and on which switchport. This can be figured out via Ironic. Once you know the switch port, you can check the switch to see if the Neutron network's VLAN is assigned to that switch port. If this is not the case, it is likely that the node has no connectivity.
 
 ```shell
 # Find all ports registered on node
@@ -82,7 +84,7 @@ crudini --get --format=lines /etc/kolla/neutron-server/ml2_conf.ini genericswitc
 vlan=$(openstack network show $network_name_or_id -f value -c provider:segmentation_id)
 ```
 
-### Dell switches
+#### Dell switches
 
 Chameleon Dell switches (S6000 model) are configured over remote SSH sessions currently. You can log in to the switch from a node that has access to the switch's out-of-band interface (such as the Neutron node.)
 
@@ -106,7 +108,7 @@ You should see the node's switchport ID listed as 'untagged' on this VLAN. If yo
 SWITCH_NAME(conf-if-vl-<VLAN>)# untagged <PORT_ID>
 ```
 
-### Corsa switches
+#### Corsa switches
 
 Corsa switches can be queried over a remote HTTP API using an authentication token.
 

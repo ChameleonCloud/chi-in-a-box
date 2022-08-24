@@ -5,29 +5,13 @@
 Commands in this section will use the system package manager, and run with root privileges. It is recommended to use python virtual environments to install chi-in-a-box and kolla-ansible.
 
 {% tabs %}
-{% tab title="Ubuntu 18.04" %}
+{% tab title="Ubuntu 20.04" %}
 * Install Python dependencies and [jq](https://stedolan.github.io/jq/)
 
 ```
 sudo apt update && sudo apt install -f -y \
     python3 python3-virtualenv python3-venv virtualenv \
     jq
-```
-
-* Ensure `/usr/bin/python` links to `python3`
-
-```
-update-alternatives --install /usr/bin/python python /usr/bin/python3 1
-```
-{% endtab %}
-
-{% tab title="Centos8" %}
-* Install Python dependencies and [jq](https://stedolan.github.io/jq/)
-
-```
-sudo dnf install \
-    python3-devel python3-libselinux python3-virtualenv \
-    libffi-devel openssl-devel gcc jq
 ```
 
 * Ensure `/usr/bin/python` links to `python3`
@@ -124,6 +108,19 @@ If you are only using two interfaces, you must do some additional configuration 
     kolla_external_vip_interface: eno2
     ```
 
+#### `${CC_ANSIBLE_SITE}/certificates/haproxy.pem`
+
+Provide a certificate matching the hostname, which must resolve to the chosen public IP.
+
+The certificate must be placed in `${CC_ANSIBLE_SITE}/certificates/haproxy.pem`
+
+An HAProxy PEM file is a concatenation of the certificate, any intermediate certificates in the chain, and then the private key.
+
+```bash
+cat certificate.crt intermediates.pem private.key \
+    > ${CC_ANSIBLE_SITE}/certificates/haproxy.pem
+```
+
 #### `${CC_ANSIBLE_SITE}/defaults.yml`
 
 1.  The following keys are mandatory for the install to complete. Set the values as appropriate to your setup.
@@ -135,23 +132,14 @@ If you are only using two interfaces, you must do some additional configuration 
     kolla_internal_vip_address: <spare IP on private subnet>
     kolla_external_vip_address: <spare IP on public subnet>
     ```
-2.  Provide a certificate matching the hostname, which must resolve to the chosen public IP.
-
-    The certificate must be placed in `${CC_ANSIBLE_SITE}/certificates/haproxy.pem`
-
-    An HAProxy PEM file is a concatenation of the certificate, any intermediate certificates in the chain, and then the private key.
-
-    ```bash
-    cat certificate.crt intermediates.pem private.key > /etc/kolla/certificates/haproxy.pem
-    ```
-3.  If you haven't been provided a keystone\_idp\_client\_id by your federated ID provider, disable it for now:
+2.  If you haven't been provided a keystone\_idp\_client\_id by your federated ID provider, disable it for now:
 
     ```yaml
     enable_keystone_federation: no
     enable_keystone_federation_openid: no
     keystone_idp_client_id: null
     ```
-4.  To give nodes internet access, at lease one internal and one external network must be enabled.
+3.  To give nodes internet access, at lease one internal and one external network must be enabled.
 
     ```yaml
     neutron_networks:
@@ -168,7 +156,7 @@ If you are only using two interfaces, you must do some additional configuration 
         # This should be your public IP block assigned to your deployment.
         cidr: 0.0.0.0/32
     ```
-5.  To enable bare metal provisioning, provide a vlan and subnet for ironic to use. This vlan should be included in the neutron `on_demand_vlan_range` above.
+4.  To enable bare metal provisioning, provide a vlan and subnet for ironic to use. This vlan should be included in the neutron `on_demand_vlan_range` above.
 
     ```yaml
     ironic_provisioning_network_vlan: 200

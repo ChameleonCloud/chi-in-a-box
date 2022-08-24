@@ -21,6 +21,8 @@
 
 ## Setup Guides
 
+* [Evaluation Site](setup-guides/evaluation-site/README.md)
+  * [Bring up the Control Plane](setup-guides/evaluation-site/bring-up-the-control-plane.md)
 * [Production Baremetal](setup-guides/production-baremetal/README.md)
   * [Baremetal QuickStart](setup-guides/production-baremetal/quickstart.md)
   * [Host Networking Configuration](setup-guides/production-baremetal/hostnetworking.md)
@@ -33,6 +35,7 @@
 * [Chameleon Identity Federation](reference/chameleon-identity-federation.md)
 * [Ironic Flat Networking](reference/ironic-flat-networking.md)
 * [Ironic Multi-Tenant Networking](reference/multi-tenant-networking.md)
+* [Glance Image Storage](reference/glance-image-storage.md)
 * [Resource Reservation](reference/resource-reservation/README.md)
   * [Default Resource Properties](reference/resource-reservation/default-resource-properties.md)
 * [Monitoring](reference/monitoring/README.md)
@@ -83,6 +86,7 @@
   * [Provider Conflict](runbooks/provider-conflict.md)
   * [Runbook Template](runbooks/Template.md)
 * [User support guide](operations/user-support-guide.md)
+* [Upgrading to a new Release](operations/upgrading-to-a-new-release.md)
 
 ## Development
 
