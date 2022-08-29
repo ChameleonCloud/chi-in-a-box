@@ -65,3 +65,42 @@ docker.chameleoncloud.org/chameleon_image_tools:latest clean \
 ```
 
 To perform a dry-run, add `--dry-run` flag to the above command to only print without actual hiding and deleting.
+
+### IPA Image Tester
+Ironic Python Agent (IPA) is an agent for controlling and deploying Ironic controlled baremetal nodes. In order to support various hardware types, Chameleon builds and deploys
+custom IPA images based on OpenStack upstream releases. To deploy Chameleon IPA images to site Glance, please use the [deployer tool](#deployer).
+
+Please note that the Chameleon IPA images are released without testing on all node types. It is fine as none of your site nodes is using the newly released images
+until you set them so. The IPA image tester will
+
+* Test the IPA images on a specified node type
+* Update all nodes of the type to use the new images if the images pass the test (optional)
+
+To test the latest IPA images, run the following command:
+
+```shell
+docker run --rm --net=host -v "/etc/chameleon_image_tools/site.yaml:/etc/chameleon_image_tools/site.yaml" \
+docker.chameleoncloud.org/chameleon_image_tools:latest ipa_test \
+--site-yaml /etc/chameleon_image_tools/site.yaml \
+--node-type <node_type>
+```
+
+If you want to test specific IPA images, run the following command:
+```shell
+docker run --rm --net=host -v "/etc/chameleon_image_tools/site.yaml:/etc/chameleon_image_tools/site.yaml" \
+docker.chameleoncloud.org/chameleon_image_tools:latest ipa_test \
+--site-yaml /etc/chameleon_image_tools/site.yaml \
+--node-type <node_type> \
+--initramfs-image <initramfs_image_id> \
+--kernel-image <kernel_image_id>
+```
+
+If you would like to update all nodes of the node type to use the tested IPA images, simply add `--push` to the above commands. Please note that the nodes under use would fail on setting
+IPA images. You can also use OpenStack CLI to manually update the node.
+
+```shell
+openstack baremetal node set <node_uuid> \
+--driver-info deploy_kernel=<kernel image> \
+--driver-info deploy_ramdisk=<ramdisk image>
+```
+
