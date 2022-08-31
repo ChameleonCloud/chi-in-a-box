@@ -1,8 +1,8 @@
-# Openstack Architecture
+# OpenStack Architecture
 
 ## Networking
 
-![](<../.gitbook/assets/CiaB Network.drawio.svg>)
+![](<../.gitbook/assets/CiaB Network.drawio (1).svg>)
 
 ### Public network
 

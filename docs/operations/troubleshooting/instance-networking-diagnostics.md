@@ -108,6 +108,14 @@ You should see the node's switchport ID listed as 'untagged' on this VLAN. If yo
 SWITCH_NAME(conf-if-vl-<VLAN>)# untagged <PORT_ID>
 ```
 
+If the switch is running OS10, you may have to do this instead:
+
+```
+# e.g. 'interface ethernet 1/1/12:2
+SWITCH_NAME(config)# interface ethernet <PORT_ID>
+SWITCH_NAME(conf-if-eth<PORT_ID>)# switchport access vlan <VLAN_ID>
+```
+
 #### Corsa switches
 
 Corsa switches can be queried over a remote HTTP API using an authentication token.
