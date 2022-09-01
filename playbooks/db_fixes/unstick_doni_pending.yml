@@ -1,0 +1,8 @@
+---
+- hosts: control
+  become: true
+  roles:
+    - mysql_query
+  vars:
+    db: doni
+    query: UPDATE worker_task SET state="PENDING" WHERE state="IN_PROGRESS";

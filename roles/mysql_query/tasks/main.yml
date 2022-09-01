@@ -1,0 +1,15 @@
+- name: Run mysql query with kolla-toolbox
+  run_once: true
+  delegate_to: "{{ groups['control'][0] }}"
+  kolla_toolbox:
+    module_name: community.mysql.mysql_query
+    module_args:
+      login_host: "{{ database_address }}"
+      login_user: "root"
+      login_password: "{{ database_password }}"
+      login_db: "{{db}}"
+      query: "{{query}}"
+  register: query_result
+- name: print output
+  debug:
+    msg: "{{query_result}}"
