@@ -23,3 +23,4 @@ vagrant/vagrantkey*
 # Python build files
 *.pyc
 __pycache__/
+galaxy.ansible.com/**

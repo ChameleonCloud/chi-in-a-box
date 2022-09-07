@@ -1,7 +1,8 @@
 ---
-# collections:
+collections:
+  - name: kubernetes.core
+  - name: openstack.cloud
 #   - name: ansible.posix
-#   - name: openstack.cloud
 
 roles:
   - name: chameleon.docker_service
