@@ -1,4 +1,8 @@
 ---
+collections:
+  - name: kubernetes.core
+  - name: openstack.cloud
+
 roles:
   - name: chameleon.docker_service
     version: master
