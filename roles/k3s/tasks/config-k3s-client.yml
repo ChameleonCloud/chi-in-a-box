@@ -1,0 +1,82 @@
+---
+- name: Wait for node-token
+  become: true
+  ansible.builtin.wait_for:
+    path: "{{ k3s_server_location }}/server/node-token"
+
+- name: Register node-token file access mode
+  become: true
+  ansible.builtin.stat:
+    path: "{{ k3s_server_location }}/server/node-token"
+  register: p
+
+- name: Change file access node-token
+  become: true
+  ansible.builtin.file:
+    path: "{{ k3s_server_location }}/server/node-token"
+    mode: "g+rx,o+rx"
+
+- name: Read node-token from master
+  become: true
+  ansible.builtin.slurp:
+    path: "{{ k3s_server_location }}/server/node-token"
+  register: node_token
+
+- name: Store Master node-token
+  become: true
+  ansible.builtin.set_fact:
+    token: "{{ node_token.content | b64decode | regex_replace('\n', '') }}"
+
+- name: Restore node-token file access
+  become: true
+  ansible.builtin.file:
+    path: "{{ k3s_server_location }}/server/node-token"
+    mode: "{{ p.stat.mode }}"
+
+- name: Create directory .kube
+  ansible.builtin.file:
+    path: ~{{ ansible_user_id }}/.kube
+    state: directory
+    owner: "{{ ansible_user_id }}"
+    mode: "u=rwx,g=rx,o="
+
+- name: Copy config file to user home directory
+  become: true
+  ansible.builtin.copy:
+    src: "{{ k3s_conf_location }}/k3s.yaml"
+    dest: ~{{ ansible_user_id }}/.kube/config
+    remote_src: yes
+    owner: "{{ ansible_user_id }}"
+    mode: "u=rw,g=,o="
+
+- name: Update cluster server address
+  # FIXME: should be ansible.builtin.command in later versions of Ansible
+  command: |
+    k3s kubectl config set-cluster default
+      --server=https://{{ k3s_server_ip }}:{{ k3s_port }}
+      --kubeconfig ~{{ ansible_user_id }}/.kube/config
+  changed_when: true
+
+- name: Create kubectl symlink
+  become: true
+  ansible.builtin.file:
+    src: /usr/local/bin/k3s
+    dest: /usr/local/bin/kubectl
+    state: link
+
+- name: Create crictl symlink
+  become: true
+  ansible.builtin.file:
+    src: /usr/local/bin/k3s
+    dest: /usr/local/bin/crictl
+    state: link
+
+- name: Copy debug manifests
+  become: true
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "{{ k3s_conf_location }}/"
+    owner: root
+    group: root
+    mode: 0755
+  with_fileglob: "debug-*.yaml"
