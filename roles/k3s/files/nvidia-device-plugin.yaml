@@ -33,8 +33,7 @@ spec:
         name: nvidia-device-plugin-ds
     spec:
       nodeSelector:
-        matchLabels:
-          nvidia-device-plugin/enabled: true
+        "nvidia-device-plugin/enabled": "true"
       tolerations:
         # This toleration is deprecated. Kept here for backward compatibility
         # See https://kubernetes.io/docs/tasks/administer-cluster/guaranteed-scheduling-critical-addon-pods/
@@ -49,7 +48,7 @@ spec:
       # See https://kubernetes.io/docs/tasks/administer-cluster/guaranteed-scheduling-critical-addon-pods/
       priorityClassName: "system-node-critical"
       containers:
-        - image: nvcr.io/nvidia/k8s-device-plugin:v0.10.0
+        - image: nvcr.io/nvidia/k8s-device-plugin:v0.12.2
           name: nvidia-device-plugin-ctr
           args: ["--fail-on-init-error=false"]
           securityContext:
