@@ -2,36 +2,21 @@
 # FUTURE NOTE: change all the kubectl invocations to use the kubernetes.core.k8s collection!
 # This will make detecting changes way easier and more reliable.
 
-- name: Copy nvidia device plugin daemonset config
-  ansible.builtin.copy:
+- name: Apply nvidia device plugin daemonset
+  delegate_to: "{{ groups['deployment'][0] }}"
+  kubernetes.core.k8s:
+    state: present
     src: nvidia-device-plugin.yaml
-    dest: "{{ k3s_conf_location }}/nvidia-device-plugin.yaml"
-    owner: root
-    group: root
-    mode: "0644"
-  register: nvidia_device_plugin
-
-- name: Update nvidia device plugin daemonset
-  command: >-
-    kubectl apply -f {{ k3s_conf_location }}/nvidia-device-plugin.yaml
+    apply: yes
   when:
-    - nvidia_device_plugin.changed
     - not (k3s_dry_run | bool)
 
-- name: Template daemonsets for smarter-device plugins
-  ansible.builtin.template:
-    src: "smarter-device-manager-ds-{{ item }}.yaml.j2"
-    dest: "{{ k3s_conf_location }}/smarter-device-manager-ds-{{ item }}.yaml"
-    owner: root
-    group: root
-    mode: "0644"
-  loop:
-    - jetson
-    - rpi
-
-- name: Apply configsets for rpi and xavier
-  command: >-
-    kubectl apply -f {{ k3s_conf_location }}/smarter-device-manager-ds-{{ item }}.yaml
+- name: Apply daemonsets for smarter-device plugins
+  delegate_to: "{{ groups['deployment'][0] }}"
+  kubernetes.core.k8s:
+    state: present
+    template: "smarter-device-manager-ds-{{ item }}.yaml.j2"
+    apply: yes
   loop:
     - jetson
     - rpi
