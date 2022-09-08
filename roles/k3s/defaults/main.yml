@@ -31,3 +31,6 @@ k3s_services:
         mode: "http"
         port: "{{ k3s_port }}"
         listen_port: "{{ k3s_port }}"
+
+calico_network_name: caliconet
+calico_subnet_name: "{{ calico_network_name }}-subnet"

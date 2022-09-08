@@ -1,10 +1,10 @@
 ---
 - name: configure predefined networks
   include_tasks: config-network.yml
-  tags: [networks]
+  tags: [neutron]
   loop: "{{ neutron_networks }}"
   loop_control:
     label: "{{ item.name }}"
 - name: configure sharednet router
-  tags: [networks]
+  tags: [neutron]
   include_tasks: sharednet-router.yml

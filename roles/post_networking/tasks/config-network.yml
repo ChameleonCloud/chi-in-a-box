@@ -1,6 +1,6 @@
 ---
 - name: network config block
-  tags: [networks]
+  tags: [neutron]
   vars:
     default_dict: "{{ lookup('vars','network_defaults_' + item.name) }}"
   block:
