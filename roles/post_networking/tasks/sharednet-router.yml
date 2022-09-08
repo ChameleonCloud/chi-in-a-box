@@ -1,0 +1,37 @@
+---
+- name: Get sharednet-router info
+  tags: [networks]
+  kolla_toolbox:
+    module_name: openstack.cloud.routers_info
+    module_args:
+      auth: "{{ openstack_auth }}"
+      name: "{{ sharednet_router_name }}"
+  register: router_result
+
+- name: Get sharednet-subnet info
+  tags: [networks]
+  kolla_toolbox:
+    module_name: openstack.cloud.subnets_info
+    module_args:
+      auth: "{{ openstack_auth }}"
+      name: "{{ default_sharednet_name }}-subnet"
+  register: subnet_result
+
+- name: get list of needed interfaces
+  tags: [networks]
+  vars:
+    current_router_interfaces: "{{ router_result.openstack_routers[0].interfaces_info }}"
+    subnet_id: "{{ subnet_result.openstack_subnets[0].id }}"
+  set_fact:
+    attached_subnet_ids: "{{ ((current_router_interfaces | map(attribute='subnet_id') | list) + [subnet_id]) | unique }}"
+
+- name: ensure default router has port for sharednet
+  tags: [networks]
+  kolla_toolbox:
+    module_name: openstack.cloud.router
+    module_args:
+      auth: "{{ openstack_auth }}"
+      project: "{{ keystone_admin_project }}"
+      name: "{{ sharednet_router_name }}"
+      state: present
+      interfaces: "{{ attached_subnet_ids }}"

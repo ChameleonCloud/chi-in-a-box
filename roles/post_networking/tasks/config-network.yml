@@ -1,0 +1,39 @@
+---
+- name: network config block
+  tags: [networks]
+  vars:
+    default_dict: "{{ lookup('vars','network_defaults_' + item.name) }}"
+  block:
+    - name: print network info
+      debug:
+        msg:
+          - "{{ item }}"
+          - "{{ default_dict }}"
+
+    - name: create openstack network
+      kolla_toolbox:
+        module_name: openstack.cloud.network
+        module_args:
+          auth: "{{ openstack_auth }}"
+          project: "{{ keystone_admin_project }}"
+          name: "{{ item.name }}"
+          provider_network_type: "{{ item.provider_network_type | default(default_dict.provider_network_type) | default(omit) }}"
+          provider_physical_network: "{{ item.provider_physical_network | default(default_dict.provider_physical_network) | default(omit) }}"
+          external: "{{ item.external | default(default_dict.external) | default(omit) }}"
+          shared: "{{ item.shared | default(default_dict.shared) | default(omit) }}"
+          state: present
+
+    - name: create openstack subnet
+      kolla_toolbox:
+        module_name: openstack.cloud.subnet
+        module_args:
+          auth: "{{ openstack_auth }}"
+          project: "{{ keystone_admin_project }}"
+          network_name: "{{ item.name }}"
+          name: "{{ item.name }}-subnet"
+          cidr: "{{ item.cidr | default(default_dict.cidr)}}"
+          enable_dhcp: "{{ item.enable_dhcp | default(default_dict.enable_dhcp) | default(omit) }}"
+          gateway_ip: "{{ item.gateway_ip | default(omit) }}"
+          allocation_pool_start: "{{ item.allocation_pools[0].start | default(omit) }}"
+          allocation_pool_end: "{{ item.allocation_pools[0].end | default(omit) }}"
+          state: present

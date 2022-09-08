@@ -1,5 +1,10 @@
 ---
-- name: configure public network and subnet
-  include_tasks: public.yml
-- name: configure shared tenant network(s) and subnet(s)
-  include_tasks: sharednet.yml
+- name: configure predefined networks
+  include_tasks: config-network.yml
+  tags: [networks]
+  loop: "{{ neutron_networks }}"
+  loop_control:
+    label: "{{ item.name }}"
+- name: configure sharednet router
+  tags: [networks]
+  include_tasks: sharednet-router.yml
