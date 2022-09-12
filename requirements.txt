@@ -8,3 +8,4 @@ docker
 python-openstackclient
 python-doniclient
 python-ironicclient
+git+https://github.com/chameleoncloud/python-blazarclient@chameleoncloud/xena
