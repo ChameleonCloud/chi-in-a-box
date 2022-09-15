@@ -84,6 +84,10 @@ crudini --get --format=lines /etc/kolla/neutron-server/ml2_conf.ini genericswitc
 vlan=$(openstack network show $network_name_or_id -f value -c provider:segmentation_id)
 ```
 
+{% hint style="info" %}
+Note: `crudini` might list a keyfile for the switch instead of a password. The path to the keyfile it shows is inside the container. You can access the keyfile _outside_ the container at `/etc/kolla/neutron-server/ssh`
+{% endhint %}
+
 #### Dell switches
 
 Chameleon Dell switches (S6000 model) are configured over remote SSH sessions currently. You can log in to the switch from a node that has access to the switch's out-of-band interface (such as the Neutron node.)
