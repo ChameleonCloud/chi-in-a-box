@@ -6,8 +6,6 @@ description: An exciting menu of footguns
 
 The following hardware has known issues. Sometimes this is because the hardware or software is flaky, and sometimes it's because extensive use uncovers edge cases.
 
-
-
 ## Networking
 
 ### Dell OS10 Switches
@@ -18,7 +16,7 @@ Dell switches running OS10 default to zero-touch-provisioning mode. Even if you 
 
 To check, run `show ztd-status`
 
-``
+\`\`
 
 ```
 # The bad state
@@ -56,8 +54,6 @@ You'll observe that, despite no useful logs, some ports are up but not passing t
 
 You can check this by launching a known-good node, then running `show mac-address-table interface <node_port_interface>`
 
-
-
 To check your current config, run `show spanning-tree`
 
 As a workaround, set the switch to `RSTP` instead of `Rapid-PVST` mode.
@@ -79,9 +75,20 @@ Spanning tree enabled protocol rstp with force-version rstp
 ...
 ```
 
-
-
 ### Dell FX2 Chassis Switch
 
 TODO
 
+## GPUs
+
+### nvidia-smi reports "no devices found" or "could not communicate with driver"
+
+This is an idiosyncratic error which happens occasionally on GPU nodes. It can be fixed through software. It can usually be resolved by some combination of the following steps:
+
+* If Ubuntu, run their driver installation utility and reboot
+* Manually install the most recent nvidia drivers using the instance's package manager and reboot
+* Install the `nvidia-dkms` module and reboot
+* If Ubuntu, install the Ubuntu hardware enablement stack (`linux-generic-hwe-<version>`) and its recommended packages, and reboot
+* Install the appropriate linux kernel headers and image and reboot
+* Check the kernel module blacklist to see if the nvidia drivers got blacklisted somehow
+* Check `dmesg` logs for "nvidia." See if there were any obvious errors that may indicate a hardware issue
