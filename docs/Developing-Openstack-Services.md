@@ -26,8 +26,6 @@ neutron_dev_plugins:
       - networking_generic_switch
 ```
 
-
-
 ## Fake hypervisors
 
 In order to create blazar hosts, and use nova servers, you must have hypervisors. You can list hypervisors with `openstack hypervisor list`.
@@ -59,7 +57,7 @@ Create a reservation for a host, as normal using blazar. Get the reservation ID.
 
 Create the server: `openstack --os-compute-api-version 2.37 server create --image test-image --flavor mini my_server --hint reservation=<RES_ID> --network none`
 
-### Creating a network&#x20;
+### Creating a network
 
 For some services, it may be useful to create a network on your development instance. Here is an example network that can help with certain tasks.
 
@@ -90,3 +88,65 @@ from oslo_log import log as logging
 root = logging.getLogger()
 root.logger.addHandler(default_handler)
 ```
+
+## Customizing Containers
+
+CHI-in-a-box, kolla-ansible, and kolla allow for customization at many levels.
+
+#### Kolla
+
+The containers and their dockerfiles are defined in the [kolla repository](https://github.com/ChameleonCloud/kolla), for example,  [certbot](https://github.com/ChameleonCloud/kolla/blob/chameleoncloud/xena/docker/letsencrypt/letsencrypt-certbot/Dockerfile.j2).\
+These dockerfiles contain macros and support templating.
+
+```
+{% raw %}
+{% block letsencrypt_certbot_header %}{% endblock %}
+{% endraw %}
+```
+
+#### Kolla-containers
+
+The Build-time customization is done in the [kolla-containers](https://github.com/ChameleonCloud/kolla-containers) repository. We maintain a file, `template-overrides.j2`, with per-service overrides. In addition, the [kolla-build.conf](https://github.com/ChameleonCloud/kolla-containers/blob/xena/kolla-build.conf.j2) sets build-wide settings, including the git repos and branches to use for each service build.&#x20;
+
+We have an extra layer of templating in place, as we maintain multiple variants of this build config. Currently, we have the following variants.
+
+| OpenStack Release | Operating System | Architecture | Variant   |
+| ----------------- | ---------------- | ------------ | --------- |
+| Xena              | Ubuntu 20.04     | x86\_64      | Baremetal |
+| Xena              | Ubuntu 20.04     | x86\_64      | CHI@Edge  |
+| Train             | Centos7          | x86\_64      | KVM       |
+
+All Centos8 variants are deprecated, as are the arm64 builds for CHI@Edge.
+
+#### Kolla-Ansible
+
+[Kolla-ansible](https://github.com/ChameleonCloud/kolla-ansible) defines run-time defaults, configuration, and tooling. Each service has a set of roles, corresponding to deployment phases. [See Letsencrypt example.](https://github.com/ChameleonCloud/kolla-ansible/tree/chameleoncloud/xena/ansible/roles/letsencrypt/tasks)
+
+They template configuration files from ansible key-value pairs into a configuration directory, usually `/etc/kolla/service`. The source for said configuration can be selectively overridden. `merge_configs` will combine ini-like config from the entries, while `with_first_found` will do as its name suggests.
+
+```yaml
+merge_configs:
+  sources:
+    - "{{ role_path }}/templates/doni.conf.j2"
+    - "{{ node_custom_config }}/global.conf"
+    - "{{ node_custom_config }}/doni.conf"
+    - "{{ node_custom_config }}/doni/{{ item.key }}.conf"
+    - "{{ node_custom_config }}/doni/{{ inventory_hostname }}/doni.conf"
+```
+
+Finally, each time a container starts, it uses a `config.json` file to define what volumes to load, and what config files to copy from said volume into its runtime location. Example for [Doni-worker](https://github.com/ChameleonCloud/kolla-ansible/blob/chameleoncloud/xena/ansible/roles/doni/templates/doni-worker.json.j2).
+
+Upstream documentation: [https://docs.openstack.org/kolla/latest/admin/kolla\_api.html](https://docs.openstack.org/kolla/latest/admin/kolla\_api.html)
+
+#### CHI-in-a-box
+
+Finally, the [chi-in-a-box repository](https://github.com/ChameleonCloud/chi-in-a-box) sets the key-value pairs used by kolla-ansbile for configuration, as well as provides templated configuration files, using by the above `merge_configs` or `with_first_found` methods.&#x20;
+
+Configuration files are applied in the following order, with more specific replacing less specific.
+
+* defaults from kolla-ansible
+* `node_custom_config/service.conf`
+* `node_custom_config/service/service.conf`
+* `node_custom_config/service/hostname/service.conf`
+
+See the [kolla-ansible docs](https://docs.openstack.org/kolla-ansible/latest/admin/advanced-configuration.html#openstack-service-configuration-in-kolla) for more.&#x20;
