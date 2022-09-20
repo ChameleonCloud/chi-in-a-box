@@ -8,6 +8,9 @@ ironic_dnsmasq_dhcp_range: "{{ ironic_provisioning_allocation_pool_start }},{{ i
 ironic_gateway_interface: "{{ network_interface | replace('_', '-') }}.{{ ironic_provisioning_network_vlan }}"
 manage_ironic_gateway_interface: false
 
+chameleon_image_swift_container_name: chameleon_supported_images
+chameleon_image_swift_url: "https://chi.uc.chameleoncloud.org:7480/swift/v1/AUTH_4140e5f9f65545dbb9f0bdc90ef68d23/{{ chameleon_image_swift_container_name }}"
+
 ironic_glance_images:
   - name: pxe_deploy_kernel
     container_format: aki
@@ -17,3 +20,19 @@ ironic_glance_images:
     container_format: aki
     disk_format: aki
     url: "https://tarballs.opendev.org/openstack/ironic-python-agent/dib/files/ipa-centos8-stable-{{ openstack_release }}.initramfs"
+  - name: CC-Ubuntu18.04
+    container_format: bare
+    disk_format: raw
+    url: "{{ chameleon_image_swift_url }}/CC-Ubuntu18.04"
+  - name: CC-Ubuntu20.04
+    container_format: bare
+    disk_format: raw
+    url: "{{ chameleon_image_swift_url }}/CC-Ubuntu20.04"
+  - name: CC-CentOS7
+    container_format: bare
+    disk_format: raw
+    url: "{{ chameleon_image_swift_url }}/CC-CentOS7"
+  - name: CC-CentOS8-stream
+    container_format: bare
+    disk_format: raw
+    url: "{{ chameleon_image_swift_url }}/CC-CentOS8-stream"
