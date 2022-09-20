@@ -243,6 +243,27 @@ All of these will be provisioned by running the post-deploy script:
 ./cc-ansible post-deploy
 ```
 
+#### Set Default PXE Boot Image
+
+After running `post-deploy`, two new images will have been downloaded, and added to glance, named `pxe_deploy_kernel` and `pxe_deploy_ramdisk`.
+
+Ironic needs to be configured to use these images to netboot nodes, and you'll need the UUIDs that glance assigned to them. Get them either from Horizon, under images, or by running `openstack image show <name>`.
+
+To set them as default, add the following to your `defaults.yml`
+
+```
+ironic_deploy_kernel: <pxe_deploy_kernel_uuid>
+ironic_deploy_ramdisk: <pxe_deploy_ramdisk_uuid>
+```
+
+Then, run `cc-ansible deploy --tags ironic` to deploy the change.
+
+These will be used if not overridden for a specific node, which can be done via:
+
+```
+openstack hardware set --deploy_kernel <deploy_kernel_uuid> --deploy_ramdisk <deploy_ramdisk_uuid> <node_uuid>
+```
+
 ### Install the OpenStack Client
 
 Run the following commands:
