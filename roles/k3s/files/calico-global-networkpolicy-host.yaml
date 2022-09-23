@@ -1,0 +1,89 @@
+---
+# enable auto host-endpoints
+# https://projectcalico.docs.tigera.io/reference/resources/kubecontrollersconfig
+apiVersion: projectcalico.org/v3
+kind: KubeControllersConfiguration
+metadata:
+  name: default
+spec:
+  controllers:
+    node:
+      hostEndpoint:
+        autoCreate: Enabled
+      syncLabels: Enabled
+---
+# define failsafe ports for felix
+apiVersion: projectcalico.org/v3
+kind: FelixConfiguration
+metadata:
+  name: default
+spec:
+  failsafeInboundHostPorts:
+    - port: 22
+      protocol: tcp
+    - port: 68
+      protocol: udp
+    - port: 179
+      protocol: tcp
+    - port: 2379
+      protocol: tcp
+    - port: 2380
+      protocol: tcp
+    - port: 5473
+      protocol: tcp
+    - port: 6443
+      protocol: tcp
+    - port: 6666
+      protocol: tcp
+    - port: 6667
+      protocol: tcp
+  failsafeOutboundHostPorts:
+    - port: 53
+      protocol: udp
+    - port: 67
+      protocol: udp
+    - port: 179
+      protocol: tcp
+    - port: 2379
+      protocol: tcp
+    - port: 2380
+      protocol: tcp
+    - port: 5473
+      protocol: tcp
+    - port: 6443
+      protocol: tcp
+    - port: 6666
+      protocol: tcp
+    - port: 6667
+      protocol: tcp
+    - port: 9099
+      protocol: tcp
+    - port: 10010
+      protocol: tcp
+    - port: 10250
+      protocol: tcp
+---
+apiVersion: projectcalico.org/v3
+kind: GlobalNetworkPolicy
+metadata:
+  name: edge-host-worker
+spec:
+  selector: "chi.edge/local_egress == 'deny'"
+  applyOnForward: True # applies to all traffic through host interfaces
+  order: 100 #lowest priority, after other rules
+  types:
+    - Egress
+  egress:
+    # don't block traffic to known k8s pods,hosts,etc
+    - action: Allow
+      destination:
+        selector: all() #all endpoints known to k8s
+    # if traffic isn't going to a k8s endpoint, allow it
+    - action: Deny
+      destination:
+        nets:
+          - 10.0.0.0/8
+          - 172.16.0.0/12
+          - 192.168.0.0/16
+    # allow egress traffic not matched above
+    - action: Allow
