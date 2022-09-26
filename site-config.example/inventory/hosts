@@ -44,6 +44,10 @@ mariadb
 [precis:children]
 control
 
+# used for CHI@Edge v2 deployment
+[k3s:children]
+control
+
 [redfish-monitor:children]
 control
 
@@ -682,6 +686,9 @@ zun
 
 [zun-compute:children]
 compute
+
+[zun-compute-k8s:children]
+zun
 
 [zun-cni-daemon:children]
 compute

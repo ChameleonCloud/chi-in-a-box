@@ -1,0 +1,31 @@
+# This spec will launch some number of pods (see "replicas") on as many hosts
+# in the cluster as possible.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pingtest
+spec:
+  selector:
+    matchLabels:
+      app: pingtest
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: pingtest
+    spec:
+      affinity:
+        # Try to schedule on as many nodes as possible
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - pingtest
+              topologyKey: "kubernetes.io/hostname"
+      containers:
+        - name: pingtest
+          image: busybox
+          command: ["sleep", "infinity"]

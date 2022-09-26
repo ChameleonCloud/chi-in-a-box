@@ -1,0 +1,36 @@
+# {{ ansible_managed }}
+# This is based on the default value of the installation configuration found at
+# https://docs.projectcalico.org/manifests/custom-resources.yaml
+
+# This section includes base Calico installation configuration.
+# For more information, see: https://docs.projectcalico.org/v3.21/reference/installation/api#operator.tigera.io/v1.Installation
+apiVersion: operator.tigera.io/v1
+kind: Installation
+metadata:
+  name: default
+spec:
+  # Configures Calico networking.
+  calicoNetwork:
+    # Note: The ipPools section cannot be modified post-install.
+    ipPools:
+      - cidr: {{ k3s_cluster_cidr }}
+        blockSize: {{ k3s_cluster_node_blocksize }}
+        encapsulation: IPIP
+        natOutgoing: Enabled
+        nodeSelector: all()
+    # Ensure calico uses the last Wireguard interface
+    nodeAddressAutodetectionV4:
+      firstFound: false
+      interface: wg-calico
+    containerIPForwarding: Enabled
+
+---
+
+# This section configures the Calico API server.
+# For more information, see: https://docs.projectcalico.org/v3.21/reference/installation/api#operator.tigera.io/v1.APIServer
+apiVersion: operator.tigera.io/v1
+kind: APIServer
+metadata:
+  name: default
+spec: {}
+
