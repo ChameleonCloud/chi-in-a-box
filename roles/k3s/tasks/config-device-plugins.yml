@@ -1,0 +1,24 @@
+---
+# FUTURE NOTE: change all the kubectl invocations to use the kubernetes.core.k8s collection!
+# This will make detecting changes way easier and more reliable.
+
+- name: Apply nvidia device plugin daemonset
+  delegate_to: "{{ groups['deployment'][0] }}"
+  kubernetes.core.k8s:
+    state: present
+    src: nvidia-device-plugin.yaml
+    apply: yes
+  when:
+    - not (k3s_dry_run | bool)
+
+- name: Apply daemonsets for smarter-device plugins
+  delegate_to: "{{ groups['deployment'][0] }}"
+  kubernetes.core.k8s:
+    state: present
+    template: "smarter-device-manager-ds-{{ item }}.yaml.j2"
+    apply: yes
+  loop:
+    - jetson
+    - rpi
+  when:
+    - not (k3s_dry_run | bool)

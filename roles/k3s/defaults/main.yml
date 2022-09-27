@@ -1,0 +1,33 @@
+---
+k3s_version: v1.22.5+k3s1
+k3s_port: 6443
+k3s_server_location: /var/lib/rancher/k3s
+k3s_conf_location: /etc/rancher/k3s
+k3s_systemd_dir: /etc/systemd/system
+k3s_server_ip: "{{ kolla_external_vip_address }}"
+k3s_extra_server_args: ""
+
+k3s_dry_run: no
+
+k3s_cluster_cidr: "192.168.64.0/18"
+k3s_cluster_node_blocksize: 28
+
+k3s_enable_calico: yes
+k3s_calico_version: v3.24.1
+
+k3s_nvidia_device_plugin_version: "v0.12.2"
+k3s_smarter_device_plugin_version: "v1.20.10"
+
+k3s_enable_registry_proxy: no
+
+k3s_services:
+  k3s_server:
+    group: k3s
+    enabled: "{{ enable_k3s }}"
+    haproxy:
+      k3s_server_external:
+        enabled: true
+        external: true
+        mode: "http"
+        port: "{{ k3s_port }}"
+        listen_port: "{{ k3s_port }}"

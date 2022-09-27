@@ -1,0 +1,39 @@
+# Launch a pod on every node in the cluster with the debug=pingtest label
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: pingtest
+spec:
+  selector:
+    matchLabels:
+      name: pingtest
+  template:
+    metadata:
+      labels:
+        name: pingtest
+    spec:
+      nodeSelector:
+        debug: pingtest
+      containers:
+        - name: pingtest
+          image: busybox
+          command: ["sleep", "infinity"]
+
+---
+# Network policy to allow traffic b/w pods on same namespace
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-allow-local
+spec:
+  podSelector: {}
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: default
+  egress:
+    - {}
+  policyTypes:
+    - Ingress
+    - Egress

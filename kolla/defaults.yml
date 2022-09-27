@@ -72,6 +72,7 @@ blazar_email_relay: "127.0.0.1"
 blazar_api_allocation_extras: user_name
 blazar_host_default_resource_properties: '["=", "\$node_type", "compute_skylake"]'
 blazar_host_retry_without_default_resources: yes
+blazar_enable_plugin_network: yes
 blazar_network_default_resource_properties: '["=", "\$stitch_provider", "none"]'
 blazar_network_retry_without_default_resources: no
 blazar_floatingip_reservation_network_regex: "[pP]ublic"
@@ -310,9 +311,14 @@ enable_grafana: no
 enable_ceph: no
 
 # Container services (Zun and supporting)
-enable_etcd: no
-enable_kuryr: no
+enable_k3s: no
 enable_zun: no
+enable_zun_compute_k8s: "{{ enable_zun | bool and enable_k3s | bool }}"
+blazar_enable_device_plugin_k8s: "{{ enable_k3s | bool }}"
+# If not running K3s, can run standard Zun deploy w/ etcd and kuryr
+enable_etcd: "{{ enable_zun | bool and not enable_k3s | bool }}"
+enable_kuryr: "{{ enable_zun | bool and not enable_k3s | bool }}"
+enable_zun_compute: "{{ enable_zun | bool and not enable_k3s | bool }}"
 
 # OSG
 enable_osg: no

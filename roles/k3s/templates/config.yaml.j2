@@ -1,0 +1,14 @@
+---
+cluster-cidr: {{ k3s_cluster_cidr }}
+# HA for K3s is not yet supported; there is no HAProxy frontend serving the traffic
+# to the API. Once that is functional, we can use the VIP address here.
+bind-address: {{ k3s_server_ip }}
+node-external-ip: {{ k3s_server_ip }}
+secrets-encryption: True
+{% if k3s_enable_calico | bool %}
+flannel-backend: none
+disable-network-policy: True
+disable:
+  - servicelb
+  - traefik
+{% endif %}

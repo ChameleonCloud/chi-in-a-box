@@ -1,0 +1,51 @@
+---
+- name: Create calico network
+  kolla_toolbox:
+    module_name: os_network
+    module_args:
+      auth: "{{ openstack_auth }}"
+      name: caliconet
+      provider_network_type: flat
+      provider_physical_network: calico
+      shared: yes
+      state: present
+  run_once: true
+  become: yes
+
+- name: Create calico subnet
+  kolla_toolbox:
+    module_name: os_subnet
+    module_args:
+      auth: "{{ openstack_auth }}"
+      network_name: caliconet
+      name: caliconet-subnet
+      cidr: "{{ k3s_cluster_cidr }}"
+      enable_dhcp: no
+  become: yes
+
+# FIXME(jason): this doesn't actually add the subnet to the router!
+# When we have updated to a later Ansible we can potentially fetch the router's
+# interfaces with routers_info and then merge this interface into the list?
+- name: Fetch existing NAT router
+  kolla_toolbox:
+    module_name: os_router
+    module_args:
+      auth: "{{ openstack_auth }}"
+      name: sharednet-router
+      # interfaces:
+      #   - caliconet-subnet
+  register: calico_router
+  run_once: true
+  become: yes
+
+- name: Generate Calico/Neutron connection script
+  ansible.builtin.template:
+    src: neutron-calico-connect.j2
+    dest: "{{ k3s_conf_location }}/neutron-calico-connect.sh"
+    owner: root
+    group: root
+    mode: "0700"
+  vars:
+    neutron_router_id: "{{ calico_router.router.id }}"
+  when:
+    - k3s_enable_calico | bool

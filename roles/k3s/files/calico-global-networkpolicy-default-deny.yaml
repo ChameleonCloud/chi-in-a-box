@@ -1,0 +1,18 @@
+# https://projectcalico.docs.tigera.io/security/kubernetes-default-deny#enable-default-deny-calico-global-network-policy-non-namespaced
+apiVersion: projectcalico.org/v3
+kind: GlobalNetworkPolicy
+metadata:
+  name: default-deny
+spec:
+  namespaceSelector: has(kubernetes.io/metadata.name) && kubernetes.io/metadata.name not in {"kube-system", "calico-apiserver", "calico-system"}
+  types:
+    - Ingress
+    - Egress
+  egress:
+    # allow all namespaces to communicate to DNS pods
+    - action: Allow
+      protocol: UDP
+      destination:
+        selector: 'k8s-app == "kube-dns"'
+        ports:
+          - 53

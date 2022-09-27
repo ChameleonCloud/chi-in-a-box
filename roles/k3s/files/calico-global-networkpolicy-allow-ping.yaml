@@ -1,0 +1,19 @@
+# https://projectcalico.docs.tigera.io/security/icmp-ping#allow-icmp-ping-all-workloads-and-host-endpoints
+apiVersion: projectcalico.org/v3
+kind: GlobalNetworkPolicy
+metadata:
+  name: allow-ping
+spec:
+  namespaceSelector: has(kubernetes.io/metadata.name) && kubernetes.io/metadata.name not in {"kube-system", "calico-apiserver", "calico-system"}
+  types:
+    - Ingress
+  ingress:
+    # Allow ICMP echo (ping) over IPv4 and IPv6
+    - action: Allow
+      protocol: ICMP
+      icmp:
+        type: 8
+    - action: Allow
+      protocol: ICMPv6
+      icmp:
+        type: 128

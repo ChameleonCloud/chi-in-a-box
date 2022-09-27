@@ -1,0 +1,64 @@
+---
+- name: ensure calico config directory exists
+  become: true
+  ansible.builtin.file:
+    name: "{{ k3s_conf_location }}/calico"
+    state: directory
+
+- name: Download Calico release
+  become: true
+  ansible.builtin.get_url:
+    url: "https://github.com/projectcalico/calico/releases/download/{{ k3s_calico_version }}/release-{{ k3s_calico_version }}.tgz"
+    dest: "{{ k3s_conf_location }}/calico/release-{{ k3s_calico_version }}.tgz"
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Unpack Calico release
+  become: true
+  ansible.builtin.unarchive:
+    remote_src: yes
+    src: "{{ k3s_conf_location }}/calico/release-{{ k3s_calico_version }}.tgz"
+    dest: "{{ k3s_conf_location }}/calico/"
+    creates: "{{ k3s_conf_location }}/calico/release-{{ k3s_calico_version }}"
+  register: calico_release
+
+# note: server-side-apply used due to the large size
+- name: Apply Calico operator
+  delegate_to: "{{ groups['deployment'][0] }}"
+  kubernetes.core.k8s:
+    state: present
+    src: "{{ k3s_conf_location }}/calico/release-{{ k3s_calico_version }}/manifests/tigera-operator.yaml"
+    apply: yes
+    server_side_apply:
+      field_manager: ansible
+      force_conflicts: yes
+  when:
+    - not (k3s_dry_run | bool)
+
+- name: Install calicoctl
+  become: true
+  ansible.builtin.copy:
+    # TODO: use facts to optionally install ARM or otherwise
+    src: "{{ k3s_conf_location }}/calico/release-{{ k3s_calico_version }}/bin/calicoctl/calicoctl-linux-amd64"
+    remote_src: yes
+    dest: /usr/local/bin/kubectl-calico
+    mode: u=rwx,g=rx,o=rx
+
+- name: Apply Calico custom resources
+  delegate_to: "{{ groups['deployment'][0] }}"
+  kubernetes.core.k8s:
+    state: present
+    template: calico-custom-resources.yaml.j2
+    apply: yes
+  when:
+    - not (k3s_dry_run | bool)
+
+- name: Apply Calico global network policies
+  delegate_to: "{{ groups['deployment'][0] }}"
+  kubernetes.core.k8s:
+    state: present
+    src: calico-global-networkpolicy-{{ item }}.yaml
+  loop:
+    - default-deny
+    - allow-ping

@@ -1,0 +1,14 @@
+---
+- include_tasks: config-k3s-service.yml
+- include_tasks: config-k3s-client.yml
+
+- include_tasks: config-calico.yml
+  when: k3s_enable_calico | bool
+
+- include_tasks: config-device-plugins.yml
+
+- include_tasks: config-neutron.yml
+  when: enable_neutron | bool
+
+- include_tasks: config-registry-proxy.yml
+  when: k3s_enable_registry_proxy | bool
