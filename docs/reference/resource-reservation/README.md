@@ -27,13 +27,17 @@ openstack reservation host create
 
 ### Devices
 
+```
+openstack reservation device create
+```
+
 ### Networks
 
 #### Create a Reservable Network
 
 This creates an entry in Blazar, allowing a user to reserve a vlan on a physical network. When their lease starts, a neutron network will be created using that vlan and physnet.
 
-Make sure that the segment ID + physnets you add here are **outside** the range of ad-hoc vlans defined for neutron (in your defaults.yml file). Otherwise, blazar's reservable vlans and neutron's ad-hoc ones may conflict.\
+Make sure that the segment ID + physnets you add here are **outside** the range of ad-hoc vlans defined for neutron (in your `defaults.yml` file). Otherwise, Blazar's reservable vlans and neutron's ad-hoc ones may conflict.\
 
 
 Usage:
@@ -64,10 +68,26 @@ openstack reservation network create \
   --extra mykey=myvalue
 ```
 
-#### Add a capability to a Reservable Network
+#### Add or update capability to a Reservable Network
 
 ```shell-session
 openstack reservation network set --extra key=value NETWORK_ID
+```
+
+Example, change the physical network:
+
+```
+openstack reservation network set --extra physical_network=physnet1
+```
+
+#### Convention for Stitch-able Networks
+
+To indicate that a network can be connected to other sites at L2, we use the key `stitch_provider`
+
+For example, if you have plumbed VLANs from your dataplane switch to a FABRIC facility port, indicate these with:
+
+```
+openstack reservation network set --extra stitch_provider=fabric
 ```
 
 ### Floating IPs
