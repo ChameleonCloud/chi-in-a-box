@@ -1,4 +1,7 @@
-ansible>=2.10,<=4
+# Xena release of Kolla-ansible requires ansible release between 2.10 and below 5.x,
+# This is because it depends on ansible-core 2.11.x
+# See https://docs.openstack.org/releasenotes/kolla-ansible/xena.html#relnotes-13-0-0-stable-xena-upgrade-notes
+ansible>=2.10,<5
 
 # ensure the version of pyopenssl installed is compatible with cryptography. May be resolved after ansible 5.x
 # https://github.com/pyca/pyopenssl/issues/1114
