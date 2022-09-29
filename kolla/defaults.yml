@@ -108,6 +108,7 @@ enable_haproxy: yes
 haproxy_listen_neutron_server_extra: ["timeout server 15m"]
 haproxy_service_template: "haproxy_single_service_split.cfg.j2"
 kolla_external_fqdn_cert: "{{ cc_ansible_site_dir }}/certificates/haproxy.pem"
+kolla_externally_managed_cert: "{{ enable_letsencrypt | bool }}"
 
 # Heat
 enable_heat: yes
