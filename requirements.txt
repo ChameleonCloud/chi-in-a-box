@@ -11,7 +11,6 @@ pyopenssl
 # See https://jinja.palletsprojects.com/en/3.1.x/changes/#version-3-1-0
 jinja2<3.1.0
 docker
-kubernetes
 
 # Client Tools
 python-openstackclient

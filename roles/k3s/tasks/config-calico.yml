@@ -23,6 +23,12 @@
     creates: "{{ k3s_conf_location }}/calico/release-{{ k3s_calico_version }}"
   register: calico_release
 
+- name: Install kubernetes python package
+  delegate_to: "{{ groups['deployment'][0] }}"
+  ansible.builtin.pip:
+    name: kubernetes
+    virtualenv: "{{ virtualenv }}"
+
 # note: server-side-apply used due to the large size
 - name: Apply Calico operator
   delegate_to: "{{ groups['deployment'][0] }}"
