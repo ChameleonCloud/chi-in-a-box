@@ -1,0 +1,124 @@
+---
+# This file contains the minimum configuration that will allow deployment to complete
+# This will bring up the control plane, but no tenant networks or compute nodes.
+# See the more fully-featured defaults files for further information.
+# This is also a useful starting place for development.
+
+####################
+# Base Configuration
+####################
+
+# You must rerun `cc-ansible bootstrap-servers` after modifying entries in this section.
+# This must be done before re-running `cc-ansible deploy`
+# The values represent the minimal values needed to bring up the control-plane and API interfaces
+
+# All services will bind to this interface, on the INTERFACE IP address
+# This example assumes that `lo` has the IP `127.0.0.1/8`
+network_interface: "lo"
+
+# Keepalived will manage this IP address, which must be in the same
+# subnet as the interface IP above. Haproxy will bind to this IP, and the
+# openstack ADMIN and INTERNAL APIs listen here.
+kolla_internal_vip_address: "127.0.0.254"
+
+# External API interface. Comment this section to use only the internal interface.
+# You will need to use sshuttle or a similar tool to access the webUI at 127.0.0.254
+# This example assumes that `ens3` has an IP address in 10.56.0.0/24
+# kolla_external_vip_interface: "ens3"
+# Keepalived will manage this IP address, which must be in the same subnet
+# as the interface IP of the `kolla_external_vip_interface`.
+# Haproxy will bind to this VIP address, and the openstack PUBLIC API will
+# listen here.
+# kolla_external_vip_address: "10.56.0.254"
+
+# Uncomment this to enable TLS on the PUBLIC API interface.
+# kolla_enable_tls_external: "yes"
+# When TLS is enabled, the kolla_external_fqdn must resolve to the kolla_external_vip_address
+# By default, it's just set to the address itself, but you can't get a cert for that.
+# kolla_external_fqdn: "{{ kolla_external_vip_address }}"
+
+#############################
+# Service Switches (optional)
+#############################
+
+## Core services (you probably want these)
+# enable_fluentd: yes
+# enable_glance: yes
+# enable_haproxy: yes
+# enable_horizon: yes
+# enable_keystone: yes
+# enable_mariadb: yes
+# enable_memcached: yes
+# enable_neutron: yes
+# enable_nova: yes
+# enable_rabbitmq: yes
+
+## Openstack Services
+# enable_blazar: yes # Reservation Service
+# enable_cinder: no # Block Storage, not compatible with baremetal nodes
+# enable_cyborg: no # PCIe device management for VMs
+# enable_doni: yes # Inventory service, contributed by Chameleon
+# enable_etcd: no # Distributed KV Store
+# enable_heat: yes # Orchestration service
+# enable_ironic: yes # Allows use of baremetal nodes for compute
+# enable_zun: no # Container service
+# enable_swift: no # Object storage, openstack native method
+# enable_swift_rgw: no # object storage using ceph RGW as backend
+
+
+## Infrastructure Services
+# Disables elasticsearch and kibana. They are less useful in a single-node configuration
+# And consume resources
+enable_central_logging: no
+
+# enable_prometheus: yes # Metrics server
+# enable_prometheus_external: no # should it be accessible externally
+# enable_grafana: no # Metrics Dashboard
+
+## Networking service Options
+# enable_openvswitch: yes
+# enable_neutron_fwaas: no
+
+## Container service options
+# enable_k3s: no
+# enable_kuryr: no
+# enable_zun_compute: no
+# enable_zun_compute_k8s: no
+
+
+#############################
+# Development mode
+#############################
+
+# when a service is set to development mode, it will be cloned from git into `/opt/stack/<service_name>`
+# NOTE: Rerunning deploy will not overwrite the checkout, you must manage the directories manually
+
+# kolla_dev_repos_git: https://github.com/chameleoncloud # git URL prefix
+
+# sets dev mode for all services
+# kolla_dev_mode: no
+
+# Dev mode for a given service can be enabled via <service_name>_dev_mode: yes
+
+# blazar_dev_mode: yes
+# blazar_source_version: chameleoncloud/xena # git branch
+
+# doni_dev_mode: yes
+# doni_source_version: chameleoncloud/xena # git branch
+
+# horizon_dev_mode: yes
+# horizon_source_version: chameleoncloud/xena # git branch
+
+## Neutron is a bit special, as we support dev mode for plugins too
+# neutron_dev_mode: yes
+# neutron_source_version: chameleoncloud/xena # git branch
+# neutron_dev_plugins:
+#   - name: networking-generic-switch
+#     git_repository: https://github.com/ChameleonCloud/networking-generic-switch
+#     source_version: "feature/dell_os10"
+#     packages:
+#       - networking_generic_switch
+
+## Enabling fake hypervisors for testing
+# enable_nova_fake: "yes"
+# num_nova_fake_per_node: 5 # Number of fake hypervisors to create
