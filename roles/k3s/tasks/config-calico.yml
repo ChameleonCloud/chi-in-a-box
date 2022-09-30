@@ -61,6 +61,7 @@
     - not (k3s_dry_run | bool)
 
 - name: Wait till the Tigera Operator has fully applied
+  delegate_to: "{{ groups['deployment'][0] }}"
   kubernetes.core.k8s_info:
     kind: TigeraStatus
     name: calico
@@ -72,6 +73,7 @@
       reason: "AllObjectsAvailable"
 
 - name: Wait till the Calico Installation is created
+  delegate_to: "{{ groups['deployment'][0] }}"
   kubernetes.core.k8s_info:
     kind: Installation
     name: default

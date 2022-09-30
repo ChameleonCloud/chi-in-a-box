@@ -1,0 +1,13 @@
+---
+- name: Restart k3s service
+  systemd:
+    name: k3s
+    daemon_reload: yes
+    state: "restarted"
+  become: yes
+
+- name: Update kubectl cluster server address
+  ansible.builtin.command: |
+    k3s kubectl config set-cluster default
+      --server=https://{{ k3s_server_ip }}:{{ k3s_port }}
+      --kubeconfig ~{{ ansible_user_id }}/.kube/config

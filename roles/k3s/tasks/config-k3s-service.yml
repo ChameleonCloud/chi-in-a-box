@@ -17,6 +17,7 @@
     owner: root
     group: root
     mode: 0600
+  notify: Restart k3s service
 
 - set_fact:
     kolla_external_vip_address_family: ipv4
@@ -42,6 +43,9 @@
     # This _address_family var is not set by default; this is just to make kolla_address
     # happy when it tries to template the primary address of the VIP interface.
     kolla_external_vip_address_family: ipv4
+  notify:
+    - Restart k3s service
+    - Update kubectl cluster server address
 
 - name: Copy K3s systemd service file
   register: k3s_service
@@ -52,6 +56,10 @@
     owner: root
     group: root
     mode: 0644
+  notify: Restart k3s service
+
+- name: Flush handlers
+  meta: flush_handlers
 
 - name: Enable and check K3s service
   become: true
