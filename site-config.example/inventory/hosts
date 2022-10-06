@@ -779,6 +779,9 @@ monitoring
 [prometheus-ipmi-exporter:children]
 ironic-conductor
 
+[prometheus-ironic-exporter:children]
+ironic-conductor
+
 [prometheus-redis-exporter:children]
 redis
 
