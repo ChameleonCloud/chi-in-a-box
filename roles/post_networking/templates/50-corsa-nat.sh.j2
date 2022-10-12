@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# This file is managed by ansible, don't edit it manually.
+
+CORSA_SUBNET={{ corsa_nat_network_cidr }}
+PUBLIC_IFACE={{ corsa_nat_external_interface }}
+
+# this script will enable NAT on the configured interface
+if [[ $IFACE == "$PUBLIC_IFACE" && $AdministrativeState == "configured" ]]; then
+    echo "Enabling NAT from subnet ${CORSA_SUBNET} via outbound interface ${PUBLIC_IFACE}" >> /var/log/syslog
+    iptables -t nat -A POSTROUTING -s "${CORSA_SUBNET}" -o "${PUBLIC_IFACE}" -j MASQUERADE
+fi
+
+exit 0

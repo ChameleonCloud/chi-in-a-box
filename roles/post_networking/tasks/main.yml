@@ -3,3 +3,5 @@
   include_tasks: public.yml
 - name: configure shared tenant network(s) and subnet(s)
   include_tasks: sharednet.yml
+- name: configure corsa nat interface
+  include_tasks: corsa_nat.yml
