@@ -284,7 +284,6 @@ prometheus_alertmanager_external_url: "{{ public_protocol }}://{{ prometheus_ext
 prometheus_bind_address: "{{ lookup('vars', 'ansible_' + network_interface).ipv4.address }}"
 
 enable_prometheus_ironic_exporter: "{{ enable_prometheus | bool and enable_ironic | bool }}"
-# prometheus_ironic_exporter_interval: 60s
 
 # Redfish Monitor
 redfish_monitor_openstack_user: "{{ keystone_admin_username }}"
