@@ -9,3 +9,6 @@ shared_network: "{{ shared_networks[0] if shared_networks }}"
 
 default_sharednet_name: sharednet1
 default_sharednet_cidr: 10.0.0.1/24
+
+# Default to using the external VIP interface for NAT
+corsa_nat_external_interface: "{{ kolla_external_vip_interface }}"

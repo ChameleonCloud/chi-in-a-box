@@ -1,0 +1,19 @@
+---
+- name: add networkd-dispatcher hook for corsa nat
+  become: True
+  ansible.builtin.template:
+    src: 50-corsa-nat.sh.j2
+    dest: /etc/networkd-dispatcher/routable.d/50-corsa-nat.sh
+    owner: root
+    group: root
+    mode: "0755"
+  when:
+    - corsa_nat_network_cidr is defined
+
+- name: Remove hook when not enabled
+  become: True
+  ansible.builtin.file:
+    path: /etc/networkd-dispatcher/routable.d/50-corsa-nat.sh
+    state: absent
+  when:
+    - corsa_nat_network_cidr is not defined
