@@ -12,3 +12,5 @@
     task_name: "mariadb_backup_{{ mariadb_backup_timer_suffix }}"
     task_command: "{{ deployment_dir }}/cc-ansible --site {{ deployment_site_config_dir }} mariadb_backup"
     task_calendar: "23:00"
+    task_user: "{{ mariadb_backup_task_user|default(None) }}"
+    task_group: "{{ mariadb_backup_task_group|default(None) }}"
