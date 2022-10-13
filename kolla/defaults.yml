@@ -284,7 +284,7 @@ prometheus_server_external_url: "{{ public_protocol }}://{{ prometheus_external_
 prometheus_alertmanager_external_url: "{{ public_protocol }}://{{ prometheus_external_fqdn }}:{{ prometheus_alertmanager_port }}"
 prometheus_bind_address: "{{ lookup('vars', 'ansible_' + network_interface).ipv4.address }}"
 
-enable_prometheus_ironic_exporter: "{{ enable_prometheus | bool and enable_ironic | bool }}"
+enable_prometheus_ironic_exporter: no
 
 # Redfish Monitor
 redfish_monitor_openstack_user: "{{ keystone_admin_username }}"
