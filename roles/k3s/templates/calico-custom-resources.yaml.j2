@@ -10,7 +10,7 @@ metadata:
   name: default
 spec:
   controlPlaneNodeSelector:
-    node-role.kubernetes.io/control-planes: "true"
+    node-role.kubernetes.io/control-plane: "true"
   # Configures Calico networking.
   calicoNetwork:
     # Note: The ipPools section cannot be modified post-install.
