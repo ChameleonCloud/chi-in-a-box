@@ -13,7 +13,7 @@ k3s_cluster_cidr: "192.168.64.0/18"
 k3s_cluster_node_blocksize: 28
 
 k3s_enable_calico: yes
-k3s_calico_version: v3.21.5
+k3s_calico_version: v3.24.1
 
 k3s_nvidia_device_plugin_version: "v0.10.0"
 k3s_smarter_device_plugin_version: "v1.20.7"
