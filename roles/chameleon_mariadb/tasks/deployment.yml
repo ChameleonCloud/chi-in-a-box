@@ -14,3 +14,4 @@
     task_calendar: "23:00"
     task_user: "{{ mariadb_backup_task_user|default(None) }}"
     task_group: "{{ mariadb_backup_task_group|default(None) }}"
+    task_workdir: "{{ deployment_dir | default(None) }}"
