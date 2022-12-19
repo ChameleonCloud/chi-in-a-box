@@ -235,6 +235,9 @@ neutron_dev_plugins:
     packages:
       - networking_generic_switch
 
+# minimal config for neutron wireguard agent
+neutron_wireguard_hub_endpoint: "{{ kolla_external_vip_address }}"
+
 # Nova
 enable_nova: yes
 enable_nova_serialconsole_proxy: yes
