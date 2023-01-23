@@ -36,7 +36,7 @@ CHAMELEON_SITES = {
 SITE_BRANDING = 'ChameleonCloud'
 
 # Load custom overrides
-HORIZON_CONFIG['customization_module'] = 'horizon_chameleon'
+HORIZON_CONFIG['customization_module'] = 'horizon_chameleon.overrides'
 
 # Hide default Help link
 HORIZON_CONFIG['help_url'] = None
