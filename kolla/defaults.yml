@@ -28,6 +28,8 @@ chameleon_site_name: localhost
 # Whether to show a dropdown in the Horizon GUI that provides links to other
 # Chameleon testbed sites.
 enable_chameleon_multisite: yes
+# Is this site a baremetal site?
+chameleon_is_baremetal_site: no
 # Default networking fallbacks
 switch_configs: []
 neutron_networks: []

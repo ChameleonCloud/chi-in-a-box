@@ -32,6 +32,11 @@ CHAMELEON_SITES = {
 {% endfor %}
 }
 {% endif %}
+{% if chameleon_is_baremetal_site | bool %}
+CHAMELEON_IS_BAREMETAL_SITE = True
+{% else %}
+CHAMELEON_IS_BAREMETAL_SITE = False
+{% endif %}
 
 SITE_BRANDING = 'ChameleonCloud'
 
