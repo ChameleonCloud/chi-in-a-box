@@ -11,7 +11,7 @@ VIRTUALENV="$(realpath "${VIRTUALENV:-"$DIR"/venv}")"
 FORCE_UPDATES="${FORCE_UPDATES:-no}"
 if [[ ! -d "$VIRTUALENV" ]]; then
   echo "Creating virtualenv at $VIRTUALENV ..."
-  python3 -m venv "$VIRTUALENV" --system-site-packages
+  python3 -m venv "$VIRTUALENV"
   "$VIRTUALENV/bin/pip" install --upgrade pip
   FORCE_UPDATES=yes
 fi
