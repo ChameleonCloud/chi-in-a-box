@@ -50,11 +50,15 @@ In addition to the tenant created and managed networks, two "special" networks a
 
 #### Ironic Provisioning / Cleaning Network
 
-This network is used for loading an image onto a baremetal node, as well as optionally cleaning them between users. The node running the Ironic Conductor must either have an address in this network, or routing must be configured between the provisioning network and the internal network.
+This network is used for loading an image onto a baremetal node, as well as optionally cleaning them between users. When an instance is launched, the baremetal node will be attached to this network, netboot an agent, download a new disk image, and finally be attached to a target tenant network.
 
-TODO: Diagram for ironic-provisioning -> mgmt traffic
-
+{% hint style="info" %}
 Provisioned user instances should **not** be on this network, as its a security risk. However, this is unavoidable if baremetal nodes are used without a network supporting VLANs.
+{% endhint %}
+
+Since the agent must communicate with the internal api interface on the controller node, the ironic provisioning network must be able to route to the internal api network. The simplest way to accomplish this is to route via an additional vlan interface on the controller node.
+
+<figure><img src="../.gitbook/assets/Neutron Networking-Ironic Provisioning.drawio.svg" alt=""><figcaption></figcaption></figure>
 
 #### Sharednet
 
@@ -80,7 +84,7 @@ You will likely want to ssh into your controller nodes for administrative purpos
 
 ## Putting it all together
 
-<figure><img src="../.gitbook/assets/Neutron Networking-Putting it all together.drawio.svg" alt=""><figcaption></figcaption></figure>
+<figure><img src="../.gitbook/assets/Neutron Networking-Putting it all together.drawio (2).svg" alt=""><figcaption></figcaption></figure>
 
 Putting it all together, you can see there are plenty of moving parts. For this diagram, we assume that the following networks are present as VLANs on the cluster's **dataplane switch**:
 
@@ -88,11 +92,15 @@ Putting it all together, you can see there are plenty of moving parts. For this 
 * Internal API network (Red)
 * Public Tenant network (Green), and reusing the same network as the public API
 * Internal Tenant Networks (Blue)
-* Ironic-Provisioning Network (A special case of the internal tenant networks)
+* Ironic-Provisioning Network (Orange, A special case of the internal tenant networks)
 
 If desired, the Public API and Tenant networks could be carried on a different switch entirely from the rest, and the Public Tenant Network could also be configured to use a separate public subnet and vlan.
 
-A separate, **1G management switch** carries the following networks, either as vlans, or a single flat network if desired.
+{% hint style="warning" %}
+IP addresses and DHCP for IPMI, Switch Management, and administrative access are **NOT** managed by CHI-in-a-box. You'll need to configure static IPs, run your own DHCP server, or rely on an external service.
+{% endhint %}
+
+A separate, **1G management switch** carries the following networks, either as vlans, or a single flat network.
 
 * Controler Node access to Baremetal Node IPMI
 * Controller Node access to Dataplane Switch's SSH management interface
