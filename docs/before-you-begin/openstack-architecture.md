@@ -86,25 +86,55 @@ You will likely want to ssh into your controller nodes for administrative purpos
 
 <figure><img src="../.gitbook/assets/Neutron Networking-Putting it all together.drawio (2).svg" alt=""><figcaption></figcaption></figure>
 
-Putting it all together, you can see there are plenty of moving parts. For this diagram, we assume that the following networks are present as VLANs on the cluster's **dataplane switch**:
+{% hint style="info" %}
+Interface Names and Vlan IDs here are only examples, customize as needed
+{% endhint %}
 
-* Public API Network (Green)
-* Internal API network (Red)
-* Public Tenant network (Green), and reusing the same network as the public API
-* Internal Tenant Networks (Blue)
-* Ironic-Provisioning Network (Orange, A special case of the internal tenant networks)
+Putting it all together, you can see there are plenty of moving parts. We'll define the following network name -> vlan mapping:
 
-If desired, the Public API and Tenant networks could be carried on a different switch entirely from the rest, and the Public Tenant Network could also be configured to use a separate public subnet and vlan.
+* Public API Network (Green: **Vlan 1000**)
+* Internal API network (Red: **Vlan 1001**)
+* Public Tenant network (Green: **Vlan 1000**), and reusing the same network as the public API
+* Internal Tenant Network Range (Blue: **Vlans 1002-1200**)
+* Ironic-Provisioning Network (Orange: **Vlan 1002**, A special case of the internal tenant networks)
+
+### Controller Node Interfaces
+
+Here we show an example with three physical interfaces. On the host OS, the following configuration is needed:
+
+* 3 vlan interfaces are attached to Eth0
+  * Eth0.1000 used for the Public API interface, with an IP address assigned
+  * Eth0.1001 used for the Internal API interface, with an IP address assigned
+  * Eth0.1002 used for the Ironic Provisioning interface, with an IP address assigned
+* Eth1 left unconfigured, it will be managed by Neutron as the external interface for the Physical Network Physnet1
+* Eth2 is used to access the dataplane switch mgmt interface, as well as IPMI on the compute nodes. An IP address in should be assigned in the same subnet as those devices.
+
+### Dataplane Switch Configuration
+
+For this diagram, we assume that the above networks are all present on the cluster's **dataplane switch,** and the following ports configured:
+
+* Uplink, access port with Vlan 1000
+* Trunk for Controller API Interfaces, carrying vlans 1000,1001,1002
+* Trunk for Neutron external interface, carrying vlans 1000,1002-1200
+* Switchport connected to eth0 on each Baremetal Node, configured as an untagged, access port. The Neutron service will dynamically configure the access vlan on these ports, from the range 1002-1200.
+
+{% hint style="info" %}
+If needed, the Public API and Public Tenant networks can be provided via a separate switch and physical interface on the controller node.
+{% endhint %}
+
+The switch must be configured to allow SSH login via the separate, out-of-band management interface, and that interface and IP address reachable by the controller node.
+
+### Out of Band Connections
+
+A separate, **1G management switch** carries the following networks, either as vlans, or a single flat network.
+
+* Controller Node access to Baremetal Node IPMI
+* Controller Node access to Dataplane Switch's SSH management interface
+* Local administrative SSH access, if desired
 
 {% hint style="warning" %}
 IP addresses and DHCP for IPMI, Switch Management, and administrative access are **NOT** managed by CHI-in-a-box. You'll need to configure static IPs, run your own DHCP server, or rely on an external service.
 {% endhint %}
-
-A separate, **1G management switch** carries the following networks, either as vlans, or a single flat network.
-
-* Controler Node access to Baremetal Node IPMI
-* Controller Node access to Dataplane Switch's SSH management interface
-* Local administrative SSH access, if desired
 
 
 
