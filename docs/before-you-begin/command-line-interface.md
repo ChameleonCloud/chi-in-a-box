@@ -1,4 +1,6 @@
-# Using cc-ansible
+# CC-Ansible
+
+## CC-Ansible
 
 The `cc-ansible` script in the root of the repo is used to drive the deployment. With this tool you can upgrade parts of the system, reconfigure various services, update and edit encrypted passwords, and run Chameleon-specific Ansible playbooks to set up supporting infrastructure not provided by the Kolla-Ansible project (such as Chameleon's automated [hammers](https://github.com/chameleoncloud/hammers) toolkit).
 

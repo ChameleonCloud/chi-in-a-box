@@ -1,10 +1,8 @@
 # inventory
 
-Your inventory is a directory following the standard layout for an Ansible inventory. It contains the following major components:
+## Ansible Hosts File
 
-### Hosts
-
-`inventory/hosts` is an ini formatted file. It defines the hosts and groups that Ansible will operate on. The majority of this file can be left as-is, and should only be customized by advanced users.
+`inventory/hosts` is an ini formatted file. It defines the hosts and groups that cc-ansible will operate on. The majority of this file can be left as-is, and should only be customized by advanced users.
 
 ```
 # These initial groups are the only groups required to be modified. The
@@ -35,7 +33,7 @@ storage
 monitoring
 ```
 
-The hostname of your control node will be added to the groups `control`, `network`, `monitoring`, and `storage`.&#x20;
+The hostname of your control node will be added to the groups `control`, `network`, `monitoring`, and `storage`.
 
 ### Host\_Vars
 

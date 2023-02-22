@@ -4,19 +4,18 @@
 
 ## Before You Begin
 
-* [OpenStack Architecture](before-you-begin/openstack-architecture.md)
-  * [Controller Nodes](before-you-begin/hardware-requirements/controller-nodes.md)
-  * [Compute Nodes](before-you-begin/hardware-requirements/compute-nodes.md)
-  * [Baremetal Nodes](before-you-begin/hardware-requirements/baremetal-nodes.md)
-  * [Dataplane Switches](before-you-begin/hardware-requirements/dataplane-switches.md)
-* [Using cc-ansible](before-you-begin/command-line-interface.md)
+* [Assumed Knowledge](before-you-begin/upstream-docs.md)
+* [Hosts and Services](before-you-begin/hosts-and-services.md)
+* [Network Overview](before-you-begin/openstack-architecture.md)
+* [CC-Ansible](before-you-begin/command-line-interface.md)
 * [The site configuration](before-you-begin/the-site-configuration/README.md)
-  * [inventory/](before-you-begin/the-site-configuration/inventory.md)
+  * [inventory](before-you-begin/the-site-configuration/inventory.md)
   * [defaults.yml](before-you-begin/the-site-configuration/defaults.yml.md)
   * [passwords.yml](before-you-begin/the-site-configuration/passwords.yml.md)
   * [certificates/](before-you-begin/the-site-configuration/certificates.md)
   * [node\_custom\_config/ (optional)](before-you-begin/the-site-configuration/node\_custom\_config.md)
   * [post-deploy.yml (optional)](before-you-begin/the-site-configuration/post-deploy.yml.md)
+* [How Deployment Works](before-you-begin/how-deployment-works.md)
 * [Security considerations](before-you-begin/security-considerations.md)
 
 ## Setup Guides
@@ -41,9 +40,6 @@
 * [Monitoring](reference/monitoring/README.md)
   * [IPMI Metrics](reference/monitoring/ipmi-metrics.md)
   * [SNMP Metrics](reference/monitoring/snmp-metrics.md)
-* [Upstream Docs](reference/upstream-docs/README.md)
-  * [Ansible Docs](https://docs.ansible.com/ansible/2.8/index.html)
-  * [Kolla-Ansible Docs](https://docs.openstack.org/kolla-ansible/train/)
 
 ## Example Deployments
 

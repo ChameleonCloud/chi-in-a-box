@@ -1,103 +1,102 @@
-# OpenStack Architecture
+---
+description: Where all the moving parts are
+---
 
-## Networking
+# Network Overview
 
-![](<../.gitbook/assets/CiaB Network.drawio (1).svg>)
+This page describes the overall architecture for our "standard" deployment of OpenStack, and where applicable, calls out that a concept is a subset of the required Background Reading.
 
-### Public network
+## OpenStack API Networking
 
-The public network is used for several things. Each purpose can use a separate interface, or reuse the same one (with caveats)
+There are two API networks to consider.&#x20;
 
-#### Public IPs
+First is the **internal api network**, used for internal communication between OpenStack services and Databases. We refer to this interface as the `api_interface` in configuration, as each OpenStack service binds to the system configured IP address on this interface. Exposing this either to users, or externally can be a security risk, so we require a dedicated network and subnet.&#x20;
 
-You'll need a minimum of **3** public IP addresses: 1 for the public facing interface, 1 for the haproxy VIP, and one for the default neutron router.
+The second is the **public api** network, which is how users and user instances communicate with the OpenStack services. We refer to this interface as the `kolla_external_vip_interface` in configuration.
 
-However, each instance will need **1** for a floating IP, as will each private tenant network. 20 IPs would be a good starting place, allowing, for example, 15 instances and 2 private networks.
+Each of the above networks require an interface, subnet, and IP address configured on the controller node. HAProxy will then bind an **additional** IP address to each of the interfaces, and forward traffic as needed to the backend OpenStack services.
 
-#### Admin SSH Interface access (optional)
+<figure><img src="../.gitbook/assets/Neutron Networking-API Networks.drawio (1).svg" alt=""><figcaption><p>Diagram of Public and Management API connectivity</p></figcaption></figure>
 
-{% hint style="info" %}
-The same physical interface (e.g. eth0), can be used for admin SSH and the public API.
-{% endhint %}
+## OpenStack Neutron Networking
 
-By default, assuming you haven't set up a separate way to get into your controller node, you'll ssh in over this network.
+Independent from the API networking, OpenStack Neutron manages networking for tenants, connecting Baremetal Nodes to each other, as well as providing internet access via NAT, and Floating IPs.
 
-#### Public API Interface
+<figure><img src="../.gitbook/assets/Neutron Networking-Neutron Networks.drawio (1).svg" alt=""><figcaption></figcaption></figure>
 
-HAProxy creates a /32 address, and binds it to an interface in the public subnet. This address is used for all the public facing API endpoints, as well as the web interface. DNS should resolve for this IP, as well as a valid SSL certificate.
+Here, `Tenant Public Network` refers to a network where tenants can request Floating IPs, and that their instances can use to reach the internet. So long as IP addresses do not overlap, this can be the same network as the Public API network above, but does not need to be.
 
 {% hint style="danger" %}
-You CANNOT directly use the same interface for the public API and the neutron external interface. They must either be two separate interfaces, connected to the same network, OR use a virtual interface (veth) pair to connect them internally.
+You CANNOT directly use the **same interface** for the public API and the neutron external interface. They must either be two separate interfaces, connected to the same network, OR use a virtual interface (veth) pair to connect them internally.
 
-Without doing this, external host networking will depend on the openvswitch container running, causing a circular dependency. Debugging this will likely lock you out of the system.
+Without doing this, external host networking will depend on the openvswitch container running, causing a circular dependency. Debugging this will likely lock you out of the system, and cause an outage.
 {% endhint %}
 
-#### Neutron External Interface (Floating IPs + NAT)
+The `Tenant Internal Network(s)` refers to the range of networks that tenants may allocate, local to the cluster.
 
-Neutron is the Openstack Networking service. It provides external connectivity for instances by creating virtual routers, and managing public IPs and NAT to internal addresses. It will bind at least one public IP address as the external address for the default router, as well as all assigned floating IPs for instances.
+As tenants can create an arbitrary amount of traffic, it is recommended that these interface(s) are kept independent from those used for API or administrative traffic.
 
-The interface defined for this network is attached to an openvswitch bridge.
+### Physical Networks
 
-### Internal Network
+Neutron creates and manages networks with namespaced sets of IPTables rules for routing, NAT, firewalling, etc, and connects these namespaces with OpenVSwitch bridges, either internally, or to external interfaces. Each interface + OVS Bridge can carry a set of networks corresponding to a range of Vlans + a single untagged vlan. Each of these sets of networks is referred to as a `Physical Network` in Neutron.
 
-The internal network is used for communication between Openstack services. With a single controller node, and no external storage or compute nodes, it's largely a loopback. However, some provisioning methods require communication between the baremetal pre-boot agent and this network.
+As shown in the above diagram, Neutron will create and manage Public, Floating IP addresses in such a router namespace, and NAT private IPs from tenant networks to this public network. User instances can reach the internet through this NAT, and can optionally bind a floating IP address to their private IP for 1-1 NAT.
 
-Similar to the public network, this network requires both an interface IP, as well as a HAProxy VIP.
+Although the diagram shows two physical networks, the same could be accomplished with two Vlan IDs on one physical network, or a vlan ID + untagged network.
 
-User instances should NOT have access to this network, this can be a security risk.
+### Tenant Internal Networks
 
-### Tenant Facing Networks
-
-There are several "types" of network that may face user instances, depending on whether a flat or VLAN configuration is used. In the default VLAN configuration, the controller node will need a vlan trunk to have access to the following networks.
+In addition to the tenant created and managed networks, two "special" networks are created by the administrative project in the same Physical Network.&#x20;
 
 #### Ironic Provisioning / Cleaning Network
 
 This network is used for loading an image onto a baremetal node, as well as optionally cleaning them between users. The node running the Ironic Conductor must either have an address in this network, or routing must be configured between the provisioning network and the internal network.
 
-Provisioned user instances should not be on this network, again as its a security risk. However, this is unavoidable in the flat networking configuration.
+TODO: Diagram for ironic-provisioning -> mgmt traffic
+
+Provisioned user instances should **not** be on this network, as its a security risk. However, this is unavoidable if baremetal nodes are used without a network supporting VLANs.
 
 #### Sharednet
 
-A default shared network can be created, that all user instances are attached to. This is the simplest configuration, and is sufficient for users who only care about access to their instance. However, it does not provide isolation between user instances.
+A default "shared" network can be created, usable as an internal network by any tenant. This is the simplest configuration, and is sufficient for users who only care about access to their instance. However, it does not provide isolation between user instances.
 
 In a flat networking configuration, this is the only user-facing network, and also serves as the ironic network, with above caveats.
 
-#### Isolated Tenant Networks
+## Additional System-level Networks
 
-Users needing isolation can create a separate neutron network. This will provide L2 connectivity between nodes, and by default a subnet and dhcp is also provided. A router must be created manually to give external access, either via SNAT, or the use of floating IPs.
+The following networks are optional, and may be combined depending on your local site's networking environment. They are outside the scope of CHI-in-a-box / Kolla-Ansible / OpenStack's configuration, and must be configured at the system level.
 
 ### Out of Band (IPMI) Network
 
 The controller node (or node running ironic conductor service), must have L3 access to the out of band controller for all baremetal nodes. This can be routed access from one of the other interfaces, or a dedicated connection.
 
-## Hosts
+### Out of Band (Network Device) Network
 
-### Deploy Host (Optional)
+If using vlans with baremetal nodes, Neutron must connect to the dataplane switches to customize the access Vlan on each instance launch. Neutron-server must have L3 access to the management IP for each switch. We highly recommend to use the dedicated management interface on each switch, rather than in-band connectivity.
 
-This is the host where the ansible deployment scripts are generated and run from, as well as storing the site configuration files. It's recommended to have this be a separate machine or VM, to make it easier to re-deploy the ansible managed hosts.
+### Administrative Access (SSH) Network
 
-### Controller Nodes
+You will likely want to ssh into your controller nodes for administrative purposes. The internal api interface is commonly used for this purpose.
 
-In a monolithic installation, the _control node_ runs all of the OpenStack and Chameleon services. If needed, services can be distributed across multiple controller nodes for high availability or scaling purposes.
+## Putting it all together
 
-For Details and Requirements, see the link below.
+<figure><img src="../.gitbook/assets/Neutron Networking-Putting it all together.drawio.svg" alt=""><figcaption></figcaption></figure>
 
-{% content-ref url="hardware-requirements/controller-nodes.md" %}
-[controller-nodes.md](hardware-requirements/controller-nodes.md)
-{% endcontent-ref %}
+Putting it all together, you can see there are plenty of moving parts. For this diagram, we assume that the following networks are present as VLANs on the cluster's **dataplane switch**:
 
-### Compute Nodes
+* Public API Network (Green)
+* Internal API network (Red)
+* Public Tenant network (Green), and reusing the same network as the public API
+* Internal Tenant Networks (Blue)
+* Ironic-Provisioning Network (A special case of the internal tenant networks)
 
-Compute nodes run virtualized guest instances. These are not a part of our default configuration, but configurations with KVM and Container compute nodes are in beta.
+If desired, the Public API and Tenant networks could be carried on a different switch entirely from the rest, and the Public Tenant Network could also be configured to use a separate public subnet and vlan.
 
-{% content-ref url="hardware-requirements/compute-nodes.md" %}
-[compute-nodes.md](hardware-requirements/compute-nodes.md)
-{% endcontent-ref %}
+A separate, **1G management switch** carries the following networks, either as vlans, or a single flat network if desired.
 
-### **Baremetal Nodes**
+* Controler Node access to Baremetal Node IPMI
+* Controller Node access to Dataplane Switch's SSH management interface
+* Local administrative SSH access, if desired
 
-A Baremetal node is externally managed by Openstack Ironic, and the entire machine is provided as an instance to a user.
 
-{% content-ref url="hardware-requirements/compute-nodes.md" %}
-[compute-nodes.md](hardware-requirements/compute-nodes.md)
-{% endcontent-ref %}
+
