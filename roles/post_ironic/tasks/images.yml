@@ -28,7 +28,6 @@
       filename: "{{ glance_images_tmp }}/{{ item.name }}"
   become: True
   run_once: True
-  ignore_errors: true
   loop: "{{ ironic_glance_images }}"
   loop_control:
     label: "{{ item.name }}"
