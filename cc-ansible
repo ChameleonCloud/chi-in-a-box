@@ -235,23 +235,36 @@ if [[ "$CHECK_UPDATES" == "yes" || "$FORCE_UPDATES" == "yes" ]]; then
     sha256sum "$galaxy_role_requirements" > "$galaxy_role_requirements_chksum"
   fi
 
+
+  # local git checkout
+  kolla_ansible_local="${KOLLA_ANSIBLE_LOCAL:-no}"
+
+  # remote_git_reference
   kolla_ansible_remote=https://github.com/chameleoncloud/kolla-ansible.git
   kolla_ansible_checkout=${KOLLA_ANSIBLE_BRANCH:-chameleoncloud/xena}
   kolla_ansible_gitref="$VIRTUALENV/kolla-ansible.gitref"
   kolla_ansible_egglink="$VIRTUALENV/src/kolla-ansible"
-  if [[ "$FORCE_UPDATES" == "yes" || ! -f "$kolla_ansible_gitref" || ! -d "$kolla_ansible_egglink" ]] || \
-        ! diff -q >/dev/null \
-          "$kolla_ansible_gitref" \
-          <(cd "$kolla_ansible_egglink"; git fetch; git show-ref -s -d origin/"$kolla_ansible_checkout"); then
+
+  if [[ "$kolla_ansible_local" == "no" ]]
+    then
+    if [[ "$FORCE_UPDATES" == "yes" || ! -f "$kolla_ansible_gitref" || ! -d "$kolla_ansible_egglink" ]] || \
+          ! diff -q >/dev/null \
+            "$kolla_ansible_gitref" \
+            <(cd "$kolla_ansible_egglink"; git fetch; git show-ref -s -d origin/"$kolla_ansible_checkout"); then
+      pushd "$VIRTUALENV" || ( echo "pushd error!" && exit 1 )
+      pip install -e git+"$kolla_ansible_remote"@"$kolla_ansible_checkout"#egg=kolla-ansible
+      popd || ( echo "popd error!" && exit 1 )
+      # [jca 2020-01-30] TODO:
+      # Ensure the /share folder is placed; this is not copied when using the "develop" setup.py method.
+      # This is a bit weird, perhaps there is some way to pass an additional flag to pip to make it
+      # copy this even though it's installing as source. We use source install to keep track of the Git revision.
+      mkdir -p "$VIRTUALENV/share" && ln -sf "$kolla_ansible_egglink" "$VIRTUALENV/share/kolla-ansible"
+      (cd "$kolla_ansible_egglink"; git rev-parse HEAD > "$kolla_ansible_gitref")
+    fi
+  else
     pushd "$VIRTUALENV" || ( echo "pushd error!" && exit 1 )
-    pip install -e git+"$kolla_ansible_remote"@"$kolla_ansible_checkout"#egg=kolla-ansible
+    pip install -e "${kolla_ansible_local}"
     popd || ( echo "popd error!" && exit 1 )
-    # [jca 2020-01-30] TODO:
-    # Ensure the /share folder is placed; this is not copied when using the "develop" setup.py method.
-    # This is a bit weird, perhaps there is some way to pass an additional flag to pip to make it
-    # copy this even though it's installing as source. We use source install to keep track of the Git revision.
-    mkdir -p "$VIRTUALENV/share" && ln -sf "$kolla_ansible_egglink" "$VIRTUALENV/share/kolla-ansible"
-    (cd "$kolla_ansible_egglink"; git rev-parse HEAD > "$kolla_ansible_gitref")
   fi
 
   # Update/install yq
