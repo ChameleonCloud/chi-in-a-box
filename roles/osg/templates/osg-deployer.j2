@@ -2,6 +2,7 @@
 
 docker run --rm \
     --env-file "{{ osg_config_path }}/openstack.env" \
+    --network=host \
     -v "{{ osg_config_path }}:/etc/osg" \
     "{{ osg_deployer_docker_image }}" \
     python3 /opt/osg/deploy.py 2>&1
