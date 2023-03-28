@@ -20,6 +20,12 @@
       role: osg
       project: "{{ osg_project_name }}"
 
+- name: Authenticate to Docker registry
+  become: True
+  docker_login:
+    registry_url: "{{ docker_registry }}"
+    username: "{{ docker_registry_username }}"
+    password: "{{ docker_registry_password }}"
 - name: Pull Docker image
   docker_image:
     source: pull
