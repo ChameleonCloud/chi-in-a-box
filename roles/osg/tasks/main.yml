@@ -1,17 +1,22 @@
 ---
-- name: Create osg role
-  os_keystone_role:
-    auth: "{{ openstack_auth }}"
-    name: osg
+- name: Ensure osg service user exists
+  no_log: True
+  kolla_toolbox:
+    module_name: openstack.cloud.identity_user
+    module_args:
+      state: present
+      name: "{{ osg_service_username }}"
+      password: "{{ osg_service_password }}"
+      auth: "{{ openstack_auth }}"
 
-- name: Create osg role
+- name: Create osg keystone role
   kolla_toolbox:
     module_name: os_keystone_role
     module_args:
       name: osg
       auth: "{{ openstack_auth }}"
 
-- name: Add service user to osg project as osg
+- name: Add service user to osg project with osg role
   kolla_toolbox:
     module_name: os_user_role
     module_args:
@@ -26,16 +31,21 @@
     registry_url: "{{ docker_registry }}"
     username: "{{ docker_registry_username }}"
     password: "{{ docker_registry_password }}"
+
 - name: Pull Docker image
+  become: True
   docker_image:
     source: pull
     name: "{{ osg_deployer_docker_image }}"
     force_source: yes
 
 - name: Create config directory
+  become: True
   file:
     path: "{{ osg_config_path }}"
     state: directory
+    owner: "{{ config_owner_user }}"
+    group: "{{ config_owner_group }}"
 
 - name: Create osg deployer conf
   template:
@@ -56,10 +66,13 @@
     dest: "{{ osg_config_path }}/openstack.env"
 
 - name: Configure osg deployer docker bash wrapper
+  become: True
   template:
     src: osg-deployer.j2
     mode: 0750
     dest: /usr/local/sbin/osg-deployer
+    owner: "{{ config_owner_user }}"
+    group: "{{ config_owner_group }}"
 
 - name: Set up osg deployer periodic task
   include_role:
@@ -70,6 +83,8 @@
     task_name: "osg_deployer"
     task_command: "/usr/local/sbin/osg-deployer"
     task_calendar: "*:0/30"
+    task_user: "{{ config_owner_user }}"
+    task_group: "{{ config_owner_group }}"
   when: enable_osg | bool
 
 - name: Check if osg timer exists
