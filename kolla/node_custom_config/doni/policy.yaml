@@ -1,0 +1,5 @@
+---
+#API attributes can be project_id, user_id or domain_id.
+
+# Allow any user to enroll devices
+hardware:create: "@"
