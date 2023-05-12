@@ -2,9 +2,8 @@
 openstack_release: xena
 cloud: envvars
 
-docker_namespace: kolla
-docker_registry_username: registry
-docker_registry: docker.chameleoncloud.org
+docker_registry: ghcr.io
+docker_namespace: chameleoncloud/kolla
 kolla_base_distro: ubuntu
 kolla_install_type: source
 
