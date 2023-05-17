@@ -1,6 +1,6 @@
 ---
 hammers_config_path: /etc/hammers
-hammers_docker_image: "{{ docker_registry }}/hammers:latest"
+hammers_docker_image: "ghcr.io/chameleoncloud/hammers:latest"
 hammers_env_file: /etc/hammers/hammers.env
 hammers_mysql_user: cc_hammers
 hammers_mysql_host: "{{ database_address }}"

@@ -32,22 +32,22 @@ precis_mysql_external_database_privileges:
   - nova.*:SELECT
   - nova_api.*:SELECT
 
-precis_init_docker_image: docker.chameleoncloud.org/experiment-precis/init:latest
+precis_init_docker_image: ghcr.io/chameleoncloud/experiment-precis/init:latest
 
-precis_event_listener_docker_image: docker.chameleoncloud.org/experiment-precis/event-listener:latest
+precis_event_listener_docker_image: ghcr.io/chameleoncloud/experiment-precis/event-listener:latest
 precis_event_listener_service_name: experiment-precis-event-listener
 precis_event_listener_prometheus_port: 8913
 
-precis_endpoint_docker_image: docker.chameleoncloud.org/experiment-precis/endpoint:latest
+precis_endpoint_docker_image: ghcr.io/chameleoncloud/experiment-precis/endpoint:latest
 precis_endpoint_service_name: experiment-precis-endpoint
 precis_endpoint_bind_interface: "{{ network_interface }}"
 precis_endpoint_port: 8910
 
-precis_generator_docker_image: docker.chameleoncloud.org/experiment-precis/generator:latest
+precis_generator_docker_image: ghcr.io/chameleoncloud/experiment-precis/generator:latest
 precis_generator_service_name: experiment-precis-generator
 precis_generator_prometheus_port: 8912
 
-precis_cleanup_docker_image: docker.chameleoncloud.org/experiment-precis/cleanup:latest
+precis_cleanup_docker_image: ghcr.io/chameleoncloud/experiment-precis/cleanup:latest
 
 precis_services:
   precis:

@@ -1,5 +1,5 @@
 ---
-chameleon_image_tools_docker_image: docker.chameleoncloud.org/chameleon_image_tools:latest
+chameleon_image_tools_docker_image: ghcr.io/chameleoncloud/chameleon_image_tools:latest
 chameleon_image_tools_config_dir: /etc/chameleon_image_tools
 
 hide_image_age_in_month: 12
