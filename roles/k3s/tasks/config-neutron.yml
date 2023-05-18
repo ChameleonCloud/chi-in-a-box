@@ -28,12 +28,10 @@
 # interfaces with routers_info and then merge this interface into the list?
 - name: Fetch existing NAT router
   kolla_toolbox:
-    module_name: os_router
+    module_name: openstack.cloud.routers_info
     module_args:
       auth: "{{ openstack_auth }}"
       name: sharednet-router
-      # interfaces:
-      #   - caliconet-subnet
   register: calico_router
   run_once: true
   become: yes
@@ -46,6 +44,7 @@
     group: root
     mode: "0700"
   vars:
-    neutron_router_id: "{{ calico_router.router.id }}"
+    neutron_router_id: "{{ calico_router.openstack_routers[0].id }}"
   when:
     - k3s_enable_calico | bool
+  become: yes

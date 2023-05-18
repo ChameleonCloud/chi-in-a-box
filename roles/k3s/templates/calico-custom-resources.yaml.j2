@@ -11,6 +11,15 @@ metadata:
 spec:
   controlPlaneNodeSelector:
     node-role.kubernetes.io/control-plane: "true"
+  typhaAffinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: node-role.kubernetes.io/control-plane
+            operator: In
+            values:
+            - "true"
   # Configures Calico networking.
   calicoNetwork:
     # Note: The ipPools section cannot be modified post-install.
@@ -29,14 +38,8 @@ spec:
     # which adds a 20-byte overhead. The underlying Wireguard interface has an MTU of
     # 1420 configured, so we subtract 20 to get 1400.
     mtu: 1400
-  # TODO(jason): remove this when we have a pull-through cache deployed
-  # Pull control plane images for Calico from our private registry to avoid rate limits.
-  imagePullSecrets:
-    - name: chi-readonly-secret
-      registry: docker.chameleoncloud.org/
 
 ---
-
 # This section configures the Calico API server.
 # For more information, see: https://docs.projectcalico.org/v3.21/reference/installation/api#operator.tigera.io/v1.APIServer
 apiVersion: operator.tigera.io/v1
@@ -44,4 +47,3 @@ kind: APIServer
 metadata:
   name: default
 spec: {}
-

@@ -29,10 +29,6 @@
   kubernetes.core.k8s:
     state: present
     src: "{{ k3s_conf_location }}/calico/release-{{ k3s_calico_version }}/manifests/tigera-operator.yaml"
-    apply: yes
-    server_side_apply:
-      field_manager: ansible
-      force_conflicts: yes
   when:
     - not (k3s_dry_run | bool)
 
@@ -45,12 +41,17 @@
     dest: /usr/local/bin/kubectl-calico
     mode: u=rwx,g=rx,o=rx
 
+- name: template calico resource defs
+  become: true
+  ansible.builtin.template:
+    src: calico-custom-resources.yaml.j2
+    dest: "{{ k3s_conf_location }}/calico/release-{{ k3s_calico_version }}/manifests/calico-custom-resources.yaml"
+
 - name: Apply Calico custom resources
   delegate_to: "{{ groups['deployment'][0] }}"
   kubernetes.core.k8s:
     state: present
-    template: calico-custom-resources.yaml.j2
-    apply: yes
+    src: "{{ k3s_conf_location }}/calico/release-{{ k3s_calico_version }}/manifests/calico-custom-resources.yaml"
   when:
     - not (k3s_dry_run | bool)
 

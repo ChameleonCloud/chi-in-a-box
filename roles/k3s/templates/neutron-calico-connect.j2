@@ -8,7 +8,7 @@ calico_cidr="{{ k3s_cluster_cidr }}"
 host_addr="192.168.150.1/24"
 ns_addr="192.168.150.2/24"
 
-neutron_ns=qrouter-"{{ neutron_router_id }}"
+neutron_ns=qrouter-{{ neutron_router_id }}
 
 # Create veth pair to connect Neutron router ns to default ns
 ip link show veth-cali0 >/dev/null || ip link add veth-cali0 type veth peer veth-caliN
@@ -32,6 +32,6 @@ iptables -t nat -S | grep -q neutron-calico-connect:01 || {
 # Floating IPs normally do DNAT, which does not change the source address. This breaks
 # Calico, which does not understand how to return the packets.
 iptables -t nat -S | grep -q neutron-calico-connect:02 || {
-  ip netns exec "$neutron_ns" iptables -t nat -A POSTROUTING -o veth-caliN -J MASQUERADE \
+  ip netns exec "$neutron_ns" iptables -t nat -A POSTROUTING -o veth-caliN -j MASQUERADE \
     -m comment --comment "(neutron-calico-connect:02) rewrite source for Calico-bound packets"
 }
