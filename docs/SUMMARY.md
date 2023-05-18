@@ -28,6 +28,7 @@
 * [Troubleshooting](setup-guides/troubleshooting/README.md)
   * [Networking](setup-guides/troubleshooting/networking.md)
 * [Verification Checklist](setup-guides/verification-checklist.md)
+* [Dev-in-a-Box](setup-guides/dev-in-a-box.md)
 
 ## Reference
 
