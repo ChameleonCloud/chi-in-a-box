@@ -35,24 +35,32 @@ You must have a user account on the machine with passwordless sudo.
 
     <pre class="language-bash"><code class="lang-bash"><strong>export CC_ANSIBLE_SITE=/opt/site-config/
     </strong></code></pre>
-4.  &#x20;Edit `/opt/site-config/defaults.yml` to contain ONLY the following lines.
+4.  Create a dummy loopback interface to bind services to. You can choose whatever interface name and IP you want. The name will be later used for the `network_interface` and the IP for `kolla_internal_vip_address` in the next step.
+
+    ```bash
+    ip link add name diab type dummy
+    ip addr add 10.100.100.1/32 dev diab
+    ```
+5.  &#x20;Edit `/opt/site-config/defaults.yml` to contain ONLY the following lines.
 
     ```yaml
     ---
     kolla_base_distro: ubuntu
-    network_interface: lo
-    kolla_internal_vip_address: 127.0.0.1
+    network_interface: diab
+    kolla_internal_vip_address: 10.100.100.1
     enable_haproxy: no
 
     # Disable central logging to reduce resource usage (no elasticsearch or kibana)
     enable_central_logging: no
+    # Disable prometheus to speed up deployment
+    enable_prometheus: no
     ```
-5.  Bootstrap the controller node, this will install apt packages, configure Docker, and modify /etc/hosts
+6.  Bootstrap the controller node, this will install apt packages, configure Docker, and modify /etc/hosts
 
     ```
     ./cc-ansible bootstrap-servers
     ```
-6.  Run prechecks to ensure common issues are avoided.
+7.  Run prechecks to ensure common issues are avoided.
 
     ```
     ./cc-ansible prechecks
@@ -63,12 +71,12 @@ You must have a user account on the machine with passwordless sudo.
         ```
         sudo systemctl disable --now nscd.service
         ```
-7.  Next, we'll pull container images for all configured services. This is done by running:
+8.  Next, we'll pull container images for all configured services. This is done by running:
 
     ```
     ./cc-ansible pull
     ```
-8.  We now need to generate the configuration that all of these services will use. This will combine the upstream defaults, contents of `chi-in-a-box`, and your `site-config`, and template config files into `/etc/kolla/<service_name>`
+9.  We now need to generate the configuration that all of these services will use. This will combine the upstream defaults, contents of `chi-in-a-box`, and your `site-config`, and template config files into `/etc/kolla/<service_name>`
 
     ```
     ./cc-ansible genconfig
@@ -76,13 +84,13 @@ You must have a user account on the machine with passwordless sudo.
 
     * If you've added additional configuration, this step can warn you about invalid or missing config values, before actually modifying any running containers.
     * Even if the step passes, you may want to inspect files under `/etc/kolla/` to make sure they match your expectations.
-9.  Finally, we want to deploy the containers for each service. This step will start each necessary container, including running one-off bootstrap steps. If you've updated any of the service configurations, this step will restart the relevant containers and apply that config.\
+10. Finally, we want to deploy the containers for each service. This step will start each necessary container, including running one-off bootstrap steps. If you've updated any of the service configurations, this step will restart the relevant containers and apply that config.\
     Technically, this step includes the `genconfig` step above, but it's mentioned separately for clarity.
 
     ```
     ./cc-ansible deploy
     ```
-10. If all the steps so far have passed, all the core services should now be running! However, this isn't everything needed for a useful cloud. `post-deploy` consists of all the steps that require a functioning control plane. These include:
+11. If all the steps so far have passed, all the core services should now be running! However, this isn't everything needed for a useful cloud. `post-deploy` consists of all the steps that require a functioning control plane. These include:
     1. Creating default networks
     2. Creating compute "flavors"
     3. Uploading default disk images for users to use
@@ -92,7 +100,7 @@ You must have a user account on the machine with passwordless sudo.
         ```
         ./cc-ansible post-deploy
         ```
-11. Use your site! You can access it by the following methods:
+12. Use your site! You can access it by the following methods:
     1.  Horizon is listening on 127.0.0.1:80, you can access it by forwarding your browser over SSH, for example via sshuttle. The username is `admin`, and the password can be viewed by running the following command:
 
         ```
