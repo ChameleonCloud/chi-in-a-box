@@ -97,6 +97,8 @@ glance_backends:
     type: "swift"
     enabled: "{{ glance_backend_swift | bool }}"
 
+glance_allow_anonymous_access: no
+
 # Hammers
 hammers_openstack_user: "{{ keystone_admin_user }}"
 hammers_openstack_password: "{{ keystone_admin_password }}"
