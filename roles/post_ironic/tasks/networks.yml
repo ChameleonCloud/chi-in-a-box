@@ -14,6 +14,7 @@
     name: michaelrigart.interfaces
   vars:
     interfaces_ether_interfaces: "{{ (ironic_interfaces | default([])) }}"
+  become: True
   when:
     - manage_ironic_gateway_interface | bool
     - enable_ironic | bool
