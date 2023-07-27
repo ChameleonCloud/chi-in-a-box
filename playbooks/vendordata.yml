@@ -1,5 +1,6 @@
 ---
 - hosts: vendordata
   roles: [vendordata]
+  become: true
   tags:
     - vendordata
