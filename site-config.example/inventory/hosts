@@ -503,7 +503,7 @@ ironic
 ironic
 
 [ironic-inspector:children]
-# Disabled; we use a separate mechanism for node property discovery
+ironic
 
 [ironic-pxe:children]
 ironic

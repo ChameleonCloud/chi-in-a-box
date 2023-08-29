@@ -164,10 +164,17 @@ ironic_provisioning_network: ironic-provisioning
 ironic_provisioning_network_cidr: 10.51.0.0/24
 ironic_provisioning_network_gateway: "{{ ironic_provisioning_network_cidr | ipaddr('next_usable') }}"
 ironic_cleaning_network: "{{ ironic_provisioning_network }}"
+ironic_inspection_network: "{{ ironic_provisioning_network }}"
 ironic_image_cache_size: 20480 # MB
 ironic_console_serial_speed: 115200n8
 encoded_ironic_pxe_root_password: "{{ ironic_pxe_root_password | password_hash('md5') |  regex_replace( '(\\$)', '$\\1') }}"
 ironic_pxe_append_params: nofb nomodeset vga=normal console=tty0 console=ttyS0,{{ ironic_console_serial_speed }} systemd.journald.forward_to_console=yes rootpwd="{{ encoded_ironic_pxe_root_password }}"
+
+# settings for ironic inspector
+
+# don't run standalone, always depend on glance+neutron+ironic.
+# this means inspector won't pxe boot devices itself, and doesn't need to serve boot files to nodes
+ironic_inspector_standalone: false
 
 # This can be "expensive"; allow setting it explicitly, but default to the prometheus interval
 ironic_send_sensor_data_interval: 60
