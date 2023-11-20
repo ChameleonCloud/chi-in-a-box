@@ -341,6 +341,7 @@ blazar_enable_device_plugin_k8s: "{{ enable_k3s | bool }}"
 enable_etcd: "{{ enable_zun | bool and not enable_k3s | bool }}"
 enable_kuryr: "{{ enable_zun | bool and not enable_k3s | bool }}"
 enable_zun_compute: "{{ enable_zun | bool and not enable_k3s | bool }}"
+blazar_zun_polling_monitor: true
 
 # OSG
 enable_osg: no
