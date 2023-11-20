@@ -76,6 +76,10 @@ blazar_network_default_resource_properties: '["=", "\$stitch_provider", "none"]'
 blazar_network_retry_without_default_resources: no
 blazar_floatingip_reservation_network_regex: "[pP]ublic"
 blazar_host_url_format: "https://chameleoncloud.org/hardware/node/sites/{{ chameleon_site_name }}/clusters/chameleon/nodes/{hypervisor_hostname}/"
+blazar_physical_polling_monitor: true
+blazar_physical_polling_monitor_dry_run: true
+blazar_fip_polling_monitor: true
+blazar_fip_polling_monitor_dry_run: true
 
 # Cinder
 enable_cinder: no
