@@ -80,6 +80,8 @@ blazar_physical_polling_monitor: true
 blazar_physical_polling_monitor_dry_run: true
 blazar_fip_polling_monitor: true
 blazar_fip_polling_monitor_dry_run: true
+blazar_network_polling_monitor: true
+blazar_network_polling_monitor_dry_run: true
 
 # Cinder
 enable_cinder: no
