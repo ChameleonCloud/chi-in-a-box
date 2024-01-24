@@ -12,6 +12,13 @@
     path: "{{ hammers_config_path }}"
     state: directory
 
+- name: Copy kubeconfig.yml file
+  become: yes
+  copy:
+    src: "{{ kubeconfig_path }}/kubeconfig.yml"
+    dest: "{{ hammers_kubeconfig_path }}"
+    mode: 0600
+
 - name: Configure Hammers docker bash wrapper
   become: yes
   template:

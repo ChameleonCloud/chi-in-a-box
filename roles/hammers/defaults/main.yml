@@ -2,6 +2,7 @@
 hammers_config_path: /etc/hammers
 hammers_docker_image: "ghcr.io/chameleoncloud/hammers:latest"
 hammers_env_file: /etc/hammers/hammers.env
+hammers_kubeconfig_path: /etc/hammers/kubeconfig.yml
 hammers_mysql_user: cc_hammers
 hammers_mysql_host: "{{ database_address }}"
 
@@ -61,5 +62,11 @@ hammers:
     cmd: "unutilized-lease-reaper delete"
     calendar: hourly
     enabled: "{{ enable_blazar | bool }}"
+
+  # Kubernetes/Edge
+  calico_ip_cleanup:
+    cmd: "k8s-calico-ip-cleanup --kubeconfig_path {{ hammers_kubeconfig_path }} --dry-run"
+    calendar: daily
+    enabled: "{{ enable_k3s | bool}}"
 
 hammers_slack_webhook: "{{ slack_api_url }}"
