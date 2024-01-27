@@ -12,12 +12,28 @@
     path: "{{ hammers_config_path }}"
     state: directory
 
-- name: Copy kubeconfig.yml file
-  become: yes
-  copy:
-    src: "{{ kubeconfig_path }}/kubeconfig.yml"
-    dest: "{{ hammers_kubeconfig_path }}"
-    mode: 0600
+- name: Configure kubeconfig for K8s hammers
+  block:
+  - name: Copy kubeconfig.yml file
+    become: yes
+    copy:
+      src: "{{ kubeconfig_path }}/kubeconfig.yml"
+      dest: "{{ hammers_kubeconfig_path }}"
+      mode: 0600
+
+  rescue:
+    - name: Create a placeholder kubeconfig.yml
+      become: yes
+      file:
+        path: "{{ hammers_kubeconfig_path }}"
+        state: touch
+        mode: 0600
+    - name: Add "placeholder" content to kubeconfig.yml
+      become: yes
+      lineinfile:
+        path: "{{ hammers_kubeconfig_path }}"
+        line: "placeholder"
+        create: yes
 
 - name: Configure Hammers docker bash wrapper
   become: yes
