@@ -65,7 +65,7 @@ hammers:
 
   # Kubernetes/Edge
   calico_ip_cleanup:
-    cmd: "k8s-calico-ip-cleanup --kubeconfig_path {{ hammers_kubeconfig_path }} --dry-run"
+    cmd: "k8s-calico-ip-cleanup --kubeconfig_path {{ hammers_kubeconfig_path }}"
     calendar: daily
     enabled: "{{ enable_k3s | bool}}"
 
