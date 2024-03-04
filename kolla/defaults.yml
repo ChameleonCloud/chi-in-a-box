@@ -99,6 +99,7 @@ glance_backends:
 hammers_openstack_user: "{{ keystone_admin_user }}"
 hammers_openstack_password: "{{ keystone_admin_password }}"
 hammers_openstack_project_name: "{{ keystone_admin_project }}"
+hammers_lease_stacking_action: "notify"
 
 # HAProxy
 enable_haproxy: yes
