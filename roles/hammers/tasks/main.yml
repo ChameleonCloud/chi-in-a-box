@@ -56,6 +56,13 @@
     mode: 0600
     dest: "{{ hammers_config_path }}/slack.json"
 
+- name: Configure lease stacking config file
+  become: yes
+  template:
+    src: lease-stacking.json.j2
+    mode: 0600
+    dest: "{{ hammers_config_path }}/lease-stacking-config.json"
+
 - name: Create MySQL user
   become: True
   kolla_toolbox:
