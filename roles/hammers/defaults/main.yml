@@ -4,10 +4,6 @@ hammers_docker_image: "{{ docker_registry }}/hammers:latest"
 hammers_env_file: /etc/hammers/hammers.env
 hammers_mysql_user: cc_hammers
 hammers_mysql_host: "{{ database_address }}"
-hammers_lease_stacking_notification_email: help@chameleoncloud.org
-hammers_lease_stacking_excluded_projects:
- - chameleon
- - openstack
 
 hammers:
   # Networking/Neutron
@@ -54,7 +50,7 @@ hammers:
     calendar: daily
     enabled: "{{ enable_blazar | bool }}"
   lease_stacking:
-    cmd: "lease-stack-notifier {{ hammers_lease_stacking_action }} {{ openstack_region_name}} --exclude_projects {% for project in hammers_lease_stacking_excluded_projects %}{{ project }} {% endfor %} --manager_email hammers_lease_stacking_notification_email"
+    cmd: "lease-stack-notifier notify --config {{ hammers_config_path }}/lease-stacking-config.json"
     calendar: daily
     enabled: "{{ enable_blazar | bool }}"
   clean_old_aggregates:
