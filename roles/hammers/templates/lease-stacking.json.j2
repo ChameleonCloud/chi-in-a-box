@@ -1,0 +1,15 @@
+{
+    "site": "{{ openstack_region_name }}",
+    "exclude_projects": [
+        "chameleon",
+        "openstack"
+    ],
+    "lease_coverage_threshold": 0.9,
+    "high_end_node_coverage_threshold": 0.5,
+    "minimum_lease_window_days": 21,
+    "min_nodes_for_coverage": 4,
+    "exclude_node_types": [],
+    "high_end_node_types": [],
+    "sender_email": "{{ hammer_lease_stacking_sender_email }}",
+    "manager_email": "{{ hammer_lease_stacking_manager_email }}"
+}

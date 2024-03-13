@@ -109,6 +109,8 @@ glance_allow_anonymous_access: no
 hammers_openstack_user: "{{ keystone_admin_user }}"
 hammers_openstack_password: "{{ keystone_admin_password }}"
 hammers_openstack_project_name: "{{ keystone_admin_project }}"
+hammer_lease_stacking_sender_email: ""
+hammer_lease_stacking_manager_email: ""
 
 # HAProxy
 enable_haproxy: yes

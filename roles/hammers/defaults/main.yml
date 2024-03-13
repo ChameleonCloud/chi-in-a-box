@@ -51,7 +51,7 @@ hammers:
     calendar: daily
     enabled: "{{ enable_blazar | bool }}"
   lease_stacking:
-    cmd: "lease-stack-reaper delete"
+    cmd: "lease-stack-notifier notify --config {{ hammers_config_path }}/lease-stacking-config.json"
     calendar: daily
     enabled: "{{ enable_blazar | bool }}"
   clean_old_aggregates:
