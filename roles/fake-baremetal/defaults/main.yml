@@ -1,0 +1,36 @@
+tenks_install_dir: ~/tenks
+ansible_roles_dir: "{{tenks_install_dir}}/ansible/roles"
+
+libvirt_pool_path: "{{ tenks_libvirt_pool_path | default('/var/lib/libvirt/tenks_pool/')}}"
+
+tenks_git_repo: https://github.com/ChameleonCloud/tenks
+
+tenks_ansible_galaxy_roles:
+  - role_name: stackhpc.libvirt-host
+    role_path: "{{tenks_install_dir}}/ansible/roles/stackhpc.libvirt-host"
+  - role_name: stackhpc.libvirt-vm
+    role_path: "{{tenks_install_dir}}/ansible/roles/stackhpc.libvirt-vm"
+
+shared_networks: "{{ neutron_networks | selectattr('sharednet', 'defined') | list }}"
+shared_network_physnet: "{{ shared_networks[0] if shared_networks }}"
+shared_network: "{{ shared_network_physnet.sharednet }}"
+
+provisioning_networks: "{{ neutron_networks | selectattr('provisioning', 'defined') | list }}"
+provisioning_network_physnet: "{{ provisioning_networks[0] if provisioning_networks }}"
+provisioning_network: "{{ provisioning_network_physnet.provisioning }}"
+
+tenks_provisoning_physnet:
+  name: "{{provisioning_network_physnet.name}}"
+  iface: "{{provisioning_network_physnet.external_interface}}b"
+tenks_sharednet_physnet:
+  name: "{{shared_network_physnet.name}}"
+  iface: "{{shared_network_physnet.external_interface}}b"
+
+ironic_deploy_image_names:
+  - pxe_deploy_kernel
+  - pxe_deploy_ramdisk
+
+fake_baremetal_node_ram_mb: 4096
+fake_baremetal_node_disk_gb: 10
+fake_baremetal_node_vcpu: 2
+fake_baremetal_node_count: 3

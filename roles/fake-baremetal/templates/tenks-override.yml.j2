@@ -1,0 +1,46 @@
+# override where tenks vm disks will be stored
+libvirt_pool_path: {{libvirt_pool_path}}
+
+physnet_mappings:
+  {{tenks_provisoning_physnet.name}}: {{tenks_provisoning_physnet.iface}}
+  {{tenks_sharednet_physnet.name}}: {{tenks_sharednet_physnet.iface}}
+
+bridge_type: "linuxbridge"
+
+# The Glance name or UUID of the image to use for the deployment kernel.
+deploy_kernel: {{ deploy_kernel_id }}
+# The Glance name or UUID of the image to use for the deployment ramdisk.
+deploy_ramdisk: {{ deploy_ramdisk_id }}
+
+node_types:
+  # The type name.
+  type0:
+    # The amount of RAM, in mebibytes.
+    memory_mb: {{fake_baremetal_node_ram_mb}}
+    # The number of virtual CPUs.
+    vcpus: {{fake_baremetal_node_vcpu}}
+    # A list of volumes, each with a capacity.
+    volumes:
+      - capacity: {{fake_baremetal_node_disk_gb}}GB
+    # A list of physical network names to connect to. These physical network
+    # names should be keyed in `physnet_mappings` in each hypervisor's host
+    # vars.
+
+    # note! only the first one listed will be used for PXE boot, and therefore must be ironic-provisioning!
+    physical_networks:
+      - {{tenks_provisoning_physnet.name}}
+      - {{tenks_sharednet_physnet.name}}
+
+specs:
+    # The type in `node_types` that this spec refers to. Required.
+  - type: type0
+    # The number of nodes to create of this spec. Required.
+    count: {{fake_baremetal_node_count}}
+    ironic_config:
+      # The resource class that nodes of this spec should use in Ironic.
+      # Required if `ironic_config` has been specified.
+      resource_class: baremetal
+
+nova_flavors:
+  - resource_class: baremetal
+    node_type: type0
