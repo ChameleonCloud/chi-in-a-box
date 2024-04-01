@@ -8,13 +8,23 @@ description: Minimal evaluation site with no compute services
 
 To get familiar with the setup procedures for chi-in-a-box, or to develop services, you can follow this (very) minimal setup guide.
 
-Note: This doesn't include support for HAProxy, TLS, or any compute services (Nova, Ironic, or Zun). Please don't use this guide for a production site, as it compromises security and reliability for simplicity.
+Note: This doesn't include support for TLS, or for communication outside of the single controller node. Services will be accessed via SSH tunnel or similar method.
 
 ## Prerequisites:
 
 Baremetal or Virtual Machine with 4 cores, 8 gb ram, 40gb disk.
-
 You must have a user account on the machine with passwordless sudo.
+
+If launching a VM on Chameleon to host this, follow the following steps.
+
+1. Launch an instance on KVM
+   flavor: m1.xlarge
+   image: CC-Ubuntu20.04
+   network: sharednet1
+2. Attach a floating IP
+3. Allow SSH via the floating IP
+4. SSH into the node as cc@floating-ip
+
 
 ## Installation
 
@@ -35,31 +45,41 @@ You must have a user account on the machine with passwordless sudo.
 
     <pre class="language-bash"><code class="lang-bash"><strong>export CC_ANSIBLE_SITE=/opt/site-config/
     </strong></code></pre>
-4.  Create a dummy loopback interface to bind services to. You can choose whatever interface name and IP you want. The name will be later used for the `network_interface` and the IP for `kolla_internal_vip_address` in the next step.
 
+4.  Create some veth-pairs to act as "dummy" network interfaces.
+
+    External API interface
     ```bash
-    ip link add name diab type dummy
-    ip addr add 10.100.100.1/32 dev diab
+    sudo ip link add name ext_api_veth type veth peer ext_api_vethb
+    sudo ip addr add 192.168.100.2/24 dev ext_api_veth
+    sudo ip link set ext_api_veth up
+    sudo ip link set ext_api_vethb up
     ```
-5.  &#x20;Edit `/opt/site-config/defaults.yml` to contain ONLY the following lines.
 
-    ```yaml
-    ---
-    kolla_base_distro: ubuntu
-    network_interface: diab
-    kolla_internal_vip_address: 10.100.100.1
-    enable_haproxy: no
-
-    # Disable central logging to reduce resource usage (no elasticsearch or kibana)
-    enable_central_logging: no
-    # Disable prometheus to speed up deployment
-    enable_prometheus: no
+    Internal API interface
+    ```bash
+    sudo ip link add name int_api_veth type veth peer int_api_vethb
+    sudo ip addr add 10.10.10.2/24 dev int_api_veth
+    sudo ip link set int_api_veth up
+    sudo ip link set int_api_vethb up
     ```
+
+    Neutron Provider Network interface
+    ```bash
+    sudo ip link add name neutron_veth type veth peer neutron_vethb
+    sudo ip link set neutron_veth up
+    sudo ip link set neutron_vethb up
+    ```
+
+5.  In your site-config, replace defaults.yml with the one for dev-in-a-box
+    `cp /opt/site-config/dev-in-a-box.yml /opt/site-config/defaults.yml`
+
 6.  Bootstrap the controller node, this will install apt packages, configure Docker, and modify /etc/hosts
 
     ```
     ./cc-ansible bootstrap-servers
     ```
+
 7.  Run prechecks to ensure common issues are avoided.
 
     ```
@@ -101,7 +121,12 @@ You must have a user account on the machine with passwordless sudo.
         ./cc-ansible post-deploy
         ```
 12. Use your site! You can access it by the following methods:
-    1.  Horizon is listening on 127.0.0.1:80, you can access it by forwarding your browser over SSH, for example via sshuttle. The username is `admin`, and the password can be viewed by running the following command:
+
+    1. All services are listening on the haproxy VIP on "ext_api_veth" interface, so you need a way to get to 192.168.100.0/24.
+       We recommend using `sshuttle` on your local machine, invoked as:
+       `sshuttle -r cc@<floating_ip_address> 192.168.100.0/24`
+
+    2.  HAProxy and thus Horizon are listening on 192.168.100.254:80, which you can access after starting sshuttle. The username is `admin`, and the password can be viewed by running the following command:
 
         ```
         ./cc-ansible view_passwords | grep "^keystone_admin_password"
