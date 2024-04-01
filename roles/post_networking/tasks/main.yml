@@ -1,7 +1,56 @@
 ---
-- name: configure public network and subnet
-  include_tasks: public.yml
-- name: configure shared tenant network(s) and subnet(s)
-  include_tasks: sharednet.yml
-- name: configure corsa nat interface
-  include_tasks: corsa_nat.yml
+- name: Ensuring post-deploy networks exist
+  with_dict: "{{ post_deploy_networks }}"
+  vars:
+    network: "{{ item.value }}"
+  kolla_toolbox:
+    module_name: os_network
+    module_args:
+      auth: "{{ openstack_auth }}"
+      project: "{{ keystone_admin_project }}"
+      name: "{{ network.name }}"
+      provider_network_type: "{{ network.provider_network_type }}"
+      provider_segmentation_id: "{{ network.provider_segmentation_id }}"
+      provider_physical_network: "{{ network.provider_physical_network }}"
+      external: "{{ network.external }}"
+      shared: "{{ network.shared }}"
+      state: present
+  become: true
+  run_once: True
+  when:
+    - item.value.enabled
+
+- name: Ensuring post-deploy subnets exist
+  with_dict: "{{ post_deploy_networks }}"
+  vars:
+    network: "{{ item.value }}"
+    subnet: "{{ item.value.subnet }}"
+  kolla_toolbox:
+    module_name: os_subnet
+    module_args:
+      auth: "{{ openstack_auth }}"
+      project: "{{ keystone_admin_project }}"
+      network_name: "{{ network.name }}"
+      name: "{{ subnet.name }}"
+      cidr: "{{ subnet.cidr }}"
+      gateway_ip: "{{ subnet.gateway_ip | default(omit) }}"
+      enable_dhcp: "{{ subnet.dhcp }}"
+      allocation_pool_start: "{{ subnet.allocation_pool_start }}"
+      allocation_pool_end: "{{ subnet.allocation_pool_end }}"
+  become: true
+  run_once: True
+  when:
+    - item.value.enabled
+
+- name: Create NAT router for shared network(s).
+  kolla_toolbox:
+    module_name: os_router
+    module_args:
+      auth: "{{ openstack_auth }}"
+      project: "{{ keystone_admin_project }}"
+      name: "{{ item.value.name }}"
+      interfaces: "{{ item.value.interfaces }}"
+      network: "{{ item.value.network }}"
+  become: true
+  run_once: True
+  with_dict: "{{ post_deploy_routers }}"

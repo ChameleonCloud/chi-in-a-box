@@ -1,14 +1,77 @@
+---
+
+# all of this section is only needed for backwards compatibility
 public_networks: "{{ neutron_networks | selectattr('public', 'defined') | list }}"
-# This is added for backwards compatibility
 named_public_networks: "{{ neutron_networks | selectattr('name', 'equalto', 'public') | list }}"
 all_public_networks: "{{ public_networks + named_public_networks }}"
-public_network: "{{ all_public_networks[0] if all_public_networks }}"
+public_network_physnet: "{{ all_public_networks[0] if all_public_networks }}"
+public_network: "{{ public_network_physnet.public }}"
 
 shared_networks: "{{ neutron_networks | selectattr('sharednet', 'defined') | list }}"
-shared_network: "{{ shared_networks[0] if shared_networks }}"
+shared_network_physnet: "{{ shared_networks[0] if shared_networks }}"
+shared_network: "{{ shared_network_physnet.sharednet }}"
 
-default_sharednet_name: sharednet1
-default_sharednet_cidr: 10.0.0.1/24
+provisioning_networks: "{{ neutron_networks | selectattr('provisioning', 'defined') | list }}"
+provisioning_network_physnet: "{{ provisioning_networks[0] if provisioning_networks }}"
+provisioning_network: "{{ provisioning_network_physnet.provisioning }}"
 
-# Default to using the external VIP interface for NAT
-corsa_nat_external_interface: "{{ kolla_external_vip_interface }}"
+
+# At this point, we've identified candidates for the public and shared networks,
+# and their physical networks, in a backwards compatible way.
+# We use the dicts below to set default values, as well as once that can be skipped
+# if omitted.
+
+post_deploy_networks:
+  default_public:
+    name: public
+    enabled: True
+    shared: false
+    external: true
+    provider_network_type: "{{ public_network.segment_type | default('flat') }}"
+    provider_segmentation_id: "{{ public_network.segment_id | default(omit) }}"
+    provider_physical_network: "{{ public_network_physnet.name | default('physnet1') }}"
+    subnet:
+      name: public_subnet
+      cidr: "{{ public_network.cidr }}"
+      gateway_ip: "{{ public_network.gateway }}"
+      dhcp: false
+      allocation_pool_start: "{{ public_network.ip_range_start }}"
+      allocation_pool_end: "{{ public_network.ip_range_end }}"
+  default_sharednet:
+    name: sharednet1
+    enabled: True
+    shared: true
+    external: false
+    provider_network_type: "{{ shared_network.segment_type | default('vlan') }}"
+    provider_segmentation_id: "{{ shared_network.segment_id | default(omit) }}"
+    provider_physical_network: "{{ shared_network_physnet.name | default('physnet1') }}"
+    subnet:
+      name: sharednet_subnet
+      cidr: "{{ shared_network.cidr | default('10.0.0.1/24')}}"
+      gateway_ip: "{{ shared_network.gateway | default(omit)}}"
+      dhcp: true
+      allocation_pool_start: "{{ shared_network.cidr | next_nth_usable(3) }}" # leave room for gw and dhcp
+      allocation_pool_end: "{{ shared_network.cidr | ipaddr('last_usable') }}"
+  ironic_provisioning:
+    name: ironic_provisioning
+    enabled: "{{ enable_ironic | bool }}"
+    shared: false
+    external: false
+    provider_network_type: "{{ provisioning_network.segment_type | default('vlan') }}"
+    provider_segmentation_id: "{{ provisioning_network.segment_id | default(omit) }}"
+    provider_physical_network: "{{ provisioning_network_physnet.name | default('physnet1') }}"
+    subnet:
+      name: ironic_provisioning_subnet
+      dhcp: true
+      cidr: "{{ provisioning_network.cidr | default('10.51.0.0/24' )}}"
+      gateway_ip: "{{ provisioning_network.cidr | next_nth_usable(1) }}"
+      allocation_pool_start: "{{ provisioning_network.cidr | next_nth_usable(3) }}" # leave room for gw and dhcp
+      allocation_pool_end: "{{ provisioning_network.cidr | ipaddr('last_usable') }}"
+
+
+post_deploy_routers:
+  sharednet_router:
+    name: sharednet_router
+    interfaces:
+      - "{{ post_deploy_networks.default_sharednet.subnet.name }}"
+    network: "{{ post_deploy_networks.default_public.name }}"

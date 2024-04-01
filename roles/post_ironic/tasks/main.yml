@@ -1,5 +1,4 @@
 ---
-- include_tasks: networks.yml
 - include_tasks: flavors.yml
 - include_tasks: images.yml
 - include_tasks: reservations.yml
