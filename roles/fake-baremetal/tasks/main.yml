@@ -1,0 +1,54 @@
+---
+- name: clone tenks git repo
+  ansible.builtin.git:
+    repo: https://github.com/openstack/tenks
+    dest: "{{ tenks_install_dir }}"
+
+- name: create venv and install build deps
+  ansible.builtin.pip:
+    name: pip
+    state: latest
+    virtualenv: "{{ tenks_install_dir }}/.venv/"
+
+- name: pip install tenks from git
+  ansible.builtin.pip:
+    name: "{{ tenks_install_dir }}/"
+    virtualenv: "{{ tenks_install_dir }}/.venv/"
+
+- name: Install tenks dependency roles from Ansible Galaxy
+  command: "ansible-galaxy install {{ item.role_name }} --roles-path={{ ansible_roles_dir }}"
+  args:
+    creates: "{{ item.role_path }}"
+  loop: "{{ tenks_ansible_galaxy_roles }}"
+
+- name: get facts for ironic images
+  kolla_toolbox:
+    module_name: openstack.cloud.image_info
+    module_args:
+      auth: "{{ openstack_auth }}"
+      image: "{{ item }}"
+  run_once: True
+  register: "image_info"
+  loop: "{{ ironic_deploy_image_names }}"
+
+- name: set facts for ironic images
+  vars:
+    deploy_kernel_img: "{{ image_info.results | selectattr('item', 'eq', 'pxe_deploy_kernel') | first }}"
+    deploy_ramdisk_img: "{{ image_info.results | selectattr('item', 'eq', 'pxe_deploy_ramdisk') | first }}"
+  ansible.builtin.set_fact:
+    deploy_kernel_id: "{{ deploy_kernel_img.image.id }}"
+    deploy_ramdisk_id: "{{ deploy_ramdisk_img.image.id }}"
+
+- name: template tenks overide file from site-config
+  ansible.builtin.template:
+    src: tenks-override.yml.j2
+    dest: "{{ tenks_install_dir }}/override.yml"
+
+- name: Tell operator to execute tenks
+  debug:
+    msg:
+      - source {{site_config_dir}}/admin-openrc.sh
+      - cd {{tenks_install_dir}}
+      - source .venv/bin/activate
+      - ansible-playbook --inventory ansible/inventory/ ansible/deploy.yml --extra-vars="@override.yml"
+      - ip addr add {{ provisioning_network_gw }} brtenks0

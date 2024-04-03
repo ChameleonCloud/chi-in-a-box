@@ -1,0 +1,29 @@
+tenks_install_dir: ~/tenks
+ansible_roles_dir: "{{tenks_install_dir}}/ansible/roles"
+
+tenks_ansible_galaxy_roles:
+  - role_name: stackhpc.libvirt-host
+    role_path: "{{tenks_install_dir}}/ansible/roles/stackhpc.libvirt-host"
+  - role_name: stackhpc.libvirt-vm
+    role_path: "{{tenks_install_dir}}/ansible/roles/stackhpc.libvirt-vm"
+
+shared_networks: "{{ neutron_networks | selectattr('sharednet', 'defined') | list }}"
+shared_network_physnet: "{{ shared_networks[0] if shared_networks }}"
+shared_network: "{{ shared_network_physnet.sharednet }}"
+
+provisioning_networks: "{{ neutron_networks | selectattr('provisioning', 'defined') | list }}"
+provisioning_network_physnet: "{{ provisioning_networks[0] if provisioning_networks }}"
+provisioning_network: "{{ provisioning_network_physnet.provisioning }}"
+
+provisioning_network_gw: "{{ provisioning_network.cidr | ansible.utils.ipaddr('next_usable') }}"
+
+tenks_provisoning_physnet:
+  name: "{{provisioning_network_physnet.name}}"
+  iface: "{{provisioning_network_physnet.external_interface}}b"
+tenks_sharednet_physnet:
+  name: "{{shared_network_physnet.name}}"
+  iface: "{{shared_network_physnet.external_interface}}b"
+
+ironic_deploy_image_names:
+  - pxe_deploy_kernel
+  - pxe_deploy_ramdisk

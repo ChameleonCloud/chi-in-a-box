@@ -850,3 +850,7 @@ control
 # Image
 [chameleon-image-tools:children]
 control
+
+# Development, fake baremetal hypervisor host using tenks
+[fake-baremetal:children]
+ironic

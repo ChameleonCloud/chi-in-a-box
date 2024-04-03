@@ -53,7 +53,7 @@ post_deploy_networks:
       allocation_pool_start: "{{ shared_network.cidr | next_nth_usable(3) }}" # leave room for gw and dhcp
       allocation_pool_end: "{{ shared_network.cidr | ipaddr('last_usable') }}"
   ironic_provisioning:
-    name: ironic_provisioning
+    name: ironic-provisioning
     enabled: "{{ enable_ironic | bool }}"
     shared: false
     external: false
