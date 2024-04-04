@@ -1,7 +1,7 @@
 ---
 - name: clone tenks git repo
   ansible.builtin.git:
-    repo: https://github.com/openstack/tenks
+    repo: "{{ tenks_git_repo }}"
     dest: "{{ tenks_install_dir }}"
 
 - name: create venv and install build deps
@@ -44,6 +44,27 @@
     src: tenks-override.yml.j2
     dest: "{{ tenks_install_dir }}/override.yml"
 
+
+- name: get facts for ironic-provisioning subnet
+  kolla_toolbox:
+    module_name: openstack.cloud.subnets_info
+    module_args:
+      auth: "{{ openstack_auth }}"
+      filters:
+        name: "ironic_provisioning_subnet"
+  run_once: True
+  register: "provisioning_subnet"
+
+# we're passing this to `ip addr add`, so we need it with the CIDR
+- name: set fact for ironic provisioning subnet
+  vars:
+    provisioning_subnet_return: "{{ provisioning_subnet.openstack_subnets | first }}"
+  ansible.builtin.set_fact:
+    provisioning_subnet_cidr: "{{ provisioning_subnet_return.cidr }}"
+    provisioning_subnet_prefix: "{{ provisioning_subnet_return.cidr | ipaddr('prefix')}}"
+    provisioning_subnet_gw: "{{ provisioning_subnet_return.gateway_ip }}"
+
+
 - name: Tell operator to execute tenks
   debug:
     msg:
@@ -51,4 +72,4 @@
       - cd {{tenks_install_dir}}
       - source .venv/bin/activate
       - ansible-playbook --inventory ansible/inventory/ ansible/deploy.yml --extra-vars="@override.yml"
-      - ip addr add {{ provisioning_network_gw }} brtenks0
+      - ip addr add {{ provisioning_subnet_gw }}/{{ provisioning_subnet_prefix }} brtenks0

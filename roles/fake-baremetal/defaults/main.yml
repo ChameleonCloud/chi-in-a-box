@@ -1,6 +1,8 @@
 tenks_install_dir: ~/tenks
 ansible_roles_dir: "{{tenks_install_dir}}/ansible/roles"
 
+tenks_git_repo: https://github.com/ChameleonCloud/tenks
+
 tenks_ansible_galaxy_roles:
   - role_name: stackhpc.libvirt-host
     role_path: "{{tenks_install_dir}}/ansible/roles/stackhpc.libvirt-host"
@@ -14,8 +16,6 @@ shared_network: "{{ shared_network_physnet.sharednet }}"
 provisioning_networks: "{{ neutron_networks | selectattr('provisioning', 'defined') | list }}"
 provisioning_network_physnet: "{{ provisioning_networks[0] if provisioning_networks }}"
 provisioning_network: "{{ provisioning_network_physnet.provisioning }}"
-
-provisioning_network_gw: "{{ provisioning_network.cidr | ansible.utils.ipaddr('next_usable') }}"
 
 tenks_provisoning_physnet:
   name: "{{provisioning_network_physnet.name}}"
