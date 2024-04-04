@@ -31,6 +31,7 @@
       image: "{{ item }}"
   run_once: True
   register: "image_info"
+  become: True
   loop: "{{ ironic_deploy_image_names }}"
 
 - name: set facts for ironic images
@@ -55,6 +56,7 @@
       filters:
         name: "ironic_provisioning_subnet"
   run_once: True
+  become: True
   register: "provisioning_subnet"
 
 # we're passing this to `ip addr add`, so we need it with the CIDR
