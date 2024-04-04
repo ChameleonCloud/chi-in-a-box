@@ -201,9 +201,14 @@ sudo ip addr add 10.205.10.1/24 dev brtenks0
       ```
       Note: to exit this shell, press `ctrl+]`
 
-14. Download some real images to use! Since our site-config and post-deploy enabled the chameleon image downloader, we just need to trigger it.
+14. Download some real images to use! To avoid downloading "all" the images, we'll manually invoke the chameleon image download tool.
     ```
-    sudo systemctl start --no-block image_deploy.service
+    sudo docker run --rm --net=host \
+        -v "/etc/chameleon_image_tools/site.yaml:/etc/chameleon_image_tools/site.yaml" \
+        ghcr.io/chameleoncloud/chameleon_image_tools:latest \
+        deploy \
+            --site-yaml /etc/chameleon_image_tools/site.yaml \
+            --latest ubuntu jammy base;
     ```
     After a little while, you'll start seeing images like `CC-Ubuntu22.04` in the output of `openstack image list`
 

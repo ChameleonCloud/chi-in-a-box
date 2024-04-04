@@ -51,8 +51,8 @@ neutron_networks:
 enable_central_logging: false
 enable_prometheus: false
 
-# enable image subscription
-enable_image_deployer: true
+# enable image subscription. Make sure you have enough disk space before turning it on!
+# enable_image_deployer: true
 
 # fake baremetal node config
 fake_baremetal_node_ram_mb: 4096
