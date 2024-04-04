@@ -17,25 +17,42 @@ kolla_external_vip_address: "192.168.100.254"
 #kolla_external_fqdn: "{{ kolla_external_vip_address }}"
 
 
+# Note! This configuration does NOT invoke networking-generic-switch.
+# It assumes only "flat" networks are available, with a separate physnet
+# per neutron network. This is due to the networking limitation for "tenks"
+# virtual baremetal nodes. A regular chi-in-a-box site would be configured
+# with vlan networks, allowing users to create per-tenant isolated networks.
+
 neutron_networks:
 - name: physnet1
   bridge_name: br_physnet1
-  external_interface: neutron_veth
-  on_demand_vlan_ranges:
-    - 200:250
-  reservable_vlan_ranges:
-    - 251:300
+  external_interface: physnet1_veth
   public:
+    segment_type: flat
     cidr: 192.168.100.0/24
-    allocation_pools:
-      - start: 192.168.100.20
-        end: 192.168.100.200
+    gateway: 192.168.100.1
+    ip_range_start: 192.168.100.20
+    ip_range_end: 192.168.100.200
+- name: physnet2
+  bridge_name: br_physnet2
+  external_interface: physnet2_veth
   sharednet:
+    segment_type: flat
     cidr: 10.200.10.0/22
-    allocation_pools:
-      - start: 10.200.10.20
-        end: 10.200.12.21
+- name: physnet3
+  bridge_name: br_physnet3
+  external_interface: physnet3_veth
+  provisioning:
+    segment_type: flat
+    cidr: 10.205.10.0/24
 
 
-# disable
+# disable to speed up deployment
 enable_central_logging: false
+enable_prometheus: false
+
+# fake baremetal node config
+fake_baremetal_node_ram_mb: 4096
+fake_baremetal_node_disk_gb: 10
+fake_baremetal_node_vcpu: 2
+fake_baremetal_node_count: 1

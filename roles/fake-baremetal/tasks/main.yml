@@ -6,11 +6,13 @@
 
 - name: create venv and install build deps
   ansible.builtin.pip:
-    name: pip
-    state: latest
     virtualenv: "{{ tenks_install_dir }}/.venv/"
+    state: latest
+    name:
+      - pip
+      - wheel
 
-- name: pip install tenks from git
+- name: pip install tenks from the git checkout
   ansible.builtin.pip:
     name: "{{ tenks_install_dir }}/"
     virtualenv: "{{ tenks_install_dir }}/.venv/"

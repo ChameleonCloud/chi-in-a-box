@@ -27,3 +27,8 @@ tenks_sharednet_physnet:
 ironic_deploy_image_names:
   - pxe_deploy_kernel
   - pxe_deploy_ramdisk
+
+fake_baremetal_node_ram_mb: 4096
+fake_baremetal_node_disk_gb: 10
+fake_baremetal_node_vcpu: 2
+fake_baremetal_node_count: 3

@@ -43,8 +43,8 @@ If launching a VM on Chameleon to host this, follow the following steps.
     ```
 3.  export an env var so you don't need to type "--site" for the remaining commands
 
-    <pre class="language-bash"><code class="lang-bash"><strong>export CC_ANSIBLE_SITE=/opt/site-config/
-    </strong></code></pre>
+    <pre class="language-bash"><code class="lang-bash">export CC_ANSIBLE_SITE=/opt/site-config/
+    </code></pre>
 
 4.  Create some veth-pairs to act as "dummy" network interfaces.
 
@@ -64,15 +64,26 @@ If launching a VM on Chameleon to host this, follow the following steps.
     sudo ip link set int_api_vethb up
     ```
 
-    Neutron Provider Network interface
+    Neutron Provider Network interfaces
     ```bash
-    sudo ip link add name neutron_veth type veth peer neutron_vethb
-    sudo ip link set neutron_veth up
-    sudo ip link set neutron_vethb up
+    sudo ip link add name physnet1_veth type veth peer physnet1_vethb
+    sudo ip link set physnet1_veth up
+    sudo ip link set physnet1_vethb up
+
+    sudo ip link add name physnet2_veth type veth peer physnet2_vethb
+    sudo ip link set physnet2_veth up
+    sudo ip link set physnet2_vethb up
+
+    sudo ip link add name physnet3_veth type veth peer physnet3_vethb
+    sudo ip link set physnet3_veth up
+    sudo ip link set physnet3_vethb up
     ```
 
 5.  In your site-config, replace defaults.yml with the one for dev-in-a-box
-    `cp /opt/site-config/dev-in-a-box.yml /opt/site-config/defaults.yml`
+
+    ```
+    cp /opt/site-config/dev-in-a-box.yml /opt/site-config/defaults.yml
+    ```
 
 6.  Bootstrap the controller node, this will install apt packages, configure Docker, and modify /etc/hosts
 
@@ -111,16 +122,43 @@ If launching a VM on Chameleon to host this, follow the following steps.
     ./cc-ansible deploy
     ```
 11. If all the steps so far have passed, all the core services should now be running! However, this isn't everything needed for a useful cloud. `post-deploy` consists of all the steps that require a functioning control plane. These include:
-    1. Creating default networks
-    2. Creating compute "flavors"
-    3. Uploading default disk images for users to use
-    4. Installing various hammers and other utility services/cron-jobs.
-    5.  To run this step, execute:
+    * Creating default networks
+    * Creating compute "flavors"
+    * Uploading default disk images for users to use
+    * Installing various hammers and other utility services/cron-jobs.
+    To run this step, execute:
+    ```
+    ./cc-ansible post-deploy
+    ```
 
-        ```
-        ./cc-ansible post-deploy
-        ```
-12. Use your site! You can access it by the following methods:
+12. Now, we'll create some "virtual" baremetal nodes, used to test out the site. These are just VMs run with libvirt, but are
+configured via IPMI and pxe network booted like a baremetal node, so we can exercise Ironic. The following playbook will install and configure the `tenks` utility to accomplish this. At the end of the invocation, it will print out some commands for you to run yourself to finish the setup.
+
+```
+./cc-ansible --playbook playbooks/fake_baremetal.yml
+```
+
+13. Run the commands to bring up tenks. They will look something like the following, but may vary if you've changed your site-config from what's included here.
+
+```
+cd ~/tenks
+source .venv/bin/activate # activate tenks virtualenv
+source /opt/site-config/admin-openrc.sh # source admin credentials to enroll nodes
+
+ansible-playbook \
+    --inventory ansible/inventory/ \
+    ansible/deploy.yml \
+    --extra-vars="@override.yml"
+```
+
+Once it's finished, we'll need to add an IP address to the bridge it attached
+for the ironic-provisioning network.
+
+```
+sudo ip addr add 10.205.10.1/24 brtenks0
+```
+
+14. Access your site! You can access it by the following methods:
 
     1. All services are listening on the haproxy VIP on "ext_api_veth" interface, so you need a way to get to 192.168.100.0/24.
        We recommend using `sshuttle` on your local machine, invoked as:

@@ -13,12 +13,12 @@ node_types:
   # The type name.
   type0:
     # The amount of RAM, in mebibytes.
-    memory_mb: 4096
+    memory_mb: {{fake_baremetal_node_ram_mb}}
     # The number of virtual CPUs.
-    vcpus: 2
+    vcpus: {{fake_baremetal_node_vcpu}}
     # A list of volumes, each with a capacity.
     volumes:
-      - capacity: 10GB
+      - capacity: {{fake_baremetal_node_disk_gb}}GB
     # A list of physical network names to connect to. These physical network
     # names should be keyed in `physnet_mappings` in each hypervisor's host
     # vars.
@@ -32,7 +32,7 @@ specs:
     # The type in `node_types` that this spec refers to. Required.
   - type: type0
     # The number of nodes to create of this spec. Required.
-    count: 3
+    count: {{fake_baremetal_node_count}}
     ironic_config:
       # The resource class that nodes of this spec should use in Ironic.
       # Required if `ironic_config` has been specified.
@@ -41,4 +41,3 @@ specs:
 nova_flavors:
   - resource_class: my_rc
     node_type: type0
-
