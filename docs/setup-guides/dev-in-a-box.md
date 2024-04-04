@@ -12,7 +12,10 @@ Note: This doesn't include support for TLS, or for communication outside of the 
 
 ## Prerequisites:
 
-Baremetal or Virtual Machine with 4 cores, 8 gb ram, 40gb disk.
+Baremetal or Virtual Machine with 8 cores, 16gb ram, 80gb disk.
+This is roughly double the minimum for just control-plane services, as we will also be using
+these resources to host  "virtual" baremetal nodes.
+
 You must have a user account on the machine with passwordless sudo.
 
 If launching a VM on Chameleon to host this, follow the following steps.
@@ -22,7 +25,7 @@ If launching a VM on Chameleon to host this, follow the following steps.
    image: CC-Ubuntu20.04
    network: sharednet1
 2. Attach a floating IP
-3. Allow SSH via the floating IP
+3. Allow SSH via the floating IP (by applying the appropriate security group)
 4. SSH into the node as cc@floating-ip
 
 
@@ -77,6 +80,17 @@ If launching a VM on Chameleon to host this, follow the following steps.
     sudo ip link add name physnet3_veth type veth peer physnet3_vethb
     sudo ip link set physnet3_veth up
     sudo ip link set physnet3_vethb up
+    ```
+
+    We also want to make sure these intefaces aren't filtered by any firewalls.
+    If you're using firewalld, then the following commands will do it:
+
+    Here, `ens3` is our external facing interface, so we don't want to keep it
+    firewalled for safety, but open up everything else.
+
+    ```
+    sudo firewall-cmd --zone=public --add-interface=ens3
+    sudo firewall-cmd --set-default-zone trusted
     ```
 
 5.  In your site-config, replace defaults.yml with the one for dev-in-a-box
@@ -155,8 +169,54 @@ Once it's finished, we'll need to add an IP address to the bridge it attached
 for the ironic-provisioning network.
 
 ```
-sudo ip addr add 10.205.10.1/24 brtenks0
+sudo ip addr add 10.205.10.1/24 dev brtenks0
 ```
+
+14. At this point, it should all be up and running! Try out one of the "baremetal nodes"
+
+    * `openstack baremetal node list`
+      ```
+      +--------------------------------------+------+---------------+-------------+--------------------+-------------+
+      | UUID                                 | Name | Instance UUID | Power State | Provisioning State | Maintenance |
+      +--------------------------------------+------+---------------+-------------+--------------------+-------------+
+      | 44d0ac06-77d6-4444-93ce-7c8db5b54fff | tk0  | None          | power off   | available          | False       |
+      +--------------------------------------+------+---------------+-------------+--------------------+-------------+
+      ```
+    * let's trigger an inspection.
+      ```
+      openstack baremetal node manage tk0
+      openstack baremetal node inspect tk0
+      ```
+    * to see what's happening on the controller:
+      ```
+      sudo tail -f /var/log/kolla/ironic/ironic-conductor.log
+      ```
+    * once you see a line like
+      > Successfully set node 44d0ac06-77d6-4444-93ce-7c8db5b54fff power state to power on by power on.
+
+      this means that the VM has been successfully "powered on".
+    * to watch the machine's "serial console", execute:
+      ```
+      sudo virsh console tk0
+      ```
+      Note: to exit this shell, press `ctrl+]`
+
+14. Download some real images to use! Since our site-config and post-deploy enabled the chameleon image downloader, we just need to trigger it.
+    ```
+    sudo systemctl start --no-block image_deploy.service
+    ```
+    After a little while, you'll start seeing images like `CC-Ubuntu22.04` in the output of `openstack image list`
+
+15. Lets launch a real instance. NOTE!: At this point, we've configured the node in ironic, but NOT in blazar, so we can launch instances without a reservation.
+    * Our node should have finished inspection, so we'll need to move it from `manageable` back to `available`
+      ```
+      openstack baremetal node provide tk0
+      ```
+    * Now that it's "available", we can launch a server on it.
+      ```
+      openstack server create --flavor my_rc --image CC-Ubuntu22.04 --network sharednet1 test-instance
+      ```
+      If you access the console again via `sudo virsh console tk0`, you should see the image get written to disk, then the VM reboot into the final image.
 
 14. Access your site! You can access it by the following methods:
 
