@@ -46,6 +46,8 @@ neutron_networks:
     segment_type: flat
     cidr: 10.205.10.0/24
 
+# path on the system where glance images will be stored
+glance_file_datadir_volume: /var/lib/glance
 
 # disable to speed up deployment
 enable_central_logging: false
@@ -54,7 +56,11 @@ enable_prometheus: false
 # enable image subscription. Make sure you have enough disk space before turning it on!
 # enable_image_deployer: true
 
-# fake baremetal node config
+# fake baremetal node installation overrides
+tenks_install_dir: /opt/tenks
+tenks_libvirt_pool_path: /var/lib/libvirt/tenks_pool/
+
+# fake baremetal node vm config
 fake_baremetal_node_ram_mb: 4096
 fake_baremetal_node_disk_gb: 10
 fake_baremetal_node_vcpu: 2

@@ -1,3 +1,6 @@
+# override where tenks vm disks will be stored
+libvirt_pool_path: {{libvirt_pool_path}}
+
 physnet_mappings:
   {{tenks_provisoning_physnet.name}}: {{tenks_provisoning_physnet.iface}}
   {{tenks_sharednet_physnet.name}}: {{tenks_sharednet_physnet.iface}}
@@ -39,5 +42,5 @@ specs:
       resource_class: my_rc
 
 nova_flavors:
-  - resource_class: my_rc
+  - resource_class: baremetal
     node_type: type0
