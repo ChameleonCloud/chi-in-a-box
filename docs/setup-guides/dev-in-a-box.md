@@ -154,7 +154,7 @@ configured via IPMI and pxe network booted like a baremetal node, so we can exer
 11. Run the commands to bring up tenks. They will look something like the following, but may vary if you've changed your site-config from what's included here.
 
 ```
-cd ~/tenks
+cd /opt/tenks
 source .venv/bin/activate # activate tenks virtualenv
 source /opt/site-config/admin-openrc.sh # source admin credentials to enroll nodes
 
