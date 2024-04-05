@@ -116,26 +116,25 @@ If launching a VM on Chameleon to host this, follow the following steps.
         ```
         sudo systemctl disable --now nscd.service
         ```
-8.  Next, we'll pull container images for all configured services. This is done by running:
-
-    ```
-    ./cc-ansible pull
-    ```
-9.  We now need to generate the configuration that all of these services will use. This will combine the upstream defaults, contents of `chi-in-a-box`, and your `site-config`, and template config files into `/etc/kolla/<service_name>`
-
-    ```
-    ./cc-ansible genconfig
-    ```
-
-    * If you've added additional configuration, this step can warn you about invalid or missing config values, before actually modifying any running containers.
-    * Even if the step passes, you may want to inspect files under `/etc/kolla/` to make sure they match your expectations.
-10. Finally, we want to deploy the containers for each service. This step will start each necessary container, including running one-off bootstrap steps. If you've updated any of the service configurations, this step will restart the relevant containers and apply that config.\
-    Technically, this step includes the `genconfig` step above, but it's mentioned separately for clarity.
-
+8. At this point, we should be ready to "deploy".
     ```
     ./cc-ansible deploy
     ```
-11. If all the steps so far have passed, all the core services should now be running! However, this isn't everything needed for a useful cloud. `post-deploy` consists of all the steps that require a functioning control plane. These include:
+   Deploy is a composite action, executing the following sub-actions:
+   * `pull`: download relevant docker container images.
+
+     Deploy will not pull newer images if one is in the cache already. You can execute `pull` directly if you need to explicitly pull a newer version.
+
+   * `genconfig`: template and copy config files into /etc/kolla, but don't restart services to apply yet
+
+     This will combine the upstream defaults, contents of `chi-in-a-box`, and your `site-config`, and template config files into `/etc/kolla/<service_name>`.
+     If you've added additional configuration, this step can warn you about invalid or missing config values, before actually modifying any running containers.
+     Even if the step passes, you may want to inspect files under `/etc/kolla/` to make sure they match your expectations.
+
+
+   * `deploy-containers`: check and if necessary update running containers. This can be run separately if you want to make sure containers are running, but explicitly don't want to touch the templated configuration, for example if you've made edits to your site config, or temporary changes directly in /etc/kolla.
+
+9. If all the steps so far have passed, all the core services should now be running! However, this isn't everything needed for a useful cloud. `post-deploy` consists of all the steps that require a functioning control plane. These include:
     * Creating default networks
     * Creating compute "flavors"
     * Uploading default disk images for users to use
@@ -145,14 +144,14 @@ If launching a VM on Chameleon to host this, follow the following steps.
     ./cc-ansible post-deploy
     ```
 
-12. Now, we'll create some "virtual" baremetal nodes, used to test out the site. These are just VMs run with libvirt, but are
+10. Now, we'll create some "virtual" baremetal nodes, used to test out the site. These are just VMs run with libvirt, but are
 configured via IPMI and pxe network booted like a baremetal node, so we can exercise Ironic. The following playbook will install and configure the `tenks` utility to accomplish this. At the end of the invocation, it will print out some commands for you to run yourself to finish the setup.
 
 ```
 ./cc-ansible --playbook playbooks/fake_baremetal.yml
 ```
 
-13. Run the commands to bring up tenks. They will look something like the following, but may vary if you've changed your site-config from what's included here.
+11. Run the commands to bring up tenks. They will look something like the following, but may vary if you've changed your site-config from what's included here.
 
 ```
 cd ~/tenks
@@ -172,7 +171,7 @@ for the ironic-provisioning network.
 sudo ip addr add 10.205.10.1/24 dev brtenks0
 ```
 
-14. At this point, it should all be up and running! Try out one of the "baremetal nodes"
+12. At this point, it should all be up and running! Try out one of the "baremetal nodes"
 
     * `openstack baremetal node list`
       ```
@@ -201,7 +200,7 @@ sudo ip addr add 10.205.10.1/24 dev brtenks0
       ```
       Note: to exit this shell, press `ctrl+]`
 
-14. Download some real images to use! To avoid downloading "all" the images, we'll manually invoke the chameleon image download tool.
+13. Download some real images to use! To avoid downloading "all" the images, we'll manually invoke the chameleon image download tool.
     ```
     sudo docker run --rm --net=host \
         -v "/etc/chameleon_image_tools/site.yaml:/etc/chameleon_image_tools/site.yaml" \
@@ -212,18 +211,18 @@ sudo ip addr add 10.205.10.1/24 dev brtenks0
     ```
     After a little while, you'll start seeing images like `CC-Ubuntu22.04` in the output of `openstack image list`
 
-15. Lets launch a real instance. NOTE!: At this point, we've configured the node in ironic, but NOT in blazar, so we can launch instances without a reservation.
+14. Lets launch a real instance. NOTE!: At this point, we've configured the node in ironic, but NOT in blazar, so we can launch instances without a reservation.
     * Our node should have finished inspection, so we'll need to move it from `manageable` back to `available`
       ```
       openstack baremetal node provide tk0
       ```
     * Now that it's "available", we can launch a server on it.
       ```
-      openstack server create --flavor my_rc --image CC-Ubuntu22.04 --network sharednet1 test-instance
+      openstack server create --flavor baremetal --image CC-Ubuntu22.04 --network sharednet1 test-instance
       ```
       If you access the console again via `sudo virsh console tk0`, you should see the image get written to disk, then the VM reboot into the final image.
 
-14. Access your site! You can access it by the following methods:
+15. Access your site! You can access it by the following methods:
 
     1. All services are listening on the haproxy VIP on "ext_api_veth" interface, so you need a way to get to 192.168.100.0/24.
        We recommend using `sshuttle` on your local machine, invoked as:
