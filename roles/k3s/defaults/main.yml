@@ -1,5 +1,5 @@
 ---
-k3s_version: v1.22.5+k3s1
+k3s_version: v1.23.17+k3s1
 k3s_port: 6443
 k3s_server_location: /var/lib/rancher/k3s
 k3s_conf_location: /etc/rancher/k3s
