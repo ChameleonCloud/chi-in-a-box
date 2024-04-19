@@ -29,11 +29,6 @@ spec:
     # which adds a 20-byte overhead. The underlying Wireguard interface has an MTU of
     # 1420 configured, so we subtract 20 to get 1400.
     mtu: 1400
-  # TODO(jason): remove this when we have a pull-through cache deployed
-  # Pull control plane images for Calico from our private registry to avoid rate limits.
-  imagePullSecrets:
-    - name: chi-readonly-secret
-      registry: docker.chameleoncloud.org/
 
 ---
 
@@ -44,4 +39,3 @@ kind: APIServer
 metadata:
   name: default
 spec: {}
-
