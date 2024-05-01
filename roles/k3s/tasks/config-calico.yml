@@ -56,9 +56,7 @@
 
 - name: Apply Calico global network policies
   delegate_to: "{{ groups['deployment'][0] }}"
-  kubernetes.core.k8s:
-    state: present
-    src: calico-global-networkpolicy-{{ item }}.yaml
+  shell: kubectl calico create --filename="{{ role_path }}/files/calico-global-networkpolicy-{{ item }}.yaml"
   loop:
     - default-deny
     - allow-ping
