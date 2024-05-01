@@ -83,6 +83,10 @@ blazar_fip_polling_monitor_dry_run: true
 blazar_network_polling_monitor: true
 blazar_network_polling_monitor_dry_run: true
 
+# enable to use https://github.com/ChameleonCloud/nova/pull/9
+# workaround for https://bugs.launchpad.net/nova/+bug/1542491
+use_blazar_prefilter: false
+
 # Cinder
 enable_cinder: no
 
@@ -109,8 +113,8 @@ glance_allow_anonymous_access: no
 hammers_openstack_user: "{{ keystone_admin_user }}"
 hammers_openstack_password: "{{ keystone_admin_password }}"
 hammers_openstack_project_name: "{{ keystone_admin_project }}"
-hammer_lease_stacking_sender_email: ""
-hammer_lease_stacking_manager_email: ""
+hammer_lease_stacking_sender_email: "noreply@chameleoncloud.org"
+hammer_lease_stacking_manager_email: "mtrichardson@uchicago.edu"
 
 # HAProxy
 enable_haproxy: yes
