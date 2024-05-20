@@ -25,3 +25,7 @@ ironic_glance_images:
     container_format: aki
     disk_format: aki
     url: "https://tarballs.opendev.org/openstack/ironic-python-agent/dib/files/ipa-centos8-stable-{{ openstack_release }}.initramfs"
+  - name: cirros-0.6.2
+    container_format: bare
+    disk_format: qcow2
+    url: "http://download.cirros-cloud.net/0.6.2/cirros-0.6.2-x86_64-disk.img"
