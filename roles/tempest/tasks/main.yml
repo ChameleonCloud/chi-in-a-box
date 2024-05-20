@@ -1,0 +1,43 @@
+---
+- name: clone tempest git repo
+  ansible.builtin.git:
+    repo: "{{ tempest_git_repo }}"
+    dest: "{{ tempest_install_dir }}"
+
+- name: create venv and install build deps
+  ansible.builtin.pip:
+    virtualenv: "{{ tempest_install_dir }}/.venv/"
+    state: latest
+    name:
+      - pip
+      - wheel
+
+- name: pip install tempest from the git checkout
+  ansible.builtin.pip:
+    name: "{{ tempest_install_dir }}/"
+    virtualenv: "{{ tempest_install_dir }}/.venv/"
+
+- name: template tempest.conf from site-config
+  template:
+    src: "tempest.conf.j2"
+    dest: "~/.tempest/etc/tempest.conf"
+
+- name: initialize tempest workspace
+  ansible.builtin.command:
+    chdir: "{{ tempest_install_dir }}"
+    argv: 
+      - .venv/bin/tempest
+      -  init 
+      - --name 
+      - local
+      - "{{ local_site_workspace}}"
+    creates: "{{ local_site_workspace }}/etc/tempest.conf"
+    
+- name: initialize tempest saved state
+  ansible.builtin.command:
+    chdir: "{{ local_site_workspace }}"
+    argv: 
+      - ../../.venv/bin/tempest
+      - cleanup
+      - --init-saved-state
+    creates: "{{ local_site_workspace }}/saved_state.json"

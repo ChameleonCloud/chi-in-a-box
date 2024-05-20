@@ -1,0 +1,13 @@
+tempest_install_dir: ~/tempest
+tempest_git_repo: https://github.com/openstack/tempest
+
+tempest_workspace_root: "{{ tempest_install_dir }}/workspaces"
+local_site_workspace: "{{ tempest_workspace_root }}/local"
+
+
+# these 4 parameters should be fetched from openstack API, values set dynamically during post-deploy
+# tempest_compute_image_uuid: "44604156-812a-4ebb-89f8-73706079c440" # ubuntu
+tempest_compute_image_uuid: "1f220529-03f1-4db1-afee-38eb6b68596f" # cirros
+tempest_baremetal_flavor_uuid: "4b9e8084-a114-4e42-b5ed-75337ec3db3c"
+tempest_fixed_network_name: "sharednet1"
+tempest_public_network_uuid: "2d51de94-20a9-44be-9285-9ad5a601ffeb"

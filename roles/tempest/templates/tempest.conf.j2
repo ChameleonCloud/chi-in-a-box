@@ -1,0 +1,88 @@
+[auth]
+
+# disabled due to flat networks in dev-in-a-box
+create_isolated_networks = false
+
+# don't use in prod!!
+use_dynamic_credentials = true
+
+admin_username = "{{ keystone_admin_user }}"
+admin_project_name = "{{ keystone_admin_project }}"
+admin_password = "{{ keystone_admin_password }}"
+admin_domain_name = Default
+admin_user_domain_name = Default
+admin_project_domain_name = Default
+
+[identity]
+
+uri_v3 = "{{ keystone_public_url }}/v3"
+auth_version = v3
+region = "{{ openstack_region_name }}"
+
+[service_available]
+cinder = "{{ enable_cinder }}"
+neutron = true
+glance = true
+swift = false
+nova = true
+horizon = true
+
+[compute]
+
+image_ref = "{{ tempest_compute_image_uuid }}"
+image_ref_alt = "{{ tempest_compute_image_uuid }}"
+flavor_ref = "{{ tempest_baremetal_flavor_uuid }}"
+
+fixed_network_name = "{{ tempest_fixed_network_name }}"
+
+[compute-feature-enabled]
+
+# must match value in nova.conf
+scheduler_enabled_filters = ComputeFilter,ComputeCapabilitiesFilter,ImagePropertiesFilter,BlazarFilter
+
+metadata_service = true
+interface_attach = true
+config_drive = true
+serial_console = true
+
+# not currently working with our ironic config
+rescue = false
+
+# Do these work??
+#disk_config = true
+#enable_instance_password = false
+#change_password = false
+#personality = false
+#unified_limits = false
+
+## VM only features, not applicable for barmetal
+snapshot = false
+resize = false
+pause = false
+shelve = false
+shelve_migrate = false
+suspend = false
+cold_migration = false
+live_migration = false
+live_migrate_back_and_forth = false
+vnc_console = false
+attach_encrypted_volume = false
+swap_volume = false
+volume_backed_live_migration = false
+volume_multiattach = false
+
+[network]
+project_networks_reachable = false
+public_network_id = "{{ tempest_public_network_uuid }}"
+
+project_network_cidr = 10.100.0.0/16
+project_network_mask_bits = 28
+
+[network-feature-enabled]
+ipv6 = false
+
+api_extensions = address-group,address-scope,router-admin-state-down-before-update,agent,agent-resources-synced,allowed-address-pairs,auto-allocated-topology,availability_zone,availability_zone_filter,default-subnetpools,dhcp_agent_scheduler,dvr,empty-string-filtering,external-net,extra_dhcp_opt,extraroute,extraroute-atomic,filter-validation,fip-port-details,flavors,floatingip-pools,ip-substring-filtering,router,ext-gw-mode,l3-ha,l3-flavors,l3-port-ip-change-not-allowed,l3_agent_scheduler,multi-provider,net-mtu,net-mtu-writable,network_availability_zone,network-ip-availability,network-segment-range,pagination,port-device-profile,port-mac-address-regenerate,port-numa-affinity-policy,binding,binding-extended,port-security,project-id,provider,quotas,quota_details,rbac-policies,rbac-address-group,rbac-address-scope,rbac-security-groups,rbac-subnetpool,revision-if-match,standard-attr-revisions,router_availability_zone,security-groups-normalized-cidr,port-security-groups-filtering,security-groups-remote-address-group,security-group,service-type,sorting,standard-attr-description,stateful-security-group,subnet_onboard,subnet-service-types,subnet_allocation,subnetpool-prefix-ops,standard-attr-tag,standard-attr-timestamp
+
+[dashboard]
+
+dashboard_url = "{{ horizon_public_endpoint }}"
