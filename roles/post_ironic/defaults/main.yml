@@ -9,6 +9,14 @@ ironic_gateway_interface: "{{ network_interface | replace('_', '-') }}.{{ ironic
 manage_ironic_gateway_interface: false
 
 ironic_glance_images:
+  - name: pxe_deploy_kernel_tinyipa
+    container_format: aki
+    disk_format: aki
+    url: "https://tarballs.opendev.org/openstack/ironic-python-agent/tinyipa/files/tinyipa-stable-{{ openstack_release }}.vmlinuz"
+  - name: pxe_deploy_ramdisk_tinyipa
+    container_format: aki
+    disk_format: aki
+    url: "https://tarballs.opendev.org/openstack/ironic-python-agent/tinyipa/files/tinyipa-stable-{{ openstack_release }}.gz"
   - name: pxe_deploy_kernel
     container_format: aki
     disk_format: aki

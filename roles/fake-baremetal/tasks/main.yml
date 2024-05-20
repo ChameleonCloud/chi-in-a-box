@@ -23,24 +23,30 @@
     creates: "{{ item.role_path }}"
   loop: "{{ tenks_ansible_galaxy_roles }}"
 
-- name: get facts for ironic images
+- name: get facts for pxe kernel
   kolla_toolbox:
     module_name: openstack.cloud.image_info
     module_args:
       auth: "{{ openstack_auth }}"
-      image: "{{ item }}"
+      image: "{{ ironic_deploy_kernel }}"
   run_once: True
-  register: "image_info"
+  register: "ironic_deploy_kernel_img"
   become: True
-  loop: "{{ ironic_deploy_image_names }}"
+
+- name: get facts for pxe ramdisk
+  kolla_toolbox:
+    module_name: openstack.cloud.image_info
+    module_args:
+      auth: "{{ openstack_auth }}"
+      image: "{{ ironic_deploy_ramdisk }}"
+  run_once: True
+  register: "ironic_deploy_ramdisk_img"
+  become: True
 
 - name: set facts for ironic images
-  vars:
-    deploy_kernel_img: "{{ image_info.results | selectattr('item', 'eq', 'pxe_deploy_kernel') | first }}"
-    deploy_ramdisk_img: "{{ image_info.results | selectattr('item', 'eq', 'pxe_deploy_ramdisk') | first }}"
   ansible.builtin.set_fact:
-    deploy_kernel_id: "{{ deploy_kernel_img.image.id }}"
-    deploy_ramdisk_id: "{{ deploy_ramdisk_img.image.id }}"
+    deploy_kernel_id: "{{ ironic_deploy_kernel_img.image.id }}"
+    deploy_ramdisk_id: "{{ ironic_deploy_ramdisk_img.image.id }}"
 
 - name: template tenks overide file from site-config
   ansible.builtin.template:
