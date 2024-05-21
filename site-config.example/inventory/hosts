@@ -71,12 +71,6 @@ keycloak
 [tempest:children]
 deployment
 
-# This group is used to ensure that the defaults.yml group_vars apply to
-# all nodes, including the deploy host, without running other roles.
-[defaults:children]
-deployment
-common
-
 # You can explicitly specify which hosts run each project by updating the
 # groups in the sections below. Common services are grouped together.
 
@@ -105,18 +99,12 @@ control
 [kafka:children]
 control
 
-[kibana:children]
-control
-
 [telegraf:children]
 compute
 control
 monitoring
 network
 storage
-
-[elasticsearch:children]
-control
 
 [hacluster:children]
 control
@@ -134,9 +122,6 @@ control
 control
 
 [outward-rabbitmq:children]
-control
-
-[qdrouterd:children]
 control
 
 [monasca-agent:children]
@@ -242,9 +227,6 @@ control
 [senlin:children]
 control
 
-[vmtp:children]
-control
-
 [trove:children]
 control
 
@@ -269,14 +251,17 @@ control
 [zun:children]
 control
 
-[skydive:children]
-monitoring
+[skyline:children]
+control
 
 [redis:children]
 control
 
 [blazar:children]
 control
+
+[venus:children]
+monitoring
 
 # Additional control implemented here. These groups allow you to control which
 # services run on which hosts at a per-service level.
@@ -298,9 +283,12 @@ common
 [kolla-toolbox:children]
 common
 
-# Elasticsearch Curator
-[elasticsearch-curator:children]
-elasticsearch
+[opensearch:children]
+control
+
+# Opensearch dashboards
+[opensearch-dashboards:children]
+opensearch
 
 # Glance
 [glance-api:children]
@@ -345,6 +333,10 @@ neutron
 neutron
 
 [neutron-ovn-metadata-agent:children]
+compute
+network
+
+[neutron-ovn-agent:children]
 compute
 
 [neutron-bgp-dragent:children]
@@ -474,9 +466,6 @@ monasca-agent
 [monasca-api:children]
 monasca
 
-[monasca-grafana:children]
-monasca
-
 [monasca-log-persister:children]
 monasca
 
@@ -509,10 +498,10 @@ ironic
 [ironic-inspector:children]
 ironic
 
-[ironic-pxe:children]
+[ironic-tftp:children]
 ironic
 
-[ironic-ipxe:children]
+[ironic-http:children]
 ironic
 
 # Magnum
@@ -586,10 +575,6 @@ gnocchi
 
 [gnocchi-metricd:children]
 gnocchi
-
-# Trove
-[trove-api:children]
-trove
 
 # Sahara
 [sahara-api:children]
@@ -697,13 +682,12 @@ zun
 [zun-cni-daemon:children]
 compute
 
-# Skydive
-[skydive-analyzer:children]
-skydive
+# Skyline
+[skyline-apiserver:children]
+skyline
 
-[skydive-agent:children]
-compute
-network
+[skyline-console:children]
+skyline
 
 # Tacker
 [tacker-server:children]
@@ -766,7 +750,7 @@ monitoring
 monitoring
 
 [prometheus-elasticsearch-exporter:children]
-elasticsearch
+opensearch
 
 [prometheus-blackbox-exporter:children]
 monitoring
@@ -788,6 +772,9 @@ ironic-conductor
 
 [prometheus-redis-exporter:children]
 redis
+
+[prometheus-msteams:children]
+prometheus-alertmanager
 
 [masakari-api:children]
 control
@@ -823,14 +810,11 @@ ovn-database
 [ovn-sb-db:children]
 ovn-database
 
-[letsencrypt:children]
-loadbalancer
+[venus-api:children]
+venus
 
-[letsencrypt-acme:children]
-letsencrypt
-
-[letsencrypt-certbot:children]
-letsencrypt
+[venus-manager:children]
+venus
 
 [doni:children]
 control
@@ -840,12 +824,6 @@ doni
 
 [doni-worker:children]
 doni
-
-[tunelo:children]
-control
-
-[tunelo-api:children]
-tunelo
 
 # OSG
 [osg:children]
