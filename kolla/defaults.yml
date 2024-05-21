@@ -1,5 +1,5 @@
 ---
-openstack_release: xena
+openstack_release: "2023.1"
 cloud: envvars
 
 docker_registry: ghcr.io
