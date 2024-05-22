@@ -5,7 +5,6 @@ cloud: envvars
 docker_registry: ghcr.io
 docker_namespace: chameleoncloud/kolla
 kolla_base_distro: ubuntu
-kolla_install_type: source
 
 # Disable addition of tag for CentOS8
 # Remove this if pulling CentOS8 containers
@@ -121,7 +120,6 @@ enable_haproxy: yes
 haproxy_listen_neutron_server_extra: ["timeout server 15m"]
 haproxy_service_template: "haproxy_single_service_split.cfg.j2"
 kolla_external_fqdn_cert: "{{ cc_ansible_site_dir }}/certificates/haproxy.pem"
-kolla_externally_managed_cert: "{{ enable_letsencrypt | bool }}"
 
 # Heat
 enable_heat: yes
@@ -198,8 +196,9 @@ ironic_send_sensor_data_for_undeployed_nodes: False
 ironic_neutron_status_code_retries: 10
 
 # Defaults for inspection network, currently unused
-ironic_dnsmasq_dhcp_range: "10.52.0.10,10.52.0.200,255.255.255.0"
-
+ironic_dnsmasq_dhcp_ranges:
+ - range: "10.52.0.10,10.52.0.200,255.255.255.0"
+ 
 #ironic_ks_services:
 #  - name: "ironic"
 #    type: "baremetal"
@@ -240,6 +239,7 @@ enable_neutron: yes
 enable_openvswitch: yes
 enable_neutron_fwaas: no
 neutron_fwaas_version: v2
+enable_neutron_wireguard: false
 # Enable notifications for Experiment Precis
 neutron_notification_topics:
   - name: notifications
@@ -303,10 +303,6 @@ prometheus_openstack_exporter_cmdline_extras: >-
   --disable-service.volume
   --disable-service.load-balancer
   --disable-service.dns
-# Legacy params
-prometheus_server_external_url: "{{ public_protocol }}://{{ prometheus_external_fqdn }}:{{ prometheus_port }}"
-prometheus_alertmanager_external_url: "{{ public_protocol }}://{{ prometheus_external_fqdn }}:{{ prometheus_alertmanager_port }}"
-prometheus_bind_address: "{{ lookup('vars', 'ansible_' + network_interface).ipv4.address }}"
 
 enable_prometheus_ironic_exporter: no
 
