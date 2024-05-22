@@ -1,6 +1,7 @@
 ---
 # Gather information about a previously created project by name
 - kolla_toolbox:
+    container_engine: "{{ kolla_container_engine }}"
     module_name: openstack.cloud.project_info
     module_args:
       auth: "{{ project_auth }}"

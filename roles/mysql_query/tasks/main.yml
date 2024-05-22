@@ -2,6 +2,7 @@
   run_once: true
   delegate_to: "{{ groups['control'][0] }}"
   kolla_toolbox:
+    container_engine: "{{ kolla_container_engine }}"
     module_name: community.mysql.mysql_query
     module_args:
       login_host: "{{ database_address }}"

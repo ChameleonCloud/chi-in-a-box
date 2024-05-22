@@ -17,6 +17,7 @@
 - name: Create OpenStack user for service user.
   become: True
   kolla_toolbox:
+    container_engine: "{{ kolla_container_engine }}"
     module_name: os_user
     module_args:
       auth: "{{ openstack_auth }}"

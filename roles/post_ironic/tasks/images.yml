@@ -4,6 +4,7 @@
     glance_images_tmp: "/tmp"
 - name: Download source Glance images.
   kolla_toolbox:
+    container_engine: "{{ kolla_container_engine }}"
     module_name: get_url
     module_args:
       url: "{{ item.url }}"
@@ -16,6 +17,7 @@
   when: enable_ironic | bool
 - name: Create Glance images.
   kolla_toolbox:
+    container_engine: "{{ kolla_container_engine }}"
     module_name: os_image
     module_args:
       auth: "{{ openstack_auth }}"

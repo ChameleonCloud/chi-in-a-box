@@ -1,6 +1,7 @@
 ---
 - name: Create cep service
   kolla_toolbox:
+    container_engine: "{{ kolla_container_engine }}"
     module_name: os_keystone_service
     module_args:
       name: cep
@@ -14,6 +15,7 @@
 
 - name: Create cep endpoint
   kolla_toolbox:
+    container_engine: "{{ kolla_container_engine }}"
     module_name: os_keystone_endpoint
     module_args:
       service: cep
@@ -32,6 +34,7 @@
       delegate_to: "{{ groups[precis_rabbitmq_inventory_group][0] }}"
       run_once: True
       kolla_toolbox:
+        container_engine: "{{ kolla_container_engine }}"
         module_name: rabbitmq_user
         module_args:
           user: "{{ precis_rabbitmq_user }}"
@@ -46,6 +49,7 @@
       delegate_to: "{{ groups[precis_rabbitmq_inventory_group][0] }}"
       run_once: True
       kolla_toolbox:
+        container_engine: "{{ kolla_container_engine }}"
         module_name: rabbitmq_queue
         module_args:
           login_user: "{{ rabbitmq_user }}"
@@ -60,6 +64,7 @@
       delegate_to: "{{ groups[precis_rabbitmq_inventory_group][0] }}"
       run_once: True
       kolla_toolbox:
+        container_engine: "{{ kolla_container_engine }}"
         module_name: rabbitmq_binding
         module_args:
           login_user: "{{ rabbitmq_user }}"
@@ -79,6 +84,7 @@
   delegate_to: "{{ groups[precis_mysql_inventory_group][0] }}"
   run_once: True
   kolla_toolbox:
+    container_engine: "{{ kolla_container_engine }}"
     module_name: mysql_user
     module_args:
       login_host: "{{ precis_mysql_host }}"

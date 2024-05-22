@@ -25,6 +25,7 @@
     
 - name: Create filesystem address scope
   kolla_toolbox:
+    container_engine: "{{ kolla_container_engine }}"
     module_name: openstack.cloud.address_scope
     module_args:
       auth: "{{ openstack_auth }}"
@@ -40,6 +41,7 @@
 
 - name: Create filesystem subnet pool
   kolla_toolbox:
+    container_engine: "{{ kolla_container_engine }}"
     module_name: openstack.cloud.subnet_pool
     module_args:
       auth: "{{ openstack_auth }}"
@@ -61,6 +63,7 @@
 
 - name: Create filesystem-ganesha network
   kolla_toolbox:
+    container_engine: "{{ kolla_container_engine }}"
     module_name: os_network
     module_args:
       auth: "{{ openstack_auth }}"
@@ -82,6 +85,7 @@
 
 - name: Create filesystem-ganesha subnet
   kolla_toolbox:
+    container_engine: "{{ kolla_container_engine }}"
     module_name: os_subnet
     module_args:
       auth: "{{ openstack_auth }}"
@@ -100,6 +104,7 @@
     
 - name: Check if filesystem-ganesha router exists
   kolla_toolbox:
+    container_engine: "{{ kolla_container_engine }}"
     module_name: openstack.cloud.routers_info
     module_args:
       auth: "{{ openstack_auth }}"
@@ -109,6 +114,7 @@
 
 - name: Create filesystem-ganesha router
   kolla_toolbox:
+    container_engine: "{{ kolla_container_engine }}"
     module_name: os_router
     module_args:
       auth: "{{ openstack_auth }}"

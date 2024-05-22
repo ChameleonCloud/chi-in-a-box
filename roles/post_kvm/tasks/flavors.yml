@@ -1,6 +1,7 @@
 ---
 - name: Create Admin-Only KVM flavors
   kolla_toolbox:
+    container_engine: "{{ kolla_container_engine }}"
     module_name: openstack.cloud.compute_flavor
     module_args:
       auth: "{{ project_auth }}"
@@ -17,6 +18,7 @@
     - enable_kvm | bool
 - name: Add flavor access to openstack project
   kolla_toolbox:
+    container_engine: "{{ kolla_container_engine }}"
     module_name: openstack.cloud.project_access
     module_args:
       auth: "{{ project_auth }}"

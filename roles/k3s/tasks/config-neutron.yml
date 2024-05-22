@@ -1,6 +1,7 @@
 ---
 - name: Create calico network
   kolla_toolbox:
+    container_engine: "{{ kolla_container_engine }}"
     module_name: os_network
     module_args:
       auth: "{{ openstack_auth }}"
@@ -59,6 +60,7 @@
 # Both of the above are pre-requisites to the proper functioning of floating ips to containers
 - name: Fetch existing NAT router
   kolla_toolbox:
+    container_engine: "{{ kolla_container_engine }}"
     module_name: os_router
     module_args:
       auth: "{{ openstack_auth }}"

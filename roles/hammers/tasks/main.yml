@@ -66,6 +66,7 @@
 - name: Create MySQL user
   become: True
   kolla_toolbox:
+    container_engine: "{{ kolla_container_engine }}"
     module_name: mysql_user
     module_args:
       login_host: "{{ database_address }}"

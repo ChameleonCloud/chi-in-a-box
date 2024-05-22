@@ -8,6 +8,7 @@
 
 - name: Create shared network(s)
   kolla_toolbox:
+    container_engine: "{{ kolla_container_engine }}"
     module_name: os_network
     module_args:
       auth: "{{ openstack_auth }}"
@@ -29,6 +30,7 @@
 
 - name: Create shared network subnet(s)
   kolla_toolbox:
+    container_engine: "{{ kolla_container_engine }}"
     module_name: os_subnet
     module_args:
       auth: "{{ openstack_auth }}"
@@ -52,6 +54,7 @@
 
 - name: Create NAT router for shared network(s).
   kolla_toolbox:
+    container_engine: "{{ kolla_container_engine }}"
     module_name: os_router
     module_args:
       auth: "{{ openstack_auth }}"

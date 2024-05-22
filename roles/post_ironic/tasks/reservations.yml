@@ -1,6 +1,7 @@
 ---
 - name: Create freepool aggregate.
   kolla_toolbox:
+    container_engine: "{{ kolla_container_engine }}"
     module_name: os_nova_host_aggregate
     module_args:
       auth: "{{ openstack_auth }}"

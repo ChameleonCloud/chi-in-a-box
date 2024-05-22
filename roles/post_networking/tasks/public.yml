@@ -17,6 +17,7 @@
 
 - name: Create public network
   kolla_toolbox:
+    container_engine: "{{ kolla_container_engine }}"
     module_name: os_network
     module_args:
       auth: "{{ openstack_auth }}"
@@ -43,6 +44,7 @@
 # at the moment, so only one allocation pool can be automatically created.
 - name: Create public subnet
   kolla_toolbox:
+    container_engine: "{{ kolla_container_engine }}"
     module_name: os_subnet
     module_args:
       auth: "{{ openstack_auth }}"
