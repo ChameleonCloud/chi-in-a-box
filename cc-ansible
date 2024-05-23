@@ -3,7 +3,6 @@
 set -o errexit
 set -o nounset
 set -o pipefail
-# set -o xtrace
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 VIRTUALENV="$(realpath "${VIRTUALENV:-"$DIR"/venv}")"
@@ -80,12 +79,22 @@ install_deps() {
   local galaxy_collection_path="$DIR/galaxy.ansible.com/"
   ansible-galaxy collection install --force -p "$galaxy_collection_path" -r "$galaxy_requirements"
 
-  kolla_ansible_remote=https://github.com/chameleoncloud/kolla-ansible.git
-  kolla_ansible_checkout=${KOLLA_ANSIBLE_BRANCH:-chameleoncloud/xena}
+  local submodule_target_commit="$(git submodule status --cached src/kolla-ansible/)"
+
+  echo "Checking if git submodules need updating"
+  if [ -z "$(git status --porcelain src/kolla-ansible)" ]; then
+    git submodule update --init src/kolla-ansible
+  else
+    echo "WARNING: you've made local changes to src/kolla-ansible, running install_deps will check out commit ${submodule_target_commit}"
+    echo "To proceed, either run 'git submodule update --init src/kolla-ansible', or commit the new submodule hash to chi-in-a-box"
+    git status src/kolla-ansible
+    return 1
+  fi
+
   pip install \
     -r requirements.txt \
     --config-settings editable_mode=strict \
-    -e git+"$kolla_ansible_remote"@"$kolla_ansible_checkout"#egg=kolla-ansible
+    -e src/kolla-ansible
 
   # Update/install yq, adding it to the venv bin path
   YQ_VERSION=4.9.6
@@ -220,7 +229,7 @@ elif [ -z "${VIRTUAL_ENV+x}" ]; then
   # VIRTUAL_ENV is present if we have sourced a venv/bin/activate
   cat <<ERRMSG
 Error: virtualenv is not set up. Please create it by running:
-./cc_ansible install_deps
+./cc-ansible install_deps
 ERRMSG
   exit 1
 else
@@ -265,7 +274,6 @@ find_kolla_ansible_base_dir () {
   fi
   echo "${BASEDIR}/ansible"
 }
-ansible_path="$(find_kolla_ansible_base_dir)"
 
 # Handle subcommands
 if [[ -n "${command:-}" ]]; then
@@ -273,6 +281,7 @@ if [[ -n "${command:-}" ]]; then
   exit $?
 fi
 
+ansible_path="$(find_kolla_ansible_base_dir)"
 if [[ -n "${CC_ANSIBLE_PLAYBOOK:-}" ]]; then
   echo "**********************************************************************"
   echo "* Playbook override detected! This playbook will be executed within  *"
