@@ -2,12 +2,11 @@
 - name: Create baremetal flavor.
   kolla_toolbox:
     container_engine: "{{ kolla_container_engine }}"
-    module_name: os_nova_flavor
+    module_name: openstack.cloud.compute_flavor
     module_args:
       auth: "{{ openstack_auth }}"
       state: present
       name: baremetal
-      interface: admin
       is_public: yes
       extra_specs:
         "resources:CUSTOM_BAREMETAL": 1
