@@ -1,0 +1,3 @@
+- hosts: deployment
+  roles:
+    - role: tempest
