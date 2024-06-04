@@ -67,6 +67,10 @@ keycloak
 [keycloak_tas_sync:children]
 keycloak
 
+# used for executing Tempest functional tests against a site
+[tempest:children]
+deployment
+
 # This group is used to ensure that the defaults.yml group_vars apply to
 # all nodes, including the deploy host, without running other roles.
 [defaults:children]
