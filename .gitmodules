@@ -1,0 +1,3 @@
+[submodule "src/kolla-ansible"]
+	path = src/kolla-ansible
+	url = https://github.com/chameleoncloud/kolla-ansible
