@@ -45,18 +45,30 @@
     dest: /usr/local/bin/kubectl-calico
     mode: u=rwx,g=rx,o=rx
 
-- name: Apply Calico custom resources
+- name: Initialize policy existence facts
+  set_fact:
+    policy_existence: {}
+
+- name: Check if Calico global network policies exist
   delegate_to: "{{ groups['deployment'][0] }}"
-  kubernetes.core.k8s:
-    state: present
-    template: calico-custom-resources.yaml.j2
-    apply: yes
-  when:
-    - not (k3s_dry_run | bool)
+  command: kubectl calico get globalnetworkpolicy {{ item }}
+  register: check_policy
+  ignore_errors: true
+  loop:
+    - default-deny
+    - allow-ping
+  changed_when: false
+  failed_when: false
+
+- name: Update policy existence facts
+  set_fact:
+    policy_existence: "{{ policy_existence | combine({item.item: (item.rc == 0)}) }}"
+  loop: "{{ check_policy.results }}"
 
 - name: Apply Calico global network policies
   delegate_to: "{{ groups['deployment'][0] }}"
-  shell: kubectl calico create --filename="{{ role_path }}/files/calico-global-networkpolicy-{{ item }}.yaml"
+  command: kubectl calico create --filename="{{ role_path }}/files/calico-global-networkpolicy-{{ item }}.yaml"
+  when: not policy_existence[item]
   loop:
     - default-deny
     - allow-ping
