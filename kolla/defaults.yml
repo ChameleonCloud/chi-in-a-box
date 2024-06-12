@@ -257,6 +257,7 @@ neutron_dev_plugins:
 
 # minimal config for neutron wireguard agent
 neutron_wireguard_hub_endpoint: "{{ kolla_external_vip_address }}"
+create_hub_in_root_netns: "{{ create_hub_in_root_netns }}"
 
 # Nova
 enable_nova: yes
