@@ -150,3 +150,47 @@ Configuration files are applied in the following order, with more specific repla
 * `node_custom_config/service/hostname/service.conf`
 
 See the [kolla-ansible docs](https://docs.openstack.org/kolla-ansible/latest/admin/advanced-configuration.html#openstack-service-configuration-in-kolla) for more.&#x20;
+
+
+## Running end-to-end functional tests with Tempest
+
+Openstack Tempest is a framework to exercise the API of a deployed Openstack site. You can utilize this to make sure that your changes have not broken the API's compatibility, and generally that tasks such as a creating a network or launching an instance work as expected.
+
+CHI-in-a-box includes a playbook to install and configure tempest to run against the local development site. 
+
+WARNING: Do NOT run this against a production site, or one with user instances/data present. Although tempest seeks to isolate the resources it creates/deletes in ephemerial Openstack Projects, it can easily consume all networks/floating ips/other instance resources on your site. Addtionally, cleaning up after tempest is not always straightforward, and significant care must be taken to avoid deleting user created resources.
+
+For this reason, we currently recommend running these tests only against a development site, or before releasing a site to end-users. 
+We are working on a "safe subset" configuration, but it's not ready yet.
+
+
+After setting your site up, including `post-deploy`, set the following parameters in your defaults.yml:
+
+```
+tempest_fixed_network_name: "sharednet1"
+tempest_public_network_uuid:  <uuid of public neutron network>
+tempest_compute_image_uuid:  <uuid of glance image to test instances with>
+tempest_baremetal_flavor_uuid: <uuid of the barmetal flavor>
+```
+
+If updating an existing site to add this feature, you'll need to add the following ansible group to your `inventory/hosts` file.
+
+Then, run `cc-ansible --playbook playbooks/tempest.yml` to install the tempest config file and tools. They will be installed into `~/tempest` by default, but you can override this by setting `tempest_install_dir` in your defaults.yml.
+
+After installing, run the following:
+```
+cd ~/tempest
+source .venv/bin/activate
+
+tempest run 
+  --workspace local \
+  --concurrency 1 \
+  --smoke
+```
+This will run a subset of important tests against your dev site.
+
+Concurrency is set to 1 to avoid running out of baremetal nodes, you can turn this up if more nodes are available. To run all tests, instead of the most critical subset, remove `--smoke`
+
+For an example of how to exclude specific tests, append the argument:
+`--exclude-list /opt/chi-in-a-box/roles/tempest/templates/exclude-list.conf`
+This list excludes tests which are known to fail if only `flat` networks are availalable, namely anything to do with user creation/update/delete of tenant networks.
