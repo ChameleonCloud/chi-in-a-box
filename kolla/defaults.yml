@@ -142,6 +142,11 @@ horizon_regions:
     blazar_database_user: "{{ blazar_database_user }}"
     blazar_database_password: "{{ blazar_database_password }}"
 
+# use to enable chameleon theme in 2023.1
+horizon_custom_themes:
+  - name: chameleoncloud
+    label: ChameleonCloud
+
 # Keystone IdP federation
 identity_provider_key: "{{ 'EABNO4wxhX0ZOryErTXnWPUkCAcWxTFHwZ6f_zjDHLg' if keycloak_hostname == 'auth.dev.chameleoncloud.org' else '02GplnOEWB4gwqrZDyyiaNdIrhgdinNnObXcPHy2RTo' }}"
 identity_provider_url: "{{ keycloak_url }}/auth/realms/{{ keycloak_realm_name }}"

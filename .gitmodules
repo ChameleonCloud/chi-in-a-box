@@ -1,3 +1,6 @@
 [submodule "src/kolla-ansible"]
 	path = src/kolla-ansible
 	url = https://github.com/chameleoncloud/kolla-ansible
+[submodule "kolla/node_custom_config/themes/chameleon_theme"]
+	path = kolla/node_custom_config/horizon/themes/chameleoncloud
+	url = https://github.com/ChameleonCloud/horizon-theme

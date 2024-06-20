@@ -85,19 +85,15 @@ OPENSTACK_BLAZAR_HOST_RESERVATION = {
 }
 {% endif %}
 
-# Add Chameleon theme and the default theme (which it inherits from), but
-# only allow the user to pick the Chameleon one.
+# horizon themes are represented as a tuple of name, label, and path
 chameleon_theme = (
   'chameleoncloud', 'ChameleonCloud',
-  '/etc/openstack-dashboard/themes/chameleoncloud')
-AVAILABLE_THEMES = [
-  ('default', 'Default', 'themes/default'),
-  chameleon_theme,
-]
-SELECTABLE_THEMES = [
-  chameleon_theme,
-]
-# Not really needed, but suppresses a spurious warning.
+  '/etc/openstack-dashboard/themes/chameleoncloud'
+  )
+
+# set to single element of "AVAILABLE_THEMES", defined in kolla local_settings
+SELECTABLE_THEMES = [chameleon_theme]
+# set default to "name" field of our theme tuple
 DEFAULT_THEME = chameleon_theme[0]
 
 # NOTE(jason): This is lifted from local_settings.j2 in Kolla-Ansible; we have
