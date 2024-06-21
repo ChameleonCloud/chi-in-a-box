@@ -22,6 +22,15 @@ update-alternatives --install /usr/bin/python python /usr/bin/python3 1
 {% endtab %}
 {% endtabs %}
 
+### Initialize cc-ansible's virtualenv and deps
+
+* cc-ansible will install all of its own dependencies into a python virtualenv, located inside the chi-in-a-box git checkout directory. You'll need to do this before running other `cc-ansible` subcommands.
+
+```bash
+./cc-ansible install_deps
+```
+
+
 ### Initialize the site configuration
 
 1.  Check out this repository:
