@@ -55,6 +55,7 @@
     src: slack.json.j2
     mode: 0600
     dest: "{{ hammers_config_path }}/slack.json"
+  when: hammers_slack_webhook is defined
 
 - name: Configure lease stacking config file
   become: yes

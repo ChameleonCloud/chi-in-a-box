@@ -24,7 +24,6 @@
       state: present
       name: "{{ item.name }}"
       is_public: yes
-      interface: admin
       container_format: "{{ item.container_format }}"
       disk_format: "{{ item.disk_format }}"
       filename: "{{ glance_images_tmp }}/{{ item.name }}"

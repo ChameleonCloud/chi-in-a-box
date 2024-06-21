@@ -10,6 +10,6 @@ mariadb_backup_file_age: 29
 mariadb_backup_s3_conf_dir: /etc/awsconf
 mariadb_backup_container_name: backup
 
-kolla_toolbox_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ kolla_install_type }}-kolla-toolbox"
+kolla_toolbox_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/kolla-toolbox"
 kolla_toolbox_tag: "{{ openstack_release }}"
 kolla_toolbox_image_full: "{{ kolla_toolbox_image }}:{{ kolla_toolbox_tag }}"
