@@ -52,6 +52,11 @@
 # FIXME(jason): this doesn't actually add the subnet to the router!
 # When we have updated to a later Ansible we can potentially fetch the router's
 # interfaces with routers_info and then merge this interface into the list?
+# Update (Soufiane June 25 2024) This still does not add the subnet to the router
+# two extra manual steps have to be performed after the succesful execution of this task
+# 1. Add the caliconet-subnet as an internal interface to the admin router
+# 2. Add an external gateway to the public network
+# Both of the above are pre-requisites to the proper functioning of floating ips to containers
 - name: Fetch existing NAT router
   kolla_toolbox:
     module_name: os_router
