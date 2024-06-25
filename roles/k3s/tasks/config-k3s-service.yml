@@ -65,4 +65,5 @@
   become: true
   pip:
     name: kubernetes
+    virtualenv: "{{ virtualenv }}"
     state: present
