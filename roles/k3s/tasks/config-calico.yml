@@ -45,18 +45,10 @@
     dest: /usr/local/bin/kubectl-calico
     mode: u=rwx,g=rx,o=rx
 
-- name: Apply Calico custom resources
-  delegate_to: "{{ groups['deployment'][0] }}"
-  kubernetes.core.k8s:
-    state: present
-    template: calico-custom-resources.yaml.j2
-    apply: yes
-  when:
-    - not (k3s_dry_run | bool)
-
 - name: Apply Calico global network policies
   delegate_to: "{{ groups['deployment'][0] }}"
-  shell: kubectl calico create --filename="{{ role_path }}/files/calico-global-networkpolicy-{{ item }}.yaml"
+  command: kubectl calico apply --filename="{{ role_path }}/files/calico-global-networkpolicy-{{ item }}.yaml"
   loop:
     - default-deny
     - allow-ping
+  become: yes
