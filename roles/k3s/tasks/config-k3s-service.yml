@@ -60,3 +60,10 @@
     daemon_reload: yes
     state: started
     enabled: yes
+
+- name: Install Kubernetes Python client
+  become: true
+  pip:
+    name: kubernetes
+    virtualenv: "{{ virtualenv }}"
+    state: present
