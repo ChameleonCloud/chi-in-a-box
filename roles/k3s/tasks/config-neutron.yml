@@ -4,6 +4,7 @@
     module_name: os_network
     module_args:
       auth: "{{ openstack_auth }}"
+      project: "{{ keystone_admin_project }}"
       name: caliconet
       provider_network_type: flat
       provider_physical_network: calico
@@ -17,20 +18,51 @@
     module_name: os_subnet
     module_args:
       auth: "{{ openstack_auth }}"
+      project: "{{ keystone_admin_project }}"
       network_name: caliconet
       name: caliconet-subnet
       cidr: "{{ k3s_cluster_cidr }}"
       enable_dhcp: no
   become: yes
 
+- name: Create tunelo-calico network
+  kolla_toolbox:
+      module_name: os_network
+      module_args:
+        auth: "{{ openstack_auth }}"
+        project: "{{ keystone_admin_project }}"
+        name: tunelo-calico
+        provider_network_type: flat
+        provider_physical_network: tunelo
+        shared: false
+  become: yes
+
+- name: Create tunelo-calico subnet
+  kolla_toolbox:
+      module_name: os_subnet
+      module_args:
+        auth: "{{ openstack_auth }}"
+        project: "{{ keystone_admin_project }}"
+        network_name: tunelo-calico
+        name: tunelo-calico-subnet
+        cidr: "{{ k3s_tunelo_cidr }}"
+        enable_dhcp: yes
+  become: yes
+
 # FIXME(jason): this doesn't actually add the subnet to the router!
 # When we have updated to a later Ansible we can potentially fetch the router's
 # interfaces with routers_info and then merge this interface into the list?
+# Update (Soufiane June 25 2024) This still does not add the subnet to the router
+# two extra manual steps have to be performed after the succesful execution of this task
+# 1. Add the caliconet-subnet as an internal interface to the admin router
+# 2. Add an external gateway to the public network
+# Both of the above are pre-requisites to the proper functioning of floating ips to containers
 - name: Fetch existing NAT router
   kolla_toolbox:
     module_name: os_router
     module_args:
       auth: "{{ openstack_auth }}"
+      project: "{{ keystone_admin_project }}"
       name: sharednet-router
       # interfaces:
       #   - caliconet-subnet
@@ -49,3 +81,4 @@
     neutron_router_id: "{{ calico_router.router.id }}"
   when:
     - k3s_enable_calico | bool
+  become: yes
