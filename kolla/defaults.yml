@@ -346,6 +346,13 @@ enable_k3s: no
 enable_zun: no
 enable_zun_compute_k8s: "{{ enable_zun | bool and enable_k3s | bool }}"
 blazar_enable_device_plugin_k8s: "{{ enable_k3s | bool }}"
+# K8S worker tainting
+zun_tolerate_worker_taint: false
+doni_enable_worker_taint: false
+worker_taint:
+    key: "{{ k8s_worker_taint.key | default('worker-node') }}"
+    value: "{{ k8s_worker_taint.value | default('true') }}"
+    effect: "{{ k8s_worker_taint.effect | default('NoSchedule') }}"
 # If not running K3s, can run standard Zun deploy w/ etcd and kuryr
 enable_etcd: "{{ enable_zun | bool and not enable_k3s | bool }}"
 enable_kuryr: "{{ enable_zun | bool and not enable_k3s | bool }}"

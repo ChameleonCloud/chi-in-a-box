@@ -5,6 +5,7 @@ k3s_server_location: /var/lib/rancher/k3s
 k3s_conf_location: /etc/rancher/k3s
 k3s_systemd_dir: /etc/systemd/system
 k3s_server_ip: "{{ kolla_external_vip_address }}"
+k3s_worker_taint: "{{ worker_taint }}"
 k3s_extra_server_args: ""
 
 k3s_dry_run: no

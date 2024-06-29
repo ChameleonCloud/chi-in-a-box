@@ -69,6 +69,11 @@ spec:
       nodeSelector:
         smarter-device-manager: enabled
         smarter-device-manager/configmap: jetson
+      tolerations:
+        - key: "{{ k3s_worker_taint.key }}"
+          operator: Equal
+          value: "{{ k3s_worker_taint.value }}"
+          effect: "{{ k3s_worker_taint.effect }}"
       priorityClassName: "system-node-critical"
       hostname: smarter-device-management
       hostNetwork: true

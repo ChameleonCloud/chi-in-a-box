@@ -6,7 +6,7 @@
   delegate_to: "{{ groups['deployment'][0] }}"
   kubernetes.core.k8s:
     state: present
-    src: nvidia-device-plugin.yaml
+    template: "nvidia-device-plugin.yaml.j2"
     apply: yes
   when:
     - not (k3s_dry_run | bool)
