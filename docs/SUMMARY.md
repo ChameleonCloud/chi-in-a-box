@@ -29,6 +29,7 @@
   * [Networking](setup-guides/troubleshooting/networking.md)
 * [Verification Checklist](setup-guides/verification-checklist.md)
 * [Dev-in-a-Box](setup-guides/dev-in-a-box.md)
+* [Edge-in-a-Box](setup-guides/edge-in-a-box.md)
 
 ## Reference
 
