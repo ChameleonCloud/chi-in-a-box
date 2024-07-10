@@ -3,6 +3,12 @@ from os import environ
 from django.utils.translation import gettext_lazy as _
 from openstack_dashboard.settings import HORIZON_CONFIG
 
+# Make oslo_policy DeprecationWarnings shut up
+{% if not (horizon_logging_debug | bool) %}
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+{% endif %}
+
 # Kolla-ansible defaults this to 'internalURL', which doesn't work when
 # we need to access another region from across the public internet. Need
 # to unfortunately default to 'public' interface for all endpoints as it is
