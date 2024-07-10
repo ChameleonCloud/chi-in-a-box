@@ -25,6 +25,7 @@
 
 - name: get facts for ironic images
   kolla_toolbox:
+    container_engine: "{{ kolla_container_engine }}"
     module_name: openstack.cloud.image_info
     module_args:
       auth: "{{ openstack_auth }}"
@@ -39,11 +40,12 @@
     deploy_kernel_img: "{{ image_info.results | selectattr('item', 'eq', 'pxe_deploy_kernel') | first }}"
     deploy_ramdisk_img: "{{ image_info.results | selectattr('item', 'eq', 'pxe_deploy_ramdisk') | first }}"
   ansible.builtin.set_fact:
-    deploy_kernel_id: "{{ deploy_kernel_img.image.id }}"
-    deploy_ramdisk_id: "{{ deploy_ramdisk_img.image.id }}"
+    deploy_kernel_id: "{{ deploy_kernel_img.images[0].id }}"
+    deploy_ramdisk_id: "{{ deploy_ramdisk_img.images[0].id }}"
 
 - name: get facts for ironic-provisioning network
   kolla_toolbox:
+    container_engine: "{{ kolla_container_engine }}"
     module_name: openstack.cloud.networks_info
     module_args:
       auth: "{{ openstack_auth }}"
@@ -55,7 +57,7 @@
 
 - name: set fact for provisoning network name
   ansible.builtin.set_fact:
-    provisioning_network_physnet_name: "{{ provisioning_network_return.openstack_networks[0]['provider:physical_network'] }}"
+    provisioning_network_physnet_name: "{{ provisioning_network_return.networks[0]['provider_physical_network'] }}"
 - name: set fact for provisoning network
   ansible.builtin.set_fact:
     provisioning_network_physnet: "{{ neutron_networks | selectattr('name', 'equalto', provisioning_network_physnet_name ) | first }}"
@@ -106,7 +108,7 @@
   become: true
   vars:
     ovs_bridge_name: "{{ provisioning_network_physnet.bridge_name }}"
-    vlan_tag: "{{ provisioning_network_return.openstack_networks[0]['provider:segmentation_id'] }}"
+    vlan_tag: "{{ provisioning_network_return.networks[0]['provider_segmentation_id'] }}"
     gateway_ip: "{{ ironic_provisioning_network_gateway }}"
     gateway_prefix: "{{ironic_provisioning_network_cidr | ipaddr('prefix')}}"
   block:
