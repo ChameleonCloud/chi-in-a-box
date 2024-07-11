@@ -17,10 +17,22 @@
     name: "{{ tempest_install_dir }}/"
     virtualenv: "{{ tempest_install_dir }}/.venv/"
 
+- name: Make sure local tempest config dir exists
+  file:
+    path: "~/.tempest/etc/"
+    recurse: true
+    state: directory
+
 - name: template tempest.conf from site-config
   template:
     src: "tempest.conf.j2"
     dest: "~/.tempest/etc/tempest.conf"
+
+- name: Make sure local tempest workspace dir exists
+  file:
+    path: "{{ local_site_workspace }}"
+    recurse: true
+    state: directory
 
 - name: initialize tempest workspace
   ansible.builtin.command:
