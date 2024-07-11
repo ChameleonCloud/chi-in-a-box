@@ -1,0 +1,121 @@
+---
+- name: clone tenks git repo
+  ansible.builtin.git:
+    repo: "{{ tenks_git_repo }}"
+    dest: "{{ tenks_install_dir }}"
+
+- name: create venv and install build deps
+  ansible.builtin.pip:
+    virtualenv: "{{ tenks_install_dir }}/.venv/"
+    state: latest
+    name:
+      - pip
+      - wheel
+
+- name: pip install tenks from the git checkout
+  ansible.builtin.pip:
+    name: "{{ tenks_install_dir }}/"
+    virtualenv: "{{ tenks_install_dir }}/.venv/"
+
+- name: Install tenks dependency roles from Ansible Galaxy
+  command: "ansible-galaxy install {{ item.role_name }} --roles-path={{ ansible_roles_dir }}"
+  args:
+    creates: "{{ item.role_path }}"
+  loop: "{{ tenks_ansible_galaxy_roles }}"
+
+- name: get facts for ironic images
+  kolla_toolbox:
+    module_name: openstack.cloud.image_info
+    module_args:
+      auth: "{{ openstack_auth }}"
+      image: "{{ item }}"
+  run_once: True
+  register: "image_info"
+  become: True
+  loop: "{{ ironic_deploy_image_names }}"
+
+- name: set facts for ironic images
+  vars:
+    deploy_kernel_img: "{{ image_info.results | selectattr('item', 'eq', 'pxe_deploy_kernel') | first }}"
+    deploy_ramdisk_img: "{{ image_info.results | selectattr('item', 'eq', 'pxe_deploy_ramdisk') | first }}"
+  ansible.builtin.set_fact:
+    deploy_kernel_id: "{{ deploy_kernel_img.image.id }}"
+    deploy_ramdisk_id: "{{ deploy_ramdisk_img.image.id }}"
+
+- name: get facts for ironic-provisioning network
+  kolla_toolbox:
+    module_name: openstack.cloud.networks_info
+    module_args:
+      auth: "{{ openstack_auth }}"
+      filters:
+        name: "{{ ironic_provisioning_network }}"
+  run_once: True
+  become: True
+  register: "provisioning_network_return"
+
+- name: set fact for provisoning network name
+  ansible.builtin.set_fact:
+    provisioning_network_physnet_name: "{{ provisioning_network_return.openstack_networks[0]['provider:physical_network'] }}"
+- name: set fact for provisoning network
+  ansible.builtin.set_fact:
+    provisioning_network_physnet: "{{ neutron_networks | selectattr('name', 'equalto', provisioning_network_physnet_name ) | first }}"
+
+- name: template tenks overide file from site-config
+  vars:
+    provisioning_physnet_name: "{{ provisioning_network_physnet.name }}"
+    provisioning_physnet_bridge: "{{ provisioning_network_physnet.bridge_name }}"
+  ansible.builtin.template:
+    src: tenks-override.yml.j2
+    dest: "{{ tenks_install_dir }}/override.yml"
+
+- name: create linux_group for neutron ssh to ovs
+  become: true
+  ansible.builtin.group:
+    name: "{{ generic_switch_user }}"
+
+- name: create linux_user for neutron ssh to ovs
+  become: true
+  ansible.builtin.user:
+    name: "{{ generic_switch_user }}"
+    create_home: yes
+    groups: 
+      - "{{ generic_switch_user }}"
+
+- name: Allow 'generic_switch_user' group to have passwordless sudo
+  become: true
+  copy:
+    dest: /etc/sudoers.d/97_kolla_ngs_ovs
+    content: "%{{generic_switch_user}} ALL=(ALL) NOPASSWD: ALL"
+    validate: visudo -cf %s
+
+- name: set ssh publickey for neutron_ovs_ssh
+  become: true
+  ansible.posix.authorized_key:
+    user: "{{ generic_switch_user }}"
+    state: present
+    key: "{{ generic_switch_pubkey }}"
+
+- name: create wrapper for kolla-ovs
+  become: true
+  template:
+    src: ovs-vsctl.j2
+    dest: /usr/local/sbin/ovs-vsctl
+    mode: 'u+rwx'
+
+- name: create interface for ironic provisioning gw
+  become: true
+  vars:
+    ovs_bridge_name: "{{ provisioning_network_physnet.bridge_name }}"
+    vlan_tag: "{{ provisioning_network_return.openstack_networks[0]['provider:segmentation_id'] }}"
+    gateway_ip: "{{ ironic_provisioning_network_gateway }}"
+    gateway_prefix: "{{ironic_provisioning_network_cidr | ipaddr('prefix')}}"
+  block:
+    - name: create OVS patch port for ironic-gw
+      command: "ovs-vsctl add-port {{ovs_bridge_name}} vlan{{vlan_tag}} tag={{vlan_tag}} -- set Interface vlan{{vlan_tag}} type=internal"
+      failed_when: false
+    - name: set ip address on interface
+      command: "ip addr add {{gateway_ip}}/{{gateway_prefix}} dev vlan{{vlan_tag}}"
+      failed_when: false
+    - name: set link up
+      command: "ip link set vlan{{vlan_tag}} up"
+      failed_when: false

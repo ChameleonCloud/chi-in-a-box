@@ -1,0 +1,25 @@
+tenks_install_dir: ~/tenks
+ansible_roles_dir: "{{tenks_install_dir}}/ansible/roles"
+
+libvirt_pool_path: "{{ tenks_libvirt_pool_path | default('/var/lib/libvirt/tenks_pool/')}}"
+
+tenks_git_repo: https://github.com/ChameleonCloud/tenks
+
+tenks_ansible_galaxy_roles:
+  - role_name: stackhpc.libvirt-host
+    role_path: "{{tenks_install_dir}}/ansible/roles/stackhpc.libvirt-host"
+  - role_name: stackhpc.libvirt-vm
+    role_path: "{{tenks_install_dir}}/ansible/roles/stackhpc.libvirt-vm"
+
+ironic_deploy_image_names:
+  - pxe_deploy_kernel
+  - pxe_deploy_ramdisk
+
+# credentials to allow neutron ngs to ssh to local ovs
+generic_switch_user: ngs_ovs_manager
+generic_switch_pubkey: "{{ kolla_ssh_key.public_key }}"
+# what neutron physnet is the ironic provisioning network attached to
+fake_baremetal_node_ram_mb: 4096
+fake_baremetal_node_disk_gb: 10
+fake_baremetal_node_vcpu: 2
+fake_baremetal_node_count: 3
