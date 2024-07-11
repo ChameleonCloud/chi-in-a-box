@@ -42,38 +42,80 @@
     deploy_kernel_id: "{{ deploy_kernel_img.image.id }}"
     deploy_ramdisk_id: "{{ deploy_ramdisk_img.image.id }}"
 
+- name: get facts for ironic-provisioning network
+  kolla_toolbox:
+    module_name: openstack.cloud.networks_info
+    module_args:
+      auth: "{{ openstack_auth }}"
+      filters:
+        name: "{{ ironic_provisioning_network }}"
+  run_once: True
+  become: True
+  register: "provisioning_network_return"
+
+- name: set fact for provisoning network name
+  ansible.builtin.set_fact:
+    provisioning_network_physnet_name: "{{ provisioning_network_return.openstack_networks[0]['provider:physical_network'] }}"
+- name: set fact for provisoning network
+  ansible.builtin.set_fact:
+    provisioning_network_physnet: "{{ neutron_networks | selectattr('name', 'equalto', provisioning_network_physnet_name ) | first }}"
+
 - name: template tenks overide file from site-config
+  vars:
+    provisioning_physnet_name: "{{ provisioning_network_physnet.name }}"
+    provisioning_physnet_bridge: "{{ provisioning_network_physnet.bridge_name }}"
   ansible.builtin.template:
     src: tenks-override.yml.j2
     dest: "{{ tenks_install_dir }}/override.yml"
 
+- name: create linux_group for neutron ssh to ovs
+  become: true
+  ansible.builtin.group:
+    name: "{{ generic_switch_user }}"
 
-- name: get facts for ironic-provisioning subnet
-  kolla_toolbox:
-    module_name: openstack.cloud.subnets_info
-    module_args:
-      auth: "{{ openstack_auth }}"
-      filters:
-        name: "ironic_provisioning_subnet"
-  run_once: True
-  become: True
-  register: "provisioning_subnet"
+- name: create linux_user for neutron ssh to ovs
+  become: true
+  ansible.builtin.user:
+    name: "{{ generic_switch_user }}"
+    create_home: yes
+    groups: 
+      - "{{ generic_switch_user }}"
 
-# we're passing this to `ip addr add`, so we need it with the CIDR
-- name: set fact for ironic provisioning subnet
+- name: Allow 'generic_switch_user' group to have passwordless sudo
+  become: true
+  copy:
+    dest: /etc/sudoers.d/97_kolla_ngs_ovs
+    content: "%{{generic_switch_user}} ALL=(ALL) NOPASSWD: ALL"
+    validate: visudo -cf %s
+
+- name: set ssh publickey for neutron_ovs_ssh
+  become: true
+  ansible.posix.authorized_key:
+    user: "{{ generic_switch_user }}"
+    state: present
+    key: "{{ generic_switch_pubkey }}"
+
+- name: create wrapper for kolla-ovs
+  become: true
+  template:
+    src: ovs-vsctl.j2
+    dest: /usr/local/sbin/ovs-vsctl
+    mode: 'u+rwx'
+
+- name: create interface for ironic provisioning gw
+  become: true
   vars:
-    provisioning_subnet_return: "{{ provisioning_subnet.openstack_subnets | first }}"
-  ansible.builtin.set_fact:
-    provisioning_subnet_cidr: "{{ provisioning_subnet_return.cidr }}"
-    provisioning_subnet_prefix: "{{ provisioning_subnet_return.cidr | ipaddr('prefix')}}"
-    provisioning_subnet_gw: "{{ provisioning_subnet_return.gateway_ip }}"
-
-
-- name: Tell operator to execute tenks
-  debug:
-    msg:
-      - source {{site_config_dir}}/admin-openrc.sh
-      - cd {{tenks_install_dir}}
-      - source .venv/bin/activate
-      - ansible-playbook --inventory ansible/inventory/ ansible/deploy.yml --extra-vars="@override.yml"
-      - ip addr add {{ provisioning_subnet_gw }}/{{ provisioning_subnet_prefix }} brtenks0
+    ovs_bridge_name: "{{ provisioning_network_physnet.bridge_name }}"
+    vlan_tag: "{{ provisioning_network_return.openstack_networks[0]['provider:segmentation_id'] }}"
+    gateway_ip: "{{ ironic_provisioning_network_gateway }}"
+    gateway_prefix: "{{ironic_provisioning_network_cidr | ipaddr('prefix')}}"
+  block:
+    - name: create OVS patch port for ironic-gw
+      command: "ovs-vsctl add-port {{ovs_bridge_name}} vlan{{vlan_tag}} tag={{vlan_tag}} -- set Interface vlan{{vlan_tag}} type=internal"
+      failed_when: false
+    - name: set ip address on interface
+      command: "ip addr add {{gateway_ip}}/{{gateway_prefix}} dev vlan{{vlan_tag}}"
+      failed_when: false
+    - name: set link up
+      command: "ip link set vlan{{vlan_tag}} up"
+      failed_when: false

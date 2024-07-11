@@ -1,0 +1,7 @@
+#!/bin/bash
+# execute ovs-vsctl inside the kolla docker container
+# installed by fake-baremetal playbook
+
+docker exec openvswitch_vswitchd \
+    ovs-vsctl \
+    "${@}"

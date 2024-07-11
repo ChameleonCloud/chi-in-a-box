@@ -24,27 +24,37 @@ kolla_external_vip_address: "192.168.100.254"
 # with vlan networks, allowing users to create per-tenant isolated networks.
 
 neutron_networks:
+- name: public
+  bridge_name: br-ex
+  external_interface: public_veth
+  cidr: 192.168.100.0/24
+  gateway_ip:  192.168.100.1
+  allocation_pools:
+    - start: 192.168.100.20
+      end: 192.168.100.200
 - name: physnet1
-  bridge_name: br_physnet1
+  bridge_name: br-physnet1
   external_interface: physnet1_veth
-  public:
-    segment_type: flat
-    cidr: 192.168.100.0/24
-    gateway: 192.168.100.1
-    ip_range_start: 192.168.100.20
-    ip_range_end: 192.168.100.200
-- name: physnet2
-  bridge_name: br_physnet2
-  external_interface: physnet2_veth
+  on_demand_vlan_ranges:
+    - 200:250
+  reservable_vlan_ranges:
+    - 251:300
   sharednet:
-    segment_type: flat
     cidr: 10.200.10.0/22
-- name: physnet3
-  bridge_name: br_physnet3
-  external_interface: physnet3_veth
-  provisioning:
-    segment_type: flat
-    cidr: 10.205.10.0/24
+    allocation_pools:
+      - start: 10.200.10.20
+        end: 10.200.11.21
+
+ironic_provisioning_network_vlan: 199
+
+switch_configs:
+  - name: brtenks0
+    device_type: netmiko_ovs_linux
+    address: 127.0.0.1
+    auth:
+      username: ngs_ovs_manager
+      private_key: "{{ ovs_ssh_key.private_key }}"
+    ngs_config: {}
 
 # path on the system where glance images will be stored
 glance_file_datadir_volume: /var/lib/glance
@@ -55,6 +65,9 @@ enable_prometheus: false
 
 # enable image subscription. Make sure you have enough disk space before turning it on!
 # enable_image_deployer: true
+
+# for local OVS debugging
+generic_switch_pubkey:  "{{ ovs_ssh_key.public_key }}"
 
 # fake baremetal node installation overrides
 tenks_install_dir: /opt/tenks
