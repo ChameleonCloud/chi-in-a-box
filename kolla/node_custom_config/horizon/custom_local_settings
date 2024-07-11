@@ -83,23 +83,6 @@ OPENSTACK_BLAZAR_HOST_RESERVATION = {
   'enabled': {{ enable_nova | bool }},
   'url_format': '{{ blazar_host_url_format }}',
 }
-# Used for Blazar dashboard, which needs to pull data from the MySQL database
-# directly at the moment.
-DATABASES = {
-  'default': {},
-{% for conf in horizon_regions %}
-{% if conf.blazar_database_host is defined %}
-  'blazar-{{ conf.region_name }}': {
-    'ENGINE': 'django.db.backends.mysql',
-    'NAME': '{{ conf.blazar_database_name }}',
-    'HOST': '{{ conf.blazar_database_host }}',
-    'PORT': '{{ conf.blazar_database_port }}',
-    'USER': '{{ conf.blazar_database_user }}',
-    'PASSWORD': '{{ conf.blazar_database_password }}',
-  },
-{% endif %}
-{% endfor %}
-}
 {% endif %}
 
 # Add Chameleon theme and the default theme (which it inherits from), but
