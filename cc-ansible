@@ -264,7 +264,7 @@ if [[ -f "$CC_ANSIBLE_ENV" ]]; then
 fi
 
 find_kolla_ansible_base_dir () {
-  kolla_direct_url="$(find ${VIRTUAL_ENV}/lib/python*/site-packages/  -wholename '*kolla_ansible*.dist-info/direct_url.json' -print -quit 1> /dev/null 2>&1)"
+  kolla_direct_url="$(find ${VIRTUAL_ENV}/lib/  -wholename '*kolla_ansible*.dist-info/direct_url.json' -print -quit)"
   if test -n "${kolla_direct_url}"; then
       # Editable install in local path
       direct_url="$(yq eval '.url' ${kolla_direct_url})"
