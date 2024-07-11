@@ -103,6 +103,10 @@ install_deps() {
     wget https://github.com/mikefarah/yq/releases/download/v${YQ_VERSION}/${YQ_BINARY}.tar.gz -O - \
       | tar xz && mv ${YQ_BINARY} "$VIRTUALENV/bin/yq"
   fi
+
+  # install kolla-ansible galaxy deps. We use a subshell to drop back out of the venv afterwards
+  (source "${VIRTUALENV}/bin/activate" && kolla-ansible install-deps)
+  
 }
 
 init() {
@@ -350,7 +354,7 @@ mkdir -p "${CONFIG_DIR}/inventory/group_vars/"
 #    the site-config to override anything here in host_vars or more specific
 #    group_vars files.
 # shellcheck disable=2016 # yq is directly evaluating this string
-yq eval-all '. as $item ireduce ({}; . * $item )' \
+"$VIRTUALENV"/bin/yq eval-all '. as $item ireduce ({}; . * $item )' \
   "$DIR/kolla/defaults.yml" "$CONFIG_DIR/defaults.yml" \
   >"$CONFIG_DIR/inventory/group_vars/defaults.yml"
 
@@ -358,7 +362,6 @@ declare -a kolla_args=()
 kolla_args+=(--configdir="$CONFIG_DIR")
 kolla_args+=(--inventory="$CONFIG_DIR/inventory")
 kolla_args+=(--key="$CC_ANSIBLE_VAULT_PASSWORD")
-kolla_args+=(--globals="$CONFIG_DIR/globals.yml")
 kolla_args+=(--passwords="$CONFIG_DIR/passwords.yml")
 kolla_args+=(--extra PASSWORDS_FILE="$CONFIG_DIR/passwords.yml")
 kolla_args+=(--extra node_custom_config="$CONFIG_DIR/node_custom_config")
@@ -396,5 +399,7 @@ if [[ -n "${ANSIBLE_SKIP_TAGS}" ]]; then
   kolla_args+=("${ANSIBLE_SKIP_TAGS}")
 fi
 
-"$VIRTUALENV"/bin/kolla-ansible "${kolla_args[@]}"
+# kolla-ansible checks PYTHONPATH, so we need to activate the virtualenv
+source "${VIRTUALENV}/bin/activate"
+kolla-ansible "${kolla_args[@]}"
 # set +o xtrace

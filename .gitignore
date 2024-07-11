@@ -24,3 +24,5 @@ vagrant/vagrantkey*
 *.pyc
 __pycache__/
 galaxy.ansible.com/**
+
+roles/ansible_collections
