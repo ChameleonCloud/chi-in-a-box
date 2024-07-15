@@ -2,6 +2,7 @@
 - name: clone tenks git repo
   ansible.builtin.git:
     repo: "{{ tenks_git_repo }}"
+    version: "{{ tenks_git_branch }}"
     dest: "{{ tenks_install_dir }}"
 
 - name: create venv and install build deps
