@@ -15,6 +15,11 @@ ironic_deploy_image_names:
   - pxe_deploy_kernel
   - pxe_deploy_ramdisk
 
+# map 'baremetal' resource class/flavor to node_type 'type0'
+nova_flavors:
+  - resource_class: baremetal
+    node_type: type0
+
 # credentials to allow neutron ngs to ssh to local ovs
 generic_switch_user: ngs_ovs_manager
 generic_switch_pubkey: "{{ kolla_ssh_key.public_key }}"

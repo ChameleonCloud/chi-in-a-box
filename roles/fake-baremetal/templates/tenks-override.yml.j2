@@ -39,6 +39,4 @@ specs:
       # Required if `ironic_config` has been specified.
       resource_class: baremetal
 
-nova_flavors:
-  - resource_class: baremetal
-    node_type: type0
+nova_flavors: "{{nova_flavors}}"
