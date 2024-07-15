@@ -12,11 +12,11 @@ ironic_glance_images:
   - name: pxe_deploy_kernel
     container_format: aki
     disk_format: aki
-    url: "https://tarballs.opendev.org/openstack/ironic-python-agent/dib/files/ipa-centos8-stable-{{ openstack_release }}.kernel"
+    url: "https://tarballs.opendev.org/openstack/ironic-python-agent/dib/files/ipa-centos8-unmaintained-{{ openstack_release }}.kernel"
   - name: pxe_deploy_ramdisk
     container_format: aki
     disk_format: aki
-    url: "https://tarballs.opendev.org/openstack/ironic-python-agent/dib/files/ipa-centos8-stable-{{ openstack_release }}.initramfs"
+    url: "https://tarballs.opendev.org/openstack/ironic-python-agent/dib/files/ipa-centos8-unmaintained-{{ openstack_release }}.initramfs"
   - name: cirros-0.6.2
     container_format: bare
     disk_format: qcow2
