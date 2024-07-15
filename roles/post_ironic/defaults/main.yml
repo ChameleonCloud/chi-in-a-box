@@ -21,3 +21,11 @@ ironic_glance_images:
     container_format: bare
     disk_format: qcow2
     url: "http://download.cirros-cloud.net/0.6.2/cirros-0.6.2-x86_64-disk.img"
+  - name: tinyipa_deploy_kernel
+    container_format: aki
+    disk_format: aki
+    url: "https://tarballs.opendev.org/openstack/ironic-python-agent/tinyipa/files/tinyipa-unmaintained-{{ openstack_release }}.vmlinuz"
+  - name: tinyipa_deploy_ramdisk
+    container_format: aki
+    disk_format: aki
+    url: "https://tarballs.opendev.org/openstack/ironic-python-agent/tinyipa/files/tinyipa-unmaintained-{{ openstack_release }}.gz"
