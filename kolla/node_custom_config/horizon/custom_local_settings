@@ -177,3 +177,7 @@ OPENSTACK_MANILA_FEATURES = {
     'enable_public_shares': True,
     'enabled_share_protocols': ['NFS'],
 }
+
+# necessary to embed serial console in iframe
+# Django3.0 changed the default from 'SAMEORIGIN' to 'DENY'
+X_FRAME_OPTIONS = 'SAMEORIGIN'
