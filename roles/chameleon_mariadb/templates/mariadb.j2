@@ -1,81 +1,45 @@
 #!/bin/bash
 #
 # MySQL Backup Script
-#
 
-ROTATE="{{ mariadb_backup_file_age }}"
-DIR="{{ backup_location }}"
+set -euo pipefail
 
-set -o pipefail
-
-{% if enable_mariabackup|bool == false %}
-#  Dumps mysql databases to a file
-##### START CONFIG ###################################################
-
-USER="{{ backup_database_user }}"
-PASS="{{ backup_database_password }}"
-MAX_ALLOWED_PACKET="{{ mariadb_backup_max_packet }}"
-
-# Create temporary mysql cnf file.
-TMPFILE=`mktemp /tmp/backup.XXXXXX` || exit 1
-cat >"$TMPFILE" <<EOF
-[client]
-password=$PASS
-user=$USER
-max_allowed_packet=$MAX_ALLOWED_PACKET
-EOF
-
-PREFIX=mysql_backup_
-
-ADDITIONAL_OPTIONS="--ignore-table=mysql.event"
-
-##### STOP CONFIG ####################################################
-backup_file_name=`date +%Y%m%d-%H%M%S`.sql.bz2
-backup_file=${DIR}/${PREFIX}${backup_file_name}
-
-cleanup() {
-  rm -f "$TMPFILE"
-  # Rotate backups
-  find "${DIR}/" -maxdepth 1 -type f -name "${PREFIX}*.sql*" -mtime +${ROTATE} -print0 | xargs -0 -r rm -f
-}
-
-mkdir -p $DIR
-mysqldump --defaults-extra-file="$TMPFILE" --opt --flush-logs --single-transaction \
- ${ADDITIONAL_OPTIONS} \
- --all-databases | bzcat -zc > "$backup_file"
-{% endif %}
-
-{% if enable_mariabackup|bool == true %}
 # mariadb backup is handled by kolla. just do cleanups here.
+ROTATE="{{ mariadb_backup_file_age }}"
+BACKUP_VOLUME="{{ backup_location }}"
 
 PREFIX=mysqlbackup-
-backup_file_name=$(docker run --rm -v ${DIR}:/backups "{{ kolla_toolbox_image_full }}" /bin/bash -c "ls -Art /backups/${PREFIX}* | tail -n 1")
-backup_file_name=$(basename $backup_file_name)
 
 cleanup() {
-  # Rotate backups  
-  docker run -u 0 --rm -v ${DIR}:/backup "{{ kolla_toolbox_image_full }}" \
+  # on exit, rotate backups keeping the last $ROTATE days
+  docker run -u 0 --rm -v ${BACKUP_VOLUME}:/backup "{{ kolla_toolbox_image_full }}" \
   /bin/bash -c \
-  "find /backup -maxdepth 1 -type f -name "${PREFIX}*" -mtime +${ROTATE} -print0 | xargs -0 -r rm -f"
+  "find /backup -maxdepth 1 -type f -name "${PREFIX}*" -mtime +${ROTATE} -print0 | xargs -0 -r rm -v -f"
 }
 
-{% endif %}
 
 trap cleanup EXIT
 
-{% if mariadb_backup_s3_endpoint is defined and mariadb_backup_s3_key_id is defined and mariadb_backup_s3_key is defined %}
-# Additionally copy backup to S3 bucket
-_aws() {
+backup_to_s3() {
+  # note: network=host is required when running on kolla control-plane hosts
+  # see "Docker iptables manipulation and bridge networking are now disabled by default"
+  # as per kolla-ansible wallaby upgrade notes
+
+  # see https://rclone.org/docs/#config-file for env_var syntax
   docker run --rm \
-    -e AWS_ACCESS_KEY_ID="{{ mariadb_backup_s3_key_id }}" \
-    -e AWS_SECRET_ACCESS_KEY="{{ mariadb_backup_s3_key }}" \
-    -v "{{ mariadb_backup_s3_conf_dir }}":/root/.aws \
-    -v ${DIR}:/backups \
-    amazon/aws-cli \
-    --endpoint="{{ mariadb_backup_s3_endpoint }}" \
-    --region=us-east-1 \
-    "$@"
+    --network host \
+    -e  "RCLONE_CONFIG_S3_TYPE=s3" \
+    -e  "RCLONE_CONFIG_S3_PROVIDER=Ceph" \
+    -e  "RCLONE_CONFIG_S3_ENDPOINT={{ mariadb_backup_s3_endpoint }}" \
+    -e  "RCLONE_CONFIG_S3_ACCESS_KEY_ID={{ mariadb_backup_s3_key_id }}" \
+    -e  "RCLONE_CONFIG_S3_SECRET_ACCESS_KEY={{ mariadb_backup_s3_key }}" \
+    -v "${BACKUP_VOLUME}:/backups:ro" \
+    "{{ rclone_image }}" \
+    "${@}"
 }
-_aws s3 mb s3://"{{ mariadb_backup_container_name }}"
-_aws s3 cp /backups/"$backup_file_name" s3://"{{ mariadb_backup_container_name }}"
-{% endif %}
+
+backup_to_s3 -v \
+	copy \
+	--ignore-existing \
+	"/backups/" \
+	"s3:/{{ mariadb_backup_bucket_name }}"
