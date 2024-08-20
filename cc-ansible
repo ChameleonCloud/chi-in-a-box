@@ -79,17 +79,7 @@ install_deps() {
   local galaxy_collection_path="$DIR/galaxy.ansible.com/"
   ansible-galaxy collection install --force -p "$galaxy_collection_path" -r "$galaxy_requirements"
 
-  local submodule_target_commit="$(git submodule status --cached src/kolla-ansible/)"
-
-  echo "Checking if git submodules need updating"
-  if [ -z "$(git status --porcelain src/kolla-ansible)" ]; then
-    git submodule update --init src/kolla-ansible
-  else
-    echo "WARNING: you've made local changes to src/kolla-ansible, running install_deps will check out commit ${submodule_target_commit}"
-    echo "To proceed, either run 'git submodule update --init src/kolla-ansible', or commit the new submodule hash to chi-in-a-box"
-    git status src/kolla-ansible
-    return 1
-  fi
+  git submodule update --init
 
   pip install \
     -r requirements.txt \
