@@ -84,7 +84,7 @@ blazar_network_polling_monitor_dry_run: true
 
 # enable to use https://github.com/ChameleonCloud/nova/pull/9
 # workaround for https://bugs.launchpad.net/nova/+bug/1542491
-use_blazar_prefilter: false
+use_blazar_prefilter: true
 
 # Cinder
 enable_cinder: no
