@@ -36,7 +36,7 @@ while [[ $# -gt 0 ]]; do
       # Add proper flag support for --check as an option for dry-runs
       export EXTRA_OPTS="${EXTRA_OPTS:-} --check"
       ;;
-    decrypt_passwords|edit_passwords|help|install_deps|init|view_passwords)
+    decrypt_passwords|edit_passwords|help|install_deps|init|view_passwords|encrypt_file|decrypt_file)
       # Special subcommand!
       command="$key"
       ;;
@@ -137,6 +137,18 @@ init() {
   echo
 }
 
+encrypt_file() {
+  ansible-vault encrypt \
+    --vault-password-file "$CC_ANSIBLE_VAULT_PASSWORD" \
+    ${POSARGS[@]}
+}
+
+decrypt_file() {
+  ansible-vault decrypt \
+    --vault-password-file "$CC_ANSIBLE_VAULT_PASSWORD" \
+    ${POSARGS[@]}
+}
+
 edit_passwords() {
   local tmpfile
   local venv_bin_path="${VIRTUALENV}/bin"
@@ -213,6 +225,10 @@ Examples:
 
   # Update the passwords file for the environment
   cc-ansible edit_passwords
+
+  # use ansible-vault to encrypt or decrypt a file
+  cc-ansible encrypt_file path/to/file
+  cc-ansible decrypt_file path/to/file
 USAGE
   exit 1
 }
