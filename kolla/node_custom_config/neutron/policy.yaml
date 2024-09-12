@@ -1,0 +1,5 @@
+---
+# permit users to see physnet info for networks they own
+"get_network:provider:network_type": "rule:admin_or_owner"
+"get_network:provider:physical_network": "rule:admin_or_owner"
+"get_network:provider:segmentation_id": "rule:admin_or_owner"
