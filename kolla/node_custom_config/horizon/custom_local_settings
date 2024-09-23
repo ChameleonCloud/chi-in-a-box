@@ -152,6 +152,11 @@ LAUNCH_INSTANCE_DEFAULTS = {
     'disable_volume': True,
     'disable_volume_snapshot': True,
     'create_volume': False,
+    'enable_metadata': False,
+    'enable_net_ports': True,
+    'enable_secgroups': False,
+    'enable_servergroups': False,
+    'default_flavor_name': 'baremetal',
 }
 
 # The OPENSTACK_IMAGE_BACKEND settings can be used to customize features
@@ -186,3 +191,6 @@ OPENSTACK_MANILA_FEATURES = {
 # necessary to embed serial console in iframe
 # Django3.0 changed the default from 'SAMEORIGIN' to 'DENY'
 X_FRAME_OPTIONS = 'SAMEORIGIN'
+
+# disable usage report on overview page
+OPENSTACK_USE_SIMPLE_TENANT_USAGE = False
