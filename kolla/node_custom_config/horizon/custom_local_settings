@@ -71,6 +71,11 @@ USER_MENU_LINKS = [
     'url': 'horizon:project:api_access:openrc',
     'external': False,
   },
+  {
+    'name': _('OpenStack clouds.yaml File'),
+    'icon_classes': ['fa-download', ],
+    'url': 'horizon:project:api_access:clouds.yaml',
+  },
 ]
 
 {% if enable_blazar | bool %}
