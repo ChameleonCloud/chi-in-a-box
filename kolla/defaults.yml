@@ -185,6 +185,8 @@ ironic_console_serial_speed: 115200n8
 encoded_ironic_pxe_root_password: "{{ ironic_pxe_root_password | password_hash('md5') |  regex_replace( '(\\$)', '$\\1') }}"
 ironic_kernel_append_params: nofb vga=normal console=tty0 console=ttyS0,{{ ironic_console_serial_speed }} rootpwd="{{ encoded_ironic_pxe_root_password }}"
 
+ironic_inspector_store: database
+
 # settings for ironic inspector
 
 # don't run standalone, always depend on glance+neutron+ironic.
