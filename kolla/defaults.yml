@@ -17,7 +17,7 @@ admin_openrc_directory: "{{ site_config_dir }}"
 # virtualenv specifies the path to the kolla virtualenv, while ansible_python_interpreter must be set explicitly
 # since it cannot be templated. This is overridden during bootstrap by cc-ansible.
 virtualenv: /etc/ansible/venv
-ansible_python_interpreter: /etc/ansible/venv/bin/python
+# ansible_python_interpreter: /etc/ansible/venv/bin/python
 
 chameleon_portal_url: https://www.chameleoncloud.org
 chameleon_reference_api_url: https://api.chameleoncloud.org

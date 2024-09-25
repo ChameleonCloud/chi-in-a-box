@@ -1,0 +1,2 @@
+---
+ansible_python_interpreter: /etc/ansible/venv/bin/python
