@@ -184,6 +184,7 @@ ironic_image_cache_size: 20480 # MB
 ironic_console_serial_speed: 115200n8
 encoded_ironic_pxe_root_password: "{{ ironic_pxe_root_password | password_hash('md5') |  regex_replace( '(\\$)', '$\\1') }}"
 ironic_kernel_append_params: nofb vga=normal console=tty0 console=ttyS0,{{ ironic_console_serial_speed }} rootpwd="{{ encoded_ironic_pxe_root_password }}"
+ironic_erase_devices_metadata_during_deploy: false
 
 # settings for ironic inspector
 
