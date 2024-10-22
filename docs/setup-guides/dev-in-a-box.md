@@ -42,6 +42,7 @@ If launching a VM on Chameleon to host this, follow the following steps.
     ```sh
     git clone https://github.com/ChameleonCloud/chi-in-a-box
     cd chi-in-a-box
+    ./cc-ansible install_deps
     ./cc-ansible --site /opt/site-config/ init
     ```
 3.  export an env var so you don't need to type "--site" for the remaining commands
@@ -67,20 +68,6 @@ If launching a VM on Chameleon to host this, follow the following steps.
     sudo ip link set int_api_vethb up
     ```
 
-    Neutron Provider Network interfaces
-    ```bash
-    sudo ip link add name physnet1_veth type veth peer physnet1_vethb
-    sudo ip link set physnet1_veth up
-    sudo ip link set physnet1_vethb up
-
-    sudo ip link add name physnet2_veth type veth peer physnet2_vethb
-    sudo ip link set physnet2_veth up
-    sudo ip link set physnet2_vethb up
-
-    sudo ip link add name physnet3_veth type veth peer physnet3_vethb
-    sudo ip link set physnet3_veth up
-    sudo ip link set physnet3_vethb up
-    ```
 
     We also want to make sure these intefaces aren't filtered by any firewalls.
     If you're using firewalld, then the following commands will do it:
