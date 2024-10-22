@@ -42,6 +42,7 @@ If launching a VM on Chameleon to host this, follow the following steps.
     ```sh
     git clone https://github.com/ChameleonCloud/chi-in-a-box
     cd chi-in-a-box
+    ./cc-ansible install_deps
     ./cc-ansible --site /opt/site-config/ init
     ```
 3.  export an env var so you don't need to type "--site" for the remaining commands
@@ -67,19 +68,11 @@ If launching a VM on Chameleon to host this, follow the following steps.
     sudo ip link set int_api_vethb up
     ```
 
-    Neutron Provider Network interfaces
+    Neutron tenant network interface (note no IP addresses!)
     ```bash
     sudo ip link add name physnet1_veth type veth peer physnet1_vethb
     sudo ip link set physnet1_veth up
     sudo ip link set physnet1_vethb up
-
-    sudo ip link add name physnet2_veth type veth peer physnet2_vethb
-    sudo ip link set physnet2_veth up
-    sudo ip link set physnet2_vethb up
-
-    sudo ip link add name physnet3_veth type veth peer physnet3_vethb
-    sudo ip link set physnet3_veth up
-    sudo ip link set physnet3_vethb up
     ```
 
     We also want to make sure these intefaces aren't filtered by any firewalls.
@@ -93,19 +86,19 @@ If launching a VM on Chameleon to host this, follow the following steps.
     sudo firewall-cmd --set-default-zone trusted
     ```
 
-5.  In your site-config, replace defaults.yml with the one for dev-in-a-box
+6.  In your site-config, replace defaults.yml with the one for dev-in-a-box
 
     ```
     cp /opt/site-config/dev-in-a-box.yml /opt/site-config/defaults.yml
     ```
 
-6.  Bootstrap the controller node, this will install apt packages, configure Docker, and modify /etc/hosts
+7.  Bootstrap the controller node, this will install apt packages, configure Docker, and modify /etc/hosts
 
     ```
     ./cc-ansible bootstrap-servers
     ```
 
-7.  Run prechecks to ensure common issues are avoided.
+8.  Run prechecks to ensure common issues are avoided.
 
     ```
     ./cc-ansible prechecks
@@ -116,7 +109,7 @@ If launching a VM on Chameleon to host this, follow the following steps.
         ```
         sudo systemctl disable --now nscd.service
         ```
-8. At this point, we should be ready to "deploy".
+9. At this point, we should be ready to "deploy".
     ```
     ./cc-ansible deploy
     ```
@@ -134,7 +127,7 @@ If launching a VM on Chameleon to host this, follow the following steps.
 
    * `deploy-containers`: check and if necessary update running containers. This can be run separately if you want to make sure containers are running, but explicitly don't want to touch the templated configuration, for example if you've made edits to your site config, or temporary changes directly in /etc/kolla.
 
-9. If all the steps so far have passed, all the core services should now be running! However, this isn't everything needed for a useful cloud. `post-deploy` consists of all the steps that require a functioning control plane. These include:
+10. If all the steps so far have passed, all the core services should now be running! However, this isn't everything needed for a useful cloud. `post-deploy` consists of all the steps that require a functioning control plane. These include:
     * Creating default networks
     * Creating compute "flavors"
     * Uploading default disk images for users to use
@@ -144,7 +137,7 @@ If launching a VM on Chameleon to host this, follow the following steps.
     ./cc-ansible post-deploy
     ```
 
-10. Now, we'll create some "virtual" baremetal nodes, used to test out the site. These are just VMs run with libvirt, but are
+11. Now, we'll create some "virtual" baremetal nodes, used to test out the site. These are just VMs run with libvirt, but are
 configured via IPMI and pxe network booted like a baremetal node, so we can exercise Ironic. The following playbook will install and configure the `tenks` utility to accomplish this. At the end of the invocation, it will print out some commands for you to run yourself to finish the setup.
 
 ```
