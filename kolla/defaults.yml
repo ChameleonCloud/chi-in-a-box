@@ -315,7 +315,7 @@ redfish_monitor_openstack_password: "{{ keystone_admin_password }}"
 redfish_monitor_openstack_project_name: "{{ keystone_admin_project }}"
 
 # Swift
-rgw_port: 7480 # Override non-standard KA default of 6780
+ceph_rgw_port: 7480 # Override non-standard KA default of 6780
 # Disable complete rgw compatibility for now. If Ceph has these options set,
 # it is considered "compatible":
 #   rgw_swift_url_prefix = "/"
