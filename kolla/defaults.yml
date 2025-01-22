@@ -224,6 +224,7 @@ prometheus_server_external_url: "{{ public_protocol }}://{{ prometheus_external_
 prometheus_alertmanager_external_url: "{{ public_protocol }}://{{ prometheus_external_fqdn }}:{{ prometheus_alertmanager_port }}"
 # Legacy chameleon_prometheus role vars
 prometheus_bind_address: "{{ lookup('vars', 'ansible_' + network_interface).ipv4.address }}"
+prometheus_user: prometheus
 
 # Redfish Monitor
 redfish_monitor_openstack_user: "{{ keystone_admin_username }}"
