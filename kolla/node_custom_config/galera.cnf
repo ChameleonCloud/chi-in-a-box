@@ -1,0 +1,7 @@
+[mysqld]
+{% set dynamic_pool_size_mb = (hostvars[inventory_hostname].ansible_facts.memtotal_mb * 0.2) | round | int %}
+{% if dynamic_pool_size_mb < 8192 %}
+innodb_buffer_pool_size = '{{ dynamic_pool_size_mb }}M'
+{% else %}
+innodb_buffer_pool_size = '8192M'
+{% endif %}
