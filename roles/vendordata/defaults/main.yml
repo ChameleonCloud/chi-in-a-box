@@ -5,7 +5,7 @@ vendordata_services:
   vendordata_api:
     group: vendordata
     enabled: true
-    image: docker.chameleoncloud.org/chameleon-vendordata-service:latest
+    image: ghcr.io/chameleoncloud/chameleon-vendordata-service:latest
     network: host
     mounts:
       - type: bind
