@@ -1,0 +1,16 @@
+chameleon_portal_url: https://www.chameleoncloud.org
+chameleon_reference_api_url: https://api.chameleoncloud.org
+
+chameleon_site_name: "{{ openstack_region_name }}"
+
+# Whether to show a dropdown in the Horizon GUI that provides links to other
+# Chameleon testbed sites.
+enable_chameleon_multisite: yes
+
+horizon_help_url: https://www.chameleoncloud.org/user/help/
+horizon_documentation_url: https://chameleoncloud.readthedocs.io/en/latest/technical/gui.html
+
+# as of antelope/2023.1, can load theme at deploy-time
+horizon_custom_themes:
+  - name: chameleoncloud
+    label: ChameleonCloud

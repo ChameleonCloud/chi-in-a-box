@@ -1,0 +1,19 @@
+# These initial groups are the only groups required to be modified. The
+# additional groups are for more control of the environment.
+[control]
+localhost       ansible_connection=local
+
+[network]
+localhost       ansible_connection=local
+
+[compute]
+localhost       ansible_connection=local
+
+[monitoring]
+localhost       ansible_connection=local
+
+[storage]
+localhost       ansible_connection=local
+
+[deployment]
+localhost       ansible_connection=local
