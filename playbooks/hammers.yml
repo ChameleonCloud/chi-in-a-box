@@ -1,7 +1,0 @@
----
-- hosts: hammers
-  become: true
-  roles:
-    - hammers
-  tags:
-    - hammers

@@ -1,9 +1,0 @@
----
-- name: restart jenkins slave
-  service:
-    name: "{{ jenkins_slave_service_name }}"
-    state: restarted
-
-- name: refresh services
-  service:
-    daemon_reload: yes
