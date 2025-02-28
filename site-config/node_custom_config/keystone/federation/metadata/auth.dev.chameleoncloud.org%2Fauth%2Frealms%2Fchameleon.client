@@ -1,0 +1,4 @@
+{
+    "client_id": "{{ keystone_idp_client_id }}",
+    "client_secret": "{{ keystone_idp_client_secret }}"
+}
