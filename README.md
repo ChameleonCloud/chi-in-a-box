@@ -15,7 +15,7 @@ cd chi-in-a-box
 git checkout ciab_minimal/2023.1
 ```
 
-## install the ciab tols
+## install the ciab tools
 ```
 uv venv .venv
 source .venv/bin/activate 
@@ -32,22 +32,28 @@ kolla-ansible install-deps
 cp site-config/passwords.yml{.example,}
 
 # and populate it with defaults
-kolla-genpwd -p ../site-config/passwords.yml
+kolla-genpwd -p site-config/passwords.yml
 ```
-
 
 edit globals.yml to set internal/external vip
 edit host_vars/localhost to set interface names
 
 
-## bootstrap servers
-1. `./cc-ansible --site /home/cc/synced_files/site-config/ bootstrap-servers`
-1. `./cc-ansible --site /home/cc/synced_files/site-config/ pull`
-1. `./cc-ansible --site /home/cc/synced_files/site-config/ genconfig`
-1. `./cc-ansible --site /home/cc/synced_files/site-config/ deploy`
+## deploy the site
 
+The below steps are a little slower, and more verbose than strictly necessary, but will make any inconsistencies clearer.
 
-<!-- uv pip install \
-    -r requirements.txt \
-    --reinstall-package kolla-ansible \
-    ../kolla-ansible -->
+On a known working site, pull and genconfig can be skipped.
+
+```
+./cc-ansible --site site-config bootstrap-servers
+./cc-ansible --site site-config prechecks
+./cc-ansible --site site-config pull
+./cc-ansible --site site-config genconfig
+./cc-ansible --site site-config deploy
+./cc-ansible --site site-config post-deploy
+```
+
+## Kicking the tires
+
+At this point, you can access the horizon dasboard at `kolla_external_vip_address`, logging in with the username+password found in `site-config/admin-openrc.sh`

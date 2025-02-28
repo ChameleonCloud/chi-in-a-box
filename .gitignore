@@ -10,7 +10,9 @@
 #secrets
 site-config/passwords.yml
 site-config/certificates
-
+site-config/*openrc*
+site-config/clouds.yaml
+site-config/clouds.yml
 
 # The virtualenv environment(s)
 venv*
