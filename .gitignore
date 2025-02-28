@@ -13,6 +13,7 @@ vault_password
 roles/galaxy.ansible.com/
 # The virtualenv environment(s)
 venv*
+.venv*
 # Kolla SSL certificates (dev only)
 kolla/certificates
 kolla/node_custom_config/certificates
