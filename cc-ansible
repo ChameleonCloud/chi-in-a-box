@@ -27,7 +27,7 @@ done
 KA_SITE=${KA_SITE_ARG:-$KA_SITE}
 
 # if KA_INVENTORY env var not set, default to site_config/inventory
-KA_INVENTORY=${KA_INVENTORY: -"${KA_SITE}/inventory"}
+KA_INVENTORY=${KA_INVENTORY:-"${KA_SITE}/inventory"}
 
 # if cmdline arg set, override env var and default
 KA_INVENTORY=${KA_INVENTORY_ARG:-$KA_INVENTORY}
