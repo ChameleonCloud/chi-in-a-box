@@ -17,6 +17,11 @@ node_config_directory: "/opt/kolla/config"
 # where bootstrap-serves will create virtualenv on target hosts
 virtualenv: /opt/kolla/venv
 
+# The group which own node_config_directory, you can use a non-root
+# user to deploy kolla
+config_owner_user: "kolla"
+config_owner_group: "kolla"
+
 # target virtualenv directory and python interpreter
 # this is set in group_vars as it varies per host
 #ansible_python_interpreter: /opt/kolla/venv/bin/python
@@ -24,6 +29,8 @@ virtualenv: /opt/kolla/venv
 ####################
 # Global config vars
 ####################
+
+kolla_base_distro: "ubuntu"
 
 # point at the docker registry we want
 docker_namespace: kolla
@@ -35,3 +42,7 @@ kolla_external_vip_address: 10.0.100.254
 
 # for kvm on kvm
 nova_compute_virt_type: kvm
+
+# default superadmin user and project
+keystone_admin_user: "admin"
+keystone_admin_project: "openstack"
