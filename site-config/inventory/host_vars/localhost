@@ -3,6 +3,6 @@
 # therefore any provisioning can be done locally.
 ansible_connection: local
 
-#network_interface: eth1
+network_interface: eno1np0
+neutron_external_interface: eno2np1
 #kolla_external_vip_interface: eth2
-#neutron_external_interface: eth3
