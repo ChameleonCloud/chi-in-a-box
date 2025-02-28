@@ -1,0 +1,3 @@
+[submodule "site-config/node_custom_config/horizon/themes/chameleoncloud"]
+	path = site-config/node_custom_config/horizon/themes/chameleoncloud
+	url = https://github.com/chameleoncloud/horizon-theme
