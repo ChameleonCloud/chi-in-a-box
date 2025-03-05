@@ -1,0 +1,71 @@
+---
+
+on:
+  push:
+    branches:
+      - 'stable/**'
+  pull_request:
+
+
+jobs:
+  test:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: checkout chi-in-a-box
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: "0.6.4"
+      - name: install python deps
+        run: |
+          uv venv .venv
+          source .venv/bin/activate
+          uv pip install \
+            -r requirements.txt \
+            git+https://github.com/openstack/kolla-ansible@unmaintained/2023.1
+          kolla-ansible install-deps
+      - name: generate kolla passwords
+        run: |
+          source .venv/bin/activate
+          cp site-config/passwords.yml{.example,}
+          kolla-genpwd -p site-config/passwords.yml
+      - name: some minimal network config
+        run: |
+          sudo ip link add macvlan1 link eth0 type macvlan mode bridge \
+          && sudo ip link set macvlan1 up \
+          && sudo ip addr add 172.16.201.10/24 dev macvlan1
+          echo "network_interface: macvlan1" >> site-config/inventory/host_vars/localhost
+
+          sudo ip link add macvlan2 link eth0 type macvlan mode bridge \
+          && sudo ip link set macvlan2 up
+          echo "neutron_external_interface: macvlan2" >> site-config/inventory/host_vars/localhost
+
+          sudo hostnamectl set-hostname "ciablocal"
+      - name: bootstrap servers
+        run: |
+          source .venv/bin/activate
+          ./cc-ansible --site site-config bootstrap-servers
+          cat /etc/hosts
+      - name: prechecks
+        run: |
+          source .venv/bin/activate
+          ./cc-ansible --site site-config prechecks
+      # - name: pull
+      #   run: |
+      #     source .venv/bin/activate
+      #     ./cc-ansible --site site-config pull
+      # - name: genconfig
+      #   run: |
+      #     source .venv/bin/activate
+      #     ./cc-ansible --site site-config genconfig
+      - name: deploy
+        run: |
+          source .venv/bin/activate
+          ./cc-ansible --site site-config deploy
+      - name: post-deploy
+        run: |
+          source .venv/bin/activate
+          ./cc-ansible --site site-config post-deploy
