@@ -1,0 +1,8 @@
+---
+image_store_cloud: 'kolla-admin'
+
+image_container: pdmars-image-test-public
+image_type: qcow2
+image_prefix: testing_
+scope: prod
+object_store_url: https://chi.uc.chameleoncloud.org:7480/swift/v1/AUTH_4140e5f9f65545dbb9f0bdc90ef68d23

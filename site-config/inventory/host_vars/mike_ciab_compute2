@@ -1,0 +1,4 @@
+---
+
+network_interface: eno1np0
+neutron_external_interface: eno2np1

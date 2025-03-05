@@ -8,6 +8,8 @@ localhost       ansible_connection=local
 
 [compute]
 localhost       ansible_connection=local
+mike_ciab_compute2 ansible_host=172.16.201.189
+mike_ciab_compute3 ansible_host=172.16.201.71
 
 [monitoring]
 localhost       ansible_connection=local
