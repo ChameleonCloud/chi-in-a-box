@@ -1,4 +1,0 @@
----
-- hosts: metric_collector
-  roles:
-    - metric_collector

@@ -1,5 +1,0 @@
----
-- hosts: chameleon_usage
-  roles:
-    - role: chameleon_usage
-      when: enable_usage_reporting | bool

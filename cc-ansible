@@ -1,412 +1,54 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
-set -o errexit
-set -o nounset
-set -o pipefail
+set -euo pipefail
 
-DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
-VIRTUALENV="$(realpath "${VIRTUALENV:-"$DIR"/venv}")"
-
-if [ -f "${VIRTUALENV}/bin/activate" ]; then
-  # shellcheck source=/dev/null
-  source "${VIRTUALENV}/bin/activate"
-  # sourcing this will set the VIRTUAL_ENV, PATH, and PYTHON_HOME env vars
-fi
 
 declare -a POSARGS=()
-declare -a TRAPS=()
-cleanup() {
-  for exit_trap in "${TRAPS[@]}"; do "$exit_trap"; done
-}
-trap cleanup EXIT
 
 while [[ $# -gt 0 ]]; do
-  key="$1"
-
-  case $key in
-    -p|--playbook)
-      CC_ANSIBLE_PLAYBOOK="$2"
-      shift # Past arg
-      ;;
-    -s|--site)
-      CC_ANSIBLE_SITE="$(realpath "$2")"
-      shift # Past arg
-      ;;
-    --check)
-      # Add proper flag support for --check as an option for dry-runs
-      export EXTRA_OPTS="${EXTRA_OPTS:-} --check"
-      ;;
-    decrypt_passwords|edit_passwords|help|install_deps|init|view_passwords|encrypt_file|decrypt_file)
-      # Special subcommand!
-      command="$key"
-      ;;
-    -h|--help)
-      command=help
-      ;;
-    *)
-      POSARGS+=("$key")
-      ;;
-  esac
-
-  shift
+    key="$1"
+    case $key in
+        -s|--site)
+            KA_SITE_ARG="$(realpath "$2")"
+            shift # Past arg
+            ;;
+        -i|--inventory)
+            KA_INVENTORY_ARG="$(realpath "$2")"
+            shift # Past arg
+            ;;
+        *)
+            POSARGS+=($key)
+            ;;
+    esac
+    shift
 done
 
-#
-# Subcommands
-#
+# if args are passed, override env vars
+KA_SITE=${KA_SITE_ARG:-$KA_SITE}
 
-install_deps() {
-  # install kolla-ansible, perform updates if necessary.
+# if KA_INVENTORY env var not set, default to site_config/inventory
+KA_INVENTORY=${KA_INVENTORY:-"${KA_SITE}/inventory"}
 
-  # create virtualenv
-  python3 -m venv "$VIRTUALENV"
-  # shellcheck source=/dev/null
-  source "${VIRTUALENV}/bin/activate"
+# if cmdline arg set, override env var and default
+KA_INVENTORY=${KA_INVENTORY_ARG:-$KA_INVENTORY}
 
-  # upgrade pip and build tools
-  pip install --upgrade \
-    pip \
-    setuptools \
-    wheel
 
-  local pip_requirements="$DIR/requirements.txt"
-  pip install -r "${pip_requirements}"
-
-  # update Ansible Galaxy roles and collections
-  local galaxy_requirements="$DIR/requirements.yml"
-  local galaxy_role_path="$DIR/galaxy.ansible.com/ansible_roles/"
-  ansible-galaxy role install --force -p "$galaxy_role_path" -r "$galaxy_requirements"
-  local galaxy_collection_path="$DIR/galaxy.ansible.com/"
-  ansible-galaxy collection install --force -p "$galaxy_collection_path" -r "$galaxy_requirements"
-
-  git submodule update --init
-
-  pip install \
-    -r requirements.txt \
-    --config-settings editable_mode=strict \
-    -e src/kolla-ansible
-
-  # Update/install yq, adding it to the venv bin path
-  YQ_VERSION=4.9.6
-  if [[ "$(type -t yq)" != "file" ]]; then
-    YQ_BINARY="yq_linux_amd64"
-    wget https://github.com/mikefarah/yq/releases/download/v${YQ_VERSION}/${YQ_BINARY}.tar.gz -O - \
-      | tar xz && mv ${YQ_BINARY} "$VIRTUALENV/bin/yq"
-  fi
-
-  # install kolla-ansible galaxy deps. We use a subshell to drop back out of the venv afterwards
-  (source "${VIRTUALENV}/bin/activate" && kolla-ansible install-deps)
-  
-}
-
-init() {
-  local site_config="$CC_ANSIBLE_SITE"
-
-  if [[ -d "$site_config" ]]; then
-    echo "Site config already exists at $site_config! Aborting."
-    return 1
-  fi
-
-  # Copy files from example
-  mkdir -p "$(dirname "$site_config")"
-  cp -a "$DIR/site-config.example/" "$site_config"
-
-  local inventory="$site_config/inventory"
-
-  # Do some simple hostname guessing
-  this_host=$(hostname -s)
-  sed -i.bak "s/<host>/$this_host/g" "$inventory/hosts" \
-    && rm -f "$inventory/hosts.bak"
-  mv "$inventory/host_vars/<host>" "$inventory/host_vars/$this_host"
-
-  # Generate vault password
-  openssl rand -base64 2048 >"$site_config/vault_password" \
-    && chmod 400 "$site_config/vault_password"
-
-  # Generate passwords
-  kolla-genpwd --passwords "$site_config/passwords.yml"
-  ansible-vault encrypt \
-    --vault-password-file "$site_config/vault_password" \
-    "$site_config/passwords.yml"
-
-  echo "The beginnings of your site configuration were installed to $site_config."
-  echo "To use this site configuration automatically for future commands, you can"
-  echo "set an environment variable:"
-  echo
-  echo -e "\texport CC_ANSIBLE_SITE=$site_config"
-  echo
-}
-
-encrypt_file() {
-  ansible-vault encrypt \
-    --vault-password-file "$CC_ANSIBLE_VAULT_PASSWORD" \
-    ${POSARGS[@]}
-}
-
-decrypt_file() {
-  ansible-vault decrypt \
-    --vault-password-file "$CC_ANSIBLE_VAULT_PASSWORD" \
-    ${POSARGS[@]}
-}
-
-edit_passwords() {
-  local tmpfile
-  local venv_bin_path="${VIRTUALENV}/bin"
-  local passwords_file="$CC_ANSIBLE_SITE/passwords.yml"
-  local passwords_file_chksum="${passwords_file}.sha256"
-
-  tmpfile="$(mktemp)"
-  _edit_passwords_cleanup() {
-    rm -f "$tmpfile"
-    rm -f "$passwords_file_chksum"
-  }
-  TRAPS+=(_edit_passwords_cleanup)
-
-  echo "Decrypting passwords..."
-  ansible-vault view \
-    --vault-password-file "$CC_ANSIBLE_VAULT_PASSWORD" \
-    "$CC_ANSIBLE_SITE/passwords.yml" >"$tmpfile"
-
-  if [[ ! -s "$tmpfile" ]]; then
-    echo "Failed to decrypt $passwords_file with vault token."
-    exit 1
-  fi
-
-  sha256sum "$tmpfile" >"$passwords_file_chksum"
-  ${EDITOR:-vi} "$tmpfile"
-  local ret=$?
-  if [[ $ret -gt 0 ]]; then exit $ret; fi
-  if sha256sum --quiet --check "$passwords_file_chksum"; then
-    echo "No passwords were changed."
-    exit 0
-  fi
-
-  echo "Generating placeholder passwords for any missing values..."
-  kolla-genpwd --passwords "$tmpfile"
-  echo "Encrypting passwords..."
-  "${venv_bin_path}/ansible-vault" encrypt \
-    --vault-password-file "$CC_ANSIBLE_VAULT_PASSWORD" \
-    "$tmpfile"
-  cp "$tmpfile" "$CC_ANSIBLE_SITE/passwords.yml"
-}
-
-# Deprecated function name
-decrypt_passwords() {
-  view_passwords
-}
-
-view_passwords() {
-  ansible-vault view \
-    --vault-password-file "$CC_ANSIBLE_VAULT_PASSWORD" \
-    "$CC_ANSIBLE_SITE/passwords.yml"
-}
-
-help() {
-  cat <<USAGE
-Usage: cc-ansible [-s|--site SITE]
-                  [subcommand|--playbook PLAYBOOK]
-                  ARGS
-
-Subcommands:
-  view_passwords: View the contents of the encrypted password file.
-  edit_passwords: Update an encrypted passwords file for the given environment.
-                  Opens an interactive editor and saves the results back out as
-                  en encrypted file.
-
-Examples:
-  # Run the 'deploy' step for Kolla-Ansible in a 'production' site
-  cc-ansible -s /path/to/sites/production deploy
-
-  # Run the 'upgrade' step for only Ironic tags
-  cc-ansible upgrade --tags ironic
-
-  # Run an external playbook
-  cc-ansible --playbook path/to/playbook.yml
-
-  # Update the passwords file for the environment
-  cc-ansible edit_passwords
-
-  # use ansible-vault to encrypt or decrypt a file
-  cc-ansible encrypt_file path/to/file
-  cc-ansible decrypt_file path/to/file
-USAGE
-  exit 1
-}
-
-# install_deps creates the virtualenv. Exit early if it's not set up
-if [ "${command:-}" == "install_deps" ]; then
-  :
-elif [ -z "${VIRTUAL_ENV+x}" ]; then
-  # VIRTUAL_ENV is present if we have sourced a venv/bin/activate
-  cat <<ERRMSG
-Error: virtualenv is not set up. Please create it by running:
-./cc-ansible install_deps
-ERRMSG
-  exit 1
-else
-  echo "Using venv ${VIRTUAL_ENV}"
-fi
-
-# On init, there is no requirement that the site config directory be defined,
-# because one of init's tasks is creating this directory. Set a default.
-if [[ "${command:-}" == "install_deps" ]]; then
-  # if we're installing deps, this is a no-op, but prevents unset variables
-  CC_ANSIBLE_SITE="${CC_ANSIBLE_SITE:-$DIR/site-config}"
-elif [[ "${command:-}" == "init" ]]; then
-  CC_ANSIBLE_SITE="${CC_ANSIBLE_SITE:-$DIR/site-config}"
-elif [[ -z "${CC_ANSIBLE_SITE:-}" ]]; then
-  cat <<ERRMSG
-Error: no site specified! Please specify which site to execute under with either
-the --site <dir> flag or by setting the CC_ANSIBLE_SITE environment variable.
-
-Example:
-  cc-ansible --site /etc/sites/production
-
-  CC_ANSIBLE_SITE=/etc/sites/production "$(basename "$0")"
-ERRMSG
-  exit 1
-fi
-
-CC_ANSIBLE_VAULT_PASSWORD="${CC_ANSIBLE_VAULT_PASSWORD:-$CC_ANSIBLE_SITE/vault_password}"
-CC_ANSIBLE_ENV="$CC_ANSIBLE_SITE/.env"
-# shellcheck disable=1090 # TODO add sample .env file for testing
-if [[ -f "$CC_ANSIBLE_ENV" ]]; then
-  set -a; source "$(realpath "$CC_ANSIBLE_ENV")"; set +a
-fi
-
-find_kolla_ansible_base_dir () {
-  kolla_direct_url="$(find ${VIRTUAL_ENV}/lib/  -wholename '*kolla_ansible*.dist-info/direct_url.json' -print -quit)"
-  if test -n "${kolla_direct_url}"; then
-      # Editable install in local path
-      direct_url="$(yq eval '.url' ${kolla_direct_url})"
-      BASEDIR="${direct_url#file:\/\/}"
-  else
-      BASEDIR="${VIRTUAL_ENV}/share/kolla-ansible"
-  fi
-  echo "${BASEDIR}/ansible"
-}
-
-# Handle subcommands
-if [[ -n "${command:-}" ]]; then
-  $command "$@"
-  exit $?
-fi
-
-ansible_path="$(find_kolla_ansible_base_dir)"
-if [[ -n "${CC_ANSIBLE_PLAYBOOK:-}" ]]; then
-  echo "**********************************************************************"
-  echo "* Playbook override detected! This playbook will be executed within  *"
-  echo "* Kolla-Ansible's playbook context.                                  *"
-  echo "**********************************************************************"
-  echo
-
-  playbook_file="$ansible_path/$(basename "$CC_ANSIBLE_PLAYBOOK")"
-
-  # Because we execute within Kolla-Ansible's playbook directory, "magic"
-  # paths will not work any more--add our plugins/libraries to Ansible's
-  # search path directly.
-  export ANSIBLE_ACTION_PLUGINS="$DIR/playbooks/action_plugins"
-  export ANSIBLE_LIBRARY="$DIR/playbooks/library"
-  export ANSIBLE_TEMPLATES="$DIR/playbooks/templates"
-
-  # Copy the playbook to a new location relative to the Kolla-Ansible installation
-  # to allow the group_vars/ in the playbook directory to take effect.
-  cp "$(realpath "$CC_ANSIBLE_PLAYBOOK")" "$playbook_file"
-  _playbook_override_cleanup() {
-    rm -f "$playbook_file"
-  }
-  TRAPS+=(_playbook_override_cleanup)
-
-  # Prepare an invocation of Kolla-Ansible targeting this playbook
-  POSARGS+=(deploy --playbook "$playbook_file")
-fi
-
-lockfile="$CC_ANSIBLE_SITE/.lock"
-if [[ -f "$lockfile" ]]; then
-  cat <<ERRMSG
-ERROR: Lockfile $lockfile exists! Another process may be updating this site.
-Wait until the other process finishes, or optionally stop the running process
-in order to continue.
-ERRMSG
-  exit 1
-fi
-
-touch "$lockfile"
-_lock_cleanup() {
-  rm -f "$lockfile"
-}
-TRAPS+=(_lock_cleanup)
-
-# Prepare the configuration directory for the Kolla-Ansible invocation:
-CONFIG_DIR="$(mktemp -d)"
-_config_dir_cleanup() {
-  rm -rf "$CONFIG_DIR"
-}
-TRAPS+=(_config_dir_cleanup)
-# 1. Copy base node_custom_config
-rsync -a "$DIR/kolla/node_custom_config/" "$CONFIG_DIR/node_custom_config/"
-# 2. Copy anything declared in site-config (can override files in node_custom_config)
-rsync -a "$CC_ANSIBLE_SITE/" "$CONFIG_DIR/"
-# 3. Ensure a defaults.yml is defined, if the site-config didn't define it.
-if [[ ! -f "$CONFIG_DIR/defaults.yml" ]]; then
-  echo -e "---\n_placeholder_for_valid_yaml:" >"$CONFIG_DIR/defaults.yml"
-fi
-if [[ ! -f "$CONFIG_DIR/globals.yml" ]]; then
-  echo -e "---\n_placeholder_for_valid_yaml:" >"$CONFIG_DIR/globals.yml"
-fi
-# 4. Ensure inventory/group_vars directory exists
-mkdir -p "${CONFIG_DIR}/inventory/group_vars/"
-# 5. Stamp out a group vars file to set defaults for any host in baremetal group
-#    (should be all nodes enrolled with Kolla-Ansible). Doing it this way allows
-#    the site-config to override anything here in host_vars or more specific
-#    group_vars files.
-# shellcheck disable=2016 # yq is directly evaluating this string
-"$VIRTUALENV"/bin/yq eval-all '. as $item ireduce ({}; . * $item )' \
-  "$DIR/kolla/defaults.yml" "$CONFIG_DIR/defaults.yml" \
-  >"$CONFIG_DIR/globals.yml"
-
+# modify positional args to pass to kolla ansible
 declare -a kolla_args=()
-kolla_args+=(--configdir="$CONFIG_DIR")
-kolla_args+=(--inventory="$CONFIG_DIR/inventory")
-kolla_args+=(--key="$CC_ANSIBLE_VAULT_PASSWORD")
-kolla_args+=(--passwords="$CONFIG_DIR/passwords.yml")
-kolla_args+=(--extra PASSWORDS_FILE="$CONFIG_DIR/passwords.yml")
-kolla_args+=(--extra node_custom_config="$CONFIG_DIR/node_custom_config")
-kolla_args+=(--extra cc_ansible_site_dir="$CONFIG_DIR")
-kolla_args+=(--extra deployment_dir="$DIR")
-kolla_args+=(--extra site_config_dir="$CC_ANSIBLE_SITE")
 
-# We set ansible ansible_python_interpreter to the virtualenv inside site-config, and override here during bootstrap.
-# Overriding at the CLI here applies to all hosts, including the deploy host.
-# Bootstrap-servers creates a virtualenv at $VIRTUALENV, on all hosts except the deploy host, requiring a special case.
-# The old behavior was to set it here if NOT bootstrapping, but that fails for the deploy-host case.
-
-if [[ "${POSARGS[*]}" =~ bootstrap-servers ]]; then
-  # Assume python3 can be found in $PATH, only used for creating the virtualenv.
-  kolla_args+=(--extra ansible_python_interpreter="python3")
+# if we're running bootstrap_servers, we use the default python interpereter
+# if we're NOT, then use python from the venv created by bootstrap_servers
+if [[ "${POSARGS[@]}" =~ bootstrap-servers ]]; then
+    kolla_args+=(--extra ansible_python_interpreter="python3")
 fi
 
-if [[ "${POSARGS[*]}" =~ post-deploy ]]; then
-  post_deploy_play="$ansible_path/ciab_post_deploy.yml"
-  _post_override_cleanup() {
-    rm -f "$post_deploy_play"
-  }
-  TRAPS+=(_post_override_cleanup)
+# disable initial host key checking
+export ANSIBLE_HOST_KEY_CHECKING=false
 
-  # Important that the destination does not having a trailing `/`
-  cp -f "$DIR/playbooks/post_deploy.yml" "$post_deploy_play"
-  kolla_args+=(--extra post_deploy_extra_play="ciab_post_deploy.yml")
-fi
+# need to pass full path or openrc fails
 kolla_args+=("${POSARGS[@]}")
-
-#load tags to skip
-ANSIBLE_SKIP_TAGS="$(grep -v "^#" ./kolla-skip-tags | paste -sd ',' || true )"
-if [[ -n "${ANSIBLE_SKIP_TAGS}" ]]; then
-  kolla_args+=("--skip-tags")
-  kolla_args+=("${ANSIBLE_SKIP_TAGS}")
-fi
-
-# kolla-ansible checks PYTHONPATH, so we need to activate the virtualenv
-source "${VIRTUALENV}/bin/activate"
-kolla-ansible "${kolla_args[@]}"
-# set +o xtrace
+kolla-ansible \
+    --configdir "${KA_SITE}" \
+    --inventory "${KA_INVENTORY}" \
+    --passwords "${KA_SITE}/passwords.yml" \
+    "${kolla_args[@]}"

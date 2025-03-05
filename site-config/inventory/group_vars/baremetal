@@ -1,0 +1,4 @@
+---
+# NOTE: This is set here because baremetal group excludes deploy host, which may have a different python path!
+# python interpreter to use after bootstrap-servers is done
+ansible_python_interpreter: /opt/kolla/venv/bin/python3

@@ -1,4 +1,0 @@
----
-- hosts: grafana
-  roles:
-    - chameleon_grafana

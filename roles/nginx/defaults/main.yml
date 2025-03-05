@@ -1,3 +1,0 @@
-nginx_docker_network_name: nginx
-
-nginx_docker_image: nginx:1.15

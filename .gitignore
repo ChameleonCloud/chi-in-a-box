@@ -5,24 +5,22 @@
 # Checksums/stamps for dependencies
 *.sha256
 *.gitref
-# The default site-config is generated here
-site-config/
-# The vault passwords are stored here by convention
-vault_password
-# Ansible Galaxy roles
-roles/galaxy.ansible.com/
+
+
+#secrets
+site-config/passwords.yml
+site-config/certificates
+site-config/*openrc*
+site-config/clouds.yaml
+site-config/clouds.yml
+
 # The virtualenv environment(s)
 venv*
-# Kolla SSL certificates (dev only)
-kolla/certificates
-kolla/node_custom_config/certificates
-# Vagrant development environment
-vagrant/.vagrant
-vagrant/storage
-vagrant/vagrantkey*
+.venv*
+
 # Python build files
 *.pyc
 __pycache__/
-galaxy.ansible.com/**
 
+# Ansible Galaxy roles and collections
 roles/ansible_collections

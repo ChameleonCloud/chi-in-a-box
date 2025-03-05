@@ -1,9 +1,0 @@
----
-- name: reload systemd daemon
-  service:
-    daemon_reload: yes
-
-- name: restart redfish monitor
-  service:
-    name: redfish_monitor
-    state: restarted

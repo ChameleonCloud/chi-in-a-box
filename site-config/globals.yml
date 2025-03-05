@@ -1,0 +1,51 @@
+---
+#########################
+# Deploy Host Config Vars
+#########################
+# The directory on the deploy host containing globals.yml.
+# this is also the base of our of our site config dir
+# CONFIG_DIR is set by --configdir
+node_config: "{{ CONFIG_DIR }}"
+# The directory to merge custom config files the kolla's config files
+node_custom_config: "{{ CONFIG_DIR }}/node_custom_config"
+
+#########################
+# Target host config vars
+#########################
+# The directory to store the config files on the destination node
+node_config_directory: "/opt/kolla/config"  
+# where bootstrap-serves will create virtualenv on target hosts
+virtualenv: /opt/kolla/venv
+
+# The group which own node_config_directory, you can use a non-root
+# user to deploy kolla
+# create_kolla_user: true
+# config_owner_user: "kolla"
+# config_owner_group: "kolla"
+
+# target virtualenv directory and python interpreter
+# this is set in group_vars as it varies per host
+#ansible_python_interpreter: /opt/kolla/venv/bin/python
+
+####################
+# Global config vars
+####################
+
+kolla_base_distro: "ubuntu"
+
+# point at the docker registry we want
+docker_namespace: kolla
+docker_registry: docker.chameleoncloud.org
+
+# default superadmin user and project
+keystone_admin_user: "admin"
+keystone_admin_project: "openstack"
+
+# for kvm on kvm
+nova_compute_virt_type: kvm
+
+# haproxy IP to bind on api_network
+kolla_internal_vip_address: 172.16.201.254
+
+# haproxy IP to bind on external_api_network
+kolla_external_vip_address: 172.16.202.254
