@@ -43,3 +43,47 @@ keystone_admin_project: "openstack"
 
 # for kvm on kvm
 nova_compute_virt_type: kvm
+
+####################################
+# Horizon config for chameleon theme
+####################################
+
+chameleon_portal_url: https://www.chameleoncloud.org
+chameleon_reference_api_url: https://api.chameleoncloud.org
+
+chameleon_site_name: "{{ openstack_region_name }}"
+
+# Whether to show a dropdown in the Horizon GUI that provides links to other
+# Chameleon testbed sites.
+enable_chameleon_multisite: yes
+
+horizon_help_url: https://www.chameleoncloud.org/user/help/
+horizon_documentation_url: https://chameleoncloud.readthedocs.io/en/latest/technical/gui.html
+
+# as of antelope/2023.1, can load theme at deploy-time
+horizon_custom_themes:
+  - name: chameleoncloud
+    label: ChameleonCloud
+
+########################
+# Federated login config
+########################
+
+enable_keystone_federation: false
+
+keystone_identity_providers:
+  - name: "chameleon_dev"
+    openstack_domain: "chameleon_dev"
+    protocol: openid
+    identifier: "https://auth.dev.chameleoncloud.org/auth/realms/chameleon"
+    public_name: Login with Chameleon Dev
+    attribute_mapping: chameleon_mapping
+    metadata_folder: "{{ node_custom_config }}/keystone/federation/metadata"
+
+keystone_identity_mappings:
+  - name: chameleon_mapping
+    file: "{{ node_custom_config }}/keystone/idp_mapping.json"
+
+keystone_image_full: ghcr.io/chameleoncloud/kolla/keystone:2023.1-ubuntu-jammy
+keystone_fernet_image_full: ghcr.io/chameleoncloud/kolla/keystone-fernet:2023.1-ubuntu-jammy
+keystone_ssh_image_full: ghcr.io/chameleoncloud/kolla/keystone-ssh:2023.1-ubuntu-jammy
