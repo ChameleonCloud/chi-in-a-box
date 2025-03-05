@@ -1,0 +1,48 @@
+---
+
+on:
+  push:
+    branches:
+      - 'stable/**'
+      - 'minimal/**'
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: checkout chi-in-a-box
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: "0.6.4"
+      - name: setup venv, chi-in-a-box, and site-config
+        run: |
+          testing/setup_ciab.sh testing/configs/base.yml
+      - name: bootstrap servers
+        run: |
+          source .venv/bin/activate
+          ./cc-ansible --site site-config bootstrap-servers
+      - name: prechecks
+        run: |
+          source .venv/bin/activate
+          ./cc-ansible --site site-config prechecks
+      - name: deploy
+        run: |
+          source .venv/bin/activate
+          ./cc-ansible --site site-config deploy
+      - name: post-deploy
+        run: |
+          source .venv/bin/activate
+          ./cc-ansible --site site-config post-deploy
+      - name: set up tests
+        run: |
+          source .venv/bin/activate
+          testing/setup_tests.sh
+#      - name: run smoke tests
+#        run: |
+#          source .venv/bin/activate
+#          rally verify start --pattern=smoke
