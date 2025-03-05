@@ -1,4 +1,0 @@
----
-- hosts: manila-nfs-ganesha
-  roles:
-    - role: filesystem
