@@ -1,0 +1,126 @@
+from os import environ
+
+from django.utils.translation import gettext_lazy as _
+from openstack_dashboard.settings import HORIZON_CONFIG
+
+# Make oslo_policy DeprecationWarnings shut up
+{% if not (horizon_logging_debug | bool) %}
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+{% endif %}
+
+# Kolla-ansible defaults this to 'internalURL', which doesn't work when
+# we need to access another region from across the public internet. Need
+# to unfortunately default to 'public' interface for all endpoints as it is
+# not currently possible (?) to use a different value here depending on which
+# region is being used.
+OPENSTACK_ENDPOINT_TYPE = 'publicURL'
+
+# Default user to specific region on login.
+DEFAULT_SERVICE_REGIONS = {
+  '*': '{{ openstack_region_name }}',
+}
+
+# Used by server instance page to create links from the instance overview
+# to the resource catalog.
+CHAMELEON_PORTAL_API_BASE_URL = '{{ chameleon_portal_url }}'
+CHAMELEON_REFERENCE_API_URL = '{{ chameleon_reference_api_url }}'
+CHAMELEON_SITE_ID = '{{ chameleon_site_name }}'
+{% if enable_chameleon_multisite | bool %}
+# Hide the region dropdown
+OPENSTACK_KEYSTONE_MULTIREGION_SUPPORT = False
+# Show the site dropdown
+CHAMELEON_MULTISITE_SUPPORT = True
+{% else %}
+CHAMELEON_SITES = {
+{% for conf in horizon_regions %}
+  '{{ conf.region_name }}': '{{ conf.chameleon_site_name }}',
+{% endfor %}
+}
+{% endif %}
+
+SITE_BRANDING = 'ChameleonCloud'
+
+# Hide default Help link
+HORIZON_CONFIG['help_url'] = None
+{% if enable_zun | bool and not enable_nova | bool %}
+# Special case when Zun is enabled and Nova is not; change default view from Nova to Zun
+HORIZON_CONFIG['user_home'] = '/project/container/containers'
+{% endif %}
+# Add in extra links
+USER_MENU_LINKS = [
+{% if horizon_help_url %}
+  {
+    'name': _('Help Desk'),
+    'icon_classes': ['fa-question-circle'],
+    'url': '{{ horizon_help_url }}',
+    'external': True,
+  },
+{% endif %}
+{% if horizon_documentation_url %}
+  {
+    'name': _('Documentation'),
+    'icon_classes': ['fa-book'],
+    'url': '{{ horizon_documentation_url }}',
+    'external': True,
+  },
+{% endif %}
+  {
+    'name': _('OpenStack RC File'),
+    'icon_classes': ['fa-download'],
+    'url': 'horizon:project:api_access:openrc',
+    'external': False,
+  },
+  {
+    'name': _('OpenStack clouds.yaml File'),
+    'icon_classes': ['fa-download', ],
+    'url': 'horizon:project:api_access:clouds.yaml',
+  },
+]
+
+# horizon themes are represented as a tuple of name, label, and path
+chameleon_theme = (
+  'chameleoncloud', 'ChameleonCloud',
+  '/etc/openstack-dashboard/themes/chameleoncloud'
+  )
+
+# set to single element of "AVAILABLE_THEMES", defined in kolla local_settings
+SELECTABLE_THEMES = [chameleon_theme]
+# set default to "name" field of our theme tuple
+DEFAULT_THEME = chameleon_theme[0]
+
+# The OPENSTACK_IMAGE_BACKEND settings can be used to customize features
+# in the OpenStack Dashboard related to the Image service, such as the list
+# of supported image formats.
+OPENSTACK_IMAGE_BACKEND = {
+    'image_formats': [
+        ('qcow2', 'QCOW2 - QEMU Emulator'),
+        ('raw', 'Raw'),
+    ],
+}
+
+# The OPENSTACK_HEAT_STACK has the only setting available - enable_user_pass,
+# which can be used to disable the password field while launching the stack.
+# Set to False if HEAT uses trusts by default otherwise it needs to be set as True.
+OPENSTACK_HEAT_STACK = {
+    'enable_user_pass': False
+}
+
+# The OPENSTACK_MANILA_FEATURES settings can be used to enable or disable
+# the UI for the various services provided by Manila.
+OPENSTACK_MANILA_FEATURES = {
+    'enable_share_groups': False,
+    'enable_replication': False,
+    'enable_migration': False,
+    'enable_public_share_type_creation': False,
+    'enable_public_share_group_type_creation': False,
+    'enable_public_shares': True,
+    'enabled_share_protocols': ['NFS'],
+}
+
+# necessary to embed serial console in iframe
+# Django3.0 changed the default from 'SAMEORIGIN' to 'DENY'
+X_FRAME_OPTIONS = 'SAMEORIGIN'
+
+# disable usage report on overview page
+OPENSTACK_USE_SIMPLE_TENANT_USAGE = False
