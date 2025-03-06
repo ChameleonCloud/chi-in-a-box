@@ -12,15 +12,14 @@ source $HOME/.local/bin/env
 ```
 git clone https://github.com/chameleoncloud/chi-in-a-box
 cd chi-in-a-box
-git checkout ciab_minimal/2023.1
+git checkout ciab_minimal/ussuri-kvm
 ```
 
 ## install the ciab tools
 ```
 uv venv .venv
 source .venv/bin/activate 
-uv pip install -r requirements.txt 
-kolla-ansible install-deps
+uv pip install -r requirements.txt
 ```
 
 ## Customize site-config

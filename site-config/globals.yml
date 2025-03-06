@@ -87,7 +87,7 @@ keystone_oidc_client_secret: "public"
 keystone_oidc_provider_metadata_url: "{{ keystone_identity_providers[0].identifier }}/.well-known/openid-configuration"
 
 # keystone must support mapping multiple projects or keycloak federation will fail
-keystone_image_full: ghcr.io/chameleoncloud/kolla/keystone:2023.1-ubuntu-jammy
-keystone_fernet_image_full: ghcr.io/chameleoncloud/kolla/keystone-fernet:2023.1-ubuntu-jammy
-keystone_ssh_image_full: ghcr.io/chameleoncloud/kolla/keystone-ssh:2023.1-ubuntu-jammy
-horizon_image_full: ghcr.io/chameleoncloud/kolla/horizon:2023.1-ubuntu-jammy
+keystone_image_full: ghcr.io/chameleoncloud/kolla/ubuntu-source-keystone:77cca74
+keystone_fernet_image_full: ghcr.io/chameleoncloud/kolla/ubuntu-source-keystone-fernet:77cca74
+keystone_ssh_image_full: ghcr.io/chameleoncloud/kolla/ubuntu-source-keystone-ssh:77cca74
+horizon_image_full: ghcr.io/chameleoncloud/kolla/ubuntu-source-horizon:77cca74

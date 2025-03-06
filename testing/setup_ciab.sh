@@ -27,8 +27,6 @@ uv venv .venv
 source .venv/bin/activate
 uv pip install -r requirements.txt
 
-kolla-ansible install-deps
-
 # setup passwords. Not overwriting to permit repeated runs
 cp --no-clobber site-config/passwords.yml{.example,}
 kolla-genpwd -p site-config/passwords.yml
