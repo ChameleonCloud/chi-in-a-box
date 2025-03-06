@@ -30,7 +30,7 @@ uv venv .venv
 source .venv/bin/activate
 uv pip install \
     -r requirements.txt \
-    git+https://github.com/openstack/kolla-ansible@ussuri-eol
+    git+https://github.com/chameleoncloud/kolla-ansible@backport/ussuri
 
 # setup passwords. Not overwriting to permit repeated runs
 cp --no-clobber site-config/passwords.yml{.example,}
