@@ -1,0 +1,41 @@
+---
+
+enable_blazar_allocation_enforcement: false
+
+blazar_randomize_hosts: false
+
+blazar_project_enforcement_id: charge_code
+# When to send lease notification email
+blazar_minutes_before_end_lease: 2880
+blazar_default_max_lease_duration: "{{ 60 * 60 * 24 * 7 }}"
+blazar_default_reservation_extension_window: 172800
+blazar_usage_default_allocated: 20000.0
+# Redis currently binds on public IP, use public FQDN
+blazar_usage_db_host: "{{ kolla_external_fqdn }}"
+blazar_usage_project_exemptions: []
+blazar_external_service_check_create_endpoint: "{{ chameleon_portal_url }}/api/balance_service/v2/check-create/"
+blazar_external_service_check_update_endpoint: "{{ chameleon_portal_url }}/api/balance_service/v2/check-update/"
+blazar_external_service_on_end_endpoint: "{{ chameleon_portal_url }}/api/balance_service/v2/on-end/"
+blazar_floatingip_billrate: 0.0
+
+# TODO: support looking up network with this name and fetching ID
+# blazar_floatingip_reservation_network: public
+
+blazar_database_name: blazar
+blazar_database_user: blazar
+blazar_database_port: "{{ database_port }}"
+blazar_email_relay: "127.0.0.1"
+blazar_api_allocation_extras: user_name
+blazar_host_default_resource_properties: '["=", "\$node_type", "compute_skylake"]'
+blazar_host_retry_without_default_resources: yes
+blazar_enable_plugin_network: yes
+blazar_network_default_resource_properties: '["=", "\$stitch_provider", "none"]'
+blazar_network_retry_without_default_resources: no
+blazar_floatingip_reservation_network_regex: "[pP]ublic"
+blazar_host_url_format: "https://chameleoncloud.org/hardware/node/sites/{{ chameleon_site_name }}/clusters/chameleon/nodes/{hypervisor_hostname}/"
+blazar_physical_polling_monitor: true
+blazar_physical_polling_monitor_dry_run: true
+blazar_fip_polling_monitor: true
+blazar_fip_polling_monitor_dry_run: true
+blazar_network_polling_monitor: true
+blazar_network_polling_monitor_dry_run: true
