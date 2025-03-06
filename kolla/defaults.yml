@@ -369,3 +369,8 @@ enable_image_cleaner: no
 
 # Manila
 default_share_type: cephfsnfstype
+
+# Flavor reservation
+enable_host_reservation: "{{ enable_nova | bool }}"
+enable_flavor_reservation: no
+blazar_randomize_hosts: no
