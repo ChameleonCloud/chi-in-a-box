@@ -7,7 +7,9 @@
 
 set -euo pipefail
 
-# rm -rf .venv
+set -x
+
+rm -rf .venv
 # rm -f site-config/passwords.yml
 # rm -f site-config/globals.yml
 
@@ -24,13 +26,11 @@ test_config="${1}"
 # set hostname
 sudo hostnamectl set-hostname "ciablocal"
 
-uv venv .venv
+UV_PYTHON=3.8 uv venv .venv
 source .venv/bin/activate
 uv pip install \
     -r requirements.txt \
-    git+https://github.com/openstack/kolla-ansible@unmaintained/2023.1
-
-kolla-ansible install-deps
+    git+https://github.com/openstack/kolla-ansible@ussuri-eol
 
 # setup passwords. Not overwriting to permit repeated runs
 cp --no-clobber site-config/passwords.yml{.example,}

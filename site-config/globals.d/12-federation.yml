@@ -22,6 +22,6 @@ keystone_identity_mappings:
   - name: chameleon_mapping
     file: "{{ node_custom_config }}/keystone/idp_mapping.json"
 
-keystone_image_full: ghcr.io/chameleoncloud/kolla/keystone:2023.1-ubuntu-jammy
-keystone_fernet_image_full: ghcr.io/chameleoncloud/kolla/keystone-fernet:2023.1-ubuntu-jammy
-keystone_ssh_image_full: ghcr.io/chameleoncloud/kolla/keystone-ssh:2023.1-ubuntu-jammy
+# keystone_image_full: ghcr.io/chameleoncloud/kolla/keystone:2023.1-ubuntu-jammy
+# keystone_fernet_image_full: ghcr.io/chameleoncloud/kolla/keystone-fernet:2023.1-ubuntu-jammy
+# keystone_ssh_image_full: ghcr.io/chameleoncloud/kolla/keystone-ssh:2023.1-ubuntu-jammy
