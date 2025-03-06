@@ -37,3 +37,11 @@ jobs:
         run: |
           source .venv/bin/activate
           ./cc-ansible --site site-config post-deploy
+      - name: set up tests
+        run: |
+          source .venv/bin/activate
+          testing/setup_tests.sh
+      - name: run smoke tests
+        run: |
+          source .venv/bin/activate
+          rally verify start --pattern=smoke
