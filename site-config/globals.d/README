@@ -1,4 +1,0 @@
-Files in the globals.d directory are applied in alphabetical order, but are still overridden by the top-level globals.yml
-
-This serves to make default settings more readable, such as ones intended to affect only blazar, or horizon.
-However, they are not scoped the same way defaults are in ansible roles, so care must be taken!

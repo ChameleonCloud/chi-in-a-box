@@ -26,7 +26,7 @@ test_config="${1}"
 # set hostname
 sudo hostnamectl set-hostname "ciablocal"
 
-UV_PYTHON=3.8 uv venv .venv
+uv venv .venv
 source .venv/bin/activate
 uv pip install \
     -r requirements.txt \
@@ -37,7 +37,7 @@ cp --no-clobber site-config/passwords.yml{.example,}
 kolla-genpwd -p site-config/passwords.yml
 
 # overwriting globals.yml with test config
-cp -f $test_config site-config/globals.yml
+cat $test_config >> site-config/globals.yml
 
 # ./cc-ansible --site site-config bootstrap-servers
 # ./cc-ansible --site site-config prechecks

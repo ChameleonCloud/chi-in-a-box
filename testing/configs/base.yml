@@ -1,5 +1,3 @@
----
-
 # config for CI
 
 ci_bridge_name: "fake_br"
