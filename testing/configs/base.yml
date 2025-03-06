@@ -1,0 +1,17 @@
+---
+
+# config for CI
+
+ci_bridge_name: "fake_br"
+ci_api_name: "dummy1"
+ci_neutron_name: "dummy2"
+
+ci_api_ip: "172.18.200.10/24"
+ci_api_vip: "172.18.200.254"
+
+# base case, single interface for api internal + external
+# second interface for neutron
+
+kolla_internal_vip_address: "{{ ci_api_vip }}"
+network_interface: "{{ ci_api_name }}"
+neutron_external_interface: "{{ ci_neutron_name }}"
