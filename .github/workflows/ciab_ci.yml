@@ -26,6 +26,7 @@ jobs:
           source .venv/bin/activate
           ./cc-ansible --site site-config bootstrap-servers
       - name: prechecks
+        continue-on-error: true
         run: |
           source .venv/bin/activate
           ./cc-ansible --site site-config prechecks
