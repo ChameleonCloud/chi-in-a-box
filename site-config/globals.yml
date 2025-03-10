@@ -32,10 +32,22 @@ virtualenv: /opt/kolla/venv
 ####################
 
 kolla_base_distro: "ubuntu"
+kolla_install_type: "source"
 
 # point at the docker registry we want
 docker_namespace: kolla
 docker_registry: docker.chameleoncloud.org
+# horizon_tag: ae78321-dirty
+# keystone_tag: ae78321-dirty
+
+keystone_image_full: ghcr.io/chameleoncloud/kolla/ubuntu-source-keystone:77cca74
+keystone_fernet_image_full: ghcr.io/chameleoncloud/kolla/ubuntu-source-keystone-fernet:77cca74
+keystone_ssh_image_full: ghcr.io/chameleoncloud/kolla/ubuntu-source-keystone-ssh:77cca74
+horizon_image_full: ghcr.io/chameleoncloud/kolla/ubuntu-source-horizon:77cca74
+
+# docker_registry: ghcr.io
+# docker_namespace: chameleoncloud/kolla
+
 
 # default superadmin user and project
 keystone_admin_user: "admin"
@@ -70,27 +82,24 @@ horizon_custom_themes:
 # Federated login config
 ########################
 
-# enable_keystone_federation: false
+enable_keystone_federation: true
 
 keystone_identity_providers:
-  - name: "chameleon"
-    openstack_domain: "chameleon"
-    protocol: openid
-    identifier: "https://auth.chameleoncloud.org/auth/realms/chameleon"
-    public_name: Login with Chameleon
-    attribute_mapping: chameleon_mapping
-    metadata_folder: "{{ node_custom_config }}/keystone/federation/metadata"
   - name: "chameleon_dev"
     openstack_domain: "chameleon_dev"
     protocol: openid
     identifier: "https://auth.dev.chameleoncloud.org/auth/realms/chameleon"
     public_name: Login with Chameleon Dev
     attribute_mapping: chameleon_mapping
-    metadata_folder: "{{ node_custom_config }}/keystone/federation/metadata"
 
 keystone_identity_mappings:
   - name: chameleon_mapping
     file: "{{ node_custom_config }}/keystone/idp_mapping.json"
+
+
+keystone_oidc_client_id: "keystone-ciab-dev"
+keystone_oidc_client_secret: "public"
+keystone_oidc_provider_metadata_url: "{{ keystone_identity_providers[0].identifier }}/.well-known/openid-configuration"
 
 # keystone_image_full: ghcr.io/chameleoncloud/kolla/keystone:2023.1-ubuntu-jammy
 # keystone_fernet_image_full: ghcr.io/chameleoncloud/kolla/keystone-fernet:2023.1-ubuntu-jammy

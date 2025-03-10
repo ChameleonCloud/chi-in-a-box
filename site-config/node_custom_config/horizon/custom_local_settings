@@ -99,6 +99,29 @@ OPENSTACK_IMAGE_BACKEND = {
     ],
 }
 
+{% if enable_keystone_federation | bool %}
+WEBSSO_ENABLED = True
+
+WEBSSO_CHOICES = (
+{% for idp in keystone_identity_providers %}
+    ("{{ idp.name }}", "{{ idp.public_name }}"),
+{% endfor %}
+)
+WEBSSO_IDP_MAPPING = {
+{% for idp in keystone_identity_providers %}
+    "{{ idp.name }}": ("{{ idp.name }}", "{{ idp.protocol }}"),
+{% endfor %}
+}
+WEBSSO_DEFAULT_REDIRECT = True
+
+# This really shouldn't have to be set, but it's set at configuration parse
+# time and derived from a value (OPENSTACK_KEYSTONE_URL) that is overriden by
+# our configuration.
+WEBSSO_KEYSTONE_URL = "{{ keystone_public_url }}/v3"
+WEBSSO_DEFAULT_REDIRECT_REGION = '{{ keystone_public_url }}/v3'
+WEBSSO_DEFAULT_REDIRECT_PROTOCOL = 'openid'
+{% endif %}
+
 # The OPENSTACK_HEAT_STACK has the only setting available - enable_user_pass,
 # which can be used to disable the password field while launching the stack.
 # Set to False if HEAT uses trusts by default otherwise it needs to be set as True.
