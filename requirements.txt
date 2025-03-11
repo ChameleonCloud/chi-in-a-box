@@ -1,7 +1,7 @@
-# ansible version for kolla-ansible ussuri release
+# ansible version for kolla-ansible victoria release
 ansible<2.10
 
-git+https://github.com/ChameleonCloud/kolla-ansible@backport/ussuri
+git+https://github.com/ChameleonCloud/kolla-ansible@backport/victoria
 
 # client tools
 openstackclient

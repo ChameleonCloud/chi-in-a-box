@@ -12,7 +12,7 @@ source $HOME/.local/bin/env
 ```
 git clone https://github.com/chameleoncloud/chi-in-a-box
 cd chi-in-a-box
-git checkout ciab_minimal/ussuri-kvm
+git checkout minimal/victoria-kvm
 ```
 
 ## install the ciab tools

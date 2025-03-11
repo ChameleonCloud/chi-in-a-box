@@ -10,6 +10,14 @@ control
 
 # You can explicitly specify which hosts run each project by updating the
 # groups in the sections below. Common services are grouped together.
+
+[common:children]
+control
+network
+compute
+storage
+monitoring
+
 [chrony-server:children]
 haproxy
 
@@ -57,16 +65,6 @@ control
 [haproxy:children]
 network
 
-[hyperv]
-#hyperv_host
-
-[hyperv:vars]
-#ansible_user=user
-#ansible_password=password
-#ansible_port=5986
-#ansible_connection=winrm
-#ansible_winrm_server_cert_validation=ignore
-
 [mariadb:children]
 control
 
@@ -91,9 +89,6 @@ monitoring
 
 [storm:children]
 monitoring
-
-[mongodb:children]
-control
 
 [keystone:children]
 control
@@ -170,9 +165,6 @@ control
 control
 compute
 
-[congress:children]
-control
-
 [panko:children]
 control
 
@@ -241,6 +233,19 @@ control
 # function appropriately. For example, neutron-metadata-agent must run on the
 # same host as the l3-agent and (depending on configuration) the dhcp-agent.
 
+# Common
+[cron:children]
+common
+
+[fluentd:children]
+common
+
+[kolla-logs:children]
+common
+
+[kolla-toolbox:children]
+common
+
 # Elasticsearch Curator
 [elasticsearch-curator:children]
 elasticsearch
@@ -289,6 +294,7 @@ neutron
 
 [neutron-ovn-metadata-agent:children]
 compute
+network
 
 [neutron-bgp-dragent:children]
 neutron
@@ -547,16 +553,6 @@ compute
 [cyborg-conductor:children]
 cyborg
 
-# Congress
-[congress-api:children]
-congress
-
-[congress-datasource:children]
-congress
-
-[congress-policy-engine:children]
-congress
-
 # Panko
 [panko-api:children]
 panko
@@ -618,6 +614,9 @@ searchlight
 
 # Octavia
 [octavia-api:children]
+octavia
+
+[octavia-driver-agent:children]
 octavia
 
 [octavia-health-manager:children]
