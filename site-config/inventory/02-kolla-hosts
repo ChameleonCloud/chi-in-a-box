@@ -46,9 +46,6 @@ monitoring
 [kafka:children]
 control
 
-[karbor:children]
-control
-
 [kibana:children]
 control
 
@@ -61,6 +58,12 @@ storage
 
 [elasticsearch:children]
 control
+
+[hacluster:children]
+control
+
+[hacluster-remote:children]
+compute
 
 [haproxy:children]
 network
@@ -143,9 +146,6 @@ control
 [magnum:children]
 control
 
-[qinling:children]
-control
-
 [sahara:children]
 control
 
@@ -194,9 +194,6 @@ control
 control
 
 [rally:children]
-control
-
-[searchlight:children]
 control
 
 [octavia:children]
@@ -344,16 +341,6 @@ ironic
 [tgtd:children]
 storage
 
-# Karbor
-[karbor-api:children]
-karbor
-
-[karbor-protection:children]
-karbor
-
-[karbor-operationengine:children]
-karbor
-
 # Manila
 [manila-api:children]
 manila
@@ -470,13 +457,6 @@ magnum
 
 [magnum-conductor:children]
 magnum
-
-# Qinling
-[qinling-api:children]
-qinling
-
-[qinling-engine:children]
-qinling
 
 # Sahara
 [sahara-api:children]
@@ -604,13 +584,6 @@ senlin
 
 [senlin-health-manager:children]
 senlin
-
-# Searchlight
-[searchlight-api:children]
-searchlight
-
-[searchlight-listener:children]
-searchlight
 
 # Octavia
 [octavia-api:children]
@@ -747,7 +720,10 @@ control
 [masakari-engine:children]
 control
 
-[masakari-monitors:children]
+[masakari-hostmonitor:children]
+control
+
+[masakari-instancemonitor:children]
 compute
 
 [ovn-controller:children]
