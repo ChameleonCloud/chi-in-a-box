@@ -18,16 +18,6 @@ compute
 storage
 monitoring
 
-[chrony-server:children]
-haproxy
-
-[chrony:children]
-control
-network
-compute
-storage
-monitoring
-
 [collectd:children]
 compute
 
@@ -65,7 +55,7 @@ control
 [hacluster-remote:children]
 compute
 
-[haproxy:children]
+[loadbalancer:children]
 network
 
 [mariadb:children]
@@ -165,9 +155,6 @@ control
 control
 compute
 
-[panko:children]
-control
-
 [gnocchi:children]
 control
 
@@ -175,10 +162,6 @@ control
 control
 
 [trove:children]
-control
-
-# Tempest
-[tempest:children]
 control
 
 [senlin:children]
@@ -191,9 +174,6 @@ control
 control
 
 [watcher:children]
-control
-
-[rally:children]
 control
 
 [octavia:children]
@@ -410,9 +390,6 @@ monasca
 [monasca-grafana:children]
 monasca
 
-[monasca-log-transformer:children]
-monasca
-
 [monasca-log-persister:children]
 monasca
 
@@ -532,10 +509,6 @@ compute
 
 [cyborg-conductor:children]
 cyborg
-
-# Panko
-[panko-api:children]
-panko
 
 # Gnocchi
 [gnocchi-api:children]
@@ -690,7 +663,7 @@ storage
 mariadb
 
 [prometheus-haproxy-exporter:children]
-haproxy
+loadbalancer
 
 [prometheus-memcached-exporter:children]
 memcached
@@ -713,6 +686,9 @@ elasticsearch
 
 [prometheus-blackbox-exporter:children]
 monitoring
+
+[prometheus-libvirt-exporter:children]
+compute
 
 [masakari-api:children]
 control
