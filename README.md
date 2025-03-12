@@ -12,7 +12,7 @@ source $HOME/.local/bin/env
 ```
 git clone https://github.com/chameleoncloud/chi-in-a-box
 cd chi-in-a-box
-git checkout minimal/wallaby-kvm
+git checkout minimal/xena-kvm
 ```
 
 ## install the ciab tools

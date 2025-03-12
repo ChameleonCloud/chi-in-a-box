@@ -1,7 +1,7 @@
-# ansible version for kolla-ansible wallaby release
-ansible<3.0
+# ansible version for kolla-ansible xena release
+ansible<5.0
 
-git+https://github.com/chameleoncloud/kolla-ansible@backport/wallaby
+git+https://github.com/chameleoncloud/kolla-ansible@backport/xena
 
 # client tools
 openstackclient
