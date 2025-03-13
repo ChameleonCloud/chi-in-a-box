@@ -19,9 +19,7 @@ git checkout ciab_minimal/2023.1
 ```
 uv venv .venv
 source .venv/bin/activate 
-uv pip install \
-    -r requirements.txt \
-    ../kolla-ansible
+uv pip install -r requirements.txt 
 kolla-ansible install-deps
 ```
 

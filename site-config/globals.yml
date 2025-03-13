@@ -34,8 +34,8 @@ virtualenv: /opt/kolla/venv
 kolla_base_distro: "ubuntu"
 
 # point at the docker registry we want
-docker_namespace: kolla
-docker_registry: docker.chameleoncloud.org
+# docker_namespace: kolla
+# docker_registry: docker.chameleoncloud.org
 
 # default superadmin user and project
 keystone_admin_user: "admin"

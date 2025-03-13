@@ -2,6 +2,8 @@
 ansible
 ansible-core>=2.13,<=2.14
 
+git+https://github.com/openstack/kolla-ansible@unmaintained/2023.1
+
 # client tools
 openstackclient
 osc-lib
