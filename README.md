@@ -12,7 +12,7 @@ source $HOME/.local/bin/env
 ```
 git clone https://github.com/chameleoncloud/chi-in-a-box
 cd chi-in-a-box
-git checkout minimal/xena-kvm
+git checkout minimal/yoga-kvm
 ```
 
 ## install the ciab tools
@@ -20,6 +20,7 @@ git checkout minimal/xena-kvm
 uv venv .venv
 source .venv/bin/activate 
 uv pip install -r requirements.txt
+kolla-ansible install-deps
 ```
 
 ## Customize site-config

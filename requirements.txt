@@ -1,7 +1,7 @@
-# ansible version for kolla-ansible xena release
-ansible<5.0
+# ansible version for kolla-ansible yoga release
+ansible>=4,<6
 
-git+https://github.com/chameleoncloud/kolla-ansible@backport/xena
+git+https://github.com/chameleoncloud/kolla-ansible@backport/yoga
 
 # client tools
 openstackclient
