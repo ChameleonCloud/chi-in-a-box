@@ -36,18 +36,12 @@ monitoring
 [kafka:children]
 control
 
-[kibana:children]
-control
-
 [telegraf:children]
 compute
 control
 monitoring
 network
 storage
-
-[elasticsearch:children]
-control
 
 [hacluster:children]
 control
@@ -65,9 +59,6 @@ control
 control
 
 [outward-rabbitmq:children]
-control
-
-[qdrouterd:children]
 control
 
 [monasca-agent:children]
@@ -200,6 +191,9 @@ control
 [blazar:children]
 control
 
+[venus:children]
+monitoring
+
 # Additional control implemented here. These groups allow you to control which
 # services run on which hosts at a per-service level.
 #
@@ -220,12 +214,12 @@ common
 [kolla-toolbox:children]
 common
 
-# Elasticsearch Curator
-[elasticsearch-curator:children]
-elasticsearch
-
 [opensearch:children]
 control
+
+# TODO: This is used for cleanup and can be removed in the Antelope cycle.
+[elasticsearch-curator:children]
+opensearch
 
 # Opensearch dashboards
 [opensearch-dashboards:children]
@@ -683,7 +677,6 @@ monitoring
 monitoring
 
 [prometheus-elasticsearch-exporter:children]
-elasticsearch
 opensearch
 
 [prometheus-blackbox-exporter:children]
@@ -728,3 +721,9 @@ ovn-database
 
 [ovn-sb-db:children]
 ovn-database
+
+[venus-api:children]
+venus
+
+[venus-manager:children]
+venus

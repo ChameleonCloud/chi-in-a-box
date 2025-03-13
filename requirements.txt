@@ -1,7 +1,7 @@
-# ansible version for kolla-ansible yoga release
+# ansible version for kolla-ansible zed release
 ansible>=4,<6
 
-git+https://github.com/chameleoncloud/kolla-ansible@backport/yoga
+git+https://github.com/chameleoncloud/kolla-ansible@backport/zed
 
 # client tools
 openstackclient
