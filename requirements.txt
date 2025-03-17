@@ -1,7 +1,7 @@
 # ansible version for kolla-ansible xena release
 ansible<5.0
 
-git+https://github.com/chameleoncloud/kolla-ansible@backport/xena
+git+https://github.com/chameleoncloud/kolla-ansible@backport/xena-edge
 
 # client tools
 openstackclient
