@@ -42,8 +42,10 @@ If using our CI/CD test scripts, or otherwise following them, you'll also need
 There are no run-time dependencies on these, they're merely used for some of the scripts under `testing/`.
 
 ```
-sudo snap install --clasic \
-    astral-uv \
+sudo snap install --classic \
+    astral-uv
+    
+sudo snap install \
     yq
 ```
 
