@@ -56,20 +56,12 @@ git submodule update --init
 
 ### 4: install the ciab tools
 
-Just for faster setup, we'll add `uv`, a much faster python package manager.
 ```
-curl -L https://github.com/astral-sh/uv/releases/download/0.6.8/uv-x86_64-unknown-linux-gnu.tar.gz \
-| tar -xzv \
-&& sudo mv uv-x86_64-unknown-linux-gnu/uv /usr/local/bin/
+python3 -m venv .venv
+source .venv/bin/activate
+pip install setuptools wheel
+pip install -r requirements.txt
 ```
-
-Then:
-```
-uv venv .venv
-source .venv/bin/activate 
-uv pip install -r requirements.txt
-```
-
 
 ### Customize the site-config
 
@@ -81,11 +73,17 @@ cp site-config/passwords.yml{.example,}
 kolla-genpwd -p site-config/passwords.yml
 ```
 
-If using the minimal CI config, add the following to `site-config/globals.yml`
+### Configure Networks
+
+#### Dummy/loopback method
+If using the minimal CI config, run the following to extend `site-config/globals.yml`
 ```
+cat <<EOF>> site-config/globals.yml
+
 kolla_internal_vip_address: "172.18.200.254"
 network_interface: "fake_br"
 neutron_external_interface: "dummy1"
+EOF
 ```
 
 Then set up the corresponding dummy network interfaces:
@@ -101,6 +99,11 @@ sudo ip link set kolla_veth master fake_br
 sudo ip link set dummy1 up 
 ```
 
+#### For "Real"
+Please refer to the following upstream docs
+
+* https://docs.openstack.org/kolla-ansible/ussuri/admin/production-architecture-guide.html#node-types-and-services-running-on-them
+* https://docs.openstack.org/kolla-ansible/ussuri/admin/advanced-configuration.html#endpoint-network-configuration
 
 ## deploy the site
 
