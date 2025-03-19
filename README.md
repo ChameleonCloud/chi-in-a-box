@@ -17,11 +17,23 @@ Therefore, please follow the minimum requirements found here: https://docs.opens
 * Ubuntu20.04, x86_64
 * 8GB RAM
 * 40GB Disk
-* 2 network interfaces, but we can get away with 1 for CI/CD purposes only.
+* 2 network interfaces (can get away with 1 for CI/CD Only)
 
-## Setup
+## Setup: Single node CI/CD example
 
-### Install APT Dependencies
+This process follows a very minimal path, also executed by our CI scripts.
+You're free to leave parts out and customize them, which will be noted.
+
+### 1: Upgrade apt packages
+
+To ensure a consistent starting point, expecially on 20.04:
+
+```
+sudo apt-get update && \
+sudo apt-get dist-upgrade -y
+```
+
+### 2: Install APT Dependencies
 
 ```
 sudo apt-get update && \
@@ -33,38 +45,33 @@ sudo apt-get install -y \
     python3-venv
 ```
 
-
-### Optional Deps for CI/CD
-
-If using our CI/CD test scripts, or otherwise following them, you'll also need
-`astral-uv` (an alterante python package manager), and `yq`.
-
-There are no run-time dependencies on these, they're merely used for some of the scripts under `testing/`.
-
-```
-sudo snap install --classic \
-    astral-uv
-    
-sudo snap install \
-    yq
-```
-
-## get chi-in-a-box repo
+### 3: clone the chi-in-a-box repo
 
 ```
 git clone https://github.com/chameleoncloud/chi-in-a-box
 cd chi-in-a-box
 git checkout minimal/ussuri-kvm
+git submodule update --init
 ```
 
-## install the ciab tools
+### 4: install the ciab tools
+
+Just for faster setup, we'll add `uv`, a much faster python package manager.
+```
+curl -L https://github.com/astral-sh/uv/releases/download/0.6.8/uv-x86_64-unknown-linux-gnu.tar.gz \
+| tar -xzv \
+&& sudo mv uv-x86_64-unknown-linux-gnu/uv /usr/local/bin/
+```
+
+Then:
 ```
 uv venv .venv
 source .venv/bin/activate 
 uv pip install -r requirements.txt
 ```
 
-## Customize site-config
+
+### Customize the site-config
 
 ```
 # generate passwords file
@@ -74,11 +81,25 @@ cp site-config/passwords.yml{.example,}
 kolla-genpwd -p site-config/passwords.yml
 ```
 
-edit globals.yml to set internal/external vip
-edit host_vars/localhost to set interface names
+If using the minimal CI config, add the following to `site-config/globals.yml`
+```
+kolla_internal_vip_address: "172.18.200.254"
+network_interface: "fake_br"
+neutron_external_interface: "dummy1"
+```
 
-To automatically generate an extra-minimal CI/CD config, run
-`./testing/setup_ciab.sh ./testing/configs/base.yml`
+Then set up the corresponding dummy network interfaces:
+```
+sudo ip link add fake_br type bridge
+sudo ip link set fake_br up
+sudo ip addr add 172.18.200.10/24 dev fake_br
+
+sudo ip link add kolla_veth type veth peer name dummy1
+sudo ip link set kolla_veth up
+sudo ip link set kolla_veth master fake_br
+
+sudo ip link set dummy1 up 
+```
 
 
 ## deploy the site
@@ -98,4 +119,16 @@ On a known working site, pull and genconfig can be skipped.
 
 ## Kicking the tires
 
-At this point, you can access the horizon dasboard at `kolla_external_vip_address`, logging in with the username+password found in `site-config/admin-openrc.sh`
+At this point, all services should be online and accessible.
+
+Run the following to verify basic functionality:
+
+```
+source site-config/admin-openrc.sh
+openstack endpoint list
+```
+
+You can access the horizon dashboard via a ssh tunnel, such as via sshuttle:
+```
+sshuttle -r $ssh_user@$ssh_ip 172.18.200.254/32
+```
