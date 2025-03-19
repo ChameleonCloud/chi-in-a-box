@@ -24,7 +24,7 @@ Therefore, please follow the minimum requirements found here: https://docs.opens
 ### Install APT Dependencies
 
 ```
-sudo apt-get update
+sudo apt-get update && \
 sudo apt-get install -y \
     python3-dev \
     libffi-dev \
@@ -42,14 +42,9 @@ If using our CI/CD test scripts, or otherwise following them, you'll also need
 There are no run-time dependencies on these, they're merely used for some of the scripts under `testing/`.
 
 ```
-# Install UV
-curl -LsSf https://astral.sh/uv/install.sh | sh
-source $HOME/.local/bin/env
-```
-
-```
-# install YQ
-sudo snap install yq
+sudo snap install --clasic \
+    astral-uv \
+    yq
 ```
 
 ## get chi-in-a-box repo
@@ -57,7 +52,7 @@ sudo snap install yq
 ```
 git clone https://github.com/chameleoncloud/chi-in-a-box
 cd chi-in-a-box
-git checkout ciab_minimal/ussuri-kvm
+git checkout minimal/ussuri-kvm
 ```
 
 ## install the ciab tools
