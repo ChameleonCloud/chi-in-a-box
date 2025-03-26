@@ -1,0 +1,20 @@
+---
+site_name: CHI-in-a-Box
+site_url: https://github.com/ChameleonCloud/chi-in-a-box
+repo_url: https://github.com/ChameleonCloud/chi-in-a-box
+
+docs_dir: 'docs'
+
+plugins:
+  - search
+  - mermaid2
+
+theme:
+  name: material
+  features: 
+    - navigation.sections
+
+nav:
+  - 'CHI@Edge':
+    - 'networking': chi_edge/networking.md
+    - 'verification': chi_edge/verification.md
