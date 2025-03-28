@@ -6,9 +6,125 @@ While Neutron is still running, it is only used for floating IPs, and end-users 
 
 Instead, the Calico CNI plugin for kubernetes is managing most networking, and all container -> container networking, and neutron and zun are configured to provide a minimal "shim" around this.
 
+## Network Details
+
+### Openstack's Perspective
+As far as Openstack knows, there are only two networks, "Public" and "Caliconet", connected by a router.
+
+This router is implemented by means of a linux network namespace, openvswitch ports (qg_iface and qr_iface) which map layer 2 traffic into that namespace, and a series of IPTables rules which configure routing between qg_iface and qr_iface.
+By default, the `qg_iface` acts as the default route within the namespace, and other links (each a separare qr_iface) route to their local subnets.
+For technical details, refer to [Neutron's Layer 3 Internals](https://docs.openstack.org/neutron/latest/contributor/internals/layer3.html)
+
+```mermaid
+flowchart LR
+
+  public[public \n 129.114.34.128/25]
+  caliconet[caliconet \n 192.168.64.0/18]
+
+  public --- qg_iface
+  subgraph qrouter_ns[Router Namespace]
+    qg_iface[qg_iface \n 129.114.34.129/32 \n 129.114.34.130/32]
+    qg_iface-- L3 Routing --- qr_iface
+    qr_iface[qr_iface \n 192.168.64.1/18]
+
+    note[net.ipv4.ip_forward = 1
+        default via 129.114.34.129 dev qg_iface
+        129.114.34.128/25 dev qg_iface 
+        192.168.64.0/16 dev qr_iface 
+        ]
+  end
+  qr_iface --- caliconet    
+```
+When a floating IP is attached, neutron binds that address to `qg_iface` in the router namespace, and also sets up NAT to forward traffic to the mapped internal address.
+
+We'll refer to the external address as `floating_ip`, and the internal one as `fixed_ip`.
+```mermaid
+sequenceDiagram
+    remote->>qg_iface: source=foo dest=floating_ip
+    qg_iface->>qr_iface: DNAT: source=foo dest=fixed_ip
+    qr_iface->>host: source=foo dest=fixed_ip
+    host->>qr_iface: source=fixed_ip dest=foo
+    qr_iface->>qg_iface: SNAT: source=floating_ip dest=foo
+    qg_iface->>remote: source=floating_ip dest=foo
+```
+
+1. Initially, a packet arriving from outside has some `source_address=foo`, and `destination_address=floating_ip`.
+2. It arrives at qg_iface, and iptables applies "destination nat (DNAT)" to rewrite the destination IP address. Now, `source_address=foo` and `destination_address=fixed_ip`
+3. As `destination_address=fixed_ip`, the routing table indicates it should be forwarded via `qr_iface`, and it's sent off into caliconet
+4. If a host were listening on `fixed_ip`, and connected to `caliconet` at layer 2, it would receive this packet and be able to respond. Its reply would have `source_address=fixed_ip` and `destination_address=foo`.
+5. On the way back out, the packet would be received at `qr_iface`, and IPtables apply source NAT (SNAT), rewriting `source_address=fixed_ip` to `source_address=floating_ip`
+6. the packet then leaves via `qg_iface`, having `source_address=floating_ip`,`destination_address=foo`, and is routed back to the intiial sender.
 
 
-## Network Architecture
+### Calico's Perspective
+
+Calico sees the world differently, and is primarily concerned about routing between kubernetes hosts. Using the below diagram, we'll look at how traffic flows between a few different pairs of endpoints.
+
+```mermaid
+flowchart LR
+
+  
+  clusternet[Cluster Network 10.3.0.0/24]
+  clusternet --- localip1
+  clusternet --- localip2
+  clusternet --- gw[Gateway:
+                    10.3.0.1/24
+                    10.8.8.1/24
+                    ]
+
+  subgraph host2[Kubernetes Host 2]
+    localip2[Local IP 2\n 10.3.0.12/24]---podcidr2
+    subgraph  podcidr2[PodCIDR 192.168.72.0/24]
+      pod2a[Pod2a 192.168.72.12]
+      pod2b[Pod2b 192.168.72.13]
+    end
+    note2[
+      0.0.0.0/0 via 10.3.0.1
+      192.168.71.0/24 via 10.3.0.11
+      192.168.72.0/24 via 10.3.0.12
+      ]
+  end
+  subgraph host1[Kubernetes Host 1]
+    localip1[Local IP 1\n 10.3.0.11/24]---podcidr1
+    subgraph podcidr1[PodCIDR: 192.168.71.0/24]
+      pod1a[Pod1a 192.168.71.10]
+      pod1b[Pod1b 192.168.71.11]
+    end
+    note1[
+      0.0.0.0/0 via 10.3.0.1
+      192.168.71.0/24 via 10.3.0.11
+      192.168.72.0/24 via 10.3.0.12
+      ]
+  end
+  subgraph "outside"
+    gw --- external[external 10.8.8.8/24]
+    note3[Route: 0.0.0.0/0 via 10.8.8.1]
+  end
+```
+
+We start with the assumption that Local IP 1 and Local IP 2 can communicate directly with each other at layer 2, as it's the simplest.
+
+* Traffic between two pods on the same host, or between the host's local IP and its own pods, is sent directly with no NAT or encapsulation.
+* Traffic from pods on one host to the local IP of another host (or other "endpoints" calico is aware of), is also sent directly, as the source and destination addresses still match the locally connected routes. (Depending on config, it could also be routed via local-ip)
+* Traffic from pods on one host to pods on another host is routed, using the destination host's "local ip" as the next-hop
+* in contrast, traffic from pods to the "outside" has source NAT applied before leaving the host, since the network outside of Calico wouldn't be aware of how to return traffic to the pod IPs.
+
+| Source               | Destination               |    Method  |
+|----------------------|---------------------------|------------|
+|  Pod1a 192.168.71.10 |   Pod1b 192.168.71.10     | Forwarded  |
+|  Pod1a 192.168.71.10 |   Host1 10.3.0.11         | Fwd/Routed |
+|  Pod1a 192.168.71.10 |   Host2 10.3.0.11         | Fwd/Routed |
+|  Pod1a 192.168.71.10 |   Pod2a 192.168.73.12     | Routed     |
+|  Pod1a 192.168.71.10 |   "outside" 10.8.8.8      | SNAT + Routed |
+
+
+
+
+
+### Connecting them together
+
+
+
 
 ```mermaid
 flowchart LR
@@ -34,6 +150,39 @@ flowchart LR
     public-subnet-- 172.18.200.2/24 --- neutron-router
     neutron-router-- N:192.168.0.1/16 \n C:192.168.0.2/16 --- calico-node
 ```
+
+
+```mermaid
+
+flowchart TD
+
+
+
+    subgraph edge-device
+      subgraph podcidr2
+        pod2[pod2 \n 192.168.9.0/24] --- eth4
+        
+      end
+      pod2 --- local-ip2
+      local-ip2[local-ip2 wg spoke \n 10.3.0.9]
+    end
+
+    subgraph edge-device3
+      subgraph podcidr3 
+        pod3[pod3 \n 192.168.10.0/24]
+      end
+      pod3 --- local-ip3
+      local-ip3[local-ip3 wg spoke  \n 10.3.0.10]
+      
+    end
+
+    local-ip2 --- wireguard-hub[hub 10.3.0.2]
+    local-ip3 --- wireguard-hub
+
+    ssh --- wireguard-hub
+   
+```
+
 
 All neutron "sees" is that some addresses in the "calico-subnet" send traffic, respond to messages, and so on.
 Calico's BGP routing handles getting ipv4 traffic from neutron to the actual destination, which may traverse multiple kubnernetes nodes before reaching a container.
