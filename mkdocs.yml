@@ -1,0 +1,16 @@
+site_name: CHI-in-a-Box
+site_dir: public
+site_url: https://chameleoncloud.github.io/chi-in-a-box/
+repo_url: https://github.com/ChameleonCloud/chi-in-a-box/
+
+plugins:
+  - search
+
+theme:
+  name: material
+  features:
+    - content.action.edit
+    - content.action.view
+    - content.code.copy
+    - navigation.sections
+    - navigation.expand
