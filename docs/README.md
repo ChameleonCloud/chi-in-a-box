@@ -1,6 +1,6 @@
 # What is CHI-in-a-Box?
 
-![](.gitbook/assets/chi-in-a-box.png)
+![](./chi-in-a-box.png)
 
 CHI-in-a-box is a packaging of the core services that together constitute the [Chameleon](https://www.chameleoncloud.org) testbed for experimental Computer Science research. These services allow Chameleon users to discover information about Chameleon resources, allocate those resources for present and future use, configure them in various ways, and monitor various types of metrics.
 
@@ -67,8 +67,3 @@ Chameleon additionally provides a few useful extra pieces for all users of CHI-i
 * Remote block storage integration for bare metal. All bare metal nodes will utilize local storage only. See the [Hardware requirements](https://github.com/ChameleonCloud/chi-in-a-box/wiki/Hardware-requirements) page for more information on what kinds of bare metal hardware configurations are currently supported.
 
 We hope the above list continues to shrink ;)
-
-## Next Steps
-
-* Let us know on our [GitHub discussions board!](https://github.com/ChameleonCloud/chi-in-a-box/discussions)
-* [Check out the docs!](https://chameleoncloud.gitbook.io/chi-in-a-box)
