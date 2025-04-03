@@ -30,7 +30,6 @@ update-alternatives --install /usr/bin/python python /usr/bin/python3 1
 ./cc-ansible install_deps
 ```
 
-
 ### Initialize the site configuration
 
 1.  Check out this repository:
@@ -77,7 +76,7 @@ If you are only using two interfaces, you must do some additional configuration 
 
 #### `${CC_ANSIBLE_SITE}/inventory/hosts`
 
-*   Edit the [Ansible inventory](https://docs.ansible.com/ansible/latest/user\_guide/intro\_inventory.html) of your site configuration to include the hostname of the node you are installing to. By default, the controller node can also be network, monitoring, and storage. It should look like this:
+*   Edit the [Ansible inventory](https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html) of your site configuration to include the hostname of the node you are installing to. By default, the controller node can also be network, monitoring, and storage. It should look like this:
 
     ```ini
     # These initial groups are the only groups required to be modified. The
@@ -105,7 +104,7 @@ If you are only using two interfaces, you must do some additional configuration 
 
 #### `${CC_ANSIBLE_SITE}/inventory/host_vars/<hostname>`
 
-* Update the "[host\_vars](https://docs.ansible.com/ansible/latest/user\_guide/intro\_inventory.html#organizing-host-and-group-variables)" file for your host to include the correct names of the network interfaces you want to use.
+* Update the "[host\_vars](https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html#organizing-host-and-group-variables)" file for your host to include the correct names of the network interfaces you want to use.
 * **network\_interface** should be set to the name of the private interface (or bridge if only two interfaces) you chose
 *   **kolla\_external\_vip\_interface** should be set to the name of the public interface (or bridge if only two interfaces) you chose
 
@@ -310,4 +309,4 @@ It's recommended to use individual user accounts to log in, rather than the buil
 
 ### Enroll Baremetal nodes
 
-Follow the steps in [Hardware-management.md](../../Hardware-management.md "mention") to enroll nodes in your testbed.
+Follow the steps in [hardware-management.md](../../operations/hardware-management.md "mention") to enroll nodes in your testbed.

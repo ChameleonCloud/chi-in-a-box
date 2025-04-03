@@ -17,7 +17,7 @@ Before you begin, ensure you have the following, and note which will be used in 
 * [ ] A name for your site
   * [ ] Friendly name, such as `CHI@SITE`: `openstack_region_name`
   * [ ] A short name, such as `site` : `chameleon_site_name`
-* [ ] one or more [Control Nodes](broken-reference/)
+* [ ] one or more [Control Nodes](https://github.com/ChameleonCloud/chi-in-a-box/blob/stable/xena/docs/setup-guides/production-baremetal/broken-reference/README.md)
   * [ ] The control node has a linux bridge named `public`: `kolla_external_vip_interface`
     * [ ] bridged to a physical interface
     * [ ] bridged to one half of a veth-pair
@@ -31,7 +31,7 @@ Before you begin, ensure you have the following, and note which will be used in 
     * [ ] bridged to one half of a veth-pair
     * [ ] With an IP address assigned from a private subnet, referred to as the `internal_subnet`
     * [ ] with a spare (not bound) ip address in `internal_subnet` for the HAProxy VIP: `kolla_internal_vip_address`
-* [ ] **at least** one [Baremetal Node](broken-reference/)
+* [ ] **at least** one [Baremetal Node](https://github.com/ChameleonCloud/chi-in-a-box/blob/stable/xena/docs/setup-guides/production-baremetal/broken-reference/README.md)
   * [ ] the out of band interface must be accessible by the controller node
 * [ ] [a managed switch with vlan capability](broken-reference)
   * [ ] Reserved VLANs: 2 minimum, 10+ recommended

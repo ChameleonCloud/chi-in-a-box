@@ -7,7 +7,7 @@ Commands are executed using the `cc-ansible` executable in the CHI-in-a-box repo
 1. Download and install dependencies, and the CHI-in-a-Box tools on your **Deploy Host**
 2. **`Initialize`** your **`Site-Configuration`**
 3. Configure the network interfaces on your **`Control Nodes`**.
-4. Add your **`Control Nodes` ** to the **ansible inventory** in your **site configuration,** and set any host variables needed to connect
+4. Add your **`Control Nodes`** to the **ansible inventory** in your **site configuration,** and set any host variables needed to connect
 5. Fill out your **defaults.yml** with all site-wide config values
 6. **Bootstrap** the control nodes
 7. **Deploy** services onto the control nodes

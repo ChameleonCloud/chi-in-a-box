@@ -31,6 +31,49 @@ openstack reservation host create
 openstack reservation device create
 ```
 
+### Disabling Resources
+
+### Hosts
+
+To Disable Resources for Maintenance - Run the following command to disable a host for maintenance. This will make the resource unreservable for users while allowing administrators to create leases. The healing monitor does not flip the 'reservable' for hosts when the host is flagged as disabled.&#x20;
+
+```
+openstack reservation host set<host id/name> --extra disabled=true
+```
+
+On disabling a host, it is also set as unreservable. For example, running `openstack reservation host list` should show the disabled host with `disabled` set to True:
+
+```
+openstack reservation host list -c hypervisor_hostname -c disabled -c reservable
++--------------------------------------+------------+----------+
+| hypervisor_hostname                  | reservable | disabled |
++--------------------------------------+------------+----------+
+| 328aa140-e8cb-48a8-a789-fb293bfb8f74 | True       | False    |
+| 8576d7ad-7f34-4588-a868-9075ac8d2c9f | True       | False    |
+| c3ce27b8-85b2-441d-ace1-078fd187f637 | False      | True     |
++--------------------------------------+------------+----------+
+
+```
+
+To Enable Resources After Maintenance - To unset the disabled flag and make the resource reservable again, use the following command:
+
+```
+openstack reservation host unset<host id/name> --extra disabled
+```
+
+This enables the host, and the 'reservable' flag is not automatically turned on, but the healing monitor should turn 'reservable' to True eventually.
+
+```
+openstack reservation host list -c hypervisor_hostname -c disabled -c reservable
++--------------------------------------+------------+----------+
+| hypervisor_hostname                  | reservable | disabled |
++--------------------------------------+------------+----------+
+| 328aa140-e8cb-48a8-a789-fb293bfb8f74 | True       | False    |
+| 8576d7ad-7f34-4588-a868-9075ac8d2c9f | True       | False    |
+| c3ce27b8-85b2-441d-ace1-078fd187f637 | False      | False    |
++--------------------------------------+------------+----------+
+```
+
 ### Networks
 
 #### Create a Reservable Network
@@ -56,7 +99,8 @@ options:
   --segment SEGMENT_ID
                         VLAN ID for VLAN networks or Tunnel ID for GENEVE/GRE/VXLAN networks
   --extra &#x3C;key>=&#x3C;value>
-                        Extra capabilities key/value pairs to add for the network</code></pre>
+                        Extra capabilities key/value pairs to add for the network
+</code></pre>
 
 Example:
 

@@ -1,6 +1,6 @@
 # What is CHI-in-a-Box?
 
-![](chi-in-a-box.png)
+![](.gitbook/assets/chi-in-a-box.png)
 
 CHI-in-a-box is a packaging of the core services that together constitute the [Chameleon](https://www.chameleoncloud.org) testbed for experimental Computer Science research. These services allow Chameleon users to discover information about Chameleon resources, allocate those resources for present and future use, configure them in various ways, and monitor various types of metrics.
 
