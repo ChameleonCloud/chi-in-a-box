@@ -26,3 +26,6 @@ __pycache__/
 galaxy.ansible.com/**
 
 roles/ansible_collectionspublic/
+
+# mkdocs build output
+public/**
