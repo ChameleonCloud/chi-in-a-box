@@ -108,6 +108,8 @@ glance_backends:
     enabled: "{{ glance_backend_swift | bool }}"
 
 glance_allow_anonymous_access: no
+glance_property_protections_file: "{{ node_custom_config }}/glance/property_protections.conf"
+glance_openstack_user: "{{ keystone_admin_user }}"
 
 # Hammers
 hammers_openstack_user: "{{ keystone_admin_user }}"
@@ -207,7 +209,7 @@ ironic_neutron_status_code_retries: 10
 # Defaults for inspection network, currently unused
 ironic_dnsmasq_dhcp_ranges:
  - range: "10.52.0.10,10.52.0.200,255.255.255.0"
- 
+
 #ironic_ks_services:
 #  - name: "ironic"
 #    type: "baremetal"
