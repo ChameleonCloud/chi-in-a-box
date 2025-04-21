@@ -108,8 +108,7 @@ glance_backends:
     enabled: "{{ glance_backend_swift | bool }}"
 
 glance_allow_anonymous_access: no
-glance_property_protections_file: "{{ node_custom_config }}/glance/property_protections.conf"
-glance_openstack_user: "{{ keystone_admin_user }}"
+glance_enable_property_protection: true
 
 # Hammers
 hammers_openstack_user: "{{ keystone_admin_user }}"
