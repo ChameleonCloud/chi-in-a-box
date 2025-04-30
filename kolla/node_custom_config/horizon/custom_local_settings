@@ -194,3 +194,6 @@ X_FRAME_OPTIONS = 'SAMEORIGIN'
 
 # disable usage report on overview page
 OPENSTACK_USE_SIMPLE_TENANT_USAGE = False
+
+# override 30d default for angular template caching
+NG_TEMPLATE_CACHE_AGE = 86400
