@@ -85,6 +85,7 @@ keystone_identity_mappings:
 keystone_oidc_client_id: "keystone-ciab-dev"
 keystone_oidc_client_secret: "public"
 
+identity_provider_name: "{{ keystone_identity_providers[0].name }}"
 identity_provider_url: "{{ keystone_identity_providers[0].identifier }}"
 keystone_oidc_provider_metadata_url: "{{ identity_provider_url }}/.well-known/openid-configuration"
 keystone_federation_oidc_jwks_uri: "{{ identity_provider_url }}/protocol/openid-connect/certs"
