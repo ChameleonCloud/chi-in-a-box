@@ -54,3 +54,32 @@ On a known working site, pull and genconfig can be skipped.
 ## Kicking the tires
 
 At this point, you can access the horizon dasboard at `kolla_external_vip_address`, logging in with the username+password found in `site-config/admin-openrc.sh`
+
+
+## post deploy stuff
+
+* create public network and subnet
+  ```
+  openstack network create --external --default --provider-physical-network physnet1 --provider-network-type flat public
+  openstack subnet create --no-dhcp --network public --subnet-range
+  ```
+* create calico network and subnet
+  ```
+  openstack network create --share caliconet
+  openstack subnet create --network caliconet --no-dhcp --subnet-range 192.168.0.0/16 caliconet
+  ```
+* create router
+  ```
+  openstack router create public --external --ha public
+  openstack router add subnet public caliconet
+  ```
+
+* add veth-pair systemd netdev
+  ```
+  [NetDev]
+  Name=veth-cali0
+  Kind=veth
+  [Peer]
+  Name=veth-caliN
+  ```
+* add host ip config to handle routing
