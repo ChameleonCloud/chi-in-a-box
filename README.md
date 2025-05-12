@@ -61,7 +61,10 @@ At this point, you can access the horizon dasboard at `kolla_external_vip_addres
 * create public network and subnet
   ```
   openstack network create --external --default --provider-physical-network physnet1 --provider-network-type flat public
-  openstack subnet create --no-dhcp --network public --subnet-range
+  openstack subnet create --no-dhcp --network public \
+    --subnet-range 172.18.200.0/24 \
+    --allocation-pool start=172.18.200.100,end=172.18.200.200 \
+    public
   ```
 * create calico network and subnet
   ```
@@ -70,16 +73,7 @@ At this point, you can access the horizon dasboard at `kolla_external_vip_addres
   ```
 * create router
   ```
-  openstack router create public --external --ha public
+  openstack router create public \
+    --external-gateway public
   openstack router add subnet public caliconet
   ```
-
-* add veth-pair systemd netdev
-  ```
-  [NetDev]
-  Name=veth-cali0
-  Kind=veth
-  [Peer]
-  Name=veth-caliN
-  ```
-* add host ip config to handle routing
