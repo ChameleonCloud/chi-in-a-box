@@ -98,16 +98,14 @@ horizon_image_full: ghcr.io/chameleoncloud/kolla/ubuntu-source-horizon:e193d13
 
 enable_nova: false
 
-enable_doni: true
-doni_api_image_full: ghcr.io/chameleoncloud/kolla/ubuntu-source-doni-api:xena
-doni_worker_image_full: ghcr.io/chameleoncloud/kolla/ubuntu-source-doni-worker:xena
-
-enable_tunelo: true
-tunelo_api_image_full: ghcr.io/chameleoncloud/kolla/ubuntu-source-tunelo-api:xena
-
 # enable zun, but use compute_k8s backend
 enable_zun: true
 enable_zun_compute: false
 enable_zun_compute_k8s: true
-zun_compute_k8s_image_full: ghcr.io/chameleoncloud/kolla/ubuntu-source-zun-compute-k8s:xena
+zun_api_image_full: ghcr.io/chameleoncloud/kolla/ubuntu-source-zun-api:xena-edge
+zun_wsproxy_image_full: ghcr.io/chameleoncloud/kolla/ubuntu-source-zun-wsproxy:xena-edge
+zun_compute_k8s_image_full: ghcr.io/chameleoncloud/kolla/ubuntu-source-zun-compute-k8s:xena-edge
 
+# deploy a k3s server on control nodes
+enable_k3s: true
+k3s_image_full: ghcr.io/chameleoncloud/kolla/ubuntu-source-k3s:xena-edge

@@ -14,6 +14,7 @@ site-config/*openrc*
 site-config/clouds.yaml
 site-config/clouds.yml
 site-config/kubeconfig*
+site-config/node_custom_config/kubeconfig*
 
 # The virtualenv environment(s)
 venv*
