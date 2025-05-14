@@ -95,3 +95,6 @@ keystone_image_full: ghcr.io/chameleoncloud/kolla/keystone:b61c66c
 keystone_fernet_image_full: ghcr.io/chameleoncloud/kolla/keystone-fernet:b61c66c
 keystone_ssh_image_full: ghcr.io/chameleoncloud/kolla/keystone-ssh:b61c66c
 horizon_image_full: ghcr.io/chameleoncloud/kolla/horizon:b61c66c
+
+# added logging to loki
+fluentd_image_full: ghcr.io/chameleoncloud/kolla/fluentd:b61c66c
