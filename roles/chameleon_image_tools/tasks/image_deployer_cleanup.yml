@@ -1,0 +1,63 @@
+- name: Check if image_deploy.timer exists
+  stat:
+    path: /etc/systemd/system/image_deploy.timer
+  register: timer_unit
+
+- name: Stop and disable image_deploy.timer if it exists
+  become: yes
+  systemd:
+    name: image_deploy.timer
+    state: stopped
+    enabled: no
+  when: timer_unit.stat.exists
+
+- name: Remove image_deploy.timer unit file
+  become: yes
+  file:
+    path: /etc/systemd/system/image_deploy.timer
+    state: absent
+  when: timer_unit.stat.exists
+
+- name: Check if image_deploy.service exists
+  stat:
+    path: /etc/systemd/system/image_deploy.service
+  register: service_unit
+
+- name: Stop and disable image_deploy.service if it exists
+  become: yes
+  systemd:
+    name: image_deploy.service
+    state: stopped
+    enabled: no
+  when: service_unit.stat.exists
+
+- name: Remove image_deploy.service unit file
+  become: yes
+  file:
+    path: /etc/systemd/system/image_deploy.service
+    state: absent
+  when: service_unit.stat.exists
+
+- name: Check if chameleon_image_tools config directory exists
+  stat:
+    path: /etc/chameleon_image_tools
+  register: tools_config_dir
+
+- name: Remove chameleon_image_tools config directory
+  become: yes
+  file:
+    path: /etc/chameleon_image_tools
+    state: absent
+  when: tools_config_dir.stat.exists
+
+- name: Check if wrapper script exists
+  stat:
+    path: /usr/local/sbin/chameleon-image-deploy
+  register: wrapper_script
+
+- name: Remove wrapper script
+  become: yes
+  file:
+    path: /usr/local/sbin/chameleon-image-deploy
+    state: absent
+  when: wrapper_script.stat.exists
