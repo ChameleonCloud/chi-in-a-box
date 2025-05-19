@@ -1,0 +1,14 @@
+[Unit]
+Description=Chameleon Image Deployer
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/docker run --rm --net=host \
+    -v "{{ chameleon_image_tools_config_dir }}:{{ chameleon_image_tools_config_dir }}:ro" \
+    {{ chameleon_image_tools_docker_image }} \
+    image_deployer --site {{ chameleon_image_tools_config_dir }}/site.yaml
+
+[Install]
+WantedBy=multi-user.target

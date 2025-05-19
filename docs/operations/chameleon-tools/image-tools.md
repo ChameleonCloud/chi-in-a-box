@@ -26,20 +26,12 @@ By default, the automatic deployment task is _disabled_. To enable the task, set
 systemctl list-timers 'image_deploy'
 ```
 
-You can also deploy the images manually by running the following commands:
+You can also deploy the images manually by running the following command:
 
 ```shell
-# to deploy a specific image
-docker run --rm --net=host -v "/etc/chameleon_image_tools/site.yaml:/etc/chameleon_image_tools/site.yaml" \
-docker.chameleoncloud.org/chameleon_image_tools:latest deploy \
---site-yaml /etc/chameleon_image_tools/site.yaml \
---image <image_id>
-
-# to deploy by image properties
-docker run --rm --net=host -v "/etc/chameleon_image_tools/site.yaml:/etc/chameleon_image_tools/site.yaml" \
-docker.chameleoncloud.org/chameleon_image_tools:latest deploy \
---site-yaml /etc/chameleon_image_tools/site.yaml \
---latest <distro>,<release>,<variant>
+docker run --rm --net=host -v "/etc/hammers:/etc/hammers:ro" \
+ghcr.io/chameleoncloud/chameleon_site_tools:sha-583d81d \
+image_deployer --site /etc/hammers/site.yaml --dry-run
 ```
 
 ### IPA Image Tester

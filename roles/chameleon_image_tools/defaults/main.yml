@@ -1,3 +1,3 @@
 ---
-chameleon_image_tools_docker_image: ghcr.io/chameleoncloud/chameleon_site_tools:latest
+chameleon_image_tools_docker_image: ghcr.io/chameleoncloud/chameleon_site_tools:sha-384af41
 chameleon_image_tools_config_dir: /etc/hammers

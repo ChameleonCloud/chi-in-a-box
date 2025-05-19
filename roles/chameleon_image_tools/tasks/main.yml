@@ -6,6 +6,58 @@
     name: "{{ chameleon_image_tools_docker_image }}"
     force_source: yes
 
+# Cleanup old service, scripts, and timer (if present)
+- name: Cleanup old image_deploy timer (stop & disable)
+  become: yes
+  systemd:
+    name: image_deploy.timer
+    state: stopped
+    enabled: no
+  ignore_errors: yes
+  when: enable_image_deployer | bool
+
+- name: Cleanup old image_deploy service (stop & disable)
+  become: yes
+  systemd:
+    name: image_deploy.service
+    state: stopped
+    enabled: no
+  ignore_errors: yes
+  when: enable_image_deployer | bool
+
+- name: Remove old timer unit file
+  become: yes
+  file:
+    path: /etc/systemd/system/image_deploy.timer
+    state: absent
+  ignore_errors: yes
+  when: enable_image_deployer | bool
+
+- name: Remove old service unit file
+  become: yes
+  file:
+    path: /etc/systemd/system/image_deploy.service
+    state: absent
+  ignore_errors: yes
+  when: enable_image_deployer | bool
+
+- name: Remove old chameleon_image_tools config dir
+  become: yes
+  file:
+    path: /etc/chameleon_image_tools
+    state: absent
+  ignore_errors: yes
+  when: enable_image_deployer | bool
+
+- name: Remove old wrapper script
+  become: yes
+  file:
+    path: /usr/local/sbin/chameleon-image-deploy
+    state: absent
+  ignore_errors: yes
+  when: enable_image_deployer | bool
+
+# Setup new chameleon-image-deploy
 - name: Create config directory
   become: yes
   file:
@@ -18,21 +70,32 @@
     src: site.yaml.j2
     dest: "{{ chameleon_image_tools_config_dir }}/site.yaml"
 
-- name: Configure chameleon image deployer docker bash wrapper
+- name: Deploy chameleon-image-deploy systemd service
   become: yes
   template:
-    src: chameleon-image-deploy.j2
-    mode: 0700
-    dest: /usr/local/sbin/chameleon-image-deploy
+    src: chameleon-image-deploy.service.j2
+    dest: /etc/systemd/system/chameleon-image-deploy.service
+    mode: '0644'
   when: enable_image_deployer | bool
 
-- name: Set up image deployer periodic task
-  include_role:
-    name: chameleon.periodic_task
-    apply:
-      become: yes
-  vars:
-    task_name: "image_deploy"
-    task_command: "/usr/local/sbin/chameleon-image-deploy"
-    task_calendar: "daily"
+- name: Deploy chameleon-image-deploy timer unit
+  become: yes
+  template:
+    src: chameleon-image-deploy.timer.j2
+    dest: /etc/systemd/system/chameleon-image-deploy.timer
+    mode: '0644'
+  when: enable_image_deployer | bool
+
+- name: Reload systemd to pick up new/changed units
+  become: yes
+  systemd:
+    daemon_reload: yes
+  when: enable_image_deployer | bool
+
+- name: Enable & start chameleon-image-deploy.timer
+  become: yes
+  systemd:
+    name: chameleon-image-deploy.timer
+    enabled: yes
+    state: started
   when: enable_image_deployer | bool
