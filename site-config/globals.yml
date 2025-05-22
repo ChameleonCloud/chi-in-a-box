@@ -95,4 +95,4 @@ keystone_image_full: ghcr.io/chameleoncloud/kolla/keystone:2023.1-ubuntu-jammy
 keystone_fernet_image_full: ghcr.io/chameleoncloud/kolla/keystone-fernet:2023.1-ubuntu-jammy
 keystone_ssh_image_full: ghcr.io/chameleoncloud/kolla/keystone-ssh:2023.1-ubuntu-jammy
 horizon_image_full: ghcr.io/chameleoncloud/kolla/horizon:2023.1-ubuntu-jammy
-fluentd_image_full: ghcr.io/chameleoncloud/kolla/horizon:2023.1-ubuntu-jammy
+fluentd_image_full: ghcr.io/chameleoncloud/kolla/fluentd:2023.1-ubuntu-jammy
