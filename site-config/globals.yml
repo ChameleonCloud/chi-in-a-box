@@ -94,7 +94,6 @@ keystone_federation_oidc_jwks_uri: "{{ identity_provider_url }}/protocol/openid-
 keystone_image_full: ghcr.io/chameleoncloud/kolla/keystone:2023.1-ubuntu-jammy
 keystone_fernet_image_full: ghcr.io/chameleoncloud/kolla/keystone-fernet:2023.1-ubuntu-jammy
 keystone_ssh_image_full: ghcr.io/chameleoncloud/kolla/keystone-ssh:2023.1-ubuntu-jammy
-horizon_image_full: ghcr.io/chameleoncloud/kolla/horizon:2023.1-ubuntu-jammy
 fluentd_image_full: ghcr.io/chameleoncloud/kolla/fluentd:2023.1-ubuntu-jammy
 
 ############
@@ -108,6 +107,10 @@ fluentd_image_full: ghcr.io/chameleoncloud/kolla/fluentd:2023.1-ubuntu-jammy
 # Reservation Config
 ####################
 enable_blazar: true
+
+horizon_image_full: ghcr.io/chameleoncloud/kolla/horizon:2023.1-kvm-res
+blazar_api_image_full: ghcr.io/chameleoncloud/kolla/blazar-api:2023.1-kvm-res
+blazar_manager_image_full: ghcr.io/chameleoncloud/kolla/blazar-manager:2023.1-kvm-res
 
 enable_blazar_allocation_enforcement: false
 
