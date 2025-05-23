@@ -112,8 +112,14 @@ horizon_image_full: ghcr.io/chameleoncloud/kolla/horizon:2023.1-kvm-res
 blazar_api_image_full: ghcr.io/chameleoncloud/kolla/blazar-api:2023.1-kvm-res
 blazar_manager_image_full: ghcr.io/chameleoncloud/kolla/blazar-manager:2023.1-kvm-res
 
-enable_blazar_allocation_enforcement: false
+# reservation type flags
+blazar_enable_host_reservation: false
+blazar_enable_flavor_reservation: true
+blazar_enable_floatingip_reservation: false
+blazar_enable_device_reservation: false
+blazar_enable_network_reservation: false
 
+enable_blazar_allocation_enforcement: false
 blazar_randomize_hosts: false
 
 blazar_project_enforcement_id: charge_code

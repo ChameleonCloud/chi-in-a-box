@@ -147,3 +147,24 @@ X_FRAME_OPTIONS = 'SAMEORIGIN'
 
 # disable usage report on overview page
 OPENSTACK_USE_SIMPLE_TENANT_USAGE = False
+
+{% if enable_blazar | bool %}
+OPENSTACK_BLAZAR_HOST_RESERVATION = {
+  'enabled': {{ blazar_enable_host_reservation | bool }},
+  'url_format': '{{ blazar_host_url_format }}',
+}
+OPENSTACK_BLAZAR_FLAVOR_RESERVATION = {
+  "enabled": {{ blazar_enable_flavor_reservation | bool}},
+}
+OPENSTACK_BLAZAR_FLOATINGIP_RESERVATION = {
+  # Allow reserving floating IPs on this network
+  'enabled': {{ blazar_enable_floatingip_reservation | bool }},
+  'network_name_regex': '{{ blazar_floatingip_reservation_network_regex }}'
+}
+OPENSTACK_BLAZAR_DEVICE_RESERVATION = {
+  'enabled': {{ blazar_enable_device_reservation | bool }},
+}
+OPENSTACK_BLAZAR_NETWORK_RESERVATION = {
+  'enabled': {{ blazar_enable_network_reservation | bool }},
+}
+{% endif %}
