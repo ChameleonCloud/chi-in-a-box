@@ -113,11 +113,22 @@ blazar_api_image_full: ghcr.io/chameleoncloud/kolla/blazar-api:2023.1-kvm-res
 blazar_manager_image_full: ghcr.io/chameleoncloud/kolla/blazar-manager:2023.1-kvm-res
 
 # reservation type flags
-blazar_enable_host_reservation: false
 blazar_enable_flavor_reservation: true
+
+blazar_enable_host_reservation: false
+blazar_physical_polling_monitor: "{{ blazar_enable_host_reservation }}"
+blazar_physical_polling_monitor_dry_run: false
+
 blazar_enable_floatingip_reservation: false
-blazar_enable_device_reservation: false
+blazar_fip_polling_monitor: "{{ blazar_enable_floatingip_reservation }}"
+blazar_fip_polling_monitor_dry_run: false
+
 blazar_enable_network_reservation: false
+blazar_network_polling_monitor: "{{ blazar_enable_network_reservation }}"
+blazar_network_polling_monitor_dry_run: false
+
+blazar_enable_device_reservation: false
+blazar_zun_polling_monitor: "{{ blazar_enable_device_reservation }}"
 
 enable_blazar_allocation_enforcement: false
 blazar_randomize_hosts: false
@@ -144,9 +155,3 @@ blazar_network_default_resource_properties: '["=", "\$stitch_provider", "none"]'
 blazar_network_retry_without_default_resources: no
 blazar_floatingip_reservation_network_regex: "[pP]ublic"
 blazar_host_url_format: "https://chameleoncloud.org/hardware/node/sites/{{ chameleon_site_name }}/clusters/chameleon/nodes/{hypervisor_hostname}/"
-blazar_physical_polling_monitor: true
-blazar_physical_polling_monitor_dry_run: true
-blazar_fip_polling_monitor: true
-blazar_fip_polling_monitor_dry_run: true
-blazar_network_polling_monitor: true
-blazar_network_polling_monitor_dry_run: true
