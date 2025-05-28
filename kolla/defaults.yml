@@ -372,6 +372,8 @@ enable_image_cleaner: no
 default_share_type: cephfsnfstype
 
 # Flavor reservation
-enable_host_reservation: "{{ enable_nova | bool }}"
-enable_flavor_reservation: no
+blazar_enable_host_reservation: "{{ enable_nova | bool }}"
+blazar_enable_flavor_reservation: no
 blazar_randomize_hosts: no
+# The trait which permits flavor reservation
+blazar_flavor_reservation_trait: blazar_flavor_reservation

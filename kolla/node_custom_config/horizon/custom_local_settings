@@ -96,6 +96,7 @@ OPENSTACK_BLAZAR_HOST_RESERVATION = {
 }
 OPENSTACK_BLAZAR_FLAVOR_RESERVATION = {
   "enabled": {{ enable_flavor_reservation | bool}},
+  "blazar_flavor_reservation_trait": {{ blazar_flavor_reservation_trait }},
 }
 {% endif %}
 
