@@ -6,6 +6,7 @@ Requires=docker.service
 [Service]
 Type=oneshot
 ExecStart=/usr/bin/docker run --rm --net=host \
+    --env-file {{ chameleon_image_tools_config_dir }}/envvars \
     -v "{{ chameleon_image_tools_config_dir }}:{{ chameleon_image_tools_config_dir }}:ro" \
     {{ chameleon_image_tools_docker_image }} \
     image_deployer --site {{ chameleon_image_tools_config_dir }}/site.yaml

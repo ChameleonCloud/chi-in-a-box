@@ -22,6 +22,18 @@
   template:
     src: site.yaml.j2
     dest: "{{ chameleon_image_tools_config_dir }}/site.yaml"
+    mode: '0600'
+    owner: 'root'
+    group: 'root'
+
+- name: template envvars file
+  become: yes
+  template:
+    src: envvars.j2
+    dest: "{{ chameleon_image_tools_config_dir }}/envvars"
+    mode: '0600'
+    owner: 'root'
+    group: 'root'
 
 - name: Deploy chameleon-image-deploy systemd service
   become: yes
