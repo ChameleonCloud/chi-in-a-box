@@ -34,7 +34,13 @@ virtualenv: /opt/kolla/venv
 kolla_base_distro: "ubuntu"
 kolla_install_type: "source"
 
+# Where to get container images from
+docker_registry: "ghcr.io"
+docker_namespace: "chameleoncloud/kolla"
+openstack_tag: "2023.1-ubuntu-jammy"
 
+horizon_tag: "2023.1-kvm-res"
+blazar_tag: "2023.1-kvm-res"
 
 # default superadmin user and project
 keystone_admin_user: "admin"
@@ -89,12 +95,6 @@ identity_provider_name: "{{ keystone_identity_providers[0].name }}"
 identity_provider_url: "{{ keystone_identity_providers[0].identifier }}"
 keystone_oidc_provider_metadata_url: "{{ identity_provider_url }}/.well-known/openid-configuration"
 keystone_federation_oidc_jwks_uri: "{{ identity_provider_url }}/protocol/openid-connect/certs"
-
-# keystone must support mapping multiple projects or keycloak federation will fail
-keystone_image_full: ghcr.io/chameleoncloud/kolla/keystone:2023.1-ubuntu-jammy
-keystone_fernet_image_full: ghcr.io/chameleoncloud/kolla/keystone-fernet:2023.1-ubuntu-jammy
-keystone_ssh_image_full: ghcr.io/chameleoncloud/kolla/keystone-ssh:2023.1-ubuntu-jammy
-fluentd_image_full: ghcr.io/chameleoncloud/kolla/fluentd:2023.1-ubuntu-jammy
 
 ############
 # GPU config
