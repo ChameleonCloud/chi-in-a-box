@@ -17,8 +17,8 @@ jobs:
         with:
           python-version: '3.10'
           cache: 'pip'
-      - run: ./cc-ansible install_deps
-      - run: ./cc-ansible init
-      - run: ./cc-ansible bootstrap_servers
-      - run: ./cc-ansible deploy
-      - run: ./cc-ansible post-deploy
+      - run: ./cc-ansible install_deps -v
+      - run: ./cc-ansible init -v
+      - run: ./cc-ansible bootstrap_servers -v
+      - run: ./cc-ansible deploy -v
+      - run: ./cc-ansible post-deploy -v
