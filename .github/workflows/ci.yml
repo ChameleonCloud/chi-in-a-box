@@ -19,6 +19,6 @@ jobs:
           cache: 'pip'
       - run: ./cc-ansible install_deps -v
       - run: ./cc-ansible init -v
-      - run: ./cc-ansible bootstrap_servers -v
+      - run: ./cc-ansible bootstrap-servers -v
       - run: ./cc-ansible deploy -v
       - run: ./cc-ansible post-deploy -v
