@@ -70,6 +70,12 @@
     src: site.yaml.j2
     dest: "{{ chameleon_image_tools_config_dir }}/site.yaml"
 
+- name: template envvars file
+  become: yes
+  template:
+    src: envvars.j2
+    dest: "{{ chameleon_image_tools_config_dir }}/envvars"
+
 - name: Deploy chameleon-image-deploy systemd service
   become: yes
   template:
