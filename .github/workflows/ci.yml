@@ -4,7 +4,7 @@ on:
   pull_request:
 
 jobs:
-  test:
+  test-deploy:
     runs-on: ubuntu-22.04
     env:
       CC_ANSIBLE_SITE: /opt/site-config
@@ -20,5 +20,8 @@ jobs:
       - run: ./cc-ansible install_deps -v
       - run: ./cc-ansible init -v
       - run: ./cc-ansible bootstrap-servers -v
+      - run: ./cc-ansible genconfig -v
+      - run: ./cc-ansible prechecks -v
+      - run: ./cc-ansible pull -v
       - run: ./cc-ansible deploy -v
       - run: ./cc-ansible post-deploy -v
