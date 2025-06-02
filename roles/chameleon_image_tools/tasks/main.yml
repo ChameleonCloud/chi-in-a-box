@@ -6,55 +6,8 @@
     name: "{{ chameleon_image_tools_docker_image }}"
     force_source: yes
 
-# Cleanup old service, scripts, and timer (if present)
-- name: Cleanup old image_deploy timer (stop & disable)
-  become: yes
-  systemd:
-    name: image_deploy.timer
-    state: stopped
-    enabled: no
-  ignore_errors: yes
-  when: enable_image_deployer | bool
-
-- name: Cleanup old image_deploy service (stop & disable)
-  become: yes
-  systemd:
-    name: image_deploy.service
-    state: stopped
-    enabled: no
-  ignore_errors: yes
-  when: enable_image_deployer | bool
-
-- name: Remove old timer unit file
-  become: yes
-  file:
-    path: /etc/systemd/system/image_deploy.timer
-    state: absent
-  ignore_errors: yes
-  when: enable_image_deployer | bool
-
-- name: Remove old service unit file
-  become: yes
-  file:
-    path: /etc/systemd/system/image_deploy.service
-    state: absent
-  ignore_errors: yes
-  when: enable_image_deployer | bool
-
-- name: Remove old chameleon_image_tools config dir
-  become: yes
-  file:
-    path: /etc/chameleon_image_tools
-    state: absent
-  ignore_errors: yes
-  when: enable_image_deployer | bool
-
-- name: Remove old wrapper script
-  become: yes
-  file:
-    path: /usr/local/sbin/chameleon-image-deploy
-    state: absent
-  ignore_errors: yes
+- name: Cleanup old image deployer artifacts
+  import_tasks: image_deployer_cleanup.yml
   when: enable_image_deployer | bool
 
 # Setup new chameleon-image-deploy
