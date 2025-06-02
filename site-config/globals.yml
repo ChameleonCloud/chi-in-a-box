@@ -115,7 +115,7 @@ blazar_manager_image_full: ghcr.io/chameleoncloud/kolla/blazar-manager:2023.1-kv
 # reservation type flags
 blazar_enable_flavor_reservation: true
 # The trait which permits flavor reservation
-blazar_flavor_reservation_trait: blazar_flavor_reservation
+blazar_flavor_reservation_trait: custom_blazar_flavor_reservation
 
 blazar_enable_host_reservation: false
 blazar_physical_polling_monitor: "{{ blazar_enable_host_reservation }}"
