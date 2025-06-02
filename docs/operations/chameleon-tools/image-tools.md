@@ -23,15 +23,13 @@ The image deployer allows the sites to pull the latest Chameleon-supported image
 By default, the automatic deployment task is _disabled_. To enable the task, set `enable_image_deployer: yes` in the site `defaults.yml`. Then, run the `post-deploy` or run the `chameleon_image_tools` playbook. The automatic deployment task runs daily to check if there are new (version of) Chameleon-supported images that have been released and deploy all new images to the site. You can check the installed automatic deployment task via the systemd [timers](https://wiki.archlinux.org/index.php/Systemd/Timers).
 
 ```shell
-systemctl list-timers 'image_deploy'
+systemctl list-timers 'chameleon-image-deploy'
 ```
 
 You can also deploy the images manually by running the following command:
 
 ```shell
-docker run --rm --net=host -v "/etc/hammers:/etc/hammers:ro" \
-ghcr.io/chameleoncloud/chameleon_site_tools:sha-583d81d \
-image_deployer --site /etc/hammers/site.yaml --dry-run
+systemctl start chameleon-image-deploy.service
 ```
 
 ### IPA Image Tester
