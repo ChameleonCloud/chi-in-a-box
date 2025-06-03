@@ -1,0 +1,3 @@
+# Original: #"project_reader_api": "role:reader and project_id:%(project_id)s"
+# replace due to keystone app credential not honoring implicit roles
+"project_reader_api": "(role:reader or role:member) and project_id:%(project_id)s"
