@@ -23,48 +23,14 @@ The image deployer allows the sites to pull the latest Chameleon-supported image
 By default, the automatic deployment task is _disabled_. To enable the task, set `enable_image_deployer: yes` in the site `defaults.yml`. Then, run the `post-deploy` or run the `chameleon_image_tools` playbook. The automatic deployment task runs daily to check if there are new (version of) Chameleon-supported images that have been released and deploy all new images to the site. You can check the installed automatic deployment task via the systemd [timers](https://wiki.archlinux.org/index.php/Systemd/Timers).
 
 ```shell
-systemctl list-timers 'image_deploy'
+systemctl list-timers 'chameleon-image-deploy'
 ```
 
-You can also deploy the images manually by running the following commands:
+You can also deploy the images manually by running the following command:
 
 ```shell
-# to deploy a specific image
-docker run --rm --net=host -v "/etc/chameleon_image_tools/site.yaml:/etc/chameleon_image_tools/site.yaml" \
-docker.chameleoncloud.org/chameleon_image_tools:latest deploy \
---site-yaml /etc/chameleon_image_tools/site.yaml \
---image <image_id>
-
-# to deploy by image properties
-docker run --rm --net=host -v "/etc/chameleon_image_tools/site.yaml:/etc/chameleon_image_tools/site.yaml" \
-docker.chameleoncloud.org/chameleon_image_tools:latest deploy \
---site-yaml /etc/chameleon_image_tools/site.yaml \
---latest <distro>,<release>,<variant>
+systemctl start chameleon-image-deploy.service
 ```
-
-### Cleaner
-
-To avoid accumulation of the older version and deprecated Chameleon-supported images in your site, we implement an image cleaning tool that cleans up images. The tool will:
-
-* Check and skip the images that are currently used by any instance.
-* Hide images that are 12 months or older (i.e. set visibility of the images to `private`). You can also tune this number by overwriting `hide_image_age_in_month` in the site `defaults.yml`.
-* Delete images that are 18 months or older. You can also tune this number by overwriting `delete_image_age_in_month` in the site `defaults.yml`.
-
-By default, the automatic cleaning task is _disabled_. To enable the task, set `enable_image_cleaner: yes` in the site `defaults.yml`. Then, run the `post-deploy` or run the `chameleon_image_tools` playbook. The automatic cleaning task runs daily to hide or delete the older version and deprecated Chameleon-supported images. You can check the installed automatic cleaning task via the systemd [timers](https://wiki.archlinux.org/index.php/Systemd/Timers).
-
-```shell
-systemctl list-timers 'image_clean'
-```
-
-You can also clean the images manually by running the following command:
-
-```shell
-docker run --rm --net=host -v "/etc/chameleon_image_tools/site.yaml:/etc/chameleon_image_tools/site.yaml" \
-docker.chameleoncloud.org/chameleon_image_tools:latest clean \
---site-yaml /etc/chameleon_image_tools/site.yaml
-```
-
-To perform a dry-run, add `--dry-run` flag to the above command to only print without actual hiding and deleting.
 
 ### IPA Image Tester
 Ironic Python Agent (IPA) is an agent for controlling and deploying Ironic controlled baremetal nodes. In order to support various hardware types, Chameleon builds and deploys
