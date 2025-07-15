@@ -1,5 +1,11 @@
 ---
-k3s_version: v1.23.17+k3s1
+#k3s_version: v1.23.17+k3s1
+#k3s_version: v1.24.17+k3s1
+#k3s_version: v1.25.16+k3s4
+#k3s_version: v1.26.15+k3s1
+k3s_version: v1.27.16+k3s1
+#k3s_version: v1.28.15+k3s1
+#k3s_version: v1.29.15+k3s1
 k3s_port: 6443
 k3s_server_location: /var/lib/rancher/k3s
 k3s_conf_location: /etc/rancher/k3s
@@ -15,7 +21,11 @@ k3s_cluster_cidr: "192.168.64.0/18"
 k3s_cluster_node_blocksize: 28
 
 k3s_enable_calico: yes
-k3s_calico_version: v3.24.1
+#k3s_calico_version: v3.24.1
+k3s_calico_version: v3.25.2
+#k3s_calico_version: v3.26.5
+#k3s_calico_version: v3.27.3
+#k3s_calico_version: v3.28.4 # wait for k3s 1.28!
 
 k3s_nvidia_device_plugin_version: "v0.12.2"
 k3s_smarter_device_plugin_version: "v1.20.10"
