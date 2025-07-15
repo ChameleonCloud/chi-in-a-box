@@ -41,6 +41,20 @@ data:
       nummaxdevices: 1
     - devicematch: ^ttyS[0-9]*$
       nummaxdevices: 1
+    - devicematch: ^dma_heap$
+      nummaxdevices: 1
+    - devicematch: ^media[0-9]*$
+      nummaxdevices: 40
+    - devicematch: ^v4l-subdev[0-9]*$
+      nummaxdevices: 2
+    - devicematch: ^spidev[0-9]*.[0-9]*$
+      nummaxdevices: 20
+    - devicematch: ^fb[0-9]*$
+      nummaxdevices: 1
+    - devicematch: ^input/event[0-9]*$
+      nummaxdevices: 1
+    - devicematch: ^input/js[0-9]*$
+      nummaxdevices: 1
 ---
 apiVersion: apps/v1
 kind: DaemonSet
