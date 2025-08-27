@@ -1,0 +1,4 @@
+---
+- hosts: chameleon-periodic-inspector
+  roles:
+    - chameleon_periodic_inspector
