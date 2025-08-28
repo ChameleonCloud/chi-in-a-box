@@ -14,7 +14,7 @@ ExecStart=/usr/bin/docker run --rm --net=host \
         {% if chameleon_resource_discovery_provide_manageable %}--provide-manageable {% endif %}\
         {% if chameleon_resource_discovery_reinspect_failed %}--reinspect-failed {% endif %}\
         --expire-days {{ chameleon_resource_discovery_expire_days }} \
-        --cloud {{ cloud }}
+        --cloud envvars
 
 [Install]
 WantedBy=multi-user.target
