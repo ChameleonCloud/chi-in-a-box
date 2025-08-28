@@ -1,0 +1,48 @@
+---
+- name: Pull Docker image
+  become: True
+  docker_image:
+    source: pull
+    name: "{{ chameleon_resource_discovery_docker_image }}"
+    force_source: yes
+
+- name: Ensure config directory exists
+  become: yes
+  file:
+    path: "{{ chameleon_resource_discovery_config_dir }}"
+    state: directory
+
+- name: Template envvars file
+  become: yes
+  template:
+    src: envvars.j2
+    dest: "{{ chameleon_resource_discovery_config_dir }}/envvars"
+    mode: '0600'
+    owner: 'root'
+    group: 'root'
+
+- name: Deploy periodic-inspector service unit
+  become: yes
+  template:
+    src: periodic-inspector.service.j2
+    dest: /etc/systemd/system/periodic-inspector.service
+    mode: '0644'
+
+- name: Deploy periodic-inspector timer unit
+  become: yes
+  template:
+    src: periodic-inspector.timer.j2
+    dest: /etc/systemd/system/periodic-inspector.timer
+    mode: '0644'
+
+- name: Reload systemd
+  become: yes
+  systemd:
+    daemon_reload: yes
+
+- name: Enable and start periodic-inspector.timer
+  become: yes
+  systemd:
+    name: periodic-inspector.timer
+    enabled: yes
+    state: started

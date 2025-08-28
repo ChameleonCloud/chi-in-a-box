@@ -842,6 +842,10 @@ control
 [chameleon-image-tools:children]
 control
 
+# Periodic Inspector
+[chameleon-periodic-inspector:children]
+control
+
 # Development, fake baremetal hypervisor host using tenks
 [fake-baremetal:children]
 ironic

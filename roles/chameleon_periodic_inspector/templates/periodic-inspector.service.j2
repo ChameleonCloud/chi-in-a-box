@@ -1,0 +1,20 @@
+[Unit]
+Description=Chameleon Periodic Inspector
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/docker run --rm --net=host \
+    --env-file {{ chameleon_resource_discovery_config_dir }}/envvars \
+    {{ chameleon_resource_discovery_docker_image }} \
+    periodic_inspector \
+        --parallel {{ chameleon_resource_discovery_parallel }} \
+        --limit {{ chameleon_resource_discovery_limit }} \
+        {% if chameleon_resource_discovery_provide_manageable %}--provide-manageable {% endif %}\
+        {% if chameleon_resource_discovery_reinspect_failed %}--reinspect-failed {% endif %}\
+        --expire-days {{ chameleon_resource_discovery_expire_days }} \
+        --cloud envvars
+
+[Install]
+WantedBy=multi-user.target

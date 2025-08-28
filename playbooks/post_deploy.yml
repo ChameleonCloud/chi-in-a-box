@@ -14,6 +14,9 @@
 - hosts: chameleon-image-tools
   roles: [chameleon_image_tools]
 
+- hosts: chameleon-periodic-inspector
+  roles: [chameleon_periodic_inspector]
+
 - hosts: deployment
   roles:
     - role: chameleon_mariadb
