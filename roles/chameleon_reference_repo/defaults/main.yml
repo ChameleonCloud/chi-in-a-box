@@ -1,0 +1,6 @@
+---
+chameleon_reference_repo_docker_image: ghcr.io/chameleoncloud/chameleon_site_tools:sha-384af41
+chameleon_reference_repo_config_dir: /etc/hammers
+
+chameleon_reference_repo_url: https://github.com/ChameleonCloud/reference-repository.git
+chameleon_reference_repo_push_changes: true

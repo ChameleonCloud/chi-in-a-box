@@ -17,6 +17,9 @@
 - hosts: chameleon-periodic-inspector
   roles: [chameleon_periodic_inspector]
 
+- hosts: chameleon-reference-repo
+  roles: [chameleon_reference_repo]
+
 - hosts: deployment
   roles:
     - role: chameleon_mariadb

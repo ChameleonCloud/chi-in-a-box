@@ -1,0 +1,16 @@
+[Unit]
+Description=Chameleon Reference Repo Generator
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/docker run --rm --net=host \
+    --env-file {{ chameleon_reference_repo_config_dir }}/envvars \
+    {{ chameleon_reference_repo_docker_image }} \
+    python generate_reference_repo \
+    --reference-repo-url {{ chameleon_reference_repo_url }} \
+    {% if chameleon_reference_repo_push_changes %} --push-changes {% endif %}
+
+[Install]
+WantedBy=multi-user.target

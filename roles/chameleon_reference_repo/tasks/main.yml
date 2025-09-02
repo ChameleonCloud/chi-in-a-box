@@ -1,0 +1,48 @@
+---
+- name: Pull Docker image
+  become: true
+  docker_image:
+    source: pull
+    name: "{{ chameleon_reference_repo_docker_image }}"
+    force_source: yes
+
+- name: Ensure config directory exists
+  become: true
+  file:
+    path: "{{ chameleon_reference_repo_config_dir }}"
+    state: directory
+
+- name: Template envvars file
+  become: true
+  template:
+    src: envvars.j2
+    dest: "{{ chameleon_reference_repo_config_dir }}/envvars"
+    mode: '0600'
+    owner: 'root'
+    group: 'root'
+
+- name: Deploy chameleon-reference-repo service unit
+  become: true
+  template:
+    src: chameleon-reference-repo.service.j2
+    dest: /etc/systemd/system/chameleon-reference-repo.service
+    mode: '0644'
+
+- name: Deploy chameleon-reference-repo timer unit
+  become: true
+  template:
+    src: chameleon-reference-repo.timer.j2
+    dest: /etc/systemd/system/chameleon-reference-repo.timer
+    mode: '0644'
+
+- name: Reload systemd
+  become: true
+  systemd:
+    daemon_reload: yes
+
+- name: Enable and start chameleon-reference-repo.timer
+  become: true
+  systemd:
+    name: chameleon-reference-repo.timer
+    enabled: yes
+    state: started
