@@ -846,6 +846,10 @@ control
 [chameleon-periodic-inspector:children]
 control
 
+# Chameleon Reference Repository Generator
+[chameleon-reference-repo:children]
+control
+
 # Development, fake baremetal hypervisor host using tenks
 [fake-baremetal:children]
 ironic

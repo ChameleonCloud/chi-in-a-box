@@ -1,0 +1,4 @@
+---
+- hosts: chameleon-reference-repo
+  roles:
+    - chameleon_reference_repo
