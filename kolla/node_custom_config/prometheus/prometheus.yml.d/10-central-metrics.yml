@@ -1,0 +1,15 @@
+---
+{% if upload_metrics_chameleon | bool %}
+remote_write:
+  - url: "{{ prometheus_remote_write_url }}"
+    basic_auth:
+      username: "{{ prometheus_remote_write_username }}"
+      password: "{{ prometheus_remote_write_password }}"
+{% endif %}
+
+global:
+  external_labels:
+    kolla_external_fqdn: "{{ kolla_external_fqdn }}"
+    keystone_idp_client_id: "{{ keystone_idp_client_id }}"
+    openstack_region_name: "{{ openstack_region_name }}"
+    chameleon_site_name: "{{ chameleon_site_name }}"
