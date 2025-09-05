@@ -4,27 +4,23 @@ name: CI for chi-in-a-box script
 on:
   push:
     branches:
-      - master
+      - main
+      - stable/*
   pull_request:
     branches:
-      - master
+      - main
+      - stable/*
+  workflow_dispatch: {}
 
 jobs:
-  test:
-    name: test cc-ansible
-    runs-on: 	[self-hosted, kvm, ciab, ubuntu-18.04]
-    env:
-      CC_ANSIBLE_SITE: /opt/site-config
-    defaults:
-      run:
-        shell: bash
+  ci:
+    name: basic setup checks
+    runs-on: 	[ ubuntu-22.04 ]
     steps:
-      - name: Checkout code base
-        uses: actions/checkout@v2
-      - name: init site-config
-        run: "./cc-ansible init"
-        continue-on-error: true
-      - run: "./cc-ansible bootstrap-servers"
-      - run: "./cc-ansible prechecks"
-      - run: "./cc-ansible pull"
-      - run: "./cc-ansible genconfig"
+      - name: checkout chi-in-a-box
+        uses: actions/checkout@v5
+        with:
+          submodules: true
+
+      - name: run test script
+        run: tests/setup_ciab.sh
