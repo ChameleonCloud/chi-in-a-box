@@ -82,10 +82,7 @@ install_deps() {
 
   git submodule update --init
 
-  pip install \
-    -r requirements.txt \
-    --config-settings editable_mode=strict \
-    -e src/kolla-ansible
+  pip install -r requirements.txt
 
   # Update/install yq, adding it to the venv bin path
   YQ_VERSION=4.9.6
@@ -94,8 +91,6 @@ install_deps() {
     wget https://github.com/mikefarah/yq/releases/download/v${YQ_VERSION}/${YQ_BINARY}.tar.gz -O - \
       | tar xz && mv ${YQ_BINARY} "$VIRTUALENV/bin/yq"
   fi
-
-  echo $(env)
 
   # install kolla-ansible galaxy deps. We use a subshell to drop back out of the venv afterwards
   (source "${VIRTUALENV}/bin/activate" && kolla-ansible install-deps)
