@@ -2,3 +2,4 @@
 # This is because it depends on ansible-core 2.11.x
 # See https://docs.openstack.org/releasenotes/kolla-ansible/xena.html#relnotes-13-0-0-stable-xena-upgrade-notes
 ansible>=2.10,<5
+git+https://github.com/chameleoncloud/kolla-ansible.git@chameleoncloud/xena#egg=kolla-ansible
