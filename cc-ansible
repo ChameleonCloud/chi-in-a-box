@@ -273,25 +273,12 @@ if [[ -f "$CC_ANSIBLE_ENV" ]]; then
   set -a; source "$(realpath "$CC_ANSIBLE_ENV")"; set +a
 fi
 
-find_kolla_ansible_base_dir () {
-  kolla_direct_url="$(find ${VIRTUAL_ENV}/lib/  -wholename '*kolla_ansible*.dist-info/direct_url.json' -print -quit)"
-  if test -n "${kolla_direct_url}"; then
-      # Editable install in local path
-      direct_url="$(yq eval '.url' ${kolla_direct_url})"
-      BASEDIR="${direct_url#file:\/\/}"
-  else
-      BASEDIR="${VIRTUAL_ENV}/share/kolla-ansible"
-  fi
-  echo "${BASEDIR}/ansible"
-}
-
 # Handle subcommands
 if [[ -n "${command:-}" ]]; then
   $command "$@"
   exit $?
 fi
 
-ansible_path="$(find_kolla_ansible_base_dir)"
 if [[ -n "${CC_ANSIBLE_PLAYBOOK:-}" ]]; then
   echo "**********************************************************************"
   echo "* Playbook override detected! This playbook will be executed within  *"
