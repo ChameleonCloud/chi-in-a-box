@@ -56,6 +56,7 @@ done
 #
 
 install_deps() {
+  set -x
   # install kolla-ansible, perform updates if necessary.
 
   # create virtualenv
@@ -94,9 +95,12 @@ install_deps() {
       | tar xz && mv ${YQ_BINARY} "$VIRTUALENV/bin/yq"
   fi
 
+  echo $(env)
+
   # install kolla-ansible galaxy deps. We use a subshell to drop back out of the venv afterwards
   (source "${VIRTUALENV}/bin/activate" && kolla-ansible install-deps)
-  
+
+  set +x
 }
 
 init() {
