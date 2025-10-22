@@ -1,3 +1,15 @@
+###########################
+# Chameleon Specific Groups
+###########################
+
+# Chameleon vendordata service
+[vendordata:children]
+control
+
+################################
+# Kolla OpenStack Service Groups
+################################
+
 [baremetal:children]
 control
 network
