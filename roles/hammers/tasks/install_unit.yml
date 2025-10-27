@@ -1,6 +1,7 @@
 ---
 - name: "set up service: {{ item.key }}"
   vars:
+    container_name: "{{ item.value.container_name | default(item.key)}}"
     description: "{{item.value.description | default(item.key) }}"
     env_file: "{{item.value.env_file | default(hammers_env_file)}}"
     image: "{{item.value.image | default(hammers_docker_image) }}"
