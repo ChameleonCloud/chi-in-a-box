@@ -70,3 +70,13 @@ hammers:
     enabled: "{{ enable_k3s | bool}}"
 
 hammers_slack_webhook: "{{ slack_api_url }}"
+
+hammers_v2_docker_image: ghcr.io/chameleoncloud/chameleon_site_tools:main
+hammers_v2:
+  floating_ip_network_reaper:
+    description: "Clean up networks for expired projects."
+    env_file: "{{ hammers_env_file }}"
+    image: "{{ hammers_v2_docker_image }}"
+    cmd: floating_ip_network_reaper --cloud envvars --grace-days 7 --dry-run
+    enabled: "{{ enable_neutron | bool }}"
+    calendar: daily

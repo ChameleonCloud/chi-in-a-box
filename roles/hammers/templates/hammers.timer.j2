@@ -1,0 +1,13 @@
+# {{ ansible_managed }}
+
+[Unit]
+Description={{ description }}
+
+[Timer]
+OnCalendar={{ calendar }}
+RandomizedDelaySec=3h
+AccuracySec=1s
+Persistent=true
+
+[Install]
+WantedBy=timers.target

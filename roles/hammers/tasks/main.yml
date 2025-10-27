@@ -7,50 +7,50 @@
     force_source: yes
 
 - name: Create config directory.
-  become: yes
+  become: true
   file:
     path: "{{ hammers_config_path }}"
     state: directory
 
 - name: Configure kubeconfig for K8s hammers
   block:
-  - name: Copy kubeconfig.yml file
-    become: yes
-    copy:
-      src: "{{ kubeconfig_path }}/kubeconfig.yml"
-      dest: "{{ hammers_kubeconfig_path }}"
-      mode: 0600
-
+    - name: Copy kubeconfig.yml file
+      become: true
+      copy:
+        src: "{{ kubeconfig_path }}/kubeconfig.yml"
+        dest: "{{ hammers_kubeconfig_path }}"
+        mode: 0600
   rescue:
     - name: Create a placeholder kubeconfig.yml
-      become: yes
+      become: true
       file:
         path: "{{ hammers_kubeconfig_path }}"
         state: touch
         mode: 0600
     - name: Add "placeholder" content to kubeconfig.yml
-      become: yes
+      become: true
       lineinfile:
         path: "{{ hammers_kubeconfig_path }}"
         line: "placeholder"
         create: yes
+  when: "{{ enable_k3s | bool }}"
 
 - name: Configure Hammers docker bash wrapper
-  become: yes
+  become: true
   template:
     src: cc-hammer.j2
     mode: a+x
     dest: /usr/local/sbin/cc-hammer
 
 - name: Configure Hammers env file
-  become: yes
+  become: true
   template:
     src: hammers.env.j2
     mode: 0600
     dest: "{{ hammers_env_file }}"
 
 - name: Configure slack webhook file
-  become: yes
+  become: true
   template:
     src: slack.json.j2
     mode: 0600
@@ -58,7 +58,7 @@
   when: hammers_slack_webhook is defined
 
 - name: Configure lease stacking config file
-  become: yes
+  become: true
   template:
     src: lease-stacking.json.j2
     mode: 0600
@@ -81,7 +81,7 @@
   delegate_to: "{{ groups['hammers'][0] }}"
 
 - name: Configure Hammers my.cnf
-  become: yes
+  become: true
   template:
     src: my.cnf.j2
     dest: "{{ hammers_config_path }}/my.cnf"
@@ -92,7 +92,7 @@
   include_role:
     name: chameleon.periodic_task
     apply:
-      become: yes
+      become: true
   vars:
     task_name: "hammer_{{ item.key }}"
     task_command: "/usr/local/sbin/cc-hammer {{ item.value.cmd }}"
@@ -101,3 +101,13 @@
   loop: "{{ hammers | dict2items }}"
   loop_control:
     label: "{{ item.key }}"
+  when:
+    - item.value.enabled
+
+- name: set hammers_v2 periodic_tasks
+  include_tasks: install_unit.yml
+  vars:
+    service_name: "hammer_{{ item.key }}"
+    timer_state: "{{ 'started' if item.value.enabled else 'stopped' }}"
+    timer_enabled: "{{item.value.enabled}}"
+  loop: "{{ hammers_v2 | dict2items }}"
