@@ -1,0 +1,18 @@
+# {{ ansible_managed }}
+
+[Unit]
+Description={{ description }}
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/docker run \
+    --net=host \
+    --rm \
+    --env-file {{ env_file }} \
+    -v "{{hammers_config_path}}:{{hammers_config_path}}:ro" \
+    {{ image }} \
+    {{ cmd }} 
+[Install]
+WantedBy=multi-user.target

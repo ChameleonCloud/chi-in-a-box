@@ -1,0 +1,25 @@
+---
+- name: "set up service: {{ item.key }}"
+  vars:
+    description: "{{item.value.description | default(item.key) }}"
+    env_file: "{{item.value.env_file | default(hammers_env_file)}}"
+    image: "{{item.value.image | default(hammers_docker_image) }}"
+    cmd: "{{item.value.cmd}}"
+    calendar: "{{item.value.calendar | default(daily) }}"
+    enabled: "{{item.value.enabled}}"
+  notify:
+    - reload systemd
+  block:
+    - name: template unit file
+      template:
+        src: hammers.service.j2
+        dest: "/etc/systemd/system/{{ service_name }}.service"
+    - name: template timer file
+      template:
+        src: hammers.timer.j2
+        dest: "/etc/systemd/system/{{ service_name }}.timer"
+    - name: Set timer state
+      ansible.builtin.systemd_service:
+        name: "{{ service_name }}.timer"
+        state: "{{ timer_state }}"
+        enabled: "{{ timer_enabled }}"

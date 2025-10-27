@@ -101,3 +101,13 @@
   loop: "{{ hammers | dict2items }}"
   loop_control:
     label: "{{ item.key }}"
+  when:
+    - item.value.enabled
+
+- name: set hammers_v2 periodic_tasks
+  include_tasks: install_unit.yml
+  vars:
+    service_name: "hammer_{{ item.key }}"
+    timer_state: "{{ 'started' if item.value.enabled else 'stopped' }}"
+    timer_enabled: "{{item.value.enabled}}"
+  loop: "{{ hammers_v2 | dict2items }}"
