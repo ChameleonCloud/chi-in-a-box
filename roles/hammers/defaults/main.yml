@@ -77,6 +77,6 @@ hammers_v2:
     description: "Clean up networks for expired projects."
     env_file: "{{ hammers_env_file }}"
     image: "{{ hammers_v2_docker_image }}"
-    cmd: floating_ip_network_reaper --cloud envvars --grace-days 7 --dry-run
+    cmd: floating_ip_network_reaper --cloud envvars --grace-days 7  --clean-floatingips --clean-routers
     enabled: "{{ enable_neutron | bool }}"
     calendar: daily
