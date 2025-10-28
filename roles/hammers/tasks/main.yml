@@ -101,8 +101,6 @@
   loop: "{{ hammers | dict2items }}"
   loop_control:
     label: "{{ item.key }}"
-  when:
-    - item.value.enabled
 
 - name: set hammers_v2 periodic_tasks
   include_tasks: install_unit.yml

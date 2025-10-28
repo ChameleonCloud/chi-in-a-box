@@ -11,7 +11,7 @@ hammers:
   floating_ip_reaper:
     cmd: floatingip-reaper --grace-days 7
     calendar: daily
-    enabled: "{{ enable_neutron | bool }}"
+    enabled: false
   conflict_macs:
     cmd: conflict-macs delete
     calendar: daily
