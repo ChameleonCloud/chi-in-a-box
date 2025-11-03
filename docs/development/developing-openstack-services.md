@@ -99,9 +99,7 @@ The containers and their dockerfiles are defined in the [kolla repository](https
 These dockerfiles contain macros and support templating.
 
 ```
-{% raw %}
 {% block letsencrypt_certbot_header %}{% endblock %}
-{% endraw %}
 ```
 
 #### Kolla-containers
@@ -112,11 +110,9 @@ We have an extra layer of templating in place, as we maintain multiple variants 
 
 | OpenStack Release | Operating System | Architecture | Variant   |
 | ----------------- | ---------------- | ------------ | --------- |
-| Xena              | Ubuntu 20.04     | x86\_64      | Baremetal |
+| 2023.1            | Ubuntu 22.04     | x86\_64      | Baremetal |
+| 2023.1            | Ubuntu 22.04     | x86\_64      | KVM       |
 | Xena              | Ubuntu 20.04     | x86\_64      | CHI@Edge  |
-| Train             | Centos7          | x86\_64      | KVM       |
-
-All Centos8 variants are deprecated, as are the arm64 builds for CHI@Edge.
 
 #### Kolla-Ansible
 
