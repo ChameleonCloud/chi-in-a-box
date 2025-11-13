@@ -36,7 +36,7 @@ while [[ $# -gt 0 ]]; do
       # Add proper flag support for --check as an option for dry-runs
       export EXTRA_OPTS="${EXTRA_OPTS:-} --check"
       ;;
-    decrypt_passwords|edit_passwords|help|install_deps|init|view_passwords|encrypt_file|decrypt_file)
+    decrypt_passwords|edit_passwords|update_passwords|help|install_deps|init|view_passwords|encrypt_file|decrypt_file)
       # Special subcommand!
       command="$key"
       ;;
@@ -149,6 +149,53 @@ decrypt_file() {
     ${POSARGS[@]}
 }
 
+update_passwords() {
+  local passwords_file="$CC_ANSIBLE_SITE/passwords.yml"
+
+  tmpfile="$(mktemp)"
+  merged="$(mktemp)"
+
+  _update_passwords_cleanup() {
+    rm -f "$tmpfile"
+    rm -f "$merged"
+  }
+  TRAPS+=(_update_passwords_cleanup)
+
+  echo "Decrypting passwords..."
+  ansible-vault view \
+    --vault-password-file "$CC_ANSIBLE_VAULT_PASSWORD" \
+    "$CC_ANSIBLE_SITE/passwords.yml" >"$tmpfile"
+
+  if [[ ! -s "$tmpfile" ]]; then
+    echo "Failed to decrypt $passwords_file with vault token."
+    exit 1
+  fi
+
+  # check if any passwords need adding
+  echo "seeing if any new passwords are needed"
+  kolla-mergepwd \
+	  --old "${tmpfile}" \
+	  --new "${DIR}/site-config.example/passwords.yml" \
+	  --final "${merged}"
+
+  diff_output=$(diff --new-line-format='%L' --old-line-format='' --unchanged-line-format='' $tmpfile $merged || true)
+  if [[ -n "$diff_output" ]]; then
+    cat <<EOF
+added the following password lines:
+
+$diff_output
+EOF
+  fi
+
+  echo "Generating placeholder passwords for any missing values..."
+  kolla-genpwd --passwords "$merged"
+  echo "Encrypting passwords..."
+  ansible-vault encrypt \
+    --vault-password-file "$CC_ANSIBLE_VAULT_PASSWORD" \
+    "$merged"
+  cp "$merged" "$CC_ANSIBLE_SITE/passwords.yml"
+}
+
 edit_passwords() {
   local tmpfile
   local venv_bin_path="${VIRTUALENV}/bin"
@@ -204,7 +251,11 @@ Subcommands:
   view_passwords: View the contents of the encrypted password file.
   edit_passwords: Update an encrypted passwords file for the given environment.
                   Opens an interactive editor and saves the results back out as
-                  en encrypted file.
+                  an encrypted file.
+  update_passwords: Update an encrypted passwords file for the given environment.
+                  Merges any new lines from chi-in-a-box's example passwords.yml,
+                  generates random passwords for those lines, then saves the
+		  results back out as an encrypted file.
 
 Examples:
   # Run the 'deploy' step for Kolla-Ansible in a 'production' site
