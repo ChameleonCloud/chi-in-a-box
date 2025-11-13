@@ -153,12 +153,10 @@ edit_passwords() {
   local tmpfile
   local venv_bin_path="${VIRTUALENV}/bin"
   local passwords_file="$CC_ANSIBLE_SITE/passwords.yml"
-  local passwords_file_chksum="${passwords_file}.sha256"
 
   tmpfile="$(mktemp)"
   _edit_passwords_cleanup() {
     rm -f "$tmpfile"
-    rm -f "$passwords_file_chksum"
   }
   TRAPS+=(_edit_passwords_cleanup)
 
@@ -172,14 +170,9 @@ edit_passwords() {
     exit 1
   fi
 
-  sha256sum "$tmpfile" >"$passwords_file_chksum"
   ${EDITOR:-vi} "$tmpfile"
   local ret=$?
   if [[ $ret -gt 0 ]]; then exit $ret; fi
-  if sha256sum --quiet --check "$passwords_file_chksum"; then
-    echo "No passwords were changed."
-    exit 0
-  fi
 
   echo "Generating placeholder passwords for any missing values..."
   kolla-genpwd --passwords "$tmpfile"
