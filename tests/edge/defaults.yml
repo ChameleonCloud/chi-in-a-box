@@ -1,0 +1,96 @@
+---
+#################
+# CHI@Edge config
+#################
+
+# CHI@Edge does not enable volumes
+enable_cinder: false
+# We use docker registries instead of glance
+enable_glance: false
+# We don't use heat
+enable_heat: false
+# No ironic, as there are no baremetal nodes
+enable_ironic_ipxe: false
+enable_ironic: false
+# No nova, as we dont use baremetal or VMs here
+enable_nova_serialconsole_proxy: false
+enable_nova: false
+
+# enable doni for edge device management
+enable_doni: true
+# enable blazar, reserve devices
+enable_blazar: true
+blazar_enable_device_plugin_k8s: true
+# enable tunelo, tunnels to edge devices
+enable_tunelo: true
+enable_neutron_wireguard: true
+
+# enable zun, but use compute_k8s backend
+enable_zun: true
+enable_zun_compute: false
+enable_zun_compute_k8s: true
+
+# deploy a k3s server on control nodes
+enable_k3s: true
+
+doni_balena_fleet_mapping:
+  - 'raspberrypi3-64:chi-edge-workers'
+  - 'raspberrypi4-64:chi-edge-workers'
+  - 'raspberrypi5-64:chi-edge-workers'
+  - 'jetson-nano:chi-edge-workers'
+  - 'jetson-xavier-nx-emmc:chi-edge-workers'
+
+  
+k3s_port: 6443
+k3s_server_ip: "{{ api_interface_address }}"
+kubeconfig_path: /opt/site-config/node_custom_config
+k8s_worker_taint:
+    key: "worker-node"
+    value: "true"
+    effect: "NoSchedule"
+zun_tolerate_worker_taint: False
+doni_enable_worker_taint: False
+
+######################
+# Site specific config
+######################
+
+#k3s_server_ip: "129.114.34.130"
+#
+openstack_region_name: CHI@Edge
+chameleon_site_name: edge
+keystone_idp_client_id: keystone-edge-prod
+
+kolla_internal_vip_address: "10.20.111.11"
+kolla_external_vip_address: "129.114.34.129"
+kolla_external_fqdn: chi.edge.chameleoncloud.org
+keepalived_virtual_router_id: "72"
+
+
+# Letsencrypt
+# kolla_enable_tls_external: "yes"
+# kolla_externally_managed_cert: "yes"
+# enable_letsencrypt: yes
+letsencrypt_email: systems@chameleoncloud.org
+letsencrypt_domains:
+  - "{{ kolla_external_fqdn }}"
+
+# Neutron
+neutron_type_drivers: flat,vlan,vxlan,local
+neutron_tenant_network_types: local
+neutron_networks:
+  - name: public
+    bridge_name: br-ex
+    external_interface: neutron1
+    # This should be your public IP block assigned to your deployment.
+    cidr: 129.114.34.128/25
+    gateway_ip: 129.114.34.254
+
+# k3s_cluster_cidr: 192.168.64.0/18
+k3s_cluster_cidr: 100.64.64.0/18
+
+# overrides for CI
+
+enable_central_logging: false
+enable_prometheus: false
+enable_letsencrypt: false
