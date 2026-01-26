@@ -90,6 +90,8 @@ blazar_network_polling_monitor: true
 blazar_network_polling_monitor_dry_run: true
 blazar_randomize_hosts: true
 blazar_cleaning_time_minutes: 5
+blazar_filter_vm_hosts: true
+blazar_filter_ironic_hosts: true
 
 # enable to use https://github.com/ChameleonCloud/nova/pull/9
 # workaround for https://bugs.launchpad.net/nova/+bug/1542491
