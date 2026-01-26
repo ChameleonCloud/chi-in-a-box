@@ -95,7 +95,7 @@ OPENSTACK_BLAZAR_HOST_RESERVATION = {
   'url_format': '{{ blazar_host_url_format }}',
 }
 OPENSTACK_BLAZAR_FLAVOR_RESERVATION = {
-  "enabled": {{ enable_flavor_reservation | bool}},
+  "enabled": {{ blazar_enable_flavor_reservation | bool}},
   "blazar_flavor_reservation_trait": '{{ blazar_flavor_reservation_trait }}',
 }
 {% endif %}
@@ -198,3 +198,6 @@ X_FRAME_OPTIONS = 'SAMEORIGIN'
 
 # disable usage report on overview page
 OPENSTACK_USE_SIMPLE_TENANT_USAGE = False
+
+# In instance launch, only show reserved flavors
+OPENSTACK_SHOW_ONLY_RESERVED_FLAVORS = {{ blazar_enable_flavor_reservation | bool}},
