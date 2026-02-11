@@ -146,6 +146,9 @@ WEBSSO_DEFAULT_REDIRECT_LOGOUT = '{{ keystone_public_url }}/redirect_uri?logout=
 
 {% endif %}
 
+# If we don't have VMs configured (i.e. no flavor res), then hide VM-only options in the UI
+CHAMELEON_BAREMETAL_ONLY = {{ not (blazar_enable_flavor_reservation | bool) }}
+
 # A dictionary of settings which can be used to provide the default values for
 # properties found in the Launch Instance modal.
 LAUNCH_INSTANCE_DEFAULTS = {
