@@ -1,7 +1,13 @@
 from os import environ
 
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from openstack_dashboard.settings import HORIZON_CONFIG
+
+# Make oslo_policy DeprecationWarnings shut up
+{% if not (horizon_logging_debug | bool) %}
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+{% endif %}
 
 # Kolla-ansible defaults this to 'internalURL', which doesn't work when
 # we need to access another region from across the public internet. Need
@@ -65,6 +71,11 @@ USER_MENU_LINKS = [
     'url': 'horizon:project:api_access:openrc',
     'external': False,
   },
+  {
+    'name': _('OpenStack clouds.yaml File'),
+    'icon_classes': ['fa-download', ],
+    'url': 'horizon:project:api_access:clouds.yaml',
+  },
 ]
 
 {% if enable_blazar | bool %}
@@ -85,67 +96,42 @@ OPENSTACK_BLAZAR_HOST_RESERVATION = {
 }
 {% endif %}
 
-# Add Chameleon theme and the default theme (which it inherits from), but
-# only allow the user to pick the Chameleon one.
+# horizon themes are represented as a tuple of name, label, and path
 chameleon_theme = (
   'chameleoncloud', 'ChameleonCloud',
-  '/etc/openstack-dashboard/themes/chameleoncloud')
-AVAILABLE_THEMES = [
-  ('default', 'Default', 'themes/default'),
-  chameleon_theme,
-]
-SELECTABLE_THEMES = [
-  chameleon_theme,
-]
-# Not really needed, but suppresses a spurious warning.
+  '/etc/openstack-dashboard/themes/chameleoncloud'
+  )
+
+# set to single element of "AVAILABLE_THEMES", defined in kolla local_settings
+SELECTABLE_THEMES = [chameleon_theme]
+# set default to "name" field of our theme tuple
 DEFAULT_THEME = chameleon_theme[0]
 
-# NOTE(jason): This is lifted from local_settings.j2 in Kolla-Ansible; we have
-# to override it to add in a kludgy entry for Portal SSO, which isn't a "true"
-# SSO in the same way as the others, which have e.g. Keystone mappings and
-# assume an identity provider is registered in Keystone. We also remove the
-# local login.
+
+
 {% if enable_keystone_federation | bool %}
 WEBSSO_ENABLED = True
-WEBSSO_KEYSTONE_URL = "{{ keystone_public_url }}/v3"
+
 WEBSSO_CHOICES = (
-    ("portal", "Log in with TACC account (Legacy)"),
 {% for idp in keystone_identity_providers %}
     ("{{ idp.name }}", "{{ idp.public_name }}"),
 {% endfor %}
 )
 WEBSSO_IDP_MAPPING = {
-    "portal": (None, None),
 {% for idp in keystone_identity_providers %}
     "{{ idp.name }}": ("{{ idp.name }}", "{{ idp.protocol }}"),
 {% endfor %}
 }
 WEBSSO_DEFAULT_REDIRECT = True
+
 # This really shouldn't have to be set, but it's set at configuration parse
 # time and derived from a value (OPENSTACK_KEYSTONE_URL) that is overriden by
 # our configuration.
+WEBSSO_KEYSTONE_URL = "{{ keystone_public_url }}/v3"
 WEBSSO_DEFAULT_REDIRECT_REGION = '{{ keystone_public_url }}/v3'
 WEBSSO_DEFAULT_REDIRECT_PROTOCOL = 'openid'
-# Use mod_auth_openidc's built-in front channel logout support (part of the
-# OpenID spec.) If we make a request to the `OIDCRedirectURI` with a ?logout
-# parameter set to a valid redirect URI, the user's session will be cleared both
-# within the mod_auth_openidc session cache, but also on the authenticating
-# provider itself. We redirect to the custom post-logout page.
-WEBSSO_DEFAULT_REDIRECT_LOGOUT = '{{ keystone_public_url }}/redirect_uri?logout={{ (identity_provider_url ~ "/post-logout?client_id=" ~ (keystone_idp_client_id|default(none)) ) | urlencode }}'
-
 {% endif %}
 
-# A dictionary of settings which can be used to provide the default values for
-# properties found in the Launch Instance modal.
-LAUNCH_INSTANCE_DEFAULTS = {
-    'config_drive': False,
-    'enable_scheduler_hints': True,
-    'disable_image': False,
-    'disable_instance_snapshot': True,
-    'disable_volume': True,
-    'disable_volume_snapshot': True,
-    'create_volume': False,
-}
 
 # The OPENSTACK_IMAGE_BACKEND settings can be used to customize features
 # in the OpenStack Dashboard related to the Image service, such as the list
@@ -175,3 +161,10 @@ OPENSTACK_MANILA_FEATURES = {
     'enable_public_shares': True,
     'enabled_share_protocols': ['NFS'],
 }
+
+# necessary to embed serial console in iframe
+# Django3.0 changed the default from 'SAMEORIGIN' to 'DENY'
+X_FRAME_OPTIONS = 'SAMEORIGIN'
+
+# disable usage report on overview page
+OPENSTACK_USE_SIMPLE_TENANT_USAGE = False
