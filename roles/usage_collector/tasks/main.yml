@@ -22,7 +22,7 @@
   when:
     - usage_collector_manage_mysql_grants | default(false) | bool
 
-- name: Ensure usage collector MySQL user exists with required grants
+- name: Apply usage collector grants
   become: true
   kolla_toolbox:
     container_engine: "{{ kolla_container_engine }}"
@@ -34,9 +34,13 @@
       name: "{{ usage_collector_mysql_user }}"
       host: "{{ usage_collector_mysql_host | default('%') }}"
       password: "{{ usage_collector_mysql_password }}"
-      priv: "{{ usage_collector_mysql_grants | join('/') }}"
+      priv: "{{ item }}"
       append_privs: true
       state: present
+  loop: "{{ usage_collector_mysql_grants }}"
+  loop_control:
+    label: "{{ item }}"
+  ignore_errors: true
   run_once: true
   delegate_to: "{{ groups['control'][0] }}"
   when:
