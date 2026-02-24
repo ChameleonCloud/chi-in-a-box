@@ -19,3 +19,29 @@ usage_collector_db_uri: "mysql://{{ usage_collector_mysql_user }}:{{ usage_colle
 usage_collector_s3_endpoint: https://chi.uc.chameleoncloud.org:7480
 # usage_collector_s3_access_key_id:
 # usage_collector_secret_access_key:
+
+usage_collector_manage_mysql_grants: true
+
+usage_collector_mysql_grants:
+  - nova.compute_nodes:SELECT
+  - nova.instances:SELECT
+  - nova.instance_actions:SELECT
+  - nova.instance_actions_events:SELECT
+  - nova_api.request_specs:SELECT
+  - blazar.computehosts:SELECT
+  - blazar.computehost_allocations:SELECT
+  - blazar.reservations:SELECT
+  - blazar.instance_reservations:SELECT
+  - blazar.leases:SELECT
+  - blazar.devices:SELECT
+  - blazar.device_allocations:SELECT
+  - blazar.device_extra_capabilities:SELECT
+  - blazar.device_reservations:SELECT
+  - zun.container:SELECT
+  - zun.container_actions:SELECT
+  - zun.container_actions_events:SELECT
+  - chameleon_usage.node_usage_report_cache:SELECT
+  - chameleon_usage.node_count_cache:SELECT
+  - chameleon_usage.node_usage:SELECT
+  - chameleon_usage.node_event:SELECT
+  - chameleon_usage.node_maintenance:SELECT
