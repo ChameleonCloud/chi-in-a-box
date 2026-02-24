@@ -1,0 +1,19 @@
+[Unit]
+Description=Chameleon Usage Reporting Collector
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/docker run \
+    --rm \
+    --net host \
+    -v {{ usage_collector_config_dir }}/site.yaml:/etc/site.yaml:ro \
+    --env-file {{ usage_collector_config_dir }}/usage-env \
+    {{ usage_collector_image_full }} \
+    extract \
+        --config /etc/site.yaml \
+        --site {{ usage_collector_site_key }}
+
+[Install]
+WantedBy=multi-user.target

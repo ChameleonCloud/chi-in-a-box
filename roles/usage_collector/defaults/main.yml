@@ -1,0 +1,21 @@
+---
+
+usage_collector_image: ghcr.io/chameleoncloud/usage-exploration
+usage_collector_tag: sha-80d51ce
+usage_collector_image_full: "{{ usage_collector_image }}:{{ usage_collector_tag }}"
+
+usage_collector_config_dir: /etc/chameleon_usage_collector
+usage_collector_timer: "*-*-* 00:00:00" # collect daily at midnight
+
+usage_collector_site_key: "{{ chameleon_site_name }}" # from defaults.yml or site-config
+usage_collector_site_name: "{{ openstack_region_name }}"
+
+usage_collector_mysql_user: cc_usage # Read only user
+#usage_collector_mysql_password:
+
+usage_collector_db_uri: "mysql://{{ usage_collector_mysql_user }}:{{ usage_collector_mysql_password }}@{{ database_address }}"
+
+# usage_collector_data_dir:  # path to save exported data. May start with s3://
+usage_collector_s3_endpoint: https://chi.uc.chameleoncloud.org:7480
+# usage_collector_s3_access_key_id:
+# usage_collector_secret_access_key:
