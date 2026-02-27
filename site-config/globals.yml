@@ -162,3 +162,9 @@ blazar_host_url_format: "https://chameleoncloud.org/hardware/node/sites/{{ chame
 # Vendordata Config
 ####################
 vendordata_read_timeout: 10 # if blazar is enabled, vendordata has slow queries
+
+
+########################
+# Usage Reporting Config
+########################
+enable_usage_reporting_new: no
