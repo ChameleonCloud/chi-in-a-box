@@ -360,6 +360,7 @@ enable_osg: no
 
 # usage reporting
 enable_usage_reporting: no
+enable_usage_reporting_new: no
 
 # image tools
 enable_image_deployer: no

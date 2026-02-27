@@ -1,0 +1,105 @@
+---
+- name: Validate required usage_collector variables
+  assert:
+    that:
+      - usage_collector_data_dir is string
+      - usage_collector_data_dir | trim | length > 0
+      - usage_collector_mysql_password is string
+      - usage_collector_mysql_password | trim | length > 0
+      - usage_collector_s3_access_key_id is string
+      - usage_collector_s3_access_key_id | trim | length > 0
+      - usage_collector_secret_access_key is string
+      - usage_collector_secret_access_key | trim | length > 0
+    fail_msg: |
+      "Set usage_collector_data_dir, usage_collector_mysql_password, usage_collector_s3_access_key_id, and usage_collector_secret_access_key."
+
+- name: Validate grant list is not empty
+  assert:
+    that:
+      - usage_collector_mysql_grants is sequence
+      - usage_collector_mysql_grants is not string
+      - usage_collector_mysql_grants | length > 0
+  when:
+    - usage_collector_manage_mysql_grants | default(false) | bool
+
+- name: Apply usage collector grants
+  become: true
+  kolla_toolbox:
+    module_name: mysql_user
+    module_args:
+      login_host: "{{ database_address }}"
+      login_user: "{{ database_user }}"
+      login_password: "{{ database_password }}"
+      name: "{{ usage_collector_mysql_user }}"
+      host: "{{ usage_collector_mysql_host | default('%') }}"
+      password: "{{ usage_collector_mysql_password }}"
+      priv: "{{ item }}"
+      append_privs: true
+      state: present
+  loop: "{{ usage_collector_mysql_grants }}"
+  loop_control:
+    label: "{{ item }}"
+  ignore_errors: true
+  run_once: true
+  delegate_to: "{{ groups['control'][0] }}"
+  when:
+    - usage_collector_manage_mysql_grants | default(false) | bool
+
+- name: Pull Docker image
+  become: true
+  docker_image:
+    source: pull
+    name: "{{ usage_collector_image_full }}"
+    force_source: yes
+
+- name: Ensure config directory exists
+  become: true
+  file:
+    path: "{{ usage_collector_config_dir }}"
+    state: directory
+    owner: "{{ config_owner_user }}"
+    group: "{{ config_owner_group }}"
+
+- name: template site.yaml file
+  become: true
+  template:
+    src: site.yaml.j2
+    dest: "{{ usage_collector_config_dir }}/site.yaml"
+    mode: "0600"
+    owner: "{{ config_owner_user }}"
+    group: "{{ config_owner_group }}"
+
+- name: template usage-env file
+  become: true
+  template:
+    src: usage-env.j2
+    dest: "{{ usage_collector_config_dir }}/usage-env"
+    mode: "0600"
+    owner: "{{ config_owner_user }}"
+    group: "{{ config_owner_group }}"
+
+- name: Deploy usage_collector service unit
+  become: true
+  template:
+    src: usage_collector.service.j2
+    dest: /etc/systemd/system/usage_collector.service
+    mode: "0644"
+
+- name: Deploy usage_collector timer unit
+  become: true
+  template:
+    src: usage_collector.timer.j2
+    dest: /etc/systemd/system/usage_collector.timer
+    mode: "0644"
+
+- name: Reload systemd
+  become: true
+  systemd:
+    daemon_reload: yes
+
+- name: Enable and start usage_collector.timer
+  become: true
+  systemd:
+    name: usage_collector.timer
+    enabled: yes
+    state: started
