@@ -47,6 +47,14 @@ backup_location: "{{ mariabackup_location if enable_mariabackup | bool else mysq
 # Blazar
 enable_blazar: yes
 enable_blazar_allocation_enforcement: no
+
+# Reservation type toggles
+blazar_enable_flavor_reservation: false
+blazar_flavor_reservation_trait: custom_blazar_flavor_reservation
+blazar_enable_host_reservation: true
+blazar_enable_floatingip_reservation: true
+blazar_enable_network_reservation: true
+blazar_enable_device_reservation: false
 blazar_project_enforcement_id: charge_code
 # When to send lease notification email
 blazar_minutes_before_end_lease: 2880
