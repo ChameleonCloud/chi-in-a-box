@@ -116,6 +116,24 @@ blazar_filter_ironic_hosts: true
 # workaround for https://bugs.launchpad.net/nova/+bug/1542491
 use_blazar_prefilter: false
 
+nova_scheduler_filters:
+  - name: "ComputeFilter"
+    enabled: true
+  - name: "ComputeCapabilitiesFilter"
+    enabled: true
+  - name: "ImagePropertiesFilter"
+    enabled: true
+  - name: "ServerGroupAntiAffinityFilter"
+    enabled: true
+  - name: "ServerGroupAffinityFilter"
+    enabled: true
+  - name: "BlazarFilter"
+    enabled: "{{ not (use_blazar_prefilter | default(false) | bool) }}"
+  - name: "PciPassthroughFilter"
+    enabled: "{{ nova_pci_device_spec is defined }}"
+
+nova_enabled_filters: "{{ nova_scheduler_filters | selectattr('enabled', 'equalto', true) | list }}"
+
 # Cinder
 enable_cinder: no
 
