@@ -80,19 +80,24 @@ USER_MENU_LINKS = [
 
 {% if enable_blazar | bool %}
 # Blazar-specific settings
-{% if blazar_floatingip_reservation_network_regex is defined %}
+OPENSTACK_BLAZAR_HOST_RESERVATION = {
+  'enabled': {{ blazar_enable_host_reservation | bool }},
+  'url_format': '{{ blazar_host_url_format }}',
+}
+OPENSTACK_BLAZAR_FLAVOR_RESERVATION = {
+  "enabled": {{ blazar_enable_flavor_reservation | bool}},
+  "blazar_flavor_reservation_trait": '{{ blazar_flavor_reservation_trait }}',
+}
 OPENSTACK_BLAZAR_FLOATINGIP_RESERVATION = {
   # Allow reserving floating IPs on this network
-  'enabled': True,
+  'enabled': {{ blazar_enable_floatingip_reservation | bool }},
   'network_name_regex': '{{ blazar_floatingip_reservation_network_regex }}'
 }
-{% endif %}
 OPENSTACK_BLAZAR_DEVICE_RESERVATION = {
-  'enabled': {{ enable_zun | bool }},
+  'enabled': {{ blazar_enable_device_reservation | bool }},
 }
-OPENSTACK_BLAZAR_HOST_RESERVATION = {
-  'enabled': {{ enable_nova | bool }},
-  'url_format': '{{ blazar_host_url_format }}',
+OPENSTACK_BLAZAR_NETWORK_RESERVATION = {
+  'enabled': {{ blazar_enable_network_reservation | bool }},
 }
 {% endif %}
 
