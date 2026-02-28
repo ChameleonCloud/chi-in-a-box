@@ -56,6 +56,25 @@ blazar_enable_floatingip_reservation: true
 blazar_enable_network_reservation: true
 blazar_enable_device_reservation: false
 blazar_project_enforcement_id: charge_code
+
+# override value in kolla-ansible/ansible/roles/blazar/defaults/main.yml
+blazar_enable_plugin_network: "{{ blazar_enable_network_reservation | bool }}"
+
+# overrides dict in kolla-ansible/ansible/roles/blazar/defaults/main.yml
+blazar_plugins:
+  - name: "physical.host"
+    enabled: "{{ enable_nova | bool }}"
+  - name: "virtual.instance"
+    enabled: "{{ enable_nova | bool }}"
+  - name: "virtual.floatingip"
+    enabled: "{{ blazar_enable_floatingip_reservation | bool }}"
+  - name: "network"
+    enabled: "{{ blazar_enable_network_reservation | bool }}"
+  - name: "device"
+    enabled: "{{ enable_zun | bool or blazar_enable_device_reservation | bool }}"
+  - name: "flavor.instance"
+    enabled: "{{ blazar_enable_flavor_reservation | bool }}"
+
 # When to send lease notification email
 blazar_minutes_before_end_lease: 2880
 blazar_default_max_lease_duration: "{{ 60 * 60 * 24 * 7 }}"
