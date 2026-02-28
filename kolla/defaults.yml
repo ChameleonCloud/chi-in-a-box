@@ -47,7 +47,34 @@ backup_location: "{{ mariabackup_location if enable_mariabackup | bool else mysq
 # Blazar
 enable_blazar: yes
 enable_blazar_allocation_enforcement: no
+
+# Reservation type toggles
+blazar_enable_flavor_reservation: false
+blazar_flavor_reservation_trait: custom_blazar_flavor_reservation
+blazar_enable_host_reservation: true
+blazar_enable_floatingip_reservation: true
+blazar_enable_network_reservation: true
+blazar_enable_device_reservation: false
 blazar_project_enforcement_id: charge_code
+
+# override value in kolla-ansible/ansible/roles/blazar/defaults/main.yml
+blazar_enable_plugin_network: "{{ blazar_enable_network_reservation | bool }}"
+
+# overrides dict in kolla-ansible/ansible/roles/blazar/defaults/main.yml
+blazar_plugins:
+  - name: "physical.host"
+    enabled: "{{ enable_nova | bool }}"
+  - name: "virtual.instance"
+    enabled: "{{ enable_nova | bool }}"
+  - name: "virtual.floatingip"
+    enabled: "{{ blazar_enable_floatingip_reservation | bool }}"
+  - name: "network"
+    enabled: "{{ blazar_enable_network_reservation | bool }}"
+  - name: "device"
+    enabled: "{{ enable_zun | bool or blazar_enable_device_reservation | bool }}"
+  - name: "flavor.instance"
+    enabled: "{{ blazar_enable_flavor_reservation | bool }}"
+
 # When to send lease notification email
 blazar_minutes_before_end_lease: 2880
 blazar_default_max_lease_duration: "{{ 60 * 60 * 24 * 7 }}"
@@ -82,10 +109,30 @@ blazar_network_polling_monitor: true
 blazar_network_polling_monitor_dry_run: true
 blazar_randomize_hosts: true
 blazar_cleaning_time_minutes: 5
+blazar_filter_vm_hosts: true
+blazar_filter_ironic_hosts: true
 
 # enable to use https://github.com/ChameleonCloud/nova/pull/9
 # workaround for https://bugs.launchpad.net/nova/+bug/1542491
 use_blazar_prefilter: false
+
+nova_scheduler_filters:
+  - name: "ComputeFilter"
+    enabled: true
+  - name: "ComputeCapabilitiesFilter"
+    enabled: true
+  - name: "ImagePropertiesFilter"
+    enabled: true
+  - name: "ServerGroupAntiAffinityFilter"
+    enabled: true
+  - name: "ServerGroupAffinityFilter"
+    enabled: true
+  - name: "BlazarFilter"
+    enabled: "{{ not (use_blazar_prefilter | default(false) | bool) }}"
+  - name: "PciPassthroughFilter"
+    enabled: "{{ nova_pci_device_spec is defined }}"
+
+nova_enabled_filters: "{{ nova_scheduler_filters | selectattr('enabled', 'equalto', true) | list }}"
 
 # Cinder
 enable_cinder: no
