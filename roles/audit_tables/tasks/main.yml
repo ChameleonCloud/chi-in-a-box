@@ -24,7 +24,7 @@
       login_host: "{{ database_address }}"
       login_user: "{{ database_user }}"
       login_password: "{{ database_password }}"
-      query: "{{ lookup('file', 'audit_' ~ item.name ~ '.sql').split('-- ---') | map('trim') | reject('equalto', '') | list }}"
+      query: "{{ lookup('template', 'audit_table.sql.j2').split('-- ---') | map('trim') | reject('equalto', '') | list }}"
   loop: "{{ audit_tables }}"
   loop_control:
     label: "{{ item.name }}"
