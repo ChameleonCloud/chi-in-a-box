@@ -1,6 +1,8 @@
 ---
 - hosts: chameleon_usage
   roles:
+    - role: audit_tables
+      when: enable_audit_tables | default(false) | bool
     - role: chameleon_usage
       when: enable_usage_reporting | bool
     - role: usage_collector

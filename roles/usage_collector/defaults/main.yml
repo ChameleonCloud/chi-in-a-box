@@ -45,3 +45,4 @@ usage_collector_mysql_grants:
   - chameleon_usage.node_usage:SELECT
   - chameleon_usage.node_event:SELECT
   - chameleon_usage.node_maintenance:SELECT
+  - openstack_audit.audit_blazar_computehosts:SELECT

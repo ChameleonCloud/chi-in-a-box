@@ -1,0 +1,9 @@
+---
+
+audit_blazar_computehosts: true
+
+audit_tables:
+  - name: blazar_computehosts
+    source_db: blazar
+    source_table: computehosts
+    enabled: "{{ audit_blazar_computehosts }}"

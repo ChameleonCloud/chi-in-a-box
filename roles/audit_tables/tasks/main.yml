@@ -1,0 +1,51 @@
+---
+
+- name: Create openstack_audit database
+  become: true
+  run_once: true
+  delegate_to: "{{ groups['control'][0] }}"
+  kolla_toolbox:
+    container_engine: "{{ kolla_container_engine }}"
+    module_name: community.mysql.mysql_query
+    module_args:
+      login_host: "{{ database_address }}"
+      login_user: "{{ database_user }}"
+      login_password: "{{ database_password }}"
+      query: "CREATE DATABASE IF NOT EXISTS openstack_audit"
+
+- name: Deploy audit table {{ item.name }}
+  become: true
+  run_once: true
+  delegate_to: "{{ groups['control'][0] }}"
+  kolla_toolbox:
+    container_engine: "{{ kolla_container_engine }}"
+    module_name: community.mysql.mysql_query
+    module_args:
+      login_host: "{{ database_address }}"
+      login_user: "{{ database_user }}"
+      login_password: "{{ database_password }}"
+      query: "{{ lookup('file', 'audit_' ~ item.name ~ '.sql').split('-- ---') | map('trim') | reject('equalto', '') | list }}"
+  loop: "{{ audit_tables }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when: item.enabled | bool
+
+- name: Drop triggers for {{ item.name }}
+  become: true
+  run_once: true
+  delegate_to: "{{ groups['control'][0] }}"
+  kolla_toolbox:
+    container_engine: "{{ kolla_container_engine }}"
+    module_name: community.mysql.mysql_query
+    module_args:
+      login_host: "{{ database_address }}"
+      login_user: "{{ database_user }}"
+      login_password: "{{ database_password }}"
+      query:
+        - "DROP TRIGGER IF EXISTS {{ item.source_db }}.trg_{{ item.source_table }}_audit_ins"
+        - "DROP TRIGGER IF EXISTS {{ item.source_db }}.trg_{{ item.source_table }}_audit_upd"
+        - "DROP TRIGGER IF EXISTS {{ item.source_db }}.trg_{{ item.source_table }}_audit_del"
+  loop: "{{ audit_tables }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when: not (item.enabled | bool)
