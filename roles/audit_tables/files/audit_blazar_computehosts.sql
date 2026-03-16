@@ -12,7 +12,8 @@ CREATE TABLE IF NOT EXISTS openstack_audit.audit_blazar_computehosts (
     deleted_at DATETIME NULL,
     audit_event_type ENUM('INSERT', 'UPDATE', 'DELETE'),
     audit_changed_by VARCHAR(255),
-    audit_changed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    audit_changed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_id_changed_at (id, audit_changed_at)
 )
 -- ---
 GRANT INSERT ON openstack_audit.audit_blazar_computehosts TO 'blazar'@'%'
@@ -44,8 +45,8 @@ BEGIN
             status, reservable, disabled, created_at, deleted_at,
             audit_event_type, audit_changed_by
         ) VALUES (
-            OLD.id, OLD.hypervisor_hostname, OLD.vcpus, OLD.memory_mb, OLD.local_gb,
-            OLD.status, OLD.reservable, OLD.disabled, OLD.created_at, OLD.deleted_at,
+            NEW.id, NEW.hypervisor_hostname, NEW.vcpus, NEW.memory_mb, NEW.local_gb,
+            NEW.status, NEW.reservable, NEW.disabled, NEW.created_at, NEW.deleted_at,
             'UPDATE', USER()
         );
     END IF;
