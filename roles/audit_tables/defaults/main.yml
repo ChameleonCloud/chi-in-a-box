@@ -1,6 +1,6 @@
 ---
 
-audit_blazar_computehosts: true
+audit_blazar_computehosts: false
 
 audit_tables:
   - name: blazar_computehosts
