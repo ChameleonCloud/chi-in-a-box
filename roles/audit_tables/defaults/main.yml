@@ -1,0 +1,25 @@
+---
+
+audit_blazar_computehosts: false
+
+audit_tables:
+  - name: blazar_computehosts
+    source_db: blazar
+    source_table: computehosts
+    grant_user: blazar
+    enabled: "{{ audit_blazar_computehosts }}"
+    columns:
+      - id
+      - hypervisor_hostname
+      - vcpus
+      - memory_mb
+      - local_gb
+      - status
+      - reservable
+      - disabled
+      - created_at
+      - deleted_at
+    watch_columns:
+      - status
+      - reservable
+      - disabled

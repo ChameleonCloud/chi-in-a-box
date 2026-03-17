@@ -1,0 +1,91 @@
+---
+
+- name: Create openstack_audit database
+  become: true
+  run_once: true
+  delegate_to: "{{ groups['control'][0] }}"
+  kolla_toolbox:
+    container_engine: "{{ kolla_container_engine }}"
+    module_name: community.mysql.mysql_query
+    module_args:
+      login_host: "{{ database_address }}"
+      login_user: "{{ database_user }}"
+      login_password: "{{ database_password }}"
+      query: "CREATE DATABASE IF NOT EXISTS openstack_audit"
+
+- name: Deploy audit table {{ item.name }}
+  become: true
+  run_once: true
+  delegate_to: "{{ groups['control'][0] }}"
+  kolla_toolbox:
+    container_engine: "{{ kolla_container_engine }}"
+    module_name: community.mysql.mysql_query
+    module_args:
+      login_host: "{{ database_address }}"
+      login_user: "{{ database_user }}"
+      login_password: "{{ database_password }}"
+      query: "{{ lookup('template', 'audit_table.sql.j2').split('-- ---') | map('trim') | reject('equalto', '') | list }}"
+  loop: "{{ audit_tables }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when: item.enabled | bool
+
+- name: Assert schema of audit_{{ item.name }}
+  become: true
+  run_once: true
+  delegate_to: "{{ groups['control'][0] }}"
+  kolla_toolbox:
+    container_engine: "{{ kolla_container_engine }}"
+    module_name: community.mysql.mysql_query
+    module_args:
+      login_host: "{{ database_address }}"
+      login_user: "{{ database_user }}"
+      login_password: "{{ database_password }}"
+      query: >
+        SELECT column_name FROM information_schema.COLUMNS
+        WHERE table_schema = 'openstack_audit'
+        AND table_name = 'audit_{{ item.name }}'
+        AND column_name IN ('audit_id', 'id', 'audit_event_type', 'audit_changed_by', 'audit_changed_at', 'data')
+  register: _schema_check
+  failed_when: _schema_check.query_result[0] | length != 6
+  loop: "{{ audit_tables }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when: item.enabled | bool
+
+- name: Backfill audit table {{ item.name }}
+  become: true
+  run_once: true
+  delegate_to: "{{ groups['control'][0] }}"
+  kolla_toolbox:
+    container_engine: "{{ kolla_container_engine }}"
+    module_name: community.mysql.mysql_query
+    module_args:
+      login_host: "{{ database_address }}"
+      login_user: "{{ database_user }}"
+      login_password: "{{ database_password }}"
+      query: "{{ lookup('template', 'audit_backfill.sql.j2').split('-- ---') | map('trim') | reject('equalto', '') | list }}"
+  loop: "{{ audit_tables }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when: item.enabled | bool
+
+- name: Drop triggers for {{ item.name }}
+  become: true
+  run_once: true
+  delegate_to: "{{ groups['control'][0] }}"
+  kolla_toolbox:
+    container_engine: "{{ kolla_container_engine }}"
+    module_name: community.mysql.mysql_query
+    module_args:
+      login_host: "{{ database_address }}"
+      login_user: "{{ database_user }}"
+      login_password: "{{ database_password }}"
+      query:
+        - "DROP TRIGGER IF EXISTS {{ item.source_db }}.trg_{{ item.source_table }}_audit_ins"
+        - "DROP TRIGGER IF EXISTS {{ item.source_db }}.trg_{{ item.source_table }}_audit_upd"
+        - "DROP TRIGGER IF EXISTS {{ item.source_db }}.trg_{{ item.source_table }}_audit_del"
+  loop: "{{ audit_tables }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when: not (item.enabled | bool)
