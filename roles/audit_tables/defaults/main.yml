@@ -4,6 +4,9 @@ audit_blazar_computehosts: false
 audit_blazar_computehost_extra_capabilities: "{{ audit_blazar_computehosts }}"
 audit_blazar_resource_properties: "{{ audit_blazar_computehosts }}"
 
+audit_nova_compute_nodes: false
+audit_nova_services: "{{ audit_nova_compute_nodes }}"
+
 audit_tables:
   - name: blazar_computehosts
     source_db: blazar
@@ -58,3 +61,73 @@ audit_tables:
       - property_name
       - private
       - is_unique
+  - name: nova_compute_nodes
+    source_db: nova
+    source_table: compute_nodes
+    grant_user: nova
+    enabled: "{{ audit_nova_compute_nodes }}"
+    columns:
+      - created_at
+      - updated_at
+      - deleted_at
+      - id
+      - service_id
+      - vcpus
+      - memory_mb
+      - local_gb
+      - vcpus_used
+      - memory_mb_used
+      - local_gb_used
+      - hypervisor_type
+      - hypervisor_version
+      - current_workload
+      - running_vms
+      - hypervisor_hostname
+      - host_ip
+      - supported_instances
+      - host
+      - ram_allocation_ratio
+      - cpu_allocation_ratio
+      - uuid
+      - disk_allocation_ratio
+      - mapped
+    watch_columns:
+      - vcpus
+      - cpu_allocation_ratio
+      - memory_mb
+      - ram_allocation_ratio
+      - local_gb
+      - disk_allocation_ratio
+      - hypervisor_hostname
+      - host
+      - hypervisor_version
+      - supported_instances
+      - mapped
+  - name: nova_services
+    source_db: nova
+    source_table: services
+    grant_user: nova
+    enabled: "{{ audit_nova_services }}"
+    columns:
+      - created_at
+      - updated_at
+      - deleted_at
+      - id
+      - host
+      - binary
+      - topic
+      - report_count
+      - disabled
+      - disabled_reason
+      - last_seen_up
+      - forced_down
+      - version
+      - uuid
+    watch_columns:
+      - host
+      - binary
+      - topic
+      - disabled
+      - disabled_reason
+      - forced_down
+      - version
