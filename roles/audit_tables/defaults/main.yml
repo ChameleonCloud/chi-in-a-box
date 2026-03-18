@@ -7,6 +7,8 @@ audit_blazar_resource_properties: "{{ audit_blazar_computehosts }}"
 audit_nova_compute_nodes: false
 audit_nova_services: "{{ audit_nova_compute_nodes }}"
 
+audit_ironic_nodes: false
+
 audit_tables:
   - name: blazar_computehosts
     source_db: blazar
@@ -131,3 +133,43 @@ audit_tables:
       - disabled_reason
       - forced_down
       - version
+  - name: ironic_nodes
+    source_db: ironic
+    source_table: nodes
+    grant_user: ironic
+    enabled: "{{ audit_ironic_nodes }}"
+    columns:
+      - created_at
+      - updated_at
+      - id
+      - uuid
+      - instance_uuid
+      - power_state
+      - target_power_state
+      - provision_state
+      - target_provision_state
+      - last_error
+      - driver
+      - reservation
+      - maintenance
+      - provision_updated_at
+      - instance_info
+      - maintenance_reason
+      - name
+      - resource_class
+      - owner
+      - lessee
+      - retired
+      - retired_reason
+      - fault
+    watch_columns:
+      # - power_state # will change multiple times per instance
+      # - provision_state # will change multiple times per instance
+      # - instance_uuid # we'll get this from instance table
+      - maintenance
+      - maintenance_reason
+      - retired
+      - owner   # shouldn't change, but maybe in future
+      - lessee  # shouldn't change, but maybe in future
+      - fault
+      - resource_class
