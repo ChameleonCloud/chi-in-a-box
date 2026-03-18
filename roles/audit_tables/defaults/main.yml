@@ -1,6 +1,8 @@
 ---
 
 audit_blazar_computehosts: false
+audit_blazar_computehost_extra_capabilities: "{{ audit_blazar_computehosts }}"
+audit_blazar_resource_properties: "{{ audit_blazar_computehosts }}"
 
 audit_tables:
   - name: blazar_computehosts
@@ -23,3 +25,36 @@ audit_tables:
       - status
       - reservable
       - disabled
+  - name: blazar_computehost_extra_capabilities
+    source_db: blazar
+    source_table: computehost_extra_capabilities
+    grant_user: blazar
+    enabled: "{{ audit_blazar_computehost_extra_capabilities }}"
+    columns:
+      - created_at
+      - updated_at
+      - deleted_at
+      - id
+      - computehost_id
+      - capability_value
+      - property_id
+    watch_columns:
+      - capability_value
+  - name: blazar_resource_properties
+    source_db: blazar
+    source_table: resource_properties
+    grant_user: blazar
+    enabled: "{{ audit_blazar_resource_properties }}"
+    columns:
+      - created_at
+      - updated_at
+      - deleted_at
+      - id
+      - resource_type
+      - property_name
+      - private
+      - is_unique
+    watch_columns:
+      - property_name
+      - private
+      - is_unique
