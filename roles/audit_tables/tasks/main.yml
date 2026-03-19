@@ -13,7 +13,7 @@
       login_password: "{{ database_password }}"
       query: "CREATE DATABASE IF NOT EXISTS openstack_audit"
 
-- name: Deploy audit table {{ item.name }}
+- name: Deploy audit table
   become: true
   run_once: true
   delegate_to: "{{ groups['control'][0] }}"
@@ -30,7 +30,7 @@
     label: "{{ item.name }}"
   when: item.enabled | bool
 
-- name: Assert schema of audit_{{ item.name }}
+- name: Assert audit table schema
   become: true
   run_once: true
   delegate_to: "{{ groups['control'][0] }}"
@@ -53,7 +53,7 @@
     label: "{{ item.name }}"
   when: item.enabled | bool
 
-- name: Backfill audit table {{ item.name }}
+- name: Backfill audit table
   become: true
   run_once: true
   delegate_to: "{{ groups['control'][0] }}"
@@ -70,7 +70,7 @@
     label: "{{ item.name }}"
   when: item.enabled | bool
 
-- name: Drop triggers for {{ item.name }}
+- name: Drop triggers
   become: true
   run_once: true
   delegate_to: "{{ groups['control'][0] }}"

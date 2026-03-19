@@ -1,6 +1,13 @@
 ---
 
 audit_blazar_computehosts: false
+audit_blazar_computehost_extra_capabilities: "{{ audit_blazar_computehosts }}"
+audit_blazar_resource_properties: "{{ audit_blazar_computehosts }}"
+
+audit_nova_compute_nodes: false
+audit_nova_services: "{{ audit_nova_compute_nodes }}"
+
+audit_ironic_nodes: false
 
 audit_tables:
   - name: blazar_computehosts
@@ -23,3 +30,146 @@ audit_tables:
       - status
       - reservable
       - disabled
+  - name: blazar_computehost_extra_capabilities
+    source_db: blazar
+    source_table: computehost_extra_capabilities
+    grant_user: blazar
+    enabled: "{{ audit_blazar_computehost_extra_capabilities }}"
+    columns:
+      - created_at
+      - updated_at
+      - deleted_at
+      - id
+      - computehost_id
+      - capability_value
+      - property_id
+    watch_columns:
+      - capability_value
+  - name: blazar_resource_properties
+    source_db: blazar
+    source_table: resource_properties
+    grant_user: blazar
+    enabled: "{{ audit_blazar_resource_properties }}"
+    columns:
+      - created_at
+      - updated_at
+      - deleted_at
+      - id
+      - resource_type
+      - property_name
+      - private
+      - is_unique
+    watch_columns:
+      - property_name
+      - private
+      - is_unique
+  - name: nova_compute_nodes
+    source_db: nova
+    source_table: compute_nodes
+    grant_user: nova
+    enabled: "{{ audit_nova_compute_nodes }}"
+    columns:
+      - created_at
+      - updated_at
+      - deleted_at
+      - id
+      - service_id
+      - vcpus
+      - memory_mb
+      - local_gb
+      - vcpus_used
+      - memory_mb_used
+      - local_gb_used
+      - hypervisor_type
+      - hypervisor_version
+      - current_workload
+      - running_vms
+      - hypervisor_hostname
+      - host_ip
+      - supported_instances
+      - host
+      - ram_allocation_ratio
+      - cpu_allocation_ratio
+      - uuid
+      - disk_allocation_ratio
+      - mapped
+    watch_columns:
+      - vcpus
+      - cpu_allocation_ratio
+      - memory_mb
+      - ram_allocation_ratio
+      - local_gb
+      - disk_allocation_ratio
+      - hypervisor_hostname
+      - host
+      - hypervisor_version
+      - supported_instances
+      - mapped
+  - name: nova_services
+    source_db: nova
+    source_table: services
+    grant_user: nova
+    enabled: "{{ audit_nova_services }}"
+    columns:
+      - created_at
+      - updated_at
+      - deleted_at
+      - id
+      - host
+      - binary
+      - topic
+      - report_count
+      - disabled
+      - disabled_reason
+      - last_seen_up
+      - forced_down
+      - version
+      - uuid
+    watch_columns:
+      - host
+      - binary
+      - topic
+      - disabled
+      - disabled_reason
+      - forced_down
+      - version
+  - name: ironic_nodes
+    source_db: ironic
+    source_table: nodes
+    grant_user: ironic
+    enabled: "{{ audit_ironic_nodes }}"
+    columns:
+      - created_at
+      - updated_at
+      - id
+      - uuid
+      - instance_uuid
+      - power_state
+      - target_power_state
+      - provision_state
+      - target_provision_state
+      - last_error
+      - driver
+      - reservation
+      - maintenance
+      - provision_updated_at
+      - instance_info
+      - maintenance_reason
+      - name
+      - resource_class
+      - owner
+      - lessee
+      - retired
+      - retired_reason
+      - fault
+    watch_columns:
+      # - power_state # will change multiple times per instance
+      # - provision_state # will change multiple times per instance
+      # - instance_uuid # we'll get this from instance table
+      - maintenance
+      - maintenance_reason
+      - retired
+      - owner   # shouldn't change, but maybe in future
+      - lessee  # shouldn't change, but maybe in future
+      - fault
+      - resource_class
