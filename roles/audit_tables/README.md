@@ -57,6 +57,7 @@ All audit tables share the same structure:
 | `audit_id` | INT AUTO_INCREMENT | Primary key |
 | `id` | VARCHAR(36) | Source entity ID (indexed) |
 | `audit_event_type` | ENUM | INSERT, UPDATE, or DELETE |
+| `audit_event_time` | TIMESTAMP | When the change happened in the source table (event time) |
 | `audit_changed_by` | VARCHAR(255) | MySQL user that triggered the change |
-| `audit_changed_at` | TIMESTAMP | When the audit row was created |
+| `audit_changed_at` | TIMESTAMP | When the audit row was physically inserted (wall-clock time) |
 | `data` | JSON | Snapshot of configured `columns` at change time |

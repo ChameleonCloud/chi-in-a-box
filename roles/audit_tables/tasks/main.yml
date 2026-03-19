@@ -45,9 +45,9 @@
         SELECT column_name FROM information_schema.COLUMNS
         WHERE table_schema = 'openstack_audit'
         AND table_name = 'audit_{{ item.name }}'
-        AND column_name IN ('audit_id', 'id', 'audit_event_type', 'audit_changed_by', 'audit_changed_at', 'data')
+        AND column_name IN ('audit_id', 'id', 'audit_event_type', 'audit_event_time', 'audit_changed_by', 'audit_changed_at', 'data')
   register: _schema_check
-  failed_when: _schema_check.query_result[0] | length != 6
+  failed_when: _schema_check.query_result[0] | length != 7
   loop: "{{ audit_tables }}"
   loop_control:
     label: "{{ item.name }}"
