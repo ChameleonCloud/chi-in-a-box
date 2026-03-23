@@ -50,7 +50,7 @@ usage_collector_mysql_grants:
   - openstack_audit.audit_blazar_resource_properties:SELECT
   - openstack_audit.audit_nova_compute_nodes:SELECT
   - openstack_audit.audit_nova_services:SELECT
-  - openstack_audit.audit_nova_instances
-  - openstack_audit.audit_nova_instance_actions
-  - openstack_audit.audit_nova_instance_actions_events
+  - openstack_audit.audit_nova_instances:SELECT
+  - openstack_audit.audit_nova_instance_actions:SELECT
+  - openstack_audit.audit_nova_instance_actions_events:SELECT
   - openstack_audit.audit_ironic_nodes:SELECT
