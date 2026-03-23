@@ -7,6 +7,8 @@ audit_blazar_resource_properties: "{{ audit_blazar_computehosts }}"
 audit_nova_compute_nodes: false
 audit_nova_services: "{{ audit_nova_compute_nodes }}"
 audit_nova_instances: false
+audit_nova_instance_actions: "{{ audit_nova_instances }}"
+audit_nova_instance_actions_events: "{{ audit_nova_instances }}"
 
 audit_ironic_nodes: false
 
@@ -207,6 +209,51 @@ audit_tables:
       - instance_type_id
       - deleted
       - hidden
+  - name: nova_instance_actions
+    source_db: nova
+    source_table: instance_actions
+    grant_user: nova
+    enabled: "{{ audit_nova_instance_actions }}"
+    columns:
+      - created_at
+      - updated_at
+      - deleted_at
+      - id
+      - action
+      - instance_uuid
+      - request_id
+      - user_id
+      - project_id
+      - start_time
+      - finish_time
+      - message
+      - deleted
+    watch_columns:
+      - finish_time
+      - message
+  - name: nova_instance_actions_events
+    source_db: nova
+    source_table: instance_actions_events
+    grant_user: nova
+    enabled: "{{ audit_nova_instance_actions_events }}"
+    columns:
+      - created_at
+      - updated_at
+      - deleted_at
+      - id
+      - event
+      - action_id
+      - start_time
+      - finish_time
+      - result
+      - traceback
+      - deleted
+      - host
+      - details
+    watch_columns:
+      - finish_time
+      - result
+      - host
   - name: ironic_nodes
     source_db: ironic
     source_table: nodes
