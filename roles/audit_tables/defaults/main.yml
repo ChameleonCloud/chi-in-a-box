@@ -6,6 +6,7 @@ audit_blazar_resource_properties: "{{ audit_blazar_computehosts }}"
 
 audit_nova_compute_nodes: false
 audit_nova_services: "{{ audit_nova_compute_nodes }}"
+audit_nova_instances: false
 
 audit_ironic_nodes: false
 
@@ -133,6 +134,79 @@ audit_tables:
       - disabled_reason
       - forced_down
       - version
+  - name: nova_instances
+    source_db: nova
+    source_table: instances
+    grant_user: nova
+    enabled: "{{ audit_nova_instances }}"
+    columns:
+      - created_at
+      - updated_at
+      - deleted_at
+      - id
+      - internal_id
+      - user_id
+      - project_id
+      - image_ref
+      - kernel_id
+      - ramdisk_id
+      - launch_index
+      - key_name
+      # - key_data
+      - power_state
+      - vm_state
+      - memory_mb
+      - vcpus
+      - hostname
+      - host
+      # - user_data
+      - reservation_id
+      - launched_at
+      - terminated_at
+      - display_name
+      - display_description
+      - availability_zone
+      - locked
+      - os_type
+      - launched_on
+      - instance_type_id
+      - vm_mode
+      - uuid
+      - architecture
+      - root_device_name
+      - access_ip_v4
+      - access_ip_v6
+      - config_drive
+      - task_state
+      - default_ephemeral_device
+      - default_swap_device
+      - progress
+      - auto_disk_config
+      - shutdown_terminate
+      - disable_terminate
+      - root_gb
+      - ephemeral_gb
+      - cell_name
+      - node
+      - deleted
+      - locked_by
+      - cleaned
+      - ephemeral_key_uuid
+      - hidden
+    watch_columns:
+      - power_state
+      - vm_state
+      - task_state
+      - host
+      - node
+      - launched_at
+      - terminated_at
+      - locked
+      - locked_by
+      - availability_zone
+      - instance_type_id
+      - deleted
+      - hidden
   - name: ironic_nodes
     source_db: ironic
     source_table: nodes
