@@ -1,0 +1,127 @@
+---
+
+- name: Create openstack_audit database
+  become: true
+  run_once: true
+  delegate_to: "{{ groups['control'][0] }}"
+  kolla_toolbox:
+    module_name: community.mysql.mysql_query
+    module_args:
+      login_host: "{{ database_address }}"
+      login_user: "{{ database_user }}"
+      login_password: "{{ database_password }}"
+      query: "CREATE DATABASE IF NOT EXISTS openstack_audit"
+
+- name: Deploy audit table
+  become: true
+  run_once: true
+  delegate_to: "{{ groups['control'][0] }}"
+  kolla_toolbox:
+    module_name: community.mysql.mysql_query
+    module_args:
+      login_host: "{{ database_address }}"
+      login_user: "{{ database_user }}"
+      login_password: "{{ database_password }}"
+      query: "{{ lookup('template', 'audit_table.sql.j2').split('-- ---') | map('trim') | reject('equalto', '') | list }}"
+  loop: "{{ audit_tables }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when: item.enabled | bool
+
+- name: Migrate audit timestamp columns to datetime
+  become: true
+  run_once: true
+  delegate_to: "{{ groups['control'][0] }}"
+  kolla_toolbox:
+    module_name: community.mysql.mysql_query
+    module_args:
+      login_host: "{{ database_address }}"
+      login_user: "{{ database_user }}"
+      login_password: "{{ database_password }}"
+      query:
+        - >-
+          ALTER TABLE openstack_audit.audit_{{ item.name }}
+          MODIFY COLUMN audit_event_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+          MODIFY COLUMN audit_changed_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        - >-
+          CREATE INDEX IF NOT EXISTS idx_id_event_type
+          ON openstack_audit.audit_{{ item.name }} (id, audit_event_type)
+  loop: "{{ audit_tables }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when: item.enabled | bool
+
+- name: Migrate audit id column type
+  become: true
+  run_once: true
+  delegate_to: "{{ groups['control'][0] }}"
+  kolla_toolbox:
+    module_name: community.mysql.mysql_query
+    module_args:
+      login_host: "{{ database_address }}"
+      login_user: "{{ database_user }}"
+      login_password: "{{ database_password }}"
+      query: >-
+        ALTER TABLE openstack_audit.audit_{{ item.name }}
+        MODIFY COLUMN id {{ item.id_type | default('VARCHAR(36)') }}
+  loop: "{{ audit_tables }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when: item.enabled | bool
+
+- name: Assert audit table schema
+  become: true
+  run_once: true
+  delegate_to: "{{ groups['control'][0] }}"
+  kolla_toolbox:
+    module_name: community.mysql.mysql_query
+    module_args:
+      login_host: "{{ database_address }}"
+      login_user: "{{ database_user }}"
+      login_password: "{{ database_password }}"
+      query: >
+        SELECT column_name FROM information_schema.COLUMNS
+        WHERE table_schema = 'openstack_audit'
+        AND table_name = 'audit_{{ item.name }}'
+        AND column_name IN ('audit_id', 'id', 'audit_event_type', 'audit_event_time', 'audit_changed_by', 'audit_changed_at', 'data')
+  register: _schema_check
+  failed_when: _schema_check.query_result[0] | length != 7
+  loop: "{{ audit_tables }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when: item.enabled | bool
+
+- name: Backfill audit table
+  become: true
+  run_once: true
+  delegate_to: "{{ groups['control'][0] }}"
+  kolla_toolbox:
+    module_name: community.mysql.mysql_query
+    module_args:
+      login_host: "{{ database_address }}"
+      login_user: "{{ database_user }}"
+      login_password: "{{ database_password }}"
+      query: "{{ lookup('template', 'audit_backfill.sql.j2').split('-- ---') | map('trim') | reject('equalto', '') | list }}"
+  loop: "{{ audit_tables }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when: item.enabled | bool
+
+- name: Drop triggers
+  become: true
+  run_once: true
+  delegate_to: "{{ groups['control'][0] }}"
+  kolla_toolbox:
+    module_name: community.mysql.mysql_query
+    module_args:
+      login_host: "{{ database_address }}"
+      login_user: "{{ database_user }}"
+      login_password: "{{ database_password }}"
+      query:
+        - "DROP TRIGGER IF EXISTS {{ item.source_db }}.trg_{{ item.source_table }}_audit_ins"
+        - "DROP TRIGGER IF EXISTS {{ item.source_db }}.trg_{{ item.source_table }}_audit_upd"
+        - "DROP TRIGGER IF EXISTS {{ item.source_db }}.trg_{{ item.source_table }}_audit_del"
+  loop: "{{ audit_tables }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when: not (item.enabled | bool)

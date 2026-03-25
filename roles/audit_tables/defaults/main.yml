@@ -1,0 +1,63 @@
+---
+
+audit_blazar_computehosts: false
+audit_blazar_computehost_extra_capabilities: "{{ audit_blazar_computehosts }}"
+audit_blazar_extra_capabilities: "{{ audit_blazar_computehosts }}"
+
+audit_tables:
+  - name: blazar_computehosts
+    source_db: blazar
+    source_table: computehosts
+    grant_user: blazar
+    id_type: "VARCHAR(36)"
+    enabled: "{{ audit_blazar_computehosts }}"
+    columns:
+      - id
+      - hypervisor_hostname
+      - vcpus
+      - memory_mb
+      - local_gb
+      - status
+      - reservable
+      - disabled
+      - created_at
+      - deleted_at
+    watch_columns:
+      - status
+      - reservable
+      - disabled
+  - name: blazar_computehost_extra_capabilities
+    source_db: blazar
+    source_table: computehost_extra_capabilities
+    grant_user: blazar
+    id_type: "VARCHAR(36)"
+    enabled: "{{ audit_blazar_computehost_extra_capabilities }}"
+    columns:
+      - created_at
+      - updated_at
+      - id
+      - computehost_id
+      - capability_id
+      - capability_value
+      - deleted
+      - deleted_at
+    watch_columns:
+      - capability_value
+  - name: blazar_extra_capabilities
+    source_db: blazar
+    source_table: extra_capabilities
+    grant_user: blazar
+    id_type: "VARCHAR(36)"
+    enabled: "{{ audit_blazar_extra_capabilities }}"
+    columns:
+      - created_at
+      - updated_at
+      - id
+      - resource_type
+      - capability_name
+      - private
+      - deleted
+      - deleted_at
+    watch_columns:
+      - capability_name
+      - private
