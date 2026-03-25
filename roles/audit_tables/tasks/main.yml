@@ -46,6 +46,9 @@
           ALTER TABLE openstack_audit.audit_{{ item.name }}
           MODIFY COLUMN audit_event_time DATETIME DEFAULT CURRENT_TIMESTAMP,
           MODIFY COLUMN audit_changed_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        - >-
+          CREATE INDEX IF NOT EXISTS idx_id_event_type
+          ON openstack_audit.audit_{{ item.name }} (id, audit_event_type)
   loop: "{{ audit_tables }}"
   loop_control:
     label: "{{ item.name }}"
