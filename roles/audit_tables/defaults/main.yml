@@ -7,6 +7,10 @@ audit_blazar_extra_capabilities: "{{ audit_blazar_computehosts }}"
 audit_blazar_devices: false
 audit_blazar_device_extra_capabilities: "{{ audit_blazar_devices }}"
 
+audit_zun_containers: false
+audit_zun_container_actions: "{{ audit_zun_containers }}"
+audit_zun_container_actions_events: "{{ audit_zun_containers }}"
+
 audit_tables:
   - name: blazar_computehosts
     source_db: blazar
@@ -102,3 +106,104 @@ audit_tables:
       - deleted_at
     watch_columns:
       - capability_value
+  - name: zun_containers
+    source_db: zun
+    source_table: container
+    grant_user: zun
+    id_type: "INT(11)"
+    enabled: "{{ audit_zun_containers }}"
+    columns:
+      - created_at
+      - updated_at
+      - id
+      - project_id
+      - user_id
+      - uuid
+      - name
+      - image
+      - command
+      - status
+      - environment
+      - container_id
+      - memory
+      - task_state
+      - cpu
+      - workdir
+      - ports
+      - hostname
+      - labels
+      - status_reason
+      - image_pull_policy
+      - addresses
+      - host
+      - restart_policy
+      - status_detail
+      - image_driver
+      - interactive
+      - websocket_url
+      - security_groups
+      - auto_remove
+      - runtime
+      - disk
+      - auto_heal
+      - capsule_id
+      - started_at
+      - privileged
+      - healthcheck
+      - exposed_ports
+      - cpu_policy
+      - cpuset
+      - registry_id
+      - container_type
+      - tty
+      - annotations
+      - cni_metadata
+      - entrypoint
+    watch_columns:
+      - status
+      - task_state
+      - status_reason
+      - status_detail
+      - started_at
+      - host
+  - name: zun_container_actions
+    source_db: zun
+    source_table: container_actions
+    grant_user: zun
+    id_type: "INT(11)"
+    enabled: "{{ audit_zun_container_actions }}"
+    columns:
+      - created_at
+      - updated_at
+      - id
+      - action
+      - container_uuid
+      - request_id
+      - user_id
+      - project_id
+      - start_time
+      - finish_time
+      - message
+    watch_columns:
+      - finish_time
+      - message
+  - name: zun_container_actions_events
+    source_db: zun
+    source_table: container_actions_events
+    grant_user: zun
+    id_type: "INT(11)"
+    enabled: "{{ audit_zun_container_actions_events }}"
+    columns:
+      - created_at
+      - updated_at
+      - id
+      - event
+      - action_id
+      - start_time
+      - finish_time
+      - result
+      - traceback
+      - details
+    watch_columns:
+      - finish_time
+      - result
