@@ -4,6 +4,9 @@ audit_blazar_computehosts: false
 audit_blazar_computehost_extra_capabilities: "{{ audit_blazar_computehosts }}"
 audit_blazar_extra_capabilities: "{{ audit_blazar_computehosts }}"
 
+audit_blazar_devices: false
+audit_blazar_device_extra_capabilities: "{{ audit_blazar_devices }}"
+
 audit_tables:
   - name: blazar_computehosts
     source_db: blazar
@@ -61,3 +64,41 @@ audit_tables:
     watch_columns:
       - capability_name
       - private
+  - name: blazar_devices
+    source_db: blazar
+    source_table: devices
+    grant_user: blazar
+    id_type: "VARCHAR(36)"
+    enabled: "{{ audit_blazar_devices }}"
+    columns:
+      - created_at
+      - updated_at
+      - id
+      - name
+      - device_type
+      - device_driver
+      - reservable
+      - deleted
+      - deleted_at
+    watch_columns:
+      - name
+      - device_type
+      - device_driver
+      - reservable
+  - name: blazar_device_extra_capabilities
+    source_db: blazar
+    source_table: device_extra_capabilities
+    grant_user: blazar
+    id_type: "VARCHAR(36)"
+    enabled: "{{ audit_blazar_device_extra_capabilities }}"
+    columns:
+      - created_at
+      - updated_at
+      - id
+      - device_id
+      - capability_id
+      - capability_value
+      - deleted
+      - deleted_at
+    watch_columns:
+      - capability_value
