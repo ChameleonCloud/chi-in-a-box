@@ -20,7 +20,7 @@ AFTER INSERT ON {{ item.source_db }}.{{ item.source_table }} FOR EACH ROW
 BEGIN
     INSERT INTO openstack_audit.audit_{{ item.name }}
         (id, audit_event_type, audit_changed_by, data)
-    VALUES (NEW.id, 'INSERT', USER(), JSON_OBJECT(
+    VALUES (NEW.{{ item.id_column | default('id') }}, 'INSERT', USER(), JSON_OBJECT(
         {% for col in item.columns %}'{{ col }}', NEW.{{ col }}{{ ',' if not loop.last }}
         {% endfor %}));
 END
@@ -31,7 +31,7 @@ BEGIN
     IF {% for col in item.watch_columns %}NOT (OLD.{{ col }} <=> NEW.{{ col }}){{ ' OR ' if not loop.last }}{% endfor %} THEN
         INSERT INTO openstack_audit.audit_{{ item.name }}
             (id, audit_event_type, audit_changed_by, data)
-        VALUES (NEW.id, 'UPDATE', USER(), JSON_OBJECT(
+        VALUES (NEW.{{ item.id_column | default('id') }}, 'UPDATE', USER(), JSON_OBJECT(
             {% for col in item.columns %}'{{ col }}', NEW.{{ col }}{{ ',' if not loop.last }}
             {% endfor %}));
     END IF;
@@ -42,7 +42,7 @@ AFTER DELETE ON {{ item.source_db }}.{{ item.source_table }} FOR EACH ROW
 BEGIN
     INSERT INTO openstack_audit.audit_{{ item.name }}
         (id, audit_event_type, audit_changed_by, data)
-    VALUES (OLD.id, 'DELETE', USER(), JSON_OBJECT(
+    VALUES (OLD.{{ item.id_column | default('id') }}, 'DELETE', USER(), JSON_OBJECT(
         {% for col in item.columns %}'{{ col }}', OLD.{{ col }}{{ ',' if not loop.last }}
         {% endfor %}));
 END

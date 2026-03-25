@@ -10,6 +10,8 @@ audit_blazar_device_extra_capabilities: "{{ audit_blazar_devices }}"
 audit_zun_containers: false
 audit_zun_container_actions: "{{ audit_zun_containers }}"
 audit_zun_container_actions_events: "{{ audit_zun_containers }}"
+audit_zun_compute_nodes: false
+audit_zun_services: "{{ audit_zun_compute_nodes }}"
 
 audit_tables:
   - name: blazar_computehosts
@@ -207,3 +209,63 @@ audit_tables:
     watch_columns:
       - finish_time
       - result
+  - name: zun_compute_nodes
+    source_db: zun
+    source_table: compute_node
+    grant_user: zun
+    id_type: "VARCHAR(36)"
+    id_column: uuid
+    enabled: "{{ audit_zun_compute_nodes }}"
+    columns:
+      - created_at
+      - updated_at
+      - uuid
+      - hostname
+      - mem_total
+      - mem_free
+      - mem_available
+      - total_containers
+      - running_containers
+      - paused_containers
+      - stopped_containers
+      - cpus
+      - cpu_used
+      - architecture
+      - os_type
+      - os
+      - kernel_version
+      - mem_used
+      - disk_total
+      - disk_used
+      - disk_quota_supported
+      - enable_cpu_pinning
+      - rp_uuid
+    watch_columns:
+      - hostname
+      - cpus
+      - mem_total
+      - disk_total
+  - name: zun_services
+    source_db: zun
+    source_table: zun_service
+    grant_user: zun
+    id_type: "INT(11)"
+    enabled: "{{ audit_zun_services }}"
+    columns:
+      - created_at
+      - updated_at
+      - id
+      - report_count
+      - host
+      - binary
+      - disabled
+      - disabled_reason
+      - last_seen_up
+      - forced_down
+      - availability_zone
+    watch_columns:
+      - host
+      - binary
+      - disabled
+      - disabled_reason
+      - forced_down
