@@ -1,3 +1,5 @@
+SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED
+-- ---
 INSERT INTO openstack_audit.audit_{{ item.name }}
     (id, audit_event_type, audit_event_time, audit_changed_by, data)
 SELECT
