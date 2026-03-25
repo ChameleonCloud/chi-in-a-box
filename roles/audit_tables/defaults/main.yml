@@ -17,6 +17,7 @@ audit_tables:
     source_db: blazar
     source_table: computehosts
     grant_user: blazar
+    id_type: "VARCHAR(36)"
     enabled: "{{ audit_blazar_computehosts }}"
     columns:
       - id
@@ -37,6 +38,7 @@ audit_tables:
     source_db: blazar
     source_table: computehost_extra_capabilities
     grant_user: blazar
+    id_type: "VARCHAR(36)"
     enabled: "{{ audit_blazar_computehost_extra_capabilities }}"
     columns:
       - created_at
@@ -52,6 +54,7 @@ audit_tables:
     source_db: blazar
     source_table: resource_properties
     grant_user: blazar
+    id_type: "VARCHAR(36)"
     enabled: "{{ audit_blazar_resource_properties }}"
     columns:
       - created_at
@@ -70,6 +73,7 @@ audit_tables:
     source_db: nova
     source_table: compute_nodes
     grant_user: nova
+    id_type: "INT(11)"
     enabled: "{{ audit_nova_compute_nodes }}"
     columns:
       - created_at
@@ -112,6 +116,7 @@ audit_tables:
     source_db: nova
     source_table: services
     grant_user: nova
+    id_type: "INT(11)"
     enabled: "{{ audit_nova_services }}"
     columns:
       - created_at
@@ -140,6 +145,7 @@ audit_tables:
     source_db: nova
     source_table: instances
     grant_user: nova
+    id_type: "INT(11)"
     enabled: "{{ audit_nova_instances }}"
     columns:
       - created_at
@@ -213,6 +219,7 @@ audit_tables:
     source_db: nova
     source_table: instance_actions
     grant_user: nova
+    id_type: "INT(11)"
     enabled: "{{ audit_nova_instance_actions }}"
     columns:
       - created_at
@@ -235,6 +242,7 @@ audit_tables:
     source_db: nova
     source_table: instance_actions_events
     grant_user: nova
+    id_type: "INT(11)"
     enabled: "{{ audit_nova_instance_actions_events }}"
     columns:
       - created_at
@@ -258,6 +266,7 @@ audit_tables:
     source_db: ironic
     source_table: nodes
     grant_user: ironic
+    id_type: "INT(11)"
     enabled: "{{ audit_ironic_nodes }}"
     columns:
       - created_at

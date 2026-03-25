@@ -54,6 +54,25 @@
     label: "{{ item.name }}"
   when: item.enabled | bool
 
+- name: Migrate audit id column type
+  become: true
+  run_once: true
+  delegate_to: "{{ groups['control'][0] }}"
+  kolla_toolbox:
+    container_engine: "{{ kolla_container_engine }}"
+    module_name: community.mysql.mysql_query
+    module_args:
+      login_host: "{{ database_address }}"
+      login_user: "{{ database_user }}"
+      login_password: "{{ database_password }}"
+      query: >-
+        ALTER TABLE openstack_audit.audit_{{ item.name }}
+        MODIFY COLUMN id {{ item.id_type | default('VARCHAR(36)') }}
+  loop: "{{ audit_tables }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when: item.enabled | bool
+
 - name: Assert audit table schema
   become: true
   run_once: true
