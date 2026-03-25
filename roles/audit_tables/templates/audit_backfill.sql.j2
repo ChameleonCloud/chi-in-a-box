@@ -1,3 +1,5 @@
+SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED
+-- ---
 INSERT INTO openstack_audit.audit_{{ item.name }}
     (id, audit_event_type, audit_event_time, audit_changed_by, data)
 SELECT
@@ -9,10 +11,13 @@ SELECT
         {% for col in item.columns %}'{{ col }}', src.{{ col }}{{ ',' if not loop.last }}
         {% endfor %})
 FROM {{ item.source_db }}.{{ item.source_table }} src
-WHERE NOT EXISTS (
-    SELECT 1 FROM openstack_audit.audit_{{ item.name }} a
-    WHERE a.id = src.id AND a.audit_event_type = 'INSERT'
-)
+JOIN (
+    SELECT s.id FROM {{ item.source_db }}.{{ item.source_table }} s
+    WHERE NOT EXISTS (
+        SELECT 1 FROM openstack_audit.audit_{{ item.name }} a
+        WHERE a.id = s.id AND a.audit_event_type = 'INSERT'
+    )
+) missing ON missing.id = src.id
 {% if 'deleted_at' in item.columns %}
 -- ---
 INSERT INTO openstack_audit.audit_{{ item.name }}
@@ -26,9 +31,12 @@ SELECT
         {% for col in item.columns %}'{{ col }}', src.{{ col }}{{ ',' if not loop.last }}
         {% endfor %})
 FROM {{ item.source_db }}.{{ item.source_table }} src
-WHERE src.deleted_at IS NOT NULL
-AND NOT EXISTS (
-    SELECT 1 FROM openstack_audit.audit_{{ item.name }} a
-    WHERE a.id = src.id AND a.audit_event_type = 'DELETE'
-)
+JOIN (
+    SELECT s.id FROM {{ item.source_db }}.{{ item.source_table }} s
+    WHERE s.deleted_at IS NOT NULL
+    AND NOT EXISTS (
+        SELECT 1 FROM openstack_audit.audit_{{ item.name }} a
+        WHERE a.id = s.id AND a.audit_event_type = 'DELETE'
+    )
+) missing ON missing.id = src.id
 {% endif %}

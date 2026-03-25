@@ -1,12 +1,13 @@
 CREATE TABLE IF NOT EXISTS openstack_audit.audit_{{ item.name }} (
     audit_id INT AUTO_INCREMENT PRIMARY KEY,
-    id VARCHAR(36),
+    id {{ item.id_type | default('VARCHAR(36)') }},
     audit_event_type ENUM('INSERT', 'UPDATE', 'DELETE'),
-    audit_event_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    audit_event_time DATETIME DEFAULT CURRENT_TIMESTAMP,
     audit_changed_by VARCHAR(255),
-    audit_changed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    audit_changed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     data JSON,
     INDEX idx_id_event_time (id, audit_event_time),
+    INDEX idx_id_event_type (id, audit_event_type),
     INDEX idx_changed_at (audit_changed_at)
 )
 -- ---
