@@ -1,5 +1,4 @@
-SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED
--- ---
+SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED;
 INSERT INTO openstack_audit.audit_{{ item.name }}
     (id, audit_event_type, audit_event_time, audit_changed_by, data)
 SELECT
@@ -17,9 +16,8 @@ JOIN (
         SELECT 1 FROM openstack_audit.audit_{{ item.name }} a
         WHERE a.id = s.id AND a.audit_event_type = 'INSERT'
     )
-) missing ON missing.id = src.id
+) missing ON missing.id = src.id;
 {% if 'deleted_at' in item.columns %}
--- ---
 INSERT INTO openstack_audit.audit_{{ item.name }}
     (id, audit_event_type, audit_event_time, audit_changed_by, data)
 SELECT
