@@ -30,6 +30,26 @@
     label: "{{ item.name }}"
   when: item.enabled | bool
 
+- name: Add audit_event_time column if missing
+  become: true
+  run_once: true
+  delegate_to: "{{ groups['control'][0] }}"
+  kolla_toolbox:
+    container_engine: "{{ kolla_container_engine }}"
+    module_name: community.mysql.mysql_query
+    module_args:
+      login_host: "{{ database_address }}"
+      login_user: "{{ database_user }}"
+      login_password: "{{ database_password }}"
+      query: >-
+        ALTER TABLE openstack_audit.audit_{{ item.name }}
+        ADD COLUMN IF NOT EXISTS audit_event_time DATETIME DEFAULT CURRENT_TIMESTAMP
+        AFTER audit_event_type
+  loop: "{{ audit_tables }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when: item.enabled | bool
+
 - name: Migrate audit timestamp columns to datetime
   become: true
   run_once: true
