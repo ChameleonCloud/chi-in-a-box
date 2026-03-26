@@ -104,3 +104,9 @@
     name: usage_collector.timer
     enabled: yes
     state: started
+
+- name: Run usage_collector now
+  become: true
+  systemd:
+    name: usage_collector.service
+    state: started
