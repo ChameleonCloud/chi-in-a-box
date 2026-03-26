@@ -1,0 +1,48 @@
+CREATE TABLE IF NOT EXISTS openstack_audit.audit_{{ item.name }} (
+    audit_id INT AUTO_INCREMENT PRIMARY KEY,
+    id {{ item.id_type | default('VARCHAR(36)') }},
+    audit_event_type ENUM('INSERT', 'UPDATE', 'DELETE'),
+    audit_event_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+    audit_changed_by VARCHAR(255),
+    audit_changed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    data JSON,
+    INDEX idx_id_event_time (id, audit_event_time),
+    INDEX idx_id_event_type (id, audit_event_type),
+    INDEX idx_changed_at (audit_changed_at)
+)
+-- ---
+GRANT INSERT ON openstack_audit.audit_{{ item.name }} TO '{{ item.grant_user }}'@'%'
+-- ---
+FLUSH PRIVILEGES
+-- ---
+CREATE OR REPLACE TRIGGER {{ item.source_db }}.trg_{{ item.source_table }}_audit_ins
+AFTER INSERT ON {{ item.source_db }}.{{ item.source_table }} FOR EACH ROW
+BEGIN
+    INSERT INTO openstack_audit.audit_{{ item.name }}
+        (id, audit_event_type, audit_changed_by, data)
+    VALUES (NEW.id, 'INSERT', USER(), JSON_OBJECT(
+        {% for col in item.columns %}'{{ col }}', NEW.{{ col }}{{ ',' if not loop.last }}
+        {% endfor %}));
+END
+-- ---
+CREATE OR REPLACE TRIGGER {{ item.source_db }}.trg_{{ item.source_table }}_audit_upd
+AFTER UPDATE ON {{ item.source_db }}.{{ item.source_table }} FOR EACH ROW
+BEGIN
+    IF {% for col in item.watch_columns %}NOT (OLD.{{ col }} <=> NEW.{{ col }}){{ ' OR ' if not loop.last }}{% endfor %} THEN
+        INSERT INTO openstack_audit.audit_{{ item.name }}
+            (id, audit_event_type, audit_changed_by, data)
+        VALUES (NEW.id, 'UPDATE', USER(), JSON_OBJECT(
+            {% for col in item.columns %}'{{ col }}', NEW.{{ col }}{{ ',' if not loop.last }}
+            {% endfor %}));
+    END IF;
+END
+-- ---
+CREATE OR REPLACE TRIGGER {{ item.source_db }}.trg_{{ item.source_table }}_audit_del
+AFTER DELETE ON {{ item.source_db }}.{{ item.source_table }} FOR EACH ROW
+BEGIN
+    INSERT INTO openstack_audit.audit_{{ item.name }}
+        (id, audit_event_type, audit_changed_by, data)
+    VALUES (OLD.id, 'DELETE', USER(), JSON_OBJECT(
+        {% for col in item.columns %}'{{ col }}', OLD.{{ col }}{{ ',' if not loop.last }}
+        {% endfor %}));
+END

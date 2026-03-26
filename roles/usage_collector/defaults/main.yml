@@ -1,7 +1,7 @@
 ---
 
 usage_collector_image: ghcr.io/chameleoncloud/usage-exploration
-usage_collector_tag: sha-80d51ce
+usage_collector_tag: latest
 usage_collector_image_full: "{{ usage_collector_image }}:{{ usage_collector_tag }}"
 
 usage_collector_config_dir: /etc/chameleon_usage_collector
@@ -45,3 +45,17 @@ usage_collector_mysql_grants:
   - chameleon_usage.node_usage:SELECT
   - chameleon_usage.node_event:SELECT
   - chameleon_usage.node_maintenance:SELECT
+  - openstack_audit.audit_blazar_computehosts:SELECT
+  - openstack_audit.audit_blazar_computehost_extra_capabilities:SELECT
+  - openstack_audit.audit_blazar_resource_properties:SELECT
+  - openstack_audit.audit_nova_compute_nodes:SELECT
+  - openstack_audit.audit_nova_services:SELECT
+  - openstack_audit.audit_nova_instances:SELECT
+  - openstack_audit.audit_nova_instance_actions:SELECT
+  - openstack_audit.audit_nova_instance_actions_events:SELECT
+  - openstack_audit.audit_ironic_nodes:SELECT
+  - openstack_audit.audit_blazar_leases:SELECT
+  - openstack_audit.audit_blazar_reservations:SELECT
+  - openstack_audit.audit_blazar_computehost_allocations:SELECT
+  - openstack_audit.audit_blazar_computehost_reservations:SELECT
+  - openstack_audit.audit_blazar_instance_reservations:SELECT
