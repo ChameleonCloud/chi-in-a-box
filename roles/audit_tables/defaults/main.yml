@@ -3,6 +3,10 @@
 audit_blazar_computehosts: false
 audit_blazar_computehost_extra_capabilities: "{{ audit_blazar_computehosts }}"
 audit_blazar_resource_properties: "{{ audit_blazar_computehosts }}"
+audit_blazar_leases: false
+audit_blazar_reservations: "{{ audit_blazar_leases }}"
+audit_blazar_computehost_allocations: "{{ audit_blazar_leases }}"
+audit_blazar_computehost_reservations: "{{ audit_blazar_leases }}"
 
 audit_nova_compute_nodes: false
 audit_nova_services: "{{ audit_nova_compute_nodes }}"
@@ -69,6 +73,99 @@ audit_tables:
       - property_name
       - private
       - is_unique
+  - name: blazar_leases
+    source_db: blazar
+    source_table: leases
+    grant_user: blazar
+    id_type: "VARCHAR(36)"
+    enabled: "{{ audit_blazar_leases }}"
+    columns:
+      - created_at
+      - updated_at
+      - deleted_at
+      - deleted
+      - id
+      - name
+      - user_id
+      - project_id
+      - start_date
+      - end_date
+      - trust_id
+      - status
+      - degraded
+    watch_columns:
+      - name
+      - start_date
+      - end_date
+      - status
+      - degraded
+  - name: blazar_reservations
+    source_db: blazar
+    source_table: reservations
+    grant_user: blazar
+    id_type: "VARCHAR(36)"
+    enabled: "{{ audit_blazar_reservations }}"
+    columns:
+      - created_at
+      - updated_at
+      - deleted_at
+      - deleted
+      - id
+      - lease_id
+      - resource_id
+      - resource_type
+      - status
+      - missing_resources
+      - resources_changed
+    watch_columns:
+      - resource_id
+      - resource_type
+      - status
+      - missing_resources
+      - resources_changed
+  - name: blazar_computehost_allocations
+    source_db: blazar
+    source_table: computehost_allocations
+    grant_user: blazar
+    id_type: "VARCHAR(36)"
+    enabled: "{{ audit_blazar_computehost_allocations }}"
+    columns:
+      - created_at
+      - updated_at
+      - deleted_at
+      - deleted
+      - id
+      - compute_host_id
+      - reservation_id
+    watch_columns:
+      - compute_host_id
+      - reservation_id
+  - name: blazar_computehost_reservations
+    source_db: blazar
+    source_table: computehost_reservations
+    grant_user: blazar
+    id_type: "VARCHAR(36)"
+    enabled: "{{ audit_blazar_computehost_reservations }}"
+    columns:
+      - created_at
+      - updated_at
+      - deleted_at
+      - deleted
+      - id
+      - reservation_id
+      - aggregate_id
+      - resource_properties
+      - count_range
+      - hypervisor_properties
+      - before_end
+      - on_start
+    watch_columns:
+      - aggregate_id
+      - resource_properties
+      - hypervisor_properties
+      - count_range
+      - on_start
+      - before_end
   - name: nova_compute_nodes
     source_db: nova
     source_table: compute_nodes
