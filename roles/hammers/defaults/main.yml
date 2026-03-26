@@ -80,3 +80,10 @@ hammers_v2:
     cmd: floating_ip_network_reaper --cloud envvars --grace-days 7  --clean-floatingips --clean-routers
     enabled: "{{ enable_neutron | bool }}"
     calendar: daily
+  idle_lease_reaper:
+    description: "Clean up idle leases."
+    env_file: "{{ hammers_env_file }}"
+    image: "{{ hammers_v2_docker_image }}"
+    cmd: "idle_lease_reaper --cloud envvars{% if hammers_slack_webhook is defined %} --slack {{ hammers_config_path }}/slack.json{% endif %} delete"
+    enabled: "{{ blazar_enable_flavor_reservation | bool }}"
+    calendar: hourly
