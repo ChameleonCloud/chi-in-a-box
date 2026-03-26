@@ -7,6 +7,7 @@ audit_blazar_leases: false
 audit_blazar_reservations: "{{ audit_blazar_leases }}"
 audit_blazar_computehost_allocations: "{{ audit_blazar_leases }}"
 audit_blazar_computehost_reservations: "{{ audit_blazar_leases }}"
+audit_blazar_instance_reservations: "{{ audit_blazar_leases }}"
 
 audit_nova_compute_nodes: false
 audit_nova_services: "{{ audit_nova_compute_nodes }}"
@@ -166,6 +167,38 @@ audit_tables:
       - count_range
       - on_start
       - before_end
+  - name: blazar_instance_reservations
+    source_db: blazar
+    source_table: instance_reservations
+    grant_user: blazar
+    id_type: "VARCHAR(36)"
+    enabled: "{{ audit_blazar_instance_reservations }}"
+    columns:
+      - created_at
+      - updated_at
+      - deleted_at
+      - deleted
+      - id
+      - reservation_id
+      - vcpus
+      - memory_mb
+      - disk_gb
+      - amount
+      - affinity
+      - flavor_id
+      - aggregate_id
+      - server_group_id
+      - resource_properties
+    watch_columns:
+      - vcpus
+      - memory_mb
+      - disk_gb
+      - amount
+      - affinity
+      - flavor_id
+      - aggregate_id
+      - server_group_id
+      - resource_properties
   - name: nova_compute_nodes
     source_db: nova
     source_table: compute_nodes

@@ -58,3 +58,4 @@ usage_collector_mysql_grants:
   - openstack_audit.audit_blazar_reservations:SELECT
   - openstack_audit.audit_blazar_computehost_allocations:SELECT
   - openstack_audit.audit_blazar_computehost_reservations:SELECT
+  - openstack_audit.audit_blazar_instance_reservations:SELECT
