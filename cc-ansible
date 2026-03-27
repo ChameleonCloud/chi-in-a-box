@@ -86,9 +86,9 @@ install_deps() {
     --config-settings editable_mode=strict \
     -e src/kolla-ansible
 
-  # Update/install yq, adding it to the venv bin path
+  # Install yq into the venv bin path (cc-ansible calls $VIRTUALENV/bin/yq explicitly)
   YQ_VERSION=4.9.6
-  if [[ "$(type -t yq)" != "file" ]]; then
+  if [[ ! -x "$VIRTUALENV/bin/yq" ]]; then
     YQ_BINARY="yq_linux_amd64"
     wget https://github.com/mikefarah/yq/releases/download/v${YQ_VERSION}/${YQ_BINARY}.tar.gz -O - \
       | tar xz && mv ${YQ_BINARY} "$VIRTUALENV/bin/yq"
