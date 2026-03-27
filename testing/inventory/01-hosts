@@ -1,0 +1,18 @@
+# Test inventory: all roles on localhost, no SSH needed.
+[control]
+localhost ansible_connection=local
+
+[network]
+localhost ansible_connection=local
+
+[compute]
+localhost ansible_connection=local
+
+[monitoring]
+localhost ansible_connection=local
+
+[storage]
+localhost ansible_connection=local
+
+[deployment]
+localhost ansible_connection=local
