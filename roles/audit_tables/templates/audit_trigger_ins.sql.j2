@@ -1,0 +1,9 @@
+CREATE OR REPLACE TRIGGER {{ item.source_db }}.trg_{{ item.source_table }}_audit_ins
+AFTER INSERT ON {{ item.source_db }}.{{ item.source_table }} FOR EACH ROW
+BEGIN
+    INSERT INTO openstack_audit.audit_{{ item.name }}
+        (id, audit_event_type, audit_changed_by, data)
+    VALUES (NEW.id, 'INSERT', USER(), JSON_OBJECT(
+        {% for col in item.columns %}'{{ col }}', NEW.{{ col }}{{ ',' if not loop.last }}
+        {% endfor %}));
+END
