@@ -1,2 +1,3 @@
 pytest
+pytest-github-actions-annotate-failures
 pyyaml

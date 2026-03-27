@@ -25,7 +25,7 @@ jobs:
       - name: Install test dependencies
         run: pip install -r testing/requirements-test.txt
       - name: Run unit tests
-        run: pytest testing/unit/ -v
+        run: pytest testing/unit/ -v -rf --tb=short
 
   integration:
     name: Integration tests (genconfig)
@@ -42,9 +42,13 @@ jobs:
       - name: Install chi-in-a-box dependencies
         run: ./cc-ansible install_deps
       - name: Install test dependencies
-        run: pip install -r testing/requirements-test.txt
+        run: |
+          source venv/bin/activate
+          pip install -r testing/requirements-test.txt
       - name: Run integration tests
-        run: pytest testing/integration/ -v
+        run: |
+          source venv/bin/activate
+          pytest testing/integration/ -v -rf --tb=short
       - name: Upload rendered configs on failure
         if: failure()
         uses: actions/upload-artifact@v4
