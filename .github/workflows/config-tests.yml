@@ -1,0 +1,28 @@
+---
+name: Config tests
+
+on:
+  push:
+    branches:
+      - "stable/*"
+  pull_request:
+
+jobs:
+  unit:
+    name: Unit tests (merge logic, sync checks)
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - name: Install yq
+        run: |
+          wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/v4.9.6/yq_linux_amd64
+          chmod +x /usr/local/bin/yq
+      - name: Install test dependencies
+        run: pip install -r testing/requirements-test.txt
+      - name: Run unit tests
+        run: pytest testing/unit/ -v -rf --tb=short
