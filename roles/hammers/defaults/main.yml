@@ -15,13 +15,13 @@ hammers:
   conflict_macs:
     cmd: conflict-macs delete
     calendar: daily
-    enabled: "{{ enable_neutron | bool }}"
+    enabled: false
 
   # Compute/Nova
   undead_instances:
     cmd: undead-instances delete
     calendar: daily
-    enabled: "{{ enable_nova | bool }}"
+    enabled: false
 
   # Bare metal/Ironic
   dirty_ports:
@@ -35,27 +35,27 @@ hammers:
   enforce_node_retirement:
     cmd: "retirement-enforcer"
     calendar: daily
-    enabled: "{{ enable_ironic | bool }}"
+    enabled: false
 
   # Reservation/Blazar
   orphan_resource_providers:
     cmd: orphan-resource-providers update
     calendar: daily
-    enabled: "{{ enable_blazar | bool }}"
+    enabled: false
   reservation_usage_notification:
     cmd: "reservation-usage-notification"
     calendar: daily
-    enabled: "{{ enable_blazar | bool }}"
+    enabled: false
   orphans_detector:
     cmd: "orphans-detector"
     calendar: daily
-    enabled: "{{ enable_blazar | bool }}"
-  lease_stacking:
-    cmd: "lease-stack-notifier notify --config {{ hammers_config_path }}/lease-stacking-config.json"
-    calendar: daily
-    enabled: "{{ enable_blazar | bool }}"
+    enabled: false
   clean_old_aggregates:
     cmd: "clean-old-aggregates"
+    calendar: daily
+    enabled: false
+  lease_stacking:
+    cmd: "lease-stack-notifier notify --config {{ hammers_config_path }}/lease-stacking-config.json"
     calendar: daily
     enabled: "{{ enable_blazar | bool }}"
   unutilized_leases:
