@@ -27,11 +27,11 @@ hammers:
   dirty_ports:
     cmd: dirty-ports clean --multiport
     calendar: daily
-    enabled: "{{ enable_ironic | bool }}"
+    enabled: "{{ hammers_enable_dirty_ports | bool }}"
   ironic_error_resetter:
     cmd: ironic-error-resetter reset
     calendar: hourly
-    enabled: "{{ enable_ironic | bool }}"
+    enabled: "{{ hammers_enable_ironic_error_resetter | bool }}"
   enforce_node_retirement:
     cmd: "retirement-enforcer"
     calendar: daily
@@ -57,17 +57,17 @@ hammers:
   lease_stacking:
     cmd: "lease-stack-notifier notify --config {{ hammers_config_path }}/lease-stacking-config.json"
     calendar: daily
-    enabled: "{{ enable_blazar | bool }}"
+    enabled: "{{ hammers_enable_lease_stacking | bool }}"
   unutilized_leases:
     cmd: "unutilized-lease-reaper delete"
     calendar: hourly
-    enabled: "{{ enable_blazar | bool }}"
+    enabled: "{{ hammers_enable_unutilized_leases_baremetal | bool }}"
 
   # Kubernetes/Edge
   calico_ip_cleanup:
     cmd: "k8s-calico-ip-cleanup --kubeconfig_path {{ hammers_kubeconfig_path }}"
     calendar: daily
-    enabled: "{{ enable_k3s | bool}}"
+    enabled: "{{ hammers_enable_calico_ip_cleanup | bool}}"
 
 hammers_slack_webhook: "{{ slack_api_url }}"
 
@@ -78,5 +78,5 @@ hammers_v2:
     env_file: "{{ hammers_env_file }}"
     image: "{{ hammers_v2_docker_image }}"
     cmd: floating_ip_network_reaper --cloud envvars --grace-days 7  --clean-floatingips --clean-routers
-    enabled: "{{ enable_neutron | bool }}"
+    enabled: "{{ hammers_enable_floating_ip_network_reaper | bool }}"
     calendar: daily
