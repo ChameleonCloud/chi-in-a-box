@@ -61,6 +61,7 @@ doni_balena_fleet_mapping:
   - 'raspberrypi5-64:chi-edge-workers'
   - 'jetson-nano:chi-edge-workers'
   - 'jetson-xavier-nx-emmc:chi-edge-workers'
+  - 'jetson-orin-nano-devkit-nvme:chi-edge-workers'
 
   
 k3s_port: 6443
