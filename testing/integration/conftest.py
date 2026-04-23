@@ -63,28 +63,32 @@ def _build_site_config(tmp_path, overrides, extra_files=None):
     pw_file = site_dir / "passwords.yml"
     subprocess.run(
         ["kolla-genpwd", "-p", str(pw_file)],
-        check=True, capture_output=True,
+        check=True,
     )
     (site_dir / "vault_password").write_text("dummy")
 
     return site_dir
 
 
-def run_genconfig(tmp_path, overrides, extra_files=None):
+def run_genconfig(tmp_path, overrides, extra_files=None, preserve_as=None):
     site_dir = _build_site_config(tmp_path, overrides, extra_files)
     output_dir = tmp_path / "output"
     output_dir.mkdir()
 
     env = {**os.environ, "CC_ANSIBLE_SITE": str(site_dir)}
-    result = subprocess.run(
+    subprocess.run(
         [str(CIAB_DIR / "cc-ansible"), "genconfig",
          "--extra", f"node_config_directory={output_dir}"],
-        env=env, capture_output=True, text=True,
+        env=env, text=True, check=True,
+        cwd=str(CIAB_DIR),  # cc-ansible reads ./kolla-skip-tags relative to CWD.
     )
-    if result.returncode != 0:
-        raise RuntimeError(
-            f"genconfig failed:\nSTDOUT:\n{result.stdout}\nSTDERR:\n{result.stderr}"
-        )
+
+    if preserve_as:
+        preserved = CIAB_DIR / "testing" / "output" / preserve_as
+        if preserved.exists():
+            shutil.rmtree(preserved)
+        preserved.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copytree(output_dir, preserved)
 
     return GenconfigResult(output_dir)
 
@@ -147,16 +151,23 @@ def install_deps():
 
 @pytest.fixture(scope="session")
 def minimal_config(install_deps, tmp_path_factory):
-    return run_genconfig(tmp_path_factory.mktemp("minimal"), MINIMAL_VARS)
+    return run_genconfig(
+        tmp_path_factory.mktemp("minimal"), MINIMAL_VARS,
+        preserve_as="minimal",
+    )
 
 
 @pytest.fixture(scope="session")
 def kvm_config(install_deps, tmp_path_factory):
-    return run_genconfig(tmp_path_factory.mktemp("kvm"), KVM_VARS)
+    return run_genconfig(
+        tmp_path_factory.mktemp("kvm"), KVM_VARS,
+        preserve_as="kvm",
+    )
 
 
 @pytest.fixture(scope="session")
 def kvm_gpu_config(install_deps, tmp_path_factory):
     return run_genconfig(
         tmp_path_factory.mktemp("kvm-gpu"), KVM_GPU_VARS, KVM_GPU_EXTRA_FILES,
+        preserve_as="kvm-gpu",
     )
