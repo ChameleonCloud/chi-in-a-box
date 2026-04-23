@@ -1,0 +1,7 @@
+---
+# Baremetal (Ironic) deployment profile: mirrors the shape of CHI@UC,
+# CHI@TACC, and similar sites. Placeholder — populate from a real
+# site-config before relying on output for production-regression
+# decisions.
+openstack_region_name: TestBaremetal
+enable_ironic: true

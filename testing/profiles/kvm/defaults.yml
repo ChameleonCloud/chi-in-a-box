@@ -1,0 +1,14 @@
+---
+# KVM deployment profile: mirrors the shape of KVM@TACC and similar
+# sites. Values here are placeholders chosen to distinguish a kvm
+# render from a baremetal render; populate from a real site-config
+# before relying on output for production-regression decisions.
+openstack_region_name: TestKVM
+enable_ironic: false
+nova_compute_virt_type: kvm
+blazar_enable_flavor_reservation: true
+blazar_flavor_reservation_trait: CUSTOM_TEST_TRAIT
+blazar_enable_host_reservation: false
+enable_blazar_allocation_enforcement: true
+blazar_filter_vm_hosts: true
+blazar_filter_ironic_hosts: true
