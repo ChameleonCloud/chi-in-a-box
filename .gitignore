@@ -23,6 +23,9 @@ vagrant/vagrantkey*
 # Python build files
 *.pyc
 __pycache__/
+.pytest_cache/
+# Testing venvs
+testing/.venv/
 galaxy.ansible.com/**
 
 roles/ansible_collections
