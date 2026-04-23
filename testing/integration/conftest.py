@@ -1,4 +1,14 @@
-"""Fixtures for integration tests. Requires cc-ansible install_deps."""
+"""Fixtures for integration tests. Requires cc-ansible install_deps.
+
+Each profile is a directory under testing/profiles/. A site-config is
+assembled by copying site-config.example, overlaying _base/ inventory,
+then the named profile. defaults.yml files are deep-merged via the same
+yq expression cc-ansible uses at deploy time, so test merge semantics
+match prod.
+
+To add a profile: create testing/profiles/<name>/defaults.yml and add
+<name> to PROFILES below.
+"""
 
 import configparser
 import os
@@ -8,8 +18,11 @@ import yaml
 import pytest
 from pathlib import Path
 
-# Derived here rather than imported — conftest files aren't importable as modules.
+# conftest.py files aren't importable modules — derive paths inline.
 CIAB_DIR = Path(__file__).resolve().parents[2]
+PROFILES_DIR = CIAB_DIR / "testing" / "profiles"
+
+PROFILES = ["baremetal", "kvm"]
 
 
 class GenconfigResult:
@@ -32,37 +45,55 @@ class GenconfigResult:
         return [d.name for d in self.output_dir.iterdir() if d.is_dir()]
 
 
-def _build_site_config(tmp_path, overrides, extra_files=None):
+def _merge_defaults(files):
+    """Deep-merge YAML files. Same yq expression cc-ansible uses at deploy
+    time to merge kolla/defaults.yml + site/defaults.yml into globals.yml,
+    so test merge semantics can't silently diverge from prod.
+    """
+    if not files:
+        return {}
+    result = subprocess.run(
+        ["yq", "eval-all", ". as $item ireduce ({}; . * $item)",
+         *[str(f) for f in files]],
+        capture_output=True, text=True, check=True,
+    )
+    return yaml.safe_load(result.stdout) or {}
+
+
+def _build_site_config(tmp_path, profile):
     site_dir = tmp_path / "site-config"
     shutil.copytree(CIAB_DIR / "site-config.example", site_dir)
 
-    (site_dir / "defaults.yml").write_text(yaml.dump(overrides))
-
-    # Safety: only modify files inside the pytest tmpdir
     assert str(site_dir).startswith(str(tmp_path)), \
         f"Refusing to modify {site_dir} outside tmpdir {tmp_path}"
 
-    # Replace example inventory with test inventory (localhost, no SSH)
+    # Overlay inventory: _base/ (synthetic localhost, connection=local)
+    # then profile-specific overrides if any. Profile inventory dirs are
+    # optional — _base is the only one we ship today.
     inv_dir = site_dir / "inventory"
     (inv_dir / "hosts").unlink(missing_ok=True)
-    test_inv = CIAB_DIR / "testing" / "inventory"
-    for f in test_inv.iterdir():
-        if f.is_dir():
-            shutil.copytree(f, inv_dir / f.name, dirs_exist_ok=True)
-        else:
-            shutil.copy(f, inv_dir / f.name)
+    for layer in ["_base", profile]:
+        src = PROFILES_DIR / layer / "inventory"
+        if not src.exists():
+            continue
+        for f in src.rglob("*"):
+            if f.is_file():
+                out = inv_dir / f.relative_to(src)
+                out.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy(f, out)
 
-    for rel_path, content in (extra_files or {}).items():
-        dest = site_dir / rel_path
-        dest.parent.mkdir(parents=True, exist_ok=True)
-        if isinstance(content, str):
-            dest.write_text(content)
-        else:
-            dest.write_text(yaml.dump(content))
+    # Deep-merge _base + profile defaults in overlay order.
+    defaults_files = [
+        PROFILES_DIR / layer / "defaults.yml"
+        for layer in ["_base", profile]
+        if (PROFILES_DIR / layer / "defaults.yml").exists()
+    ]
+    (site_dir / "defaults.yml").write_text(
+        yaml.dump(_merge_defaults(defaults_files))
+    )
 
-    pw_file = site_dir / "passwords.yml"
     subprocess.run(
-        ["kolla-genpwd", "-p", str(pw_file)],
+        ["kolla-genpwd", "-p", str(site_dir / "passwords.yml")],
         check=True,
     )
     (site_dir / "vault_password").write_text("dummy")
@@ -70,8 +101,8 @@ def _build_site_config(tmp_path, overrides, extra_files=None):
     return site_dir
 
 
-def run_genconfig(tmp_path, overrides, extra_files=None, preserve_as=None):
-    site_dir = _build_site_config(tmp_path, overrides, extra_files)
+def run_genconfig(tmp_path, profile, preserve_as=None):
+    site_dir = _build_site_config(tmp_path, profile)
     output_dir = tmp_path / "output"
     output_dir.mkdir()
 
@@ -93,52 +124,6 @@ def run_genconfig(tmp_path, overrides, extra_files=None, preserve_as=None):
     return GenconfigResult(output_dir)
 
 
-# --- Profile variable sets ---
-
-MINIMAL_VARS = {
-    "kolla_internal_vip_address": "172.18.200.254",
-    "kolla_external_vip_address": "172.18.200.254",
-    "network_interface": "eth0",
-    "neutron_external_interface": "eth1",
-    "kolla_base_distro": "ubuntu",
-    # Override the default /etc/ansible/venv/bin/python which is created by
-    # bootstrap-servers on real hosts. In test we just use system python3.
-    "ansible_python_interpreter": "python3",
-}
-
-KVM_VARS = {
-    **MINIMAL_VARS,
-    "openstack_region_name": "TestKVM",
-    "enable_ironic": False,
-    "nova_compute_virt_type": "kvm",
-    "blazar_enable_flavor_reservation": True,
-    "blazar_flavor_reservation_trait": "CUSTOM_TEST_TRAIT",
-    "blazar_enable_host_reservation": False,
-    "enable_blazar_allocation_enforcement": True,
-    "blazar_filter_vm_hosts": True,
-    "blazar_filter_ironic_hosts": True,
-}
-
-KVM_GPU_VARS = {**KVM_VARS}
-
-KVM_GPU_EXTRA_FILES = {
-    "inventory/host_vars/localhost.yml": yaml.dump({
-        "gpu": True,
-        "node_reserved_memory_mb": 65536,
-        "nova_pci_device_spec": [
-            {"vendor_id": "10de", "product_id": "2339",
-             "traits": "CUSTOM_GPU_H100,CUSTOM_GPU"},
-        ],
-        "nova_pci_alias": [
-            {"name": "h100", "vendor_id": "10de",
-             "product_id": "2339", "device_type": "type-PF"},
-        ],
-    }),
-}
-
-
-# --- Fixtures ---
-
 @pytest.fixture(scope="session")
 def install_deps():
     venv = CIAB_DIR / "venv"
@@ -149,25 +134,13 @@ def install_deps():
         )
 
 
-@pytest.fixture(scope="session")
-def minimal_config(install_deps, tmp_path_factory):
-    return run_genconfig(
-        tmp_path_factory.mktemp("minimal"), MINIMAL_VARS,
-        preserve_as="minimal",
-    )
+@pytest.fixture(scope="session", params=PROFILES)
+def profile(request):
+    return request.param
 
 
 @pytest.fixture(scope="session")
-def kvm_config(install_deps, tmp_path_factory):
+def profile_config(install_deps, profile, tmp_path_factory):
     return run_genconfig(
-        tmp_path_factory.mktemp("kvm"), KVM_VARS,
-        preserve_as="kvm",
-    )
-
-
-@pytest.fixture(scope="session")
-def kvm_gpu_config(install_deps, tmp_path_factory):
-    return run_genconfig(
-        tmp_path_factory.mktemp("kvm-gpu"), KVM_GPU_VARS, KVM_GPU_EXTRA_FILES,
-        preserve_as="kvm-gpu",
+        tmp_path_factory.mktemp(profile), profile, preserve_as=profile,
     )
