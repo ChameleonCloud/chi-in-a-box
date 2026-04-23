@@ -1,0 +1,33 @@
+---
+name: Config tests
+
+on:
+  push:
+    branches:
+      - "stable/*"
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  unit:
+    name: Unit tests (containerized)
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Build test image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile
+          load: true
+          tags: ciab:test
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Run unit tests
+        run: docker run --rm ciab:test pytest testing/unit/
