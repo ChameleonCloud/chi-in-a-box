@@ -36,3 +36,6 @@ vagrant/vagrantkey*
 *.pyc
 **/__pycache__/
 .pytest_cache/
+
+# Rendered genconfig output preserved by integration fixtures for manual review
+testing/output/
