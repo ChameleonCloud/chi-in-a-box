@@ -1,0 +1,4 @@
+# Populate [compute] with localhost so compute-side templates are exercised.
+# (nova-compute.conf, neutron-openvswitch-agent, ...)
+[compute]
+localhost ansible_connection=local

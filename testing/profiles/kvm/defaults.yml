@@ -1,0 +1,36 @@
+---
+# KVM profile fragment. Feature flags that distinguish a KVM site from
+# baremetal, plus blazar flavor reservation and nova PCI passthrough
+# config. Layered on top of _base/defaults.yml by the test harness.
+
+openstack_region_name: TestKVM
+
+enable_ironic: false
+
+#########################################
+# Blazar: flavor-based (VM) reservations.
+#########################################
+blazar_enable_flavor_reservation: true
+blazar_flavor_reservation_trait: CUSTOM_TEST_TRAIT
+
+blazar_enable_host_reservation: false
+
+enable_blazar_allocation_enforcement: true
+
+blazar_filter_vm_hosts: true
+blazar_filter_ironic_hosts: true
+
+######################################
+# Nova: PCI passthrough for GPU hosts.
+######################################
+gpu: true
+node_reserved_memory_mb: 65536
+nova_pci_device_spec:
+  - vendor_id: "10de"
+    product_id: "2339"
+    traits: "CUSTOM_GPU_H100,CUSTOM_GPU"
+nova_pci_alias:
+  - name: h100
+    vendor_id: "10de"
+    product_id: "2339"
+    device_type: "type-PF"
