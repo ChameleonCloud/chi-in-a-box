@@ -9,8 +9,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  unit:
-    name: Unit tests (containerized)
+  tests:
+    name: Config tests (containerized)
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
@@ -31,3 +31,19 @@ jobs:
 
       - name: Run unit tests
         run: docker run --rm ciab:test pytest testing/unit/
+
+      - name: Run integration tests
+        run: |
+          mkdir -p "${{ runner.temp }}/genconfig-output"
+          docker run --rm \
+            -e CIAB_PRESERVED_OUTPUT=/preserved \
+            -v "${{ runner.temp }}/genconfig-output:/preserved" \
+            ciab:test pytest testing/integration/
+
+      - name: Upload rendered genconfig
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: genconfig-output
+          path: ${{ runner.temp }}/genconfig-output/
+          retention-days: 14

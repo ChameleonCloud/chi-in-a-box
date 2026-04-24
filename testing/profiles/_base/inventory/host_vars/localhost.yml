@@ -1,0 +1,30 @@
+---
+# Fake ansible_facts so genconfig can render without a real host:
+#   - kolla_address (kolla-ansible filter plugin) reads ansible_<iface>.ipv4
+#     to produce listen addresses for services (api_interface, etc.).
+#   - service role tasks gate on ansible_os_family / ansible_distribution.
+#   - ansible_default_ipv4 is referenced by several templates as a fallback.
+# If a kolla-ansible bump starts reading a new fact, extend this file to
+# match. The integration test failure signal for that is a render error
+# or a missing-attribute traceback from kolla_address.
+ansible_facts:
+  ansible_os_family: Debian
+  ansible_distribution: Ubuntu
+  ansible_distribution_version: "22.04"
+  ansible_architecture: x86_64
+  ansible_eth0:
+    active: true
+    device: eth0
+    ipv4:
+      address: 172.18.200.1
+      netmask: 255.255.255.0
+    type: ether
+  ansible_eth1:
+    active: true
+    device: eth1
+    type: ether
+  ansible_default_ipv4:
+    address: 172.18.200.1
+    interface: eth0
+  ansible_hostname: localhost
+  ansible_fqdn: localhost

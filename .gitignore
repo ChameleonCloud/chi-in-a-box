@@ -29,3 +29,6 @@ testing/.venv/
 galaxy.ansible.com/**
 
 roles/ansible_collections
+
+# Rendered genconfig output preserved by integration fixtures for manual review
+testing/output/
