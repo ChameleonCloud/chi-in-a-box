@@ -1,16 +1,11 @@
-"""Fixtures for genconfig integration tests.
+"""Integration tests for cc-ansible genconfig.
 
-Builds a site-config from site-config.example plus a test profile
-(inventory + host_vars overlays, defaults merged via the same yq
-expression cc-ansible uses at deploy time), then runs `cc-ansible
-genconfig` end-to-end. A failure here means rendered service config
-would break on a real host.
-
-No profile parametrization yet — a single synthetic _base profile is
-enough to prove the pipeline works. A profile matrix (baremetal/kvm)
-is a later PR.
+The harness assembles a site-config from site-config.example plus one
+or more profile fragments under testing/profiles/, then runs
+`cc-ansible genconfig` and exposes the result to tests.
 """
 
+import configparser
 import os
 import shutil
 import subprocess
@@ -19,8 +14,36 @@ from pathlib import Path
 import pytest
 import yaml
 
+# Repo root, the directory holding all profile fragments, and the
+# shared base fragment every profile layers on top of.
 CIAB_DIR = Path(__file__).resolve().parents[2]
-BASE_PROFILE_DIR = CIAB_DIR / "testing" / "profiles" / "_base"
+PROFILES_DIR = CIAB_DIR / "testing" / "profiles"
+BASE_PROFILE_DIR = PROFILES_DIR / "_base"
+
+
+class GenconfigResult:
+    """Read helpers for a rendered genconfig output directory."""
+
+    def __init__(self, output_dir: Path):
+        self.output_dir = output_dir
+
+    def ini(self, service, filename="") -> configparser.ConfigParser:
+        """Return a parsed ConfigParser for a rendered .conf file.
+        filename defaults to the service's base name + .conf
+        (e.g. 'blazar-manager' -> 'blazar.conf')."""
+        if not filename:
+            filename = service.split("-")[0] + ".conf"
+        conf = configparser.ConfigParser(strict=False, allow_no_value=True)
+        conf.read(self.output_dir / service / filename)
+        return conf
+
+    def text(self, service, filename) -> str:
+        """Read a rendered file under <service>/<filename> as raw text."""
+        return (self.output_dir / service / filename).read_text()
+
+    def services(self) -> list:
+        """List the service directories genconfig rendered."""
+        return [d.name for d in self.output_dir.iterdir() if d.is_dir()]
 
 
 def _merge_yaml(files):
@@ -36,29 +59,35 @@ def _merge_yaml(files):
     return yaml.safe_load(result.stdout) or {}
 
 
-def _build_site_config(dest, profile_dir):
+def _build_site_config(dest, profile_dirs):
+    """Assemble a site-config at `dest` from base and profiles.
+
+    Follows cc-ansible init flow, taking site-config.example and
+    overlaying fragments from _base and a given profile.
+    Uses ansible to merge inventory files, and `yq` for
+    defaults.yml, following how cc-ansible does it.
+    """
     shutil.copytree(CIAB_DIR / "site-config.example", dest)
 
-    # Substitute <host> -> localhost in the example inventory. [compute]
-    # is left empty, matching site-config.example; compute-side templates
-    # (nova-compute.conf etc.) will be exercised by profiles that populate
-    # [compute] with real hosts (e.g. the kvm profile).
+    # Substitute <host> with localhost in the example inventory.
     hosts = dest / "inventory" / "hosts"
     hosts.write_text(
         hosts.read_text().replace("<host>", "localhost ansible_connection=local")
     )
 
-    # Overlay profile inventory and host_vars. shutil.copytree with
-    # dirs_exist_ok replaces files at matching paths. Real site profiles
-    # (kvm, baremetal) ship pre-expanded inventory that fully replaces
-    # site-config.example's hosts; _base ships only host_vars overlays.
-    profile_inv = profile_dir / "inventory"
-    if profile_inv.exists():
-        shutil.copytree(profile_inv, dest / "inventory", dirs_exist_ok=True)
+    # Overlay each profile's inventory/ on top. Ansible reads inventory
+    # directories, so new files add and matching paths replace.
+    for profile_dir in profile_dirs:
+        profile_inv = profile_dir / "inventory"
+        if profile_inv.exists():
+            shutil.copytree(profile_inv, dest / "inventory", dirs_exist_ok=True)
 
-    (dest / "defaults.yml").write_text(
-        yaml.dump(_merge_yaml([profile_dir / "defaults.yml"]))
-    )
+    # Deep-merge defaults.yml layers in order (later overrides earlier).
+    defaults_files = [
+        p / "defaults.yml" for p in profile_dirs
+        if (p / "defaults.yml").exists()
+    ]
+    (dest / "defaults.yml").write_text(yaml.dump(_merge_yaml(defaults_files)))
 
     subprocess.run(
         ["kolla-genpwd", "-p", str(dest / "passwords.yml")],
@@ -67,30 +96,12 @@ def _build_site_config(dest, profile_dir):
     (dest / "vault_password").write_text("dummy")
 
 
-@pytest.fixture(scope="session")
-def install_deps():
-    if not (CIAB_DIR / "venv" / "bin" / "kolla-ansible").exists():
-        subprocess.run(
-            [str(CIAB_DIR / "cc-ansible"), "install_deps"],
-            check=True,
-        )
-
-
-@pytest.fixture(scope="session")
-def genconfig_output(install_deps, tmp_path_factory):
-    """Run genconfig once per session against the _base profile and return
-    the output directory.
-
-    A copy is preserved at $CIAB_PRESERVED_OUTPUT/_base/ (default:
-    testing/output/_base/) so the most recent render is always available
-    as a reference snapshot — useful both for debugging a failed test and
-    as an example of what default-templated config looks like."""
-    workdir = tmp_path_factory.mktemp("_base")
-    site_dir = workdir / "site-config"
-    output_dir = workdir / "output"
+def _run_genconfig(tmp_path, profile_dirs, preserve_name):
+    site_dir = tmp_path / "site-config"
+    output_dir = tmp_path / "output"
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    _build_site_config(site_dir, BASE_PROFILE_DIR)
+    _build_site_config(site_dir, profile_dirs)
 
     env = {**os.environ, "CC_ANSIBLE_SITE": str(site_dir)}
     subprocess.run(
@@ -102,10 +113,30 @@ def genconfig_output(install_deps, tmp_path_factory):
     preserve_root = Path(
         os.environ.get("CIAB_PRESERVED_OUTPUT", CIAB_DIR / "testing" / "output")
     )
-    preserved = preserve_root / "_base"
+    preserved = preserve_root / preserve_name
     if preserved.exists():
         shutil.rmtree(preserved)
     preserved.parent.mkdir(parents=True, exist_ok=True)
     shutil.copytree(output_dir, preserved)
 
-    return output_dir
+    return GenconfigResult(output_dir)
+
+@pytest.fixture(scope="session")
+def minimal_config(tmp_path_factory):
+    """Assembled site-config with the _base fragment only. Proves
+    site-config.example renders end-to-end."""
+    return _run_genconfig(
+        tmp_path_factory.mktemp("minimal"),
+        [BASE_PROFILE_DIR],
+        preserve_name="minimal",
+    )
+
+
+@pytest.fixture(scope="session")
+def kvm_config(tmp_path_factory):
+    """Assembled site-config with _base + kvm fragments."""
+    return _run_genconfig(
+        tmp_path_factory.mktemp("kvm"),
+        [BASE_PROFILE_DIR, PROFILES_DIR / "kvm"],
+        preserve_name="kvm",
+    )
