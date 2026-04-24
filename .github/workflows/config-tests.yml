@@ -40,6 +40,12 @@ jobs:
             -v "${{ runner.temp }}/genconfig-output:/preserved" \
             ciab:test pytest testing/integration/
 
+      # Container runs as root; bind-mounted output files end up
+      # root-owned and the runner user can't read them to upload.
+      - name: Fix artifact ownership
+        if: always()
+        run: sudo chown -R runner:runner "${{ runner.temp }}/genconfig-output"
+
       - name: Upload rendered genconfig
         if: always()
         uses: actions/upload-artifact@v4
