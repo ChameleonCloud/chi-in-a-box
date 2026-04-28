@@ -12,3 +12,29 @@ default_sharednet_cidr: 10.0.0.1/24
 
 # Default to using the external VIP interface for NAT
 corsa_nat_external_interface: "{{ kolla_external_vip_interface }}"
+
+##############################################################################
+# Edge networks: tunelo-calico (wireguard IPAM) + caliconet (container IPs)
+##############################################################################
+
+# tunelo-calico is a "shadow" neutron network used by tunelo as IPAM for
+# wireguard tunnel endpoints. tunelo creates the hub port itself at startup;
+# ansible only owns the network and subnet.
+tunelo_calico_network_name: tunelo-calico
+tunelo_calico_subnet_name: tunelo-calico-subnet
+tunelo_calico_subnet_cidr: 10.0.3.0/24
+# DHCP is off because tunelo only needs neutron for IPAM.
+# Leaving DHCP on causes the DHCP agent to claim the first allocatable IP, 
+# which collides with the hub port.
+tunelo_calico_subnet_enable_dhcp: false
+
+# caliconet routes container (calico pod) IPs through neutron so they can be
+# associated with floating IPs on the public network. No subnet is created
+# unless caliconet_subnet_cidr is set in site config.
+caliconet_network_name: caliconet
+caliconet_subnet_name: caliconet-subnet
+# caliconet_subnet_cidr: ""
+
+# Admin router: caliconet-subnet attached as internal interface, public as
+# external gateway. Required for floating-ip connectivity to k8s pods.
+admin_router_name: admin-router

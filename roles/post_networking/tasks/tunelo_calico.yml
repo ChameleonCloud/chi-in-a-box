@@ -1,0 +1,38 @@
+---
+# Creates the tunelo-calico shadow network and subnet. Tunelo uses this network
+# purely for IPAM; the wireguard agent plugs port IPs onto wg-<port_id>
+# interfaces in the root netns (assumes
+# neutron_wireguard_create_hub_in_root_netns: True).
+#
+# Tunelo bootstraps the hub port itself at API startup
+# (see bootstrap_default_hub in tunelo/api/channels.py). DHCP must stay off on
+# this subnet, or the DHCP agent grabs the first allocatable IP and collides
+# with the desired hub IP.
+
+- name: Create tunelo-calico network
+  kolla_toolbox:
+    module_name: os_network
+    module_args:
+      auth: "{{ openstack_auth }}"
+      project: "{{ keystone_admin_project }}"
+      name: "{{ tunelo_calico_network_name }}"
+      provider_network_type: local
+      shared: false
+      external: false
+      state: present
+  become: true
+  run_once: true
+
+- name: Create tunelo-calico subnet
+  kolla_toolbox:
+    module_name: os_subnet
+    module_args:
+      auth: "{{ openstack_auth }}"
+      project: "{{ keystone_admin_project }}"
+      network_name: "{{ tunelo_calico_network_name }}"
+      name: "{{ tunelo_calico_subnet_name }}"
+      cidr: "{{ tunelo_calico_subnet_cidr }}"
+      enable_dhcp: "{{ tunelo_calico_subnet_enable_dhcp }}"
+      state: present
+  become: true
+  run_once: true

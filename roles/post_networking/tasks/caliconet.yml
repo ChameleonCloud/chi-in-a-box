@@ -1,0 +1,33 @@
+---
+# Creates the caliconet network and subnet. caliconet routes container (calico
+# pod) IPs through neutron so they can be associated with floating IPs on the
+# public network. Operator must supply caliconet_subnet_cidr; this whole file
+# is skipped when unset (see main.yml).
+
+- name: Create caliconet network
+  kolla_toolbox:
+    module_name: os_network
+    module_args:
+      auth: "{{ openstack_auth }}"
+      project: "{{ keystone_admin_project }}"
+      name: "{{ caliconet_network_name }}"
+      provider_network_type: local
+      shared: false
+      external: false
+      state: present
+  become: true
+  run_once: true
+
+- name: Create caliconet subnet
+  kolla_toolbox:
+    module_name: os_subnet
+    module_args:
+      auth: "{{ openstack_auth }}"
+      project: "{{ keystone_admin_project }}"
+      network_name: "{{ caliconet_network_name }}"
+      name: "{{ caliconet_subnet_name }}"
+      cidr: "{{ caliconet_subnet_cidr }}"
+      enable_dhcp: false
+      state: present
+  become: true
+  run_once: true

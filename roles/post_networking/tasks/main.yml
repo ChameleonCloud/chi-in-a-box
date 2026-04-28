@@ -5,3 +5,16 @@
   include_tasks: sharednet.yml
 - name: configure corsa nat interface
   include_tasks: corsa_nat.yml
+- name: configure tunelo-calico shadow network
+  include_tasks: tunelo_calico.yml
+  when: enable_neutron_wireguard | default(false) | bool
+- name: configure caliconet network for k8s pods
+  include_tasks: caliconet.yml
+  when: caliconet_subnet_cidr | default('') | length > 0
+- name: configure admin router (caliconet internal, public external gateway)
+  include_tasks: admin_router.yml
+  when:
+    - caliconet_subnet_cidr | default('') | length > 0
+    - public_network is defined
+    - public_network is mapping
+    - public_network.name is defined
