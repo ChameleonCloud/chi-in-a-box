@@ -92,6 +92,17 @@ enable_cinder: no
 
 # Doni
 enable_doni: yes
+default_balena_fleet: "chi-edge-workers"
+doni_balena_fleet_mapping:
+  - "raspberrypi3-64:{{ default_balena_fleet }}"
+  - "raspberrypi4-64:{{ default_balena_fleet }}"
+  - "raspberrypi5:{{ default_balena_fleet }}"
+  - "jetson-nano:{{ default_balena_fleet }}"
+  - "jetson-xavier-nx-emmc:{{ default_balena_fleet }}"
+  - "jetson-orin-nano-devkit-nvme:{{ default_balena_fleet }}"
+  - "jetson-agx-orin-devkit:{{ default_balena_fleet }}"
+  - "jetson-agx-orin-devkit-64gb:{{ default_balena_fleet }}"
+  - "coral-dev:chi-edge-coral"
 
 # Glance
 enable_glance: yes
