@@ -30,6 +30,8 @@ usage_collector_mysql_grants:
   - nova_api.request_specs:SELECT
   - blazar.computehosts:SELECT
   - blazar.computehost_allocations:SELECT
+  - blazar.computehost_extra_capabilities:SELECT
+  - blazar.computehost_reservations:SELECT
   - blazar.reservations:SELECT
   - blazar.instance_reservations:SELECT
   - blazar.leases:SELECT
@@ -37,6 +39,10 @@ usage_collector_mysql_grants:
   - blazar.device_allocations:SELECT
   - blazar.device_extra_capabilities:SELECT
   - blazar.device_reservations:SELECT
+  - blazar.resource_properties:SELECT
+  - keystone.user:SELECT
+  - keystone.federated_user:SELECT
+  - keystone.project:SELECT
   - zun.container:SELECT
   - zun.container_actions:SELECT
   - zun.container_actions_events:SELECT
