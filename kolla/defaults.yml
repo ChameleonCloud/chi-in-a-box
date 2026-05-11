@@ -112,6 +112,12 @@ glance_allow_anonymous_access: no
 glance_enable_property_protection: true
 
 # Hammers
+hammers_enable_dirty_ports: "{{ enable_ironic | bool }}"
+hammers_enable_ironic_error_resetter: "{{ enable_ironic | bool }}"
+hammers_enable_lease_stacking: "{{ enable_blazar | bool }}"
+hammers_enable_unutilized_leases_baremetal: "{{ enable_blazar | bool }}"
+hammers_enable_calico_ip_cleanup: "{{ enable_k3s | bool }}"
+hammers_enable_floating_ip_network_reaper: "{{ enable_neutron | bool }}"
 hammers_openstack_user: "{{ keystone_admin_user }}"
 hammers_openstack_password: "{{ keystone_admin_password }}"
 hammers_openstack_project_name: "{{ keystone_admin_project }}"
