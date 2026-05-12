@@ -155,6 +155,14 @@ horizon_regions:
     blazar_database_user: "{{ blazar_database_user }}"
     blazar_database_password: "{{ blazar_database_password }}"
 
+# Register the chameleon Horizon theme so kolla-ansible copies it into
+# the container and adds it to AVAILABLE_THEMES. The theme name/label
+# here must match the entry referenced in
+# kolla/node_custom_config/horizon/custom_local_settings.
+horizon_custom_themes:
+  - name: chameleoncloud
+    label: ChameleonCloud
+
 # Keystone IdP federation
 identity_provider_key: "{{ 'EABNO4wxhX0ZOryErTXnWPUkCAcWxTFHwZ6f_zjDHLg' if keycloak_hostname == 'auth.dev.chameleoncloud.org' else '02GplnOEWB4gwqrZDyyiaNdIrhgdinNnObXcPHy2RTo' }}"
 identity_provider_url: "{{ keycloak_url }}/auth/realms/{{ keycloak_realm_name }}"
