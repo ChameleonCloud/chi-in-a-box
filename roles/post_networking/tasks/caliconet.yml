@@ -12,7 +12,7 @@
       project: "{{ keystone_admin_project }}"
       name: "{{ caliconet_network_name }}"
       provider_network_type: local
-      shared: false
+      shared: true
       external: false
       state: present
   become: true
