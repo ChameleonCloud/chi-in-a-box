@@ -102,7 +102,7 @@ doni_balena_fleet_mapping:
   - "jetson-orin-nano-devkit-nvme:{{ default_balena_fleet }}"
   - "jetson-agx-orin-devkit:{{ default_balena_fleet }}"
   - "jetson-agx-orin-devkit-64gb:{{ default_balena_fleet }}"
-  - "coral-dev:chi-edge-coral"
+  - "coral-dev:{{ default_balena_fleet }}"
 
 # Glance
 enable_glance: yes
