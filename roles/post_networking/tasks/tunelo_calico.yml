@@ -14,7 +14,7 @@
     module_name: os_network
     module_args:
       auth: "{{ openstack_auth }}"
-      project: "{{ keystone_admin_project }}"
+      project: "service"
       name: "{{ tunelo_calico_network_name }}"
       provider_network_type: local
       shared: false
@@ -28,7 +28,7 @@
     module_name: os_subnet
     module_args:
       auth: "{{ openstack_auth }}"
-      project: "{{ keystone_admin_project }}"
+      project: "service"
       network_name: "{{ tunelo_calico_network_name }}"
       name: "{{ tunelo_calico_subnet_name }}"
       cidr: "{{ tunelo_calico_subnet_cidr }}"
