@@ -23,10 +23,6 @@ corsa_nat_external_interface: "{{ kolla_external_vip_interface }}"
 tunelo_calico_network_name: tunelo-calico
 tunelo_calico_subnet_name: tunelo-calico-subnet
 tunelo_calico_subnet_cidr: 10.0.3.0/24
-# DHCP is off because tunelo only needs neutron for IPAM.
-# Leaving DHCP on causes the DHCP agent to claim the first allocatable IP, 
-# which collides with the hub port.
-tunelo_calico_subnet_enable_dhcp: false
 
 # caliconet routes container (calico pod) IPs through neutron so they can be
 # associated with floating IPs on the public network. No subnet is created

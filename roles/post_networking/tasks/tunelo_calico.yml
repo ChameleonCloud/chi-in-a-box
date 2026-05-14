@@ -32,7 +32,7 @@
       network_name: "{{ tunelo_calico_network_name }}"
       name: "{{ tunelo_calico_subnet_name }}"
       cidr: "{{ tunelo_calico_subnet_cidr }}"
-      enable_dhcp: "{{ tunelo_calico_subnet_enable_dhcp }}"
+      enable_dhcp: false
       state: present
   become: true
   run_once: true
