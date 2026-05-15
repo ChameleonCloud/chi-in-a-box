@@ -390,3 +390,6 @@ enable_image_cleaner: no
 
 # Manila
 default_share_type: cephfsnfstype
+
+# vendordata
+enable_vendordata: "{{ enable_nova | bool }}"
