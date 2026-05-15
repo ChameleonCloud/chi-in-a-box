@@ -3,6 +3,7 @@
   include_tasks: public.yml
 - name: configure shared tenant network(s) and subnet(s)
   include_tasks: sharednet.yml
+  when: neutron_networks | selectattr('sharednet', 'defined') | list | length > 0
 - name: configure corsa nat interface
   include_tasks: corsa_nat.yml
 - name: configure tunelo-calico shadow network
