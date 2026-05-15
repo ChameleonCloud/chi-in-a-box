@@ -1,0 +1,85 @@
+---
+# Floating-IP to Calico pod connectivity bridge.
+#
+# Caliconet is attached to admin-router so floating IPs can be associated with
+# addresses in the calico CIDR, but the qr-<caliconet> interface inside the
+# router netns has no real L2 peer (pods live behind Calico IPIP). The apply
+# script creates a veth pair between root netns and qrouter, installs a route
+# inside qrouter that overrides the dead caliconet interface, and adds the two
+# MASQUERADE rules required for floating-IP traffic.
+#
+# Lifecycle: a .path watcher re-fires the .service on /var/run/netns changes,
+# which handles re-application after neutron-l3-agent restarts the qrouter.
+#
+# Invoked from playbooks/post_deploy.yml in a `hosts: neutron-l3-agent` play.
+
+- name: Look up admin-router id
+  kolla_toolbox:
+    module_name: openstack.cloud.routers_info
+    module_args:
+      auth: "{{ openstack_auth }}"
+      name: "{{ admin_router_name }}"
+  delegate_to: "{{ groups['control'][0] }}"
+  run_once: true
+  register: admin_router_lookup
+  become: true
+
+- name: Assert admin-router uuid resolved
+  ansible.builtin.assert:
+    that:
+      - admin_router_lookup.openstack_routers is defined
+      - admin_router_lookup.openstack_routers | length == 1
+      - admin_router_lookup.openstack_routers[0].id is defined
+    fail_msg: >-
+      Could not resolve admin-router uuid (got
+      {{ admin_router_lookup.openstack_routers | default([]) | length }} matches).
+      admin_router.yml must run successfully on the control host first.
+
+- name: Set admin_router_uuid fact
+  ansible.builtin.set_fact:
+    admin_router_uuid: "{{ admin_router_lookup.openstack_routers[0].id }}"
+
+- name: Install neutron-calico-connect script
+  ansible.builtin.copy:
+    src: neutron-calico-connect
+    dest: /usr/local/sbin/neutron-calico-connect
+    owner: root
+    group: root
+    mode: "0755"
+  become: true
+
+- name: Install neutron-calico-connect.service unit
+  ansible.builtin.template:
+    src: neutron-calico-connect.service.j2
+    dest: /etc/systemd/system/neutron-calico-connect.service
+    owner: root
+    group: root
+    mode: "0644"
+  become: true
+
+- name: Install neutron-calico-connect.path unit
+  ansible.builtin.template:
+    src: neutron-calico-connect.path.j2
+    dest: /etc/systemd/system/neutron-calico-connect.path
+    owner: root
+    group: root
+    mode: "0644"
+  become: true
+
+- name: Reload systemd
+  ansible.builtin.systemd:
+    daemon_reload: true
+  become: true
+
+- name: Enable and start neutron-calico-connect.path
+  ansible.builtin.systemd:
+    name: neutron-calico-connect.path
+    enabled: true
+    state: started
+  become: true
+
+- name: Apply bridge + NAT rules immediately
+  ansible.builtin.systemd:
+    name: neutron-calico-connect.service
+    state: started
+  become: true
