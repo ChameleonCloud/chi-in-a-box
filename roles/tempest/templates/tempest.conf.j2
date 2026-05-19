@@ -1,17 +1,10 @@
+[DEFAULT]
+log_dir = /var/lib/tempest
+log_file = tempest.log
+
 [auth]
-
-# disabled due to flat networks in dev-in-a-box
-create_isolated_networks = false
-
-# don't use in prod!!
-use_dynamic_credentials = true
-
-admin_username = "{{ keystone_admin_user }}"
-admin_project_name = "{{ keystone_admin_project }}"
-admin_password = "{{ keystone_admin_password }}"
-admin_domain_name = Default
-admin_user_domain_name = Default
-admin_project_domain_name = Default
+use_dynamic_credentials = False
+test_accounts_file = /etc/tempest/accounts.yaml
 
 [identity]
 
