@@ -1,55 +1,86 @@
 ---
-- name: clone tempest git repo
-  ansible.builtin.git:
-    repo: "{{ tempest_git_repo }}"
-    dest: "{{ tempest_install_dir }}"
+- name: tempest_account_password must be set in passwords.yml
+  ansible.builtin.assert:
+    that: (tempest_account_password | default('')) | length > 0
+    fail_msg: |
+      tempest_account_password is unset. Add it to /opt/site-config/passwords.yml
+      (vault-encrypted). All four tempest test accounts share this password.
 
-- name: create venv and install build deps
-  ansible.builtin.pip:
-    virtualenv: "{{ tempest_install_dir }}/.venv/"
-    state: latest
-    name:
-      - pip
-      - wheel
+- name: bootstrap tempest projects, users, role grants
+  ansible.builtin.import_tasks: testusers.yml
+  tags:
+    - tempest-keystone
 
-- name: pip install tempest from the git checkout
-  ansible.builtin.pip:
-    name: "{{ tempest_install_dir }}/"
-    virtualenv: "{{ tempest_install_dir }}/.venv/"
+- name: pull tempest_smoke_tests image
+  become: true
+  docker_image:
+    source: pull
+    name: "{{ tempest_docker_image }}"
+    force_source: true
 
-- name: Make sure local tempest config dir exists
-  file:
-    path: "~/.tempest/etc/"
-    recurse: true
+- name: create tempest config dir
+  become: true
+  ansible.builtin.file:
+    path: "{{ tempest_config_path }}"
     state: directory
+    owner: root
+    group: root
+    mode: "0755"
 
-- name: template tempest.conf from site-config
-  template:
-    src: "tempest.conf.j2"
-    dest: "~/.tempest/etc/tempest.conf"
+- name: look up public network
+  kolla_toolbox:
+    module_name: openstack.cloud.networks_info
+    module_args:
+      auth: "{{ openstack_auth }}"
+      filters:
+        name: "{{ tempest_public_network_name }}"
+  register: tempest_public_network_info
+  run_once: true
+  become: true
+  delegate_to: "{{ groups['control'][0] }}"
 
-- name: Make sure local tempest workspace dir exists
-  file:
-    path: "{{ local_site_workspace }}"
-    recurse: true
-    state: directory
+- ansible.builtin.assert:
+    that: tempest_public_network_info.openstack_networks | length > 0
+    fail_msg: |
+      Network '{{ tempest_public_network_name }}' not found in
+      {{ openstack_region_name }}. Override tempest_public_network_name
+      or create the network first.
 
-- name: initialize tempest workspace
-  ansible.builtin.command:
-    chdir: "{{ tempest_install_dir }}"
-    argv: 
-      - .venv/bin/tempest
-      -  init 
-      - --name 
-      - local
-      - "{{ local_site_workspace}}"
-    creates: "{{ local_site_workspace }}/etc/tempest.conf"
-    
-- name: initialize tempest saved state
-  ansible.builtin.command:
-    chdir: "{{ local_site_workspace }}"
-    argv: 
-      - ../../.venv/bin/tempest
-      - cleanup
-      - --init-saved-state
-    creates: "{{ local_site_workspace }}/saved_state.json"
+- ansible.builtin.set_fact:
+    tempest_public_network_uuid: "{{ tempest_public_network_info.openstack_networks[0].id }}"
+
+- name: template tempest.conf
+  become: true
+  ansible.builtin.template:
+    src: tempest.conf.j2
+    dest: "{{ tempest_config_path }}/tempest.conf"
+    mode: "0644"
+
+- name: template accounts.yaml
+  become: true
+  ansible.builtin.template:
+    src: accounts.yaml.j2
+    dest: "{{ tempest_config_path }}/accounts.yaml"
+    mode: "0640"
+  no_log: true
+
+- name: write include_list
+  become: true
+  ansible.builtin.copy:
+    src: include_list
+    dest: "{{ tempest_config_path }}/include_list"
+    mode: "0644"
+
+- name: write exclude_list
+  become: true
+  ansible.builtin.copy:
+    src: exclude_list
+    dest: "{{ tempest_config_path }}/exclude_list"
+    mode: "0644"
+
+- name: install cc-tempest docker wrapper
+  become: true
+  ansible.builtin.template:
+    src: cc-tempest.j2
+    dest: /usr/local/sbin/cc-tempest
+    mode: "0755"

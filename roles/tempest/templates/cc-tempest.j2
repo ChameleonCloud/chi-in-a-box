@@ -1,0 +1,17 @@
+#!/bin/sh
+# cc-tempest: thin docker wrapper around the tempest_smoke_tests image.
+# All args are passed through as `tempest <args>` inside the container.
+#
+#   cc-tempest run \
+#     --concurrency 2 \
+#     --include-list include_list \
+#     --exclude-list exclude_list \
+#     --regex tempest.api.compute.test_versions
+
+exec docker run --rm \
+  --net=host \
+  -e TEMPEST_CONFIG_DIR=/etc/tempest \
+  -v {{ tempest_config_path }}:/etc/tempest:ro \
+  -v {{ tempest_workspace_volume }}:/var/lib/tempest \
+  {{ tempest_docker_image }} \
+  tempest "$@"
