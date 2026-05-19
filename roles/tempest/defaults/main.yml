@@ -1,13 +1,45 @@
-tempest_install_dir: ~/tempest
-tempest_git_repo: https://github.com/openstack/tempest
+---
+tempest_docker_image: ghcr.io/chameleoncloud/tempest_smoke_tests:main
 
-tempest_workspace_root: "{{ tempest_install_dir }}/workspaces"
-local_site_workspace: "{{ tempest_workspace_root }}/local"
+tempest_config_path: /etc/tempest
+# Docker volume holding the tempest workspace with stestr repo + logs.
+tempest_workspace_volume: tempest
 
+# Used as `tempest init --name <site>`. Shows up in subunit logs.
+tempest_site_name: "{{ chameleon_site_name | default('local') }}"
 
-# TODO: these 4 parameters should be fetched from openstack API, since the values are
-# set dynamically during post-deploy
-tempest_fixed_network_name: "sharednet1"
-tempest_public_network_uuid:
-tempest_compute_image_uuid:
-tempest_baremetal_flavor_uuid:
+# Non-admin keystone accounts used by static-credential tempest runs.
+# Bootstrapped by tasks/keystone.yml
+tempest_accounts:
+  - username: testuser-01
+    project_name: testing-01
+  - username: testuser-02
+    project_name: testing-02
+  - username: testuser-03
+    project_name: testing-03
+  - username: testuser-04
+    project_name: testing-04
+tempest_account_roles:
+  - member
+  - reader
+
+# Shared password for all four test accounts. Set in passwords.yml
+# tempest_account_password: ""
+
+tempest_public_network_name: public
+tempest_floating_network_name: "{{ tempest_public_network_name }}"
+tempest_fixed_network_name: "{{ 'caliconet' if (enable_zun_compute_k8s | default(false) | bool) else 'sharednet1' }}"
+
+# blazar-tempest-plugin feature toggles.
+tempest_reservation_host_plugin: false
+tempest_reservation_flavor_instance_plugin: false
+tempest_reservation_device_plugin: "{{ blazar_enable_device_plugin_k8s | default(false) | bool }}"
+tempest_reservation_floatingip_plugin: false
+tempest_reservation_network_plugin: false
+tempest_reservation_network_storage_plugin: false
+
+# Copied from chi@edge prod tempest.conf, should match neutron config.
+tempest_network_api_extensions: address-group,address-scope,router-admin-state-down-before-update,agent,agent-resources-synced,allowed-address-pairs,auto-allocated-topology,availability_zone,availability_zone_filter,default-subnetpools,dhcp_agent_scheduler,dvr,empty-string-filtering,external-net,extra_dhcp_opt,extraroute,extraroute-atomic,filter-validation,floating-ip-port-forwarding-detail,fip-port-details,flavors,floatingip-pools,ip-substring-filtering,router,ext-gw-mode,l3-ha,l3-flavors,l3-port-ip-change-not-allowed,l3_agent_scheduler,multi-provider,net-mtu,net-mtu-writable,network_availability_zone,network-ip-availability,network-segment-range,pagination,port-device-profile,port-mac-override,port-mac-address-regenerate,port-numa-affinity-policy,binding,binding-extended,port-security,project-id,provider,quota-check-limit,quotas,quota_details,rbac-policies,rbac-address-group,rbac-address-scope,rbac-security-groups,rbac-subnetpool,revision-if-match,standard-attr-revisions,router_availability_zone,security-groups-normalized-cidr,port-security-groups-filtering,security-groups-remote-address-group,security-groups-shared-filtering,security-group,service-type,sorting,standard-attr-description,stateful-security-group,subnet_onboard,subnet-service-types,subnet_allocation,subnetpool-prefix-ops,standard-attr-tag,standard-attr-timestamp
+
+# need 2 test accounts per concurrent run
+tempest_concurrency: 2
