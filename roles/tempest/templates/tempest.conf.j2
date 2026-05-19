@@ -7,26 +7,38 @@ use_dynamic_credentials = False
 test_accounts_file = /etc/tempest/accounts.yaml
 
 [identity]
-
-uri_v3 = "{{ keystone_public_url }}/v3"
-auth_version = v3
-region = "{{ openstack_region_name }}"
+uri_v3 = {{ keystone_public_url }}/v3
+region = {{ openstack_region_name }}
+v3_endpoint_type = public
 
 [service_available]
-cinder = "{{ enable_cinder }}"
-neutron = true
-glance = true
-swift = false
-nova = true
-horizon = true
+cinder = {{ enable_cinder | default(false) | bool }}
+neutron = {{ enable_neutron | default(false) | bool }}
+glance = {{ enable_glance | default(false) | bool }}
+swift = {{ (enable_ceph_rgw | default(false) | bool) or (enable_swift | default(false) | bool) }}
+nova = {{ enable_nova | default(false) | bool }}
+horizon = {{ enable_horizon | default(false) | bool }}
+
+# from blazar tempest plugin
+blazar = {{ enable_blazar | default(false) | bool }}
+
+# from zun tempest plugin
+zun = {{ enable_zun | default(false) | bool }}
+
+[validation]
+ping_timeout = 300
+connect_timeout = 300
+ssh_timeout = 300
+image_ssh_user = cc
 
 [compute]
-
-image_ref = "{{ tempest_compute_image_uuid }}"
-image_ref_alt = "{{ tempest_compute_image_uuid }}"
-flavor_ref = "{{ tempest_baremetal_flavor_uuid }}"
-
-fixed_network_name = "{{ tempest_fixed_network_name }}"
+{% if enable_nova | default(false) | bool %}
+image_ref = {{ tempest_compute_image_uuid }}
+image_ref_alt = {{ tempest_compute_image_uuid }}
+flavor_ref = {{ tempest_baremetal_flavor_uuid }}
+{% endif %}
+build_timeout = 900
+fixed_network_name = {{ tempest_fixed_network_name }}
 
 [compute-feature-enabled]
 
@@ -65,17 +77,27 @@ volume_backed_live_migration = false
 volume_multiattach = false
 
 [network]
-project_networks_reachable = false
-public_network_id = "{{ tempest_public_network_uuid }}"
-
-project_network_cidr = 10.100.0.0/16
-project_network_mask_bits = 28
+public_network_id = {{ tempest_public_network_uuid }}
+floating_network_name = {{ tempest_floating_network_name }}
 
 [network-feature-enabled]
+api_extensions = {{ tempest_network_api_extensions }}
 ipv6 = false
+shared_physical_network = true
 
-api_extensions = address-group,address-scope,router-admin-state-down-before-update,agent,agent-resources-synced,allowed-address-pairs,auto-allocated-topology,availability_zone,availability_zone_filter,default-subnetpools,dhcp_agent_scheduler,dvr,empty-string-filtering,external-net,extra_dhcp_opt,extraroute,extraroute-atomic,filter-validation,fip-port-details,flavors,floatingip-pools,ip-substring-filtering,router,ext-gw-mode,l3-ha,l3-flavors,l3-port-ip-change-not-allowed,l3_agent_scheduler,multi-provider,net-mtu,net-mtu-writable,network_availability_zone,network-ip-availability,network-segment-range,pagination,port-device-profile,port-mac-address-regenerate,port-numa-affinity-policy,binding,binding-extended,port-security,project-id,provider,quotas,quota_details,rbac-policies,rbac-address-group,rbac-address-scope,rbac-security-groups,rbac-subnetpool,revision-if-match,standard-attr-revisions,router_availability_zone,security-groups-normalized-cidr,port-security-groups-filtering,security-groups-remote-address-group,security-group,service-type,sorting,standard-attr-description,stateful-security-group,subnet_onboard,subnet-service-types,subnet_allocation,subnetpool-prefix-ops,standard-attr-tag,standard-attr-timestamp
+[container_service]
+min_microversion = 1.12
+
+[object-storage-feature-enabled]
+container_sync = false
 
 [dashboard]
+dashboard_url = {{ horizon_public_endpoint }}
 
-dashboard_url = "{{ horizon_public_endpoint }}"
+[reservation-feature-enabled]
+host_plugin = {{ tempest_reservation_host_plugin | bool }}
+flavor_instance_plugin = {{ tempest_reservation_flavor_instance_plugin | bool }}
+device_plugin = {{ tempest_reservation_device_plugin | bool }}
+floatingip_plugin = {{ tempest_reservation_floatingip_plugin | bool }}
+network_plugin = {{ tempest_reservation_network_plugin | bool }}
+network_storage_plugin = {{ tempest_reservation_network_storage_plugin | bool }}

@@ -1,0 +1,20 @@
+# known failing due to interaction between federated auth and our horizon config
+tempest.scenario.test_dashboard_basic_ops.TestDashboardBasicOps.test_basic_scenario
+
+# these tests fail to bootstrap because chi@edge doesn't permit network creation
+tempest.api.network.test_floating_ips.FloatingIPTestJSON
+tempest.api.network.test_networks.NetworksTest
+tempest.api.network.test_ports.PortsTestJSON
+
+# chi@edge doesn't permit user-created networks, all networks are caliconet
+tempest.api.network.test_networks.BulkNetworkOpsTest.test_bulk_create_delete_network
+tempest.api.network.test_networks.BulkNetworkOpsTest.test_bulk_create_delete_port
+tempest.api.network.test_networks.BulkNetworkOpsTest.test_bulk_create_delete_subnet
+
+# since chi@edge doesn't permit multiple networks, user-created routers also don't work right
+tempest.api.network.test_routers.RoutersTest.test_add_multiple_router_interfaces
+tempest.api.network.test_routers.RoutersTest.test_add_remove_router_interface_with_port_id
+tempest.api.network.test_routers.RoutersTest.test_add_remove_router_interface_with_subnet_id
+
+# this should be excluded by config, but we put it here for now.
+blazar_tempest_plugin.tests.scenario.test_oshost_basic_ops
