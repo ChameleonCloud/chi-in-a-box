@@ -1,0 +1,9 @@
+{% for acct in tempest_accounts %}
+- username: {{ acct.username }}
+  project_name: {{ acct.project_name }}
+  password: {{ tempest_account_password }}
+  roles:
+{% for role in tempest_account_roles %}
+    - {{ role }}
+{% endfor %}
+{% endfor %}
