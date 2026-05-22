@@ -16,4 +16,3 @@ This can happen for _many_ reasons. Check a few things:
 
 * Are there errors in the `/var/log/ironic/ironic-conductor.log`?
 * Is the node in maintenance mode? (It must be set to the "available" status for Nova to consider it.)
-* Does the node have enough space on the file system? It must have more than the space defined in the `baremetal` Nova flavor (we set this to a low value on purpose; 20Gb).

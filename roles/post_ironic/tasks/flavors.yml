@@ -13,9 +13,10 @@
         "resources:VCPU": 0
         "resources:MEMORY_MB": 0
         "resources:DISK_GB": 0
-      # Needs to be greater than largest expected disk image, yet smaller than
-      # actual node capacity; we guess a low value.
-      disk: 20
+      # disk=0 skips nova's "is the disk big enough" checks entirely.
+      # if image bigger than node disk attempted, will fail when writing image.
+      # requires nova policy override, otherwise non-admins get 400 error.
+      disk: 0
       ram: 1
       vcpus: 1
   run_once: True
