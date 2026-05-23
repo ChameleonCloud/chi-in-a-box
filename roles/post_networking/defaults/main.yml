@@ -1,11 +1,42 @@
-public_networks: "{{ neutron_networks | selectattr('public', 'defined') | list }}"
-# This is added for backwards compatibility
-named_public_networks: "{{ neutron_networks | selectattr('name', 'equalto', 'public') | list }}"
-all_public_networks: "{{ public_networks + named_public_networks }}"
-public_network: "{{ all_public_networks[0] if all_public_networks else none }}"
+# Extract raw entries from neutron_networks list of physnets
+_public_by_attr: "{{ neutron_networks | selectattr('public', 'defined') | list }}"
+_public_by_name: "{{ neutron_networks | selectattr('name', 'equalto', 'public') | list }}"
+_public_raw: "{{ (_public_by_attr + _public_by_name)[0] | default({}) }}"
+_public_cidr: "{{ _public_raw.cidr | default(none) }}"
+_public_pools: "{{ (_public_raw.allocation_pools | default([{}]))[0] }}"
 
-shared_networks: "{{ neutron_networks | selectattr('sharednet', 'defined') | list }}"
-shared_network: "{{ shared_networks[0] if shared_networks else none }}"
+_sharednet_raw: "{{ (neutron_networks | selectattr('sharednet', 'defined') | list)[0] | default({}) }}"
+_sharednet_config: "{{ _sharednet_raw.sharednet | default({}) }}"
+_sharednet_vlan_ranges: "{{ _sharednet_raw.on_demand_vlan_ranges | default([]) }}"
+_sharednet_cidr: "{{ _sharednet_config.cidr | default('10.0.0.0/24') }}"
+_sharednet_pools: "{{ (_sharednet_config.allocation_pools | default([{}]))[0] }}"
 
-default_sharednet_name: sharednet1
-default_sharednet_cidr: 10.0.0.1/24
+# Public network model
+public_network:
+  enabled: "{{ _public_cidr is not none }}"
+  name: public
+  cidr: "{{ _public_cidr }}"
+  gateway_ip: "{{ _public_raw.gateway_ip | default(_public_cidr | ipaddr('last_usable')) }}"
+  enable_dhcp: false
+  allocation_pool_start: "{{ _public_pools.start | default(_public_cidr | next_nth_usable(2)) }}"
+  allocation_pool_end: "{{ _public_pools.end | default(_public_cidr | ipaddr('last_usable') | ipmath(-1)) }}"
+  provider_network_type: flat
+  provider_physical_network: public
+  provider_segmentation_id: "{{ omit }}"
+  external: true
+  shared: false
+
+# Shared network model
+shared_network:
+  enabled: "{{ _sharednet_config | length > 0 }}"
+  name: "{{ _sharednet_config.name | default('sharednet1') }}"
+  cidr: "{{ _sharednet_cidr }}"
+  gateway_ip: "{{ _sharednet_pools.gateway_ip | default(omit) }}"
+  enable_dhcp: true
+  allocation_pool_start: "{{ _sharednet_pools.start | default(_sharednet_cidr | next_nth_usable(2)) }}"
+  allocation_pool_end: "{{ _sharednet_pools.end | default(_sharednet_cidr | ipaddr('last_usable') | ipmath(-1)) }}"
+  provider_network_type: "{{ _sharednet_raw.network_type | default('vlan') }}"
+  provider_physical_network: "{{ _sharednet_raw.name | default('physnet1') }}"
+  provider_segmentation_id: "{{ ((_sharednet_vlan_ranges[0].split(':')[0] | int) + 1) if _sharednet_vlan_ranges else omit }}"
+  external: false
+  shared: true
