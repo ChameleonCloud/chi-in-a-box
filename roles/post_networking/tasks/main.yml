@@ -1,9 +1,99 @@
 ---
-- name: configure public network and subnet
-  include_tasks: public.yml
-- name: configure shared tenant network(s) and subnet(s)
-  include_tasks: sharednet.yml
-- name: Clean up corsa NAT hook if present
+# Public network and subnet
+- name: Configure public network
+  include_tasks: create_network.yml
+  vars:
+    network_name: public
+    network_args:
+      project: "{{ keystone_admin_project }}"
+      provider_network_type: flat
+      provider_physical_network: public
+      external: yes
+  when: public_network is defined
+
+- name: Set fact for public allocation pool
+  set_fact:
+    public_allocation_pool_start: "{{ public_network.allocation_pools[0].start | default(public_network.cidr | next_nth_usable(2)) }}"
+    public_allocation_pool_end: "{{ public_network.allocation_pools[0].end | default(public_network.cidr | ipaddr('last_usable') | ipmath(-1)) }}"
+  when:
+    - public_network is defined
+    - public_network.cidr is defined
+
+- name: Configure public subnet
+  include_tasks: create_subnet.yml
+  vars:
+    subnet_name: public-subnet
+    subnet_args:
+      project: "{{ keystone_admin_project }}"
+      network_name: public
+      cidr: "{{ public_network.cidr }}"
+      enable_dhcp: false
+      gateway_ip: "{{ public_network.gateway_ip | default(public_network.cidr | ipaddr('last_usable')) }}"
+      allocation_pool_start: "{{ public_allocation_pool_start }}"
+      allocation_pool_end: "{{ public_allocation_pool_end }}"
+  when:
+    - public_network is defined
+    - public_network.cidr is defined
+
+# Shared tenant network, subnet, and NAT router
+- name: Set fact for sharednet configuration
+  set_fact:
+    sharednet_name: "{{ shared_network.sharednet.name | default(default_sharednet_name) }}"
+    sharednet_cidr: "{{ shared_network.sharednet.cidr | default(default_sharednet_cidr) }}"
+  when: shared_network is defined
+
+- name: Set fact for sharednet segmentation id
+  set_fact:
+    sharednet_segmentation_id: "{{ (shared_network.on_demand_vlan_ranges[0].split(':')[0] | int) + 1 }}"
+  when:
+    - shared_network is defined
+    - shared_network.on_demand_vlan_ranges is defined
+    - shared_network.on_demand_vlan_ranges | length > 0
+
+- name: Configure shared network
+  include_tasks: create_network.yml
+  vars:
+    network_name: "{{ sharednet_name }}"
+    network_args:
+      project: "{{ keystone_admin_project }}"
+      provider_network_type: "{{ shared_network.network_type | default('vlan') }}"
+      provider_segmentation_id: "{{ sharednet_segmentation_id | default(omit) }}"
+      provider_physical_network: "{{ '' if (shared_network.network_type | default('vlan')) == 'vxlan' else shared_network.name }}"
+      shared: yes
+  when: shared_network is defined
+
+- name: Configure shared network subnet
+  include_tasks: create_subnet.yml
+  vars:
+    subnet_name: "{{ sharednet_name }}-subnet"
+    subnet_args:
+      project: "{{ keystone_admin_project }}"
+      network_name: "{{ sharednet_name }}"
+      cidr: "{{ sharednet_cidr }}"
+      allocation_pool_start: "{{ shared_network.sharednet.allocation_pools[0].start | default(sharednet_cidr | next_nth_usable(2)) }}"
+      allocation_pool_end: "{{ shared_network.sharednet.allocation_pools[0].end | default(sharednet_cidr | ipaddr('last_usable') | ipmath(-1)) }}"
+  when:
+    - shared_network is defined
+    - shared_network.sharednet.enabled | default(true) | bool
+
+- name: Configure NAT router for shared network
+  include_tasks: create_router.yml
+  vars:
+    router_name: sharednet-router
+    router_args:
+      project: "{{ keystone_admin_project }}"
+      interfaces:
+        - "{{ sharednet_name }}-subnet"
+      network: "{{ public_network.name }}"
+      external_fixed_ips:
+        - subnet: "public-subnet"
+  when:
+    - shared_network is defined
+    - public_network is defined
+    - public_network.cidr is defined
+
+# Clean up corsa NAT hook if present
+- name: Remove corsa NAT hook
   become: True
   ansible.builtin.file:
     path: /etc/networkd-dispatcher/routable.d/50-corsa-nat.sh
