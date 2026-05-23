@@ -1,0 +1,29 @@
+---
+# Create a router if it doesn't already exist.
+# Required vars:
+#   router_name: name of the router
+#   router_args: dict of args passed to os_router (excluding auth/state/name)
+- name: "Check if router '{{ router_name }}' exists"
+  become: true
+  run_once: true
+  kolla_toolbox:
+    container_engine: "{{ kolla_container_engine }}"
+    module_name: openstack.cloud.routers_info
+    module_args:
+      auth: "{{ openstack_auth }}"
+      name: "{{ router_name }}"
+  register: _router_check
+
+- name: "Create router '{{ router_name }}'"
+  become: true
+  run_once: true
+  kolla_toolbox:
+    container_engine: "{{ kolla_container_engine }}"
+    module_name: os_router
+    module_args: "{{ {'auth': openstack_auth, 'name': router_name, 'state': 'present'} | combine(router_args) }}"
+  when: _router_check.routers | length == 0
+
+- name: "Router '{{ router_name }}' already exists, skipping"
+  debug:
+    msg: "Router '{{ router_name }}' already exists. To recreate, delete it manually first."
+  when: _router_check.routers | length > 0

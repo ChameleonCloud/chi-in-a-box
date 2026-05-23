@@ -1,0 +1,29 @@
+---
+# Create a network if it doesn't already exist.
+# Required vars:
+#   network_name: name of the network
+#   network_args: dict of args passed to os_network (excluding auth/state/name)
+- name: "Check if network '{{ network_name }}' exists"
+  become: true
+  run_once: true
+  kolla_toolbox:
+    container_engine: "{{ kolla_container_engine }}"
+    module_name: openstack.cloud.networks_info
+    module_args:
+      auth: "{{ openstack_auth }}"
+      name: "{{ network_name }}"
+  register: _net_check
+
+- name: "Create network '{{ network_name }}'"
+  become: true
+  run_once: true
+  kolla_toolbox:
+    container_engine: "{{ kolla_container_engine }}"
+    module_name: os_network
+    module_args: "{{ {'auth': openstack_auth, 'name': network_name, 'state': 'present'} | combine(network_args) }}"
+  when: _net_check.networks | length == 0
+
+- name: "Network '{{ network_name }}' already exists, skipping"
+  debug:
+    msg: "Network '{{ network_name }}' already exists. To recreate, delete it manually first."
+  when: _net_check.networks | length > 0
