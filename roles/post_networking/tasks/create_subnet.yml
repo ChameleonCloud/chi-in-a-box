@@ -1,5 +1,5 @@
 ---
-# Create a subnet if it doesn't already exist.
+# Create a subnet, or run in check mode if it already exists.
 # Required vars:
 #   subnet_name: name of the subnet
 #   subnet_args: dict of args passed to os_subnet (excluding auth/state/name)
@@ -14,16 +14,11 @@
       name: "{{ subnet_name }}"
   register: _subnet_check
 
-- name: "Create subnet '{{ subnet_name }}'"
+- name: "Create or update subnet '{{ subnet_name }}'"
   become: true
   run_once: true
+  check_mode: "{{ _subnet_check.subnets | length > 0 }}"
   kolla_toolbox:
     container_engine: "{{ kolla_container_engine }}"
     module_name: os_subnet
     module_args: "{{ {'auth': openstack_auth, 'name': subnet_name, 'state': 'present'} | combine(subnet_args) }}"
-  when: _subnet_check.subnets | length == 0
-
-- name: "Subnet '{{ subnet_name }}' already exists, skipping"
-  debug:
-    msg: "Subnet '{{ subnet_name }}' already exists. To recreate, delete it manually first."
-  when: _subnet_check.subnets | length > 0
