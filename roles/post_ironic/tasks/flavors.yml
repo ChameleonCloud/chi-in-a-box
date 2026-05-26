@@ -1,23 +1,34 @@
 ---
+- name: Look up existing baremetal flavor
+  kolla_toolbox:
+    container_engine: "{{ kolla_container_engine }}"
+    module_name: openstack.cloud.compute_flavor_info
+    module_args:
+      auth: "{{ openstack_auth }}"
+      name: "{{ baremetal_flavor.name }}"
+  register: baremetal_flavor_lookup
+  run_once: True
+  become: True
+  check_mode: false
+  when: enable_ironic | bool
+
 - name: Create baremetal flavor.
+  vars:
+    flavor_id: "{{ (baremetal_flavor_lookup.flavors | first).id }}"
   kolla_toolbox:
     container_engine: "{{ kolla_container_engine }}"
     module_name: openstack.cloud.compute_flavor
     module_args:
       auth: "{{ openstack_auth }}"
       state: present
-      name: baremetal
-      is_public: yes
-      extra_specs:
-        "resources:CUSTOM_BAREMETAL": 1
-        "resources:VCPU": 0
-        "resources:MEMORY_MB": 0
-        "resources:DISK_GB": 0
-      # Needs to be greater than largest expected disk image, yet smaller than
-      # actual node capacity; we guess a low value.
-      disk: 20
-      ram: 1
-      vcpus: 1
+      # Reuse existing ID during delete+recreate
+      id: "{{ flavor_id | default(omit) }}"
+      name: "{{ baremetal_flavor.name }}"
+      is_public: "{{ baremetal_flavor.is_public }}"
+      disk: "{{ baremetal_flavor.disk }}"
+      ram: "{{ baremetal_flavor.ram }}"
+      vcpus: "{{ baremetal_flavor.vcpus }}"
+      extra_specs: "{{ baremetal_flavor.extra_specs }}"
   run_once: True
   become: True
   when: enable_ironic | bool
