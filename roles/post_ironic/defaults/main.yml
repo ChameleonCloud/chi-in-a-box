@@ -8,6 +8,20 @@ ironic_dnsmasq_dhcp_range: "{{ ironic_provisioning_allocation_pool_start }},{{ i
 ironic_gateway_interface: "{{ network_interface | replace('_', '-') }}.{{ ironic_provisioning_network_vlan }}"
 manage_ironic_gateway_interface: false
 
+baremetal_flavor:
+  name: baremetal
+  is_public: yes
+  # set to useful value, must be smaller than smallest node disk
+  disk: 20
+  ram: 1
+  vcpus: 1
+  extra_specs: 
+    "resources:CUSTOM_BAREMETAL": 1
+    # disable scheduling by vcpu, memory, disk
+    "resources:VCPU": 0
+    "resources:MEMORY_MB": 0
+    "resources:DISK_GB": 0
+
 ironic_glance_images:
   - name: pxe_deploy_kernel
     container_format: aki
