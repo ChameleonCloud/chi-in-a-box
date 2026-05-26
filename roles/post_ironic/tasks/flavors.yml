@@ -1,5 +1,20 @@
 ---
+- name: Look up existing baremetal flavor
+  kolla_toolbox:
+    container_engine: "{{ kolla_container_engine }}"
+    module_name: openstack.cloud.compute_flavor_info
+    module_args:
+      auth: "{{ openstack_auth }}"
+      name: baremetal
+  register: baremetal_flavor_lookup
+  run_once: True
+  become: True
+  check_mode: false
+  when: enable_ironic | bool
+
 - name: Create baremetal flavor.
+  vars:
+    flavor_id: "{{ (baremetal_flavor_lookup.flavors | first).id }}"
   kolla_toolbox:
     container_engine: "{{ kolla_container_engine }}"
     module_name: openstack.cloud.compute_flavor
@@ -7,6 +22,8 @@
       auth: "{{ openstack_auth }}"
       state: present
       name: baremetal
+      # Reuse existing UUID so update-via-recreate doesn't strand instances/reservations.
+      id: "{{ flavor_id | default(omit) }}"
       is_public: yes
       extra_specs:
         "resources:CUSTOM_BAREMETAL": 1
