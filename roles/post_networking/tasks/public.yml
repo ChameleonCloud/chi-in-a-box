@@ -10,6 +10,8 @@
     module_args:
       auth: "{{ openstack_auth }}"
       name: public
+      filters:
+        router:external: yes
   register: public_network_lookup
   become: true
   run_once: True
@@ -65,9 +67,9 @@
       project: "{{ keystone_admin_project }}"
       network_name: public
       name: public-subnet
-      cidr: "{{ network.cidr }}"
+      cidr: "{{ public_network.cidr }}"
       enable_dhcp: false
-      gateway_ip: "{{ network.gateway_ip | default(network.cidr | ipaddr('last_usable')) }}"
+      gateway_ip: "{{ public_network.gateway_ip | default(public_network.cidr | ipaddr('last_usable')) }}"
       allocation_pool_start: "{{ public_allocation_pool_start }}"
       allocation_pool_end: "{{ public_allocation_pool_end }}"
       state: present
