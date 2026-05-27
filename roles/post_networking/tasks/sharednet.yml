@@ -6,10 +6,24 @@
     - shared_network.on_demand_vlan_ranges is defined
     - shared_network.on_demand_vlan_ranges | length > 0
 
+- name: Look up existing sharednet
+  kolla_toolbox:
+    container_engine: "{{ kolla_container_engine }}"
+    module_name: openstack.cloud.networks_info
+    module_args:
+      auth: "{{ openstack_auth }}"
+      name: "{{ shared_network.sharednet.name | default(default_sharednet_name) }}"
+      filters:
+        shared: yes
+
+  register: existing_sharednet_lookup
+  become: true
+  run_once: True
+
 - name: Create shared network(s)
   kolla_toolbox:
     container_engine: "{{ kolla_container_engine }}"
-    module_name: os_network
+    module_name: openstack.cloud.network
     module_args:
       auth: "{{ openstack_auth }}"
       project: "{{ keystone_admin_project }}"
@@ -27,11 +41,23 @@
   run_once: True
   when:
     - item.sharednet is defined
+    - (existing_sharednet_lookup.networks | default([])) | length == 0
+
+- name: Look up existing sharednet subnet
+  kolla_toolbox:
+    container_engine: "{{ kolla_container_engine }}"
+    module_name: openstack.cloud.subnets_info
+    module_args:
+      auth: "{{ openstack_auth }}"
+      name: "{{ (shared_network.sharednet.name | default(default_sharednet_name)) + '-subnet' }}"
+  register: existing_sharednet_subnet_lookup
+  become: true
+  run_once: True
 
 - name: Create shared network subnet(s)
   kolla_toolbox:
     container_engine: "{{ kolla_container_engine }}"
-    module_name: os_subnet
+    module_name: openstack.cloud.subnet
     module_args:
       auth: "{{ openstack_auth }}"
       project: "{{ keystone_admin_project }}"
@@ -50,12 +76,28 @@
   when:
     - item.sharednet is defined
     - item.sharednet.enabled | default(true) | bool
+    - (existing_sharednet_subnet_lookup.subnets | default([])) | length == 0
   register: sharednet_subnets
+
+- name: Look up existing sharednet router
+  kolla_toolbox:
+    container_engine: "{{ kolla_container_engine }}"
+    module_name: openstack.cloud.routers_info
+    module_args:
+      auth: "{{ openstack_auth }}"
+      name: sharednet-router
+  register: sharednet_router_lookup
+  become: true
+  run_once: True
+  when:
+    - public_network is defined
+    - public_network.name is defined
+    - public_network.cidr is defined
 
 - name: Create NAT router for shared network(s).
   kolla_toolbox:
     container_engine: "{{ kolla_container_engine }}"
-    module_name: os_router
+    module_name: openstack.cloud.router
     module_args:
       auth: "{{ openstack_auth }}"
       project: "{{ keystone_admin_project }}"
@@ -71,3 +113,4 @@
     - public_network is defined
     - public_network.name is defined
     - public_network.cidr is defined
+    - (sharednet_router_lookup.routers | default([])) | length == 0
