@@ -18,8 +18,6 @@
   register: existing_sharednet_lookup
   become: true
   run_once: True
-  when:
-    - shared_network.sharednet is defined
 
 - name: Create shared network(s)
   kolla_toolbox:
@@ -54,8 +52,6 @@
   register: existing_sharednet_subnet_lookup
   become: true
   run_once: True
-  when:
-    - shared_network.sharednet is defined
 
 - name: Create shared network subnet(s)
   kolla_toolbox:
