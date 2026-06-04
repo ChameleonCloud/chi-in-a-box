@@ -10,16 +10,16 @@ tempest_site_name: "{{ chameleon_site_name | default('local') }}"
 
 # Non-admin keystone accounts used by static-credential tempest runs.
 # Bootstrapped by tasks/testusers.yml
-tempest_accounts_ansible_managed: false
+tempest_accounts_ansible_managed: true
 tempest_accounts:
-  - username: testuser-01
-    project_name: testing-01
-  - username: testuser-02
-    project_name: testing-02
-  - username: testuser-03
-    project_name: testing-03
-  - username: testuser-04
-    project_name: testing-04
+  - username: local-testuser-01
+    project_name: local-testing-01
+  - username: local-testuser-02
+    project_name: local-testing-02
+  - username: local-testuser-03
+    project_name: local-testing-03
+  - username: local-testuser-04
+    project_name: local-testing-04
 tempest_account_roles:
   - member
   - reader
