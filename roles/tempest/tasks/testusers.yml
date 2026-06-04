@@ -1,0 +1,60 @@
+---
+- name: require tempest_account_password if managing test users
+  ansible.builtin.assert:
+    that: (tempest_account_password | default('')) | length > 0
+    fail_msg: |
+      tempest_account_password is unset. Add it to /opt/site-config/passwords.yml
+
+- name: create tempest test projects
+  kolla_toolbox:
+    container_engine: "{{ kolla_container_engine }}"
+    module_name: openstack.cloud.project
+    module_args:
+      auth: "{{ openstack_auth }}"
+      name: "{{ item.project_name }}"
+      domain: default
+      state: present
+  loop: "{{ tempest_accounts }}"
+  loop_control:
+    label: "{{ item.project_name }}"
+  run_once: true
+  become: true
+  delegate_to: "{{ groups['control'][0] }}"
+
+- name: create tempest test users
+  kolla_toolbox:
+    container_engine: "{{ kolla_container_engine }}"
+    module_name: openstack.cloud.identity_user
+    module_args:
+      auth: "{{ openstack_auth }}"
+      name: "{{ item.username }}"
+      password: "{{ tempest_account_password }}"
+      domain: default
+      default_project: "{{ item.project_name }}"
+      update_password: on_create
+      state: present
+  loop: "{{ tempest_accounts }}"
+  loop_control:
+    label: "{{ item.username }}"
+  run_once: true
+  become: true
+  delegate_to: "{{ groups['control'][0] }}"
+  no_log: true
+
+- name: grant {{ tempest_account_roles | join(',') }} on each test project
+  kolla_toolbox:
+    container_engine: "{{ kolla_container_engine }}"
+    module_name: openstack.cloud.role_assignment
+    module_args:
+      auth: "{{ openstack_auth }}"
+      user: "{{ item.0.username }}"
+      project: "{{ item.0.project_name }}"
+      role: "{{ item.1 }}"
+      domain: default
+      state: present
+  loop: "{{ tempest_accounts | product(tempest_account_roles) | list }}"
+  loop_control:
+    label: "{{ item.0.username }} -> {{ item.1 }}"
+  run_once: true
+  become: true
+  delegate_to: "{{ groups['control'][0] }}"

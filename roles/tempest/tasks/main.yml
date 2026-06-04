@@ -1,55 +1,138 @@
 ---
-- name: clone tempest git repo
-  ansible.builtin.git:
-    repo: "{{ tempest_git_repo }}"
-    dest: "{{ tempest_install_dir }}"
 
-- name: create venv and install build deps
-  ansible.builtin.pip:
-    virtualenv: "{{ tempest_install_dir }}/.venv/"
-    state: latest
-    name:
-      - pip
-      - wheel
+- name: pull tempest_smoke_tests image
+  become: true
+  docker_image:
+    source: pull
+    name: "{{ tempest_docker_image }}"
+    force_source: true
+  run_once: true
+  delegate_to: "{{ groups['control'][0] }}"
 
-- name: pip install tempest from the git checkout
-  ansible.builtin.pip:
-    name: "{{ tempest_install_dir }}/"
-    virtualenv: "{{ tempest_install_dir }}/.venv/"
-
-- name: Make sure local tempest config dir exists
-  file:
-    path: "~/.tempest/etc/"
-    recurse: true
+- name: create tempest config dir
+  become: true
+  ansible.builtin.file:
+    path: "{{ tempest_config_path }}"
     state: directory
+    owner: "{{ config_owner_user }}"
+    group: "{{ config_owner_group }}"
+    mode: "0770"
+  run_once: true
+  delegate_to: "{{ groups['control'][0] }}"
 
-- name: template tempest.conf from site-config
+- name: look up public network
+  kolla_toolbox:
+    container_engine: "{{ kolla_container_engine }}"
+    module_name: openstack.cloud.networks_info
+    module_args:
+      auth: "{{ openstack_auth }}"
+      filters:
+        name: "{{ tempest_public_network_name }}"
+  register: tempest_public_network_info
+  run_once: true
+  become: true
+  delegate_to: "{{ groups['control'][0] }}"
+
+- ansible.builtin.assert:
+    that: tempest_public_network_info.networks | length > 0
+    fail_msg: |
+      Network '{{ tempest_public_network_name }}' not found in
+      {{ openstack_region_name }}. Override tempest_public_network_name
+      or create the network first.
+
+- ansible.builtin.set_fact:
+    tempest_public_network_uuid: "{{ tempest_public_network_info.networks[0].id }}"
+
+- name: template tempest.conf
+  become: true
+  ansible.builtin.template:
+    src: "{{ item }}"
+    dest: "{{ tempest_config_path }}/tempest.conf"
+    owner: "{{ config_owner_user }}"
+    group: "{{ config_owner_group }}"
+    mode: "0660"
+  with_first_found:
+    - "{{ node_custom_config }}/tempest/tempest.conf"
+    - "tempest.conf.j2"
+  run_once: true
+  delegate_to: "{{ groups['control'][0] }}"
+
+- name: bootstrap tempest projects, users,and role grants
+  ansible.builtin.import_tasks: testusers.yml
+  tags:
+    - tempest-keystone
+  when: tempest_accounts_ansible_managed | bool
+
+- name: Checking whether external accounts.yaml is supplied
+  stat:
+    path: "{{ node_custom_config }}/tempest/accounts.yaml"
+  delegate_to: localhost
+  run_once: True
+  register: check_tempest_accounts_yaml
+
+- name: Copying over accounts.yaml
+  become: true
+  no_log: true  # contains credentials
   template:
-    src: "tempest.conf.j2"
-    dest: "~/.tempest/etc/tempest.conf"
+    src: "{{ node_custom_config }}/tempest/accounts.yaml"
+    dest: "{{ tempest_config_path }}/accounts.yaml"
+    owner: "{{ config_owner_user }}"
+    group: "{{ config_owner_group }}"
+    mode: "0660"
+  when:
+    - check_tempest_accounts_yaml.stat.exists
+  run_once: true
+  delegate_to: "{{ groups['control'][0] }}"
 
-- name: Make sure local tempest workspace dir exists
-  file:
-    path: "{{ local_site_workspace }}"
-    recurse: true
-    state: directory
+- name: ensure test accounts password is set
+  ansible.builtin.assert:
+    that: (tempest_account_password | default('')) | length > 0
+    fail_msg: |
+      tempest_account_password is unset. Add it to /opt/site-config/passwords.yml
+  when:
+    - not check_tempest_accounts_yaml.stat.exists
 
-- name: initialize tempest workspace
-  ansible.builtin.command:
-    chdir: "{{ tempest_install_dir }}"
-    argv: 
-      - .venv/bin/tempest
-      -  init 
-      - --name 
-      - local
-      - "{{ local_site_workspace}}"
-    creates: "{{ local_site_workspace }}/etc/tempest.conf"
-    
-- name: initialize tempest saved state
-  ansible.builtin.command:
-    chdir: "{{ local_site_workspace }}"
-    argv: 
-      - ../../.venv/bin/tempest
-      - cleanup
-      - --init-saved-state
-    creates: "{{ local_site_workspace }}/saved_state.json"
+- name: template accounts.yaml
+  become: true
+  no_log: true  # contains credentials
+  ansible.builtin.template:
+    src: "accounts.yaml.j2"
+    dest: "{{ tempest_config_path }}/accounts.yaml"
+    owner: "{{ config_owner_user }}"
+    group: "{{ config_owner_group }}"
+    mode: "0660"
+  when:
+    - not check_tempest_accounts_yaml.stat.exists
+  run_once: true
+  delegate_to: "{{ groups['control'][0] }}"
+
+- name: write include_list
+  become: true
+  ansible.builtin.copy:
+    src: include_list
+    dest: "{{ tempest_config_path }}/include_list"
+    owner: "{{ config_owner_user }}"
+    group: "{{ config_owner_group }}"
+    mode: "0644"
+  run_once: true
+  delegate_to: "{{ groups['control'][0] }}"
+
+- name: write exclude_list
+  become: true
+  ansible.builtin.copy:
+    src: exclude_list
+    dest: "{{ tempest_config_path }}/exclude_list"
+    owner: "{{ config_owner_user }}"
+    group: "{{ config_owner_group }}"
+    mode: "0644"
+  run_once: true
+  delegate_to: "{{ groups['control'][0] }}"
+
+- name: install cc-tempest docker wrapper
+  become: true
+  ansible.builtin.template:
+    src: cc-tempest.j2
+    dest: /usr/local/sbin/cc-tempest
+    mode: "0755"
+  run_once: true
+  delegate_to: "{{ groups['control'][0] }}"

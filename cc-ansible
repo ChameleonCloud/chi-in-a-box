@@ -197,7 +197,6 @@ EOF
 }
 
 edit_passwords() {
-  local tmpfile
   local venv_bin_path="${VIRTUALENV}/bin"
   local passwords_file="$CC_ANSIBLE_SITE/passwords.yml"
 
