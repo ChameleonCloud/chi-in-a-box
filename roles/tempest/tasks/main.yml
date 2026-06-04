@@ -29,6 +29,7 @@
 
 - name: look up public network
   kolla_toolbox:
+    container_engine: "{{ kolla_container_engine }}"
     module_name: openstack.cloud.networks_info
     module_args:
       auth: "{{ openstack_auth }}"

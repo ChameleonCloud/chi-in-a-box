@@ -1,6 +1,7 @@
 ---
 - name: create tempest test projects
   kolla_toolbox:
+    container_engine: "{{ kolla_container_engine }}"
     module_name: openstack.cloud.project
     module_args:
       auth: "{{ openstack_auth }}"
@@ -16,6 +17,7 @@
 
 - name: create tempest test users
   kolla_toolbox:
+    container_engine: "{{ kolla_container_engine }}"
     module_name: openstack.cloud.identity_user
     module_args:
       auth: "{{ openstack_auth }}"
@@ -35,6 +37,7 @@
 
 - name: grant {{ tempest_account_roles | join(',') }} on each test project
   kolla_toolbox:
+    container_engine: "{{ kolla_container_engine }}"
     module_name: openstack.cloud.role_assignment
     module_args:
       auth: "{{ openstack_auth }}"
