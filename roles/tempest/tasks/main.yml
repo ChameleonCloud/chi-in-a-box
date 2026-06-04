@@ -48,6 +48,8 @@
   ansible.builtin.template:
     src: "{{ item }}"
     dest: "{{ tempest_config_path }}/tempest.conf"
+    owner: "{{ config_owner_user }}"
+    group: "{{ config_owner_group }}"
     mode: "0660"
   with_first_found:
     - "{{ node_custom_config }}/tempest/tempest.conf"
@@ -74,6 +76,8 @@
   template:
     src: "{{ node_custom_config }}/tempest/accounts.yaml"
     dest: "{{ tempest_config_path }}/accounts.yaml"
+    owner: "{{ config_owner_user }}"
+    group: "{{ config_owner_group }}"
     mode: "0660"
   when:
     - check_tempest_accounts_yaml.stat.exists
@@ -94,6 +98,8 @@
   ansible.builtin.template:
     src: "accounts.yaml.j2"
     dest: "{{ tempest_config_path }}/accounts.yaml"
+    owner: "{{ config_owner_user }}"
+    group: "{{ config_owner_group }}"
     mode: "0660"
   when:
     - not check_tempest_accounts_yaml.stat.exists
@@ -105,6 +111,8 @@
   ansible.builtin.copy:
     src: include_list
     dest: "{{ tempest_config_path }}/include_list"
+    owner: "{{ config_owner_user }}"
+    group: "{{ config_owner_group }}"
     mode: "0644"
   run_once: true
   delegate_to: "{{ groups['control'][0] }}"
@@ -114,6 +122,8 @@
   ansible.builtin.copy:
     src: exclude_list
     dest: "{{ tempest_config_path }}/exclude_list"
+    owner: "{{ config_owner_user }}"
+    group: "{{ config_owner_group }}"
     mode: "0644"
   run_once: true
   delegate_to: "{{ groups['control'][0] }}"
