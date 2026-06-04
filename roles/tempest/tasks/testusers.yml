@@ -2,6 +2,8 @@
 - name: require tempest_account_password if managing test users
   ansible.builtin.assert:
     that: (tempest_account_password | default('')) | length > 0
+    fail_msg: |
+      tempest_account_password is unset. Add it to /opt/site-config/passwords.yml
 
 - name: create tempest test projects
   kolla_toolbox:

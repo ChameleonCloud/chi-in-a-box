@@ -6,15 +6,19 @@
     source: pull
     name: "{{ tempest_docker_image }}"
     force_source: true
+  run_once: true
+  delegate_to: "{{ groups['control'][0] }}"
 
 - name: create tempest config dir
   become: true
   ansible.builtin.file:
     path: "{{ tempest_config_path }}"
     state: directory
-    owner: "{{ config_owner_user}}"
+    owner: "{{ config_owner_user }}"
     group: "{{ config_owner_group }}"
     mode: "0770"
+  run_once: true
+  delegate_to: "{{ groups['control'][0] }}"
 
 - name: look up public network
   kolla_toolbox:
@@ -48,6 +52,8 @@
   with_first_found:
     - "{{ node_custom_config }}/tempest/tempest.conf"
     - "tempest.conf.j2"
+  run_once: true
+  delegate_to: "{{ groups['control'][0] }}"
 
 - name: bootstrap tempest projects, users,and role grants
   ansible.builtin.import_tasks: testusers.yml
@@ -61,8 +67,9 @@
   delegate_to: localhost
   run_once: True
   register: check_tempest_accounts_yaml
-  
+
 - name: Copying over accounts.yaml
+  become: true
   no_log: true  # contains credentials
   template:
     src: "{{ node_custom_config }}/tempest/accounts.yaml"
@@ -70,14 +77,19 @@
     mode: "0660"
   when:
     - check_tempest_accounts_yaml.stat.exists
+  run_once: true
+  delegate_to: "{{ groups['control'][0] }}"
 
 - name: ensure test accounts password is set
   ansible.builtin.assert:
     that: (tempest_account_password | default('')) | length > 0
+    fail_msg: |
+      tempest_account_password is unset. Add it to /opt/site-config/passwords.yml
   when:
     - not check_tempest_accounts_yaml.stat.exists
 
 - name: template accounts.yaml
+  become: true
   no_log: true  # contains credentials
   ansible.builtin.template:
     src: "accounts.yaml.j2"
@@ -85,6 +97,8 @@
     mode: "0660"
   when:
     - not check_tempest_accounts_yaml.stat.exists
+  run_once: true
+  delegate_to: "{{ groups['control'][0] }}"
 
 - name: write include_list
   become: true
@@ -92,6 +106,8 @@
     src: include_list
     dest: "{{ tempest_config_path }}/include_list"
     mode: "0644"
+  run_once: true
+  delegate_to: "{{ groups['control'][0] }}"
 
 - name: write exclude_list
   become: true
@@ -99,6 +115,8 @@
     src: exclude_list
     dest: "{{ tempest_config_path }}/exclude_list"
     mode: "0644"
+  run_once: true
+  delegate_to: "{{ groups['control'][0] }}"
 
 - name: install cc-tempest docker wrapper
   become: true
@@ -106,3 +124,5 @@
     src: cc-tempest.j2
     dest: /usr/local/sbin/cc-tempest
     mode: "0755"
+  run_once: true
+  delegate_to: "{{ groups['control'][0] }}"
