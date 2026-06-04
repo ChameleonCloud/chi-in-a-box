@@ -1,15 +1,4 @@
 ---
-- name: tempest_account_password must be set in passwords.yml
-  ansible.builtin.assert:
-    that: (tempest_account_password | default('')) | length > 0
-    fail_msg: |
-      tempest_account_password is unset. Add it to /opt/site-config/passwords.yml
-      (vault-encrypted). All four tempest test accounts share this password.
-
-- name: bootstrap tempest projects, users, role grants
-  ansible.builtin.import_tasks: testusers.yml
-  tags:
-    - tempest-keystone
 
 - name: pull tempest_smoke_tests image
   become: true
@@ -23,9 +12,9 @@
   ansible.builtin.file:
     path: "{{ tempest_config_path }}"
     state: directory
-    owner: root
-    group: root
-    mode: "0755"
+    owner: "{{ config_owner_user}}"
+    group: "{{ config_owner_group }}"
+    mode: "0770"
 
 - name: look up public network
   kolla_toolbox:
@@ -53,17 +42,49 @@
 - name: template tempest.conf
   become: true
   ansible.builtin.template:
-    src: tempest.conf.j2
+    src: "{{ item }}"
     dest: "{{ tempest_config_path }}/tempest.conf"
-    mode: "0644"
+    mode: "0660"
+  with_first_found:
+    - "{{ node_custom_config }}/tempest/tempest.conf"
+    - "tempest.conf.j2"
+
+- name: bootstrap tempest projects, users,and role grants
+  ansible.builtin.import_tasks: testusers.yml
+  tags:
+    - tempest-keystone
+  when: tempest_accounts_ansible_managed | bool
+
+- name: Checking whether external accounts.yaml is supplied
+  stat:
+    path: "{{ node_custom_config }}/tempest/accounts.yaml"
+  delegate_to: localhost
+  run_once: True
+  register: check_tempest_accounts_yaml
+  
+- name: Copying over accounts.yaml
+  no_log: true  # contains credentials
+  template:
+    src: "{{ node_custom_config }}/tempest/accounts.yaml"
+    dest: "{{ tempest_config_path }}/accounts.yaml"
+    mode: "0660"
+  when:
+    - check_tempest_accounts_yaml.stat.exists
+
+- name: ensure test accounts password is set
+  ansible.builtin.assert:
+    that: (tempest_account_password | default('')) | length > 0
+  when:
+    - not check_tempest_accounts_yaml.stat.exists
 
 - name: template accounts.yaml
-  become: true
+  no_log: true  # contains credentials
   ansible.builtin.template:
-    src: accounts.yaml.j2
+    src: "accounts.yaml.j2"
     dest: "{{ tempest_config_path }}/accounts.yaml"
-    mode: "0640"
-  no_log: true
+    mode: "0660"
+  when:
+    - not check_tempest_accounts_yaml.stat.exists
 
 - name: write include_list
   become: true

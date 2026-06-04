@@ -1,4 +1,8 @@
 ---
+- name: require tempest_account_password if managing test users
+  ansible.builtin.assert:
+    that: (tempest_account_password | default('')) | length > 0
+
 - name: create tempest test projects
   kolla_toolbox:
     container_engine: "{{ kolla_container_engine }}"
