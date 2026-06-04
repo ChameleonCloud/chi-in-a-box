@@ -41,14 +41,14 @@
   delegate_to: "{{ groups['control'][0] }}"
 
 - ansible.builtin.assert:
-    that: tempest_public_network_info.openstack_networks | length > 0
+    that: tempest_public_network_info.networks | length > 0
     fail_msg: |
       Network '{{ tempest_public_network_name }}' not found in
       {{ openstack_region_name }}. Override tempest_public_network_name
       or create the network first.
 
 - ansible.builtin.set_fact:
-    tempest_public_network_uuid: "{{ tempest_public_network_info.openstack_networks[0].id }}"
+    tempest_public_network_uuid: "{{ tempest_public_network_info.networks[0].id }}"
 
 - name: template tempest.conf
   become: true
