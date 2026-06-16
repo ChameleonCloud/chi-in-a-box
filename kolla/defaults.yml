@@ -256,6 +256,8 @@ keystone_user_domain: default
 keystone_project_domain: default
 keystone_authversion: 3
 openstack_keystone_auth_url: "{{ internal_protocol }}://{{ kolla_internal_fqdn }}:{{ keystone_public_port }}"
+# Required for blazar lease creation
+keystone_allow_insecure_application_credential_trust_escalation: yes
 
 # JupyterHub
 enable_jupyterhub: no
