@@ -385,6 +385,9 @@ enable_kuryr: "{{ enable_zun | bool and not enable_k3s | bool }}"
 enable_zun_compute: "{{ enable_zun | bool and not enable_k3s | bool }}"
 blazar_zun_polling_monitor: true
 
+# k3s defaults
+k3s_cluster_cidr: 100.64.64.0/18
+
 # OSG
 enable_osg: no
 
@@ -405,5 +408,6 @@ image_object_store_url: https://chi.tacc.chameleoncloud.org:7480/swift/v1/AUTH_f
 default_share_type: cephfsnfstype
 
 # Vendordata
+enable_vendordata: "{{ enable_nova | bool }}"
 chameleon_vendordata_tag: "v1.1"
 chameleon_vendordata_read_timeout: 10

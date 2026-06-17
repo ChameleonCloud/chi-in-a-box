@@ -5,8 +5,22 @@
     - role: post_ironic
       when: enable_ironic
 
+- hosts: neutron-l3-agent
+  tasks:
+    - name: configure calico/neutron floating-IP bridge
+      ansible.builtin.import_role:
+        name: post_networking
+        tasks_from: neutron_calico_connect.yml
+      when:
+        - enable_k3s | bool
+        - public_network is defined
+        - public_network is mapping
+        - public_network.name is defined
+
 - hosts: vendordata
-  roles: [vendordata]
+  roles:
+    - role: vendordata
+      when: enable_vendordata | bool
 
 - hosts: hammers
   roles: [hammers]

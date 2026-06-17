@@ -1,0 +1,24 @@
+---
+# Admin router for chi@edge: caliconet-subnet attached as internal interface,
+# public network attached as external gateway. Required for floating-ip
+# connectivity to k8s pods (caliconet IPs <-> public floating IPs).
+#
+# Skipped unless enable_k3s is set and a public_network is defined (see main.yml
+# gating). os_router is idempotent, so re-running is safe.
+
+- name: Create admin router
+  kolla_toolbox:
+    container_engine: "{{ kolla_container_engine }}"
+    module_name: openstack.cloud.router
+    module_args:
+      auth: "{{ openstack_auth }}"
+      project: "{{ keystone_admin_project }}"
+      name: "{{ admin_router_name }}"
+      interfaces:
+        - "{{ caliconet_subnet_name }}"
+      network: "{{ public_network.name }}"
+      external_fixed_ips:
+        - subnet: public-subnet
+      state: present
+  become: true
+  run_once: true

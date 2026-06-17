@@ -1,0 +1,133 @@
+#!/usr/bin/env bash
+# Bridges Neutron floating IPs to Calico pods on chi@edge.
+#
+# Caliconet is a Neutron network with subnet CIDR matching the k3s cluster 
+# network CIDR. Admin-router has an interface in this network so that neutron 
+# will create the necessary NAT rules to assocociate floating IPs with pod IPs.
+#
+# However, the `qr-` interface for caliconet is a stub leading nowhere, as the
+# actual pod IPs are on calico's IPIP overlay via `tunl0`, on top of the 
+# wireguard hub-and-spoke via "wg-" interfaces.
+# 
+# This script bridges the gap by connecting the router ns to root ns with a
+# veth-pair, adding ips and routes so that traffic uses it, and iptables 
+# MASQUERADE rules so that reply traffic from pods follows the path back.
+#
+# Usage:
+#   neutron-calico-connect <admin-router-uuid> <calico-cidr>
+
+set -euo pipefail
+
+tag="neutron-calico-connect"
+log()  { echo "$tag: $*"; }
+warn() { echo "$tag: $*" >&2; }
+die()  { warn "$1"; exit "${2:-1}"; }
+trap 'warn "FAIL line $LINENO: $BASH_COMMAND (exit $?)"' ERR
+
+in_router() { ip netns exec "$neutron_ns" "$@"; }
+
+# Just yell if args aren't passed
+if [[ $# -ne 2 ]]; then
+  die "usage: $0 <admin-router-uuid> <calico-cidr>" 2
+fi
+
+# Yell if not root
+[[ $EUID -eq 0 ]] || die "must run as root" 3
+
+# --- args and constants ---
+router_id="$1"        # neutron router uuid
+calico_cidr="$2"      # cidr of calico network, e.g. `100.64.64.0/18`
+neutron_ns="qrouter-$router_id"
+
+# Private /28 used only by the veth pair. Adjust here if it collides with
+# anything on the site.
+bridge_prefix="28"
+bridge_host_addr="172.16.150.2"
+bridge_router_addr="172.16.150.1"
+
+# --- ensure methods ---
+ensure_veth_pair() {
+  local host_exists rtr_exists state
+  ip -br link show cnb-host >/dev/null 2>&1 && host_exists=1 || host_exists=0
+  in_router ip -br link show cnb-router >/dev/null 2>&1 && rtr_exists=1 || rtr_exists=0
+  state="${host_exists}${rtr_exists}"  # host:rtr, e.g. "10" = host only
+
+  case "$state" in
+    11) return ;;
+    10) warn "veth cnb-router missing in $neutron_ns; recreating pair"
+        ip link delete cnb-host ;;
+    01) warn "veth cnb-host missing but cnb-router lingering in $neutron_ns; cleaning up"
+        in_router ip link delete cnb-router ;;
+    00) log "veth pair absent; creating" ;;
+  esac
+
+  ip link add cnb-host type veth peer name cnb-router
+  ip link set cnb-router netns "$neutron_ns"
+  log "created veth pair cnb-host (root ns) <-> cnb-router ($neutron_ns ns)"
+}
+
+ensure_veth_addrs() {
+  # TODO: log on state change. ip addr replace is silent on noop.
+  ip link set cnb-host up
+  ip addr replace "${bridge_host_addr}/${bridge_prefix}" dev cnb-host
+  in_router ip link set cnb-router up
+  in_router ip addr replace "${bridge_router_addr}/${bridge_prefix}" dev cnb-router
+}
+
+ensure_caliconet_route() {
+  in_router ip route replace "$calico_cidr" via "$bridge_host_addr"
+}
+
+ensure_nat_masq_host() {
+  local rule=(POSTROUTING -o tunl0 -j MASQUERADE
+              -m comment --comment "($tag:01) bridge Neutron floating IPs to Calico")
+  if ! iptables-legacy -t nat -C "${rule[@]}" 2>/dev/null; then
+    iptables-legacy -t nat -A "${rule[@]}"
+    log "inserted nat POSTROUTING ($tag:01) on tunl0 (root ns)"
+  fi
+}
+
+ensure_nat_masq_router() {
+  local rule=(POSTROUTING -o cnb-router -j MASQUERADE
+              -m comment --comment "($tag:02) rewrite source for Calico-bound packets")
+  if ! in_router iptables-legacy -t nat -C "${rule[@]}" 2>/dev/null; then
+    in_router iptables-legacy -t nat -A "${rule[@]}"
+    log "inserted nat POSTROUTING ($tag:02) on cnb-router ($neutron_ns ns)"
+  fi
+}
+
+################
+# --- main --- #
+################
+
+# The network namespace is created by neutron-l3-agent
+# If this script runs early, bail out for retry later
+if [[ ! -e "/var/run/netns/$neutron_ns" ]]; then
+  log "netns $neutron_ns absent; nothing to do"
+  exit 0
+fi
+
+# Ensure veth pair exists, connecting root ns to router ns.
+ensure_veth_pair
+
+# ensure that the veths have correct state and addresses
+# handles case that veth exist, but something modified them
+ensure_veth_addrs
+
+# Override neutron's directly-connected caliconet route so calico-bound
+# traffic from the qrouter exits via the veth instead of via the dead
+# qr-<caliconet> interface.
+ensure_caliconet_route
+
+# Calico encapsulates pod traffic in IPIP via tunl0 to reach pods on
+# remote nodes. If traffic has source IP outside Calico's known address space 
+# (such as processes on the host, or ips in router namespace), replies from pods
+# are undeliverable. Set MASQUERADE on tunl0 to replace source IP with tunl0 IP.
+ensure_nat_masq_host
+
+# For traffic inbound to Floating IPs, neutron-l3-agent does DNAT (rewrite dest
+# addr from FIP to pod), but leaves source IP unmodified. Source will see reply
+# from pod's local GW instead of from the floating IP and may drop it. Set
+# MASQUERADE on router veth to replace source IP with router veth IP, so replies
+# return via the same path.
+ensure_nat_masq_router
