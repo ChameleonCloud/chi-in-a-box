@@ -6,7 +6,9 @@
       when: enable_ironic
 
 - hosts: vendordata
-  roles: [vendordata]
+  roles:
+    - role: vendordata
+      when: enable_vendordata | bool
 
 - hosts: hammers
   roles: [hammers]

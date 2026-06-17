@@ -405,5 +405,6 @@ image_object_store_url: https://chi.tacc.chameleoncloud.org:7480/swift/v1/AUTH_f
 default_share_type: cephfsnfstype
 
 # Vendordata
+enable_vendordata: "{{ enable_nova | bool }}"
 chameleon_vendordata_tag: "v1.1"
 chameleon_vendordata_read_timeout: 10
