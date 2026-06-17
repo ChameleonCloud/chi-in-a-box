@@ -1,0 +1,9 @@
+[Unit]
+Description=Re-apply neutron-calico-connect rules when qrouter netns changes
+
+[Path]
+PathModified=/var/run/netns/qrouter-{{ admin_router_uuid }}
+Unit=neutron-calico-connect.service
+
+[Install]
+WantedBy=multi-user.target

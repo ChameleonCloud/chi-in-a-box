@@ -1,0 +1,12 @@
+[Unit]
+Description=Apply neutron-calico-connect rules
+After=docker.service network-online.target
+Wants=network-online.target
+StartLimitIntervalSec=60
+StartLimitBurst=5
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/neutron-calico-connect {{ admin_router_uuid }} {{ k3s_cluster_cidr }}
+Restart=on-failure
+RestartSec=5s
