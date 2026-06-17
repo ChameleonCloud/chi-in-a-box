@@ -1,0 +1,35 @@
+---
+# Creates the caliconet network and subnet. caliconet routes container (calico
+# pod) IPs through neutron so they can be associated with floating IPs on the
+# public network. The subnet CIDR matches k3s_cluster_cidr (the calico pod
+# CIDR); this whole file is skipped unless enable_k3s is set (see main.yml).
+
+- name: Create caliconet network
+  kolla_toolbox:
+    container_engine: "{{ kolla_container_engine }}"
+    module_name: openstack.cloud.network
+    module_args:
+      auth: "{{ openstack_auth }}"
+      project: "{{ keystone_admin_project }}"
+      name: "{{ caliconet_network_name }}"
+      provider_network_type: local
+      shared: true
+      external: false
+      state: present
+  become: true
+  run_once: true
+
+- name: Create caliconet subnet
+  kolla_toolbox:
+    container_engine: "{{ kolla_container_engine }}"
+    module_name: openstack.cloud.subnet
+    module_args:
+      auth: "{{ openstack_auth }}"
+      project: "{{ keystone_admin_project }}"
+      network_name: "{{ caliconet_network_name }}"
+      name: "{{ caliconet_subnet_name }}"
+      cidr: "{{ k3s_cluster_cidr }}"
+      enable_dhcp: false
+      state: present
+  become: true
+  run_once: true

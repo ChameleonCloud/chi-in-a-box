@@ -3,8 +3,22 @@
   include_tasks: public.yml
 - name: configure shared tenant network(s) and subnet(s)
   include_tasks: sharednet.yml
+  when: neutron_networks | selectattr('sharednet', 'defined') | list | length > 0
 - name: Clean up corsa NAT hook if present
   become: True
   ansible.builtin.file:
     path: /etc/networkd-dispatcher/routable.d/50-corsa-nat.sh
     state: absent
+- name: configure tunelo-calico shadow network
+  include_tasks: tunelo_calico.yml
+  when: enable_neutron_wireguard | default(false) | bool
+- name: configure caliconet network for k8s pods
+  include_tasks: caliconet.yml
+  when: enable_k3s | bool
+- name: configure admin router (caliconet internal, public external gateway)
+  include_tasks: admin_router.yml
+  when:
+    - enable_k3s | bool
+    - public_network is defined
+    - public_network is mapping
+    - public_network.name is defined

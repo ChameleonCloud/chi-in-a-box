@@ -9,3 +9,24 @@ shared_network: "{{ shared_networks[0] if shared_networks }}"
 
 default_sharednet_name: sharednet1
 default_sharednet_cidr: 10.0.0.1/24
+
+##############################################################################
+# Edge networks: tunelo-calico (wireguard IPAM) + caliconet (container IPs)
+##############################################################################
+
+# tunelo-calico is a "shadow" neutron network used by tunelo as IPAM for
+# wireguard tunnel endpoints. tunelo creates the hub port itself at startup;
+# ansible only owns the network and subnet.
+tunelo_calico_network_name: tunelo-calico
+tunelo_calico_subnet_name: tunelo-calico-subnet
+tunelo_calico_subnet_cidr: 10.0.3.0/24
+
+# caliconet routes container (calico pod) IPs through neutron so they can be
+# associated with floating IPs on the public network. The subnet CIDR matches
+# k3s_cluster_cidr (the calico pod CIDR); created only when enable_k3s is set.
+caliconet_network_name: caliconet
+caliconet_subnet_name: caliconet-subnet
+
+# Admin router: caliconet-subnet attached as internal interface, public as
+# external gateway. Required for floating-ip connectivity to k8s pods.
+admin_router_name: admin-router
