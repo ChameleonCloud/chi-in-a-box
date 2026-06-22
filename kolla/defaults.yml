@@ -47,6 +47,7 @@ backup_location: "{{ mariabackup_location if enable_mariabackup | bool else mysq
 # Blazar
 enable_blazar: yes
 enable_blazar_allocation_enforcement: no
+enable_blazar_lease_duration_enforcement: no
 blazar_project_enforcement_id: charge_code
 # When to send lease notification email
 blazar_minutes_before_end_lease: 2880
