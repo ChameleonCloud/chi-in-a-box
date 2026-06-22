@@ -95,6 +95,10 @@ OPENSTACK_BLAZAR_HOST_RESERVATION = {
   'url_format': '{{ blazar_host_url_format }}',
 }
 OPENSTACK_BLAZAR_DEFAULT_COMPUTE_NODE_TYPE = '{{ blazar_default_compute_node_type }}'
+OPENSTACK_BLAZAR_FLAVOR_RESERVATION = {
+  "enabled": {{ blazar_enable_flavor_reservation | bool}},
+  "blazar_flavor_reservation_trait": '{{ blazar_flavor_reservation_trait }}',
+}
 {% endif %}
 
 # horizon themes are represented as a tuple of name, label, and path
