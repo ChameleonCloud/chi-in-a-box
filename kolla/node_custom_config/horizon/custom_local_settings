@@ -91,7 +91,7 @@ OPENSTACK_BLAZAR_DEVICE_RESERVATION = {
   'enabled': {{ enable_zun | bool }},
 }
 OPENSTACK_BLAZAR_HOST_RESERVATION = {
-  'enabled': {{ enable_nova | bool }},
+  'enabled': {{ blazar_enable_host_reservation | bool }},
   'url_format': '{{ blazar_host_url_format }}',
 }
 OPENSTACK_BLAZAR_DEFAULT_COMPUTE_NODE_TYPE = '{{ blazar_default_compute_node_type }}'
