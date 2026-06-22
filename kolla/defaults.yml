@@ -87,6 +87,8 @@ blazar_cleaning_time_minutes: 5
 blazar_enable_host_reservation: "{{ enable_nova | bool }}"
 blazar_enable_flavor_reservation: false
 blazar_flavor_reservation_trait: blazar_flavor_reservation
+blazar_filter_vm_hosts: true
+blazar_filter_ironic_hosts: true
 
 # enable to use https://github.com/ChameleonCloud/nova/pull/9
 # workaround for https://bugs.launchpad.net/nova/+bug/1542491
