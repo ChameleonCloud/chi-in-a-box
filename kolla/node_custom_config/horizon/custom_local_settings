@@ -202,3 +202,6 @@ X_FRAME_OPTIONS = 'SAMEORIGIN'
 
 # disable usage report on overview page
 OPENSTACK_USE_SIMPLE_TENANT_USAGE = False
+
+# In instance launch, only show reserved flavors
+OPENSTACK_SHOW_ONLY_RESERVED_FLAVORS = {{ blazar_enable_flavor_reservation | bool}},
