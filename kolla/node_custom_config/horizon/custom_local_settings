@@ -147,20 +147,23 @@ WEBSSO_DEFAULT_REDIRECT_LOGOUT = '{{ keystone_public_url }}/redirect_uri?logout=
 
 {% endif %}
 
+# If we don't have VMs configured (i.e. no flavor res), then hide VM-only options in the UI
+CHAMELEON_BAREMETAL_ONLY = {{ not (blazar_enable_flavor_reservation | bool) }}
+
 # A dictionary of settings which can be used to provide the default values for
 # properties found in the Launch Instance modal.
 LAUNCH_INSTANCE_DEFAULTS = {
-    'config_drive': False,
+    'config_drive': True,
     'enable_scheduler_hints': True,
     'disable_image': False,
-    'disable_instance_snapshot': True,
-    'disable_volume': True,
-    'disable_volume_snapshot': True,
-    'create_volume': False,
-    'enable_metadata': False,
+    'disable_instance_snapshot': CHAMELEON_BAREMETAL_ONLY,
+    'disable_volume': CHAMELEON_BAREMETAL_ONLY,
+    'disable_volume_snapshot': CHAMELEON_BAREMETAL_ONLY,
+    'create_volume': not CHAMELEON_BAREMETAL_ONLY,
+    'enable_metadata': not CHAMELEON_BAREMETAL_ONLY,
     'enable_net_ports': True,
-    'enable_secgroups': False,
-    'enable_servergroups': False,
+    'enable_secgroups': not CHAMELEON_BAREMETAL_ONLY,
+    'enable_servergroups': not CHAMELEON_BAREMETAL_ONLY,
     'default_flavor_name': 'baremetal',
 }
 
