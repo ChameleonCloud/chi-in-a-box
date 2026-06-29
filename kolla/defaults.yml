@@ -409,5 +409,5 @@ default_share_type: cephfsnfstype
 
 # Vendordata
 enable_vendordata: "{{ enable_nova | bool }}"
-chameleon_vendordata_tag: "v1.1"
+chameleon_vendordata_tag: "v1.3"
 chameleon_vendordata_read_timeout: 10
