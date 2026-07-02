@@ -1,0 +1,92 @@
+# These initial groups are the only groups required to be modified. The
+# additional groups are for more control of the environment.
+[control]
+<host>
+
+# The network nodes are where your l3-agent and loadbalancers will run
+# This can be the same as a host in the control group
+[network]
+<host>
+
+[compute]
+# kvm-compute01
+# kvm-compute02
+# kvm-compute03
+
+[monitoring]
+<host>
+
+[storage]
+<host>
+
+[deployment]
+localhost       ansible_connection=local
+
+######################################
+# Custom Ansible playbooks
+######################################
+
+[hammers:children]
+control
+
+[frontends:children]
+control
+
+[jenkins_slave:children]
+deployment
+
+[jupyterhub:children]
+control
+
+[metric_collector:children]
+control
+
+[chameleon_usage:children]
+mariadb
+
+# Experiment precis service(s)
+[precis:children]
+control
+
+[redfish-monitor:children]
+control
+
+# Chameleon vendordata service
+[vendordata:children]
+control
+
+[keycloak:children]
+control
+
+[keycloak_server:children]
+keycloak
+
+[keycloak_db:children]
+keycloak
+
+[keycloak_tas_sync:children]
+keycloak
+
+# used for executing Tempest functional tests against a site
+[tempest:children]
+deployment
+
+# OSG
+[osg:children]
+control
+
+# Image
+[chameleon-image-tools:children]
+control
+
+# Periodic Inspector
+[chameleon-periodic-inspector:children]
+control
+
+# Chameleon Reference Repository Generator
+[chameleon-reference-repo:children]
+control
+
+# Development, fake baremetal hypervisor host using tenks
+[fake-baremetal:children]
+ironic
