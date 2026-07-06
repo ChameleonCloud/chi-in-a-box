@@ -1,0 +1,25 @@
+# These initial groups are the only groups required to be modified. The
+# additional groups are for more control of the environment.
+[control]
+<host>
+
+# The network nodes are where your l3-agent and loadbalancers will run
+# This can be the same as a host in the control group
+[network]
+<host>
+
+[compute]
+# kvm-compute01
+# kvm-compute02
+# kvm-compute03
+
+[monitoring]
+<host>
+
+[storage]
+<host>
+
+[deployment]
+localhost       ansible_connection=local
+
+# to customize per-service deplyoment details, motify `50-kolla-hosts`
