@@ -1,5 +1,6 @@
 ---
 - name: "set up service: {{ item.key }}"
+  become: true
   vars:
     container_name: "{{ item.value.container_name | default(item.key)}}"
     description: "{{item.value.description | default(item.key) }}"
