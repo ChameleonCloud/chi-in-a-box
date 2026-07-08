@@ -23,7 +23,7 @@ shared_networks: "{{ neutron_networks | selectattr('sharednet', 'defined') | lis
 shared_network: "{{ shared_networks[0] if shared_networks }}"
 
 default_sharednet_name: sharednet1
-default_sharednet_cidr: 10.0.0.1/24
+default_sharednet_cidr: 10.0.0.0/24
 
 ##############################################################################
 # Edge networks: tunelo-calico (wireguard IPAM) + caliconet (container IPs)
