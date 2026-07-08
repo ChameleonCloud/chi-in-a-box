@@ -1,0 +1,5 @@
+- hosts: control
+  roles:
+    - role: post_kvm
+      when: 
+        - chameleon_enable_virtual | bool
