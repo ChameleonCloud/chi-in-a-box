@@ -9,14 +9,14 @@
     module_name: openstack.cloud.networks_info
     module_args:
       auth: "{{ openstack_auth }}"
-      name: public
+      name: "{{ public_network_name }}"
       filters:
         router:external: yes
   register: public_network_lookup
   become: true
   run_once: True
   when:
-    - public_network is defined
+    - public_network is mapping
 
 - name: Create public network
   kolla_toolbox:
@@ -25,15 +25,15 @@
     module_args:
       auth: "{{ openstack_auth }}"
       project: "{{ keystone_admin_project }}"
-      name: public
+      name: "{{ public_network_name }}"
       provider_network_type: flat
-      provider_physical_network: public
+      provider_physical_network: "{{ public_network.name }}"
       external: yes
       state: present
   become: true
   run_once: True
   when:
-    - public_network is defined
+    - public_network is mapping
     - (public_network_lookup.networks | default([])) | length == 0
 
 - name: Look up existing public subnet
@@ -42,19 +42,19 @@
     module_name: openstack.cloud.subnets_info
     module_args:
       auth: "{{ openstack_auth }}"
-      name: public-subnet
+      name: "{{ public_subnet_name }}"
   register: public_subnet_lookup
   become: true
   run_once: True
   when:
-    - public_network.cidr is defined
+    - public_conf.cidr is defined
 
 - name: Set fact for public allocation pool
   ansible.builtin.set_fact:
-    public_allocation_pool_start: "{{ public_network.allocation_pools[0].start | default(public_network.cidr | next_nth_usable(2)) }}"
-    public_allocation_pool_end: "{{ public_network.allocation_pools[0].end | default(public_network.cidr | ipaddr('last_usable') | ipmath(-1)) }}"
+    public_allocation_pool_start: "{{ public_conf.allocation_pools[0].start | default(public_conf.cidr | next_nth_usable(2)) }}"
+    public_allocation_pool_end: "{{ public_conf.allocation_pools[0].end | default(public_conf.cidr | ipaddr('last_usable') | ipmath(-1)) }}"
   when:
-    - public_network.cidr is defined
+    - public_conf.cidr is defined
 
 # NOTE(jason): the os_subnet module doesn't support multiple allocation pools
 # at the moment, so only one allocation pool can be automatically created.
@@ -65,16 +65,16 @@
     module_args:
       auth: "{{ openstack_auth }}"
       project: "{{ keystone_admin_project }}"
-      network_name: public
-      name: public-subnet
-      cidr: "{{ public_network.cidr }}"
+      network_name: "{{ public_network_name }}"
+      name: "{{ public_subnet_name }}"
+      cidr: "{{ public_conf.cidr }}"
       enable_dhcp: false
-      gateway_ip: "{{ public_network.gateway_ip | default(public_network.cidr | ipaddr('last_usable')) }}"
+      gateway_ip: "{{ public_conf.gateway_ip | default(public_conf.cidr | ipaddr('last_usable')) }}"
       allocation_pool_start: "{{ public_allocation_pool_start }}"
       allocation_pool_end: "{{ public_allocation_pool_end }}"
       state: present
   become: true
   run_once: True
   when:
-    - public_network.cidr is defined
+    - public_conf.cidr is defined
     - (public_subnet_lookup.subnets | default([])) | length == 0

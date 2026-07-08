@@ -115,35 +115,38 @@ kolla_internal_vip_address: "10.10.10.254"
 # bridge_name: name of openvswitch bridge mapped to the physical network
 # external_interface: what interface on the host to attach to the ovs bridge
 
-# cidr: the address and netmask for the subnet to be associated with the network.
-#   If using a gateway, it must match the configuration for that gateway.
-# Gateway IP: IP address of external router
-# allocation_pools: Define the address range(s) to hand out on this network.
-#   For the public network, ensure this does NOT overlap with your API addresses defined above!
-
 # on_demand_vlan_ranges: list of vlan IDs that can be automatically assigned on network creation
 # reservable_vlan_ranges: list of vlan IDs that can be reserved via Blazar. it should NOT overlap with
 #   the on_demand_vlan_ranges. Currently a placeholder, as reservable vlans are still created manually.
 
+# public: marks this physical network as the one carrying the external "public" neutron
+#   network, used for router external interfaces and floating IP addresses.
+#   cidr: the address and netmask for the subnet to be associated with the network.
+#   gateway_ip: IP address of external router
+#   allocation_pools: Define the address range(s) to hand out on this network.
+#     Ensure this does NOT overlap with your API addresses defined above!
+
 # sharednet: l3 tenant network used as the "default", for users who don't need isolation.
 #   post-deploy will create a neutron router attached to this network, and NAT traffic from it to the public network.
+#   Takes the same nested cidr/allocation_pools parameters as public.
+
+# The public and sharednet keys may be placed on the same entry to run both over a
+# single physical network (flat public + tagged vlans on one bridge).
 
 neutron_networks:
-- name: public
+- name: physnet1
   bridge_name: br-ex
   # external_interface: <neutron_public_physnet_interface>
-  # cidr: 192.5.87.0/24
-  # gateway_ip: 192.5.87.1
-  # allocation_pools:
-  #   - start: 192.5.87.10
-  #     end: 192.5.87.250
-- name: physnet1
-  bridge_name: br-physnet1
-  # external_interface: <neutron_tenant_physnet_interface>
   on_demand_vlan_ranges:
     - 200:250
   reservable_vlan_ranges:
     - 251:300
+  # public:
+  #   cidr: 192.5.87.0/24
+  #   gateway_ip: 192.5.87.1
+  #   allocation_pools:
+  #     - start: 192.5.87.10
+  #       end: 192.5.87.250
   sharednet:
     # cidr: 10.200.10.0/22
     # allocation_pools:
