@@ -16,9 +16,9 @@
       name: "{{ admin_router_name }}"
       interfaces:
         - "{{ caliconet_subnet_name }}"
-      network: "{{ public_network.name }}"
+      network: "{{ public_network_name }}"
       external_fixed_ips:
-        - subnet: public-subnet
+        - subnet: "{{ public_subnet_name }}"
       state: present
   become: true
   run_once: true

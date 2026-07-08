@@ -1,14 +1,29 @@
+# This file handles configuration of neutron "logical" networks and mapping to 
+# neutron physical networks.  The complexity is due to backwards compatibility
+# concerns, the plan is to clean this up during the 2023.1 -> 2025.1 migration.
+
+# `public_network` here is the neutron physical network config which contains a
+# config entry for the public logical network. See above for why this is messy :(
 public_networks: "{{ neutron_networks | selectattr('public', 'defined') | list }}"
-# This is added for backwards compatibility
+# Entries literally named "public" are also accepted, for backwards compatibility
 named_public_networks: "{{ neutron_networks | selectattr('name', 'equalto', 'public') | list }}"
 all_public_networks: "{{ public_networks + named_public_networks }}"
 public_network: "{{ all_public_networks[0] if all_public_networks }}"
+# Effective public subnet config (cidr, gateway_ip, allocation_pools).
+# For backwards compatibility, this takes values listed under `physnet.public.value`,
+# put also `physnet.value` as previously the subnet config was top level.
+public_conf: "{{ (public_network | combine(public_network.public | default({}, true))) if public_network is mapping else {} }}"
 
+public_network_name: public
+public_subnet_name: public-subnet
+
+# Subnet parameters for sharednet live inside the `sharednet:` dict itself
+# (see sharednet.yml), unlike public_conf there is no top-level fallback.
 shared_networks: "{{ neutron_networks | selectattr('sharednet', 'defined') | list }}"
 shared_network: "{{ shared_networks[0] if shared_networks }}"
 
 default_sharednet_name: sharednet1
-default_sharednet_cidr: 10.0.0.1/24
+default_sharednet_cidr: 10.0.0.0/24
 
 ##############################################################################
 # Edge networks: tunelo-calico (wireguard IPAM) + caliconet (container IPs)
