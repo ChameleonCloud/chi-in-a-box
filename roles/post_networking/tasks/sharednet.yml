@@ -89,9 +89,9 @@
   become: true
   run_once: True
   when:
-    - public_network is defined
+    - public_network is mapping
     - public_network.name is defined
-    - public_network.cidr is defined
+    - public_conf.cidr is defined
 
 - name: Create NAT router for shared network(s).
   kolla_toolbox:
@@ -102,14 +102,14 @@
       project: "{{ keystone_admin_project }}"
       name: sharednet-router
       interfaces: "{{ sharednet_subnets.results | selectattr('subnet', 'defined') | map(attribute='subnet') | map(attribute='name') | list }}"
-      network: "{{ public_network.name }}"
+      network: "{{ public_network_name }}"
       external_fixed_ips:
-        - subnet: "public-subnet"
+        - subnet: "{{ public_subnet_name }}"
   become: true
   run_once: True
   when:
     - sharednet_subnets is defined
-    - public_network is defined
+    - public_network is mapping
     - public_network.name is defined
-    - public_network.cidr is defined
+    - public_conf.cidr is defined
     - (sharednet_router_lookup.routers | default([])) | length == 0
