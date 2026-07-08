@@ -8,8 +8,8 @@
       state: present
       name: "{{ item.name }}"
       is_public: "{{ item.is_public }}"
-      disk: "{{ item.disk }}"
-      ram: "{{ item.ram }}"
+      disk: "{{ item.disk_gb }}"
+      ram: "{{ item.ram_mb }}"
       vcpus: "{{ item.vcpus }}"
   run_once: True
   when:

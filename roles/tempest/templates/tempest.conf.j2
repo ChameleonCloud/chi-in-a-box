@@ -35,7 +35,7 @@ image_ssh_user = cc
 {% if enable_nova | default(false) | bool %}
 image_ref = {{ tempest_compute_image_uuid }}
 image_ref_alt = {{ tempest_compute_image_uuid }}
-flavor_ref = {{ tempest_baremetal_flavor_uuid }}
+flavor_ref = {{ tempest_flavor_uuid }}
 {% endif %}
 build_timeout = 900
 fixed_network_name = {{ tempest_fixed_network_name }}
@@ -93,6 +93,12 @@ container_sync = false
 
 [dashboard]
 dashboard_url = {{ horizon_public_endpoint }}
+
+[reservation]
+{% if chameleon_enable_virtual %}
+reservable_flavor_ref = {{ tempest_flavor_uuid }}
+reservation_type = kvm
+{% endif %}
 
 [reservation-feature-enabled]
 host_plugin = {{ tempest_reservation_host_plugin | bool }}
