@@ -93,7 +93,12 @@
     - public_network.name is defined
     - public_conf.cidr is defined
 
+# To ensure we have the router interface in sharednet, use output of either 
+# lookup or create.
 - name: Create NAT router for shared network(s).
+  vars:
+    existing_subnets: "{{ existing_sharednet_subnet_lookup.subnets | default([]) }}"
+    created_subnets: "{{ sharednet_subnets.results | default([]) | selectattr('subnet', 'defined') | map(attribute='subnet') | list }}"
   kolla_toolbox:
     container_engine: "{{ kolla_container_engine }}"
     module_name: openstack.cloud.router
@@ -101,14 +106,13 @@
       auth: "{{ openstack_auth }}"
       project: "{{ keystone_admin_project }}"
       name: sharednet-router
-      interfaces: "{{ sharednet_subnets.results | selectattr('subnet', 'defined') | map(attribute='subnet') | map(attribute='name') | list }}"
+      interfaces: "{{ (existing_subnets + created_subnets) | map(attribute='name') | list }}"
       network: "{{ public_network_name }}"
       external_fixed_ips:
         - subnet: "{{ public_subnet_name }}"
   become: true
   run_once: True
   when:
-    - sharednet_subnets is defined
     - public_network is mapping
     - public_network.name is defined
     - public_conf.cidr is defined
