@@ -1,3 +1,3 @@
-# Kolla Ansible 2024.1 requires at least Ansible 8 (or ansible-core 2.15) and 
-# supports up to 9 (or ansible-core 2.16).
-ansible >=8,<=9
+# Kolla Ansible 2025.1 requires at least ansible-core 2.17 
+# and up to ansible-core 2.18
+ansible-core >=2.17,<=2.18
