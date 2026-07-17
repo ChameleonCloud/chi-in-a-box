@@ -85,9 +85,6 @@ control
 [horizon:children]
 control
 
-[swift:children]
-control
-
 [barbican:children]
 control
 
@@ -114,7 +111,6 @@ control
 
 [cyborg:children]
 control
-compute
 
 [gnocchi:children]
 control
@@ -158,6 +154,9 @@ monitoring
 [letsencrypt:children]
 loadbalancer
 
+[valkey:children]
+control
+
 # Additional control implemented here. These groups allow you to control which
 # services run on which hosts at a per-service level.
 #
@@ -194,6 +193,9 @@ glance
 nova
 
 [nova-conductor:children]
+nova
+
+[nova-metadata:children]
 nova
 
 [nova-super-conductor:children]
@@ -291,19 +293,6 @@ manila
 
 [manila-nfs-ganesha:children]
 manila
-
-# Swift
-[swift-proxy-server:children]
-swift
-
-[swift-account-server:children]
-storage
-
-[swift-container-server:children]
-storage
-
-[swift-object-server:children]
-storage
 
 # Barbican
 [barbican-api:children]
@@ -550,9 +539,6 @@ monitoring
 [prometheus-libvirt-exporter:children]
 compute
 
-[prometheus-msteams:children]
-prometheus-alertmanager
-
 [prometheus-snmp-exporter:children]
 monitoring
 
@@ -588,6 +574,9 @@ ovn-database
 ovn-database
 
 [ovn-sb-db:children]
+ovn-database
+
+[ovn-sb-db-relay:children]
 ovn-database
 
 [venus-api:children]
