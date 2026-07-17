@@ -411,7 +411,7 @@ mkdir -p "${CONFIG_DIR}/inventory/group_vars/"
 declare -a kolla_args=()
 kolla_args+=(--configdir="$CONFIG_DIR")
 kolla_args+=(--inventory="$CONFIG_DIR/inventory")
-kolla_args+=(--key="$CC_ANSIBLE_VAULT_PASSWORD")
+kolla_args+=(--vault-password-file="$CC_ANSIBLE_VAULT_PASSWORD")
 kolla_args+=(--passwords="$CONFIG_DIR/passwords.yml")
 kolla_args+=(--extra PASSWORDS_FILE="$CONFIG_DIR/passwords.yml")
 kolla_args+=(--extra node_custom_config="$CONFIG_DIR/node_custom_config")
@@ -440,16 +440,10 @@ if [[ "${POSARGS[*]}" =~ post-deploy ]]; then
   cp -f "$DIR/playbooks/post_deploy.yml" "$post_deploy_play"
   kolla_args+=(--extra post_deploy_extra_play="ciab_post_deploy.yml")
 fi
-kolla_args+=("${POSARGS[@]}")
-
-#load tags to skip
-ANSIBLE_SKIP_TAGS="$(grep -v "^#" ./kolla-skip-tags | paste -sd ',' || true )"
-if [[ -n "${ANSIBLE_SKIP_TAGS}" ]]; then
-  kolla_args+=("--skip-tags")
-  kolla_args+=("${ANSIBLE_SKIP_TAGS}")
-fi
+cmdline_args=${POSARGS}
+cmdline_args+=("${kolla_args[@]}")
 
 # kolla-ansible checks PYTHONPATH, so we need to activate the virtualenv
 source "${VIRTUALENV}/bin/activate"
-kolla-ansible "${kolla_args[@]}"
+kolla-ansible "${cmdline_args[@]}"
 # set +o xtrace
