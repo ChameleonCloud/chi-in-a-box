@@ -440,7 +440,7 @@ if [[ "${POSARGS[*]}" =~ post-deploy ]]; then
   cp -f "$DIR/playbooks/post_deploy.yml" "$post_deploy_play"
   kolla_args+=(--extra post_deploy_extra_play="ciab_post_deploy.yml")
 fi
-cmdline_args=${POSARGS}
+cmdline_args=("${POSARGS[@]}")
 cmdline_args+=("${kolla_args[@]}")
 
 # kolla-ansible checks PYTHONPATH, so we need to activate the virtualenv
