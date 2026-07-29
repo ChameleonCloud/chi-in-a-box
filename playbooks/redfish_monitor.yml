@@ -1,4 +1,0 @@
----
-- hosts: redfish-monitor
-  roles:
-    - redfish_monitor
