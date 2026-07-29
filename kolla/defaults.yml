@@ -214,10 +214,6 @@ ironic_inspector_store: database
 # this means inspector won't pxe boot devices itself, and doesn't need to serve boot files to nodes
 ironic_inspector_standalone: false
 
-# This can be "expensive"; allow setting it explicitly, but default to the prometheus interval
-ironic_send_sensor_data_interval: 60
-ironic_send_sensor_data_for_undeployed_nodes: False
-
 # number of times to retry failed neutron api requests
 # will use exponential backoff from 0.5s up to 60s, or
 # will use ironic_neutron_status_code_retry_delay if set
@@ -324,7 +320,7 @@ prometheus_alertmanager_slack_channel: "#notifications"
 # workaround for https://github.com/openstack-exporter/openstack-exporter/issues/268
 prometheus_openstack_exporter_compute_api_version: "2.87"
 
-enable_prometheus_ironic_exporter: no
+enable_ironic_prometheus_exporter: no
 
 # Redfish Monitor
 redfish_monitor_openstack_user: "{{ keystone_admin_username }}"
