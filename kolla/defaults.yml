@@ -208,6 +208,9 @@ ironic_erase_devices_metadata_during_deploy: false
 
 ironic_inspector_store: database
 
+# Temporary workaround, disable ironic scope enforcement until policy updated
+ironic_rbac_enforce_scope: false
+
 # settings for ironic inspector
 
 # don't run standalone, always depend on glance+neutron+ironic.
