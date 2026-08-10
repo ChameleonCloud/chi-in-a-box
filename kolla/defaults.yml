@@ -258,11 +258,6 @@ openstack_keystone_auth_url: "{{ internal_protocol }}://{{ kolla_internal_fqdn }
 # Required for blazar lease creation
 keystone_allow_insecure_application_credential_trust_escalation: yes
 
-# JupyterHub
-enable_jupyterhub: no
-enable_jupyterhub_external: "{{ enable_jupyterhub }}"
-enable_jupyterhub_external_frontend: "{{ enable_jupyterhub_external }}"
-
 # Neutron
 enable_neutron: yes
 enable_openvswitch: yes
