@@ -31,8 +31,6 @@ control
 [jenkins_slave:children]
 deployment
 
-[jupyterhub:children]
-control
 
 [metric_collector:children]
 control
