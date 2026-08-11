@@ -70,7 +70,6 @@
   * [Instance Failure](runbooks/instance-failure.md)
   * [Image Cache Space](runbooks/IronicLowImageCacheSpace.md)
   * [Ironic Node Error State](runbooks/IronicNodeInErrorState.md)
-  * [Jupyter Server Launch Failure](runbooks/JupyterServerLaunchFailure.md)
   * [MySQL Host Down](runbooks/MySQLHostDown.md)
   * [MySQL Replication Error](runbooks/MySQLReplicationError.md)
   * [Node Exporter Down](runbooks/NodeExporterDown.md)
