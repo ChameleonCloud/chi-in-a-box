@@ -31,7 +31,6 @@ done | sort | uniq)"
 
 playbooks=(
   frontends
-  jupyterhub
   metric_collector
   precis
   prometheus
