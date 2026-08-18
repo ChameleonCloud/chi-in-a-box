@@ -1,5 +1,5 @@
 ---
-openstack_release: "2024.1"
+openstack_release: "2025.1"
 cloud: envvars
 
 docker_registry: ghcr.io
