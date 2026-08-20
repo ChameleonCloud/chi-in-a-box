@@ -1,2 +1,2 @@
-"baremetal:node:get": "role:osg or rule:is_admin"
+"baremetal:node:get": "role:osg or rule:is_admin or role:service"
 "show_password": "rule:is_admin"
