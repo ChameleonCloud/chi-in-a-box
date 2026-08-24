@@ -361,7 +361,7 @@ if [[ -n "${CC_ANSIBLE_PLAYBOOK:-}" ]]; then
   TRAPS+=(_playbook_override_cleanup)
 
   # Prepare an invocation of Kolla-Ansible targeting this playbook
-  POSARGS+=(deploy --playbook "$playbook_file")
+  POSARGS=(deploy --playbook "$playbook_file" "${POSARGS[@]}")
 fi
 
 lockfile="$CC_ANSIBLE_SITE/.lock"
