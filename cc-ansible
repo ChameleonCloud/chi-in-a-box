@@ -112,7 +112,7 @@ init() {
   # Do some simple hostname guessing
   this_host=$(hostname -s)
   sed -i.bak "s/<host>/$this_host/g" "$inventory/10-base-hosts" \
-    && rm -f "$inventory/hosts.bak"
+    && rm -f "$inventory/10-base-hosts.bak"
   mv "$inventory/host_vars/<host>" "$inventory/host_vars/$this_host"
 
   # Generate vault password
