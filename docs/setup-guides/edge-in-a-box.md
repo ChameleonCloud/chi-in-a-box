@@ -275,7 +275,7 @@ Once the images are pulled, you can run the "deploy" phase, which sets up all th
 ./cc-ansible deploy
 ```
 
-> **Note**: if you encounter errors and need to re-run the deploy step, which is expensive, you can skip parts you know have already succeeded. You can watch the Ansible output to see which "role" (service) it is updating. If you know a certain role has completed successfully, you can try skipping it on the next run with the `--skip-tags` option, e.g. `--skip-tags keystone,nova` to skip the Keystone and Nova provisioning. You can persist these by uncommenting their lines in `kolla-skip-tags`
+> **Note**: if you encounter errors and need to re-run the deploy step, which is expensive, you can skip parts you know have already succeeded. You can watch the Ansible output to see which "role" (service) it is updating. If you know a certain role has completed successfully, you can try skipping it on the next run with the `--skip-tags` option, e.g. `--skip-tags keystone,nova` to skip the Keystone and Nova provisioning. Note that flags must come after the subcommand, e.g. `./cc-ansible deploy --skip-tags keystone,nova`.
 
 ### Deploy K3S Playbook
 
