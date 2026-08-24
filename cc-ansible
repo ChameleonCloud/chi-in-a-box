@@ -32,10 +32,6 @@ while [[ $# -gt 0 ]]; do
       CC_ANSIBLE_SITE="$(realpath "$2")"
       shift # Past arg
       ;;
-    --check)
-      # Add proper flag support for --check as an option for dry-runs
-      export EXTRA_OPTS="${EXTRA_OPTS:-} --check"
-      ;;
     decrypt_passwords|edit_passwords|update_passwords|help|install_deps|init|view_passwords|encrypt_file|decrypt_file)
       # Special subcommand!
       command="$key"
@@ -262,6 +258,9 @@ Examples:
 
   # Run the 'upgrade' step for only Ironic tags
   cc-ansible upgrade --tags ironic
+
+  # Dry-run a deploy (flags must come after the subcommand)
+  cc-ansible deploy --check
 
   # Run an external playbook
   cc-ansible --playbook path/to/playbook.yml
