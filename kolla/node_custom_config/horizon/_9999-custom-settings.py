@@ -90,6 +90,9 @@ OPENSTACK_BLAZAR_FLOATINGIP_RESERVATION = {
 OPENSTACK_BLAZAR_DEVICE_RESERVATION = {
   'enabled': {{ enable_zun | bool }},
 }
+OPENSTACK_BLAZAR_FLAVOR_RESERVATION = {
+  'enabled': {{ blazar_enable_flavor_reservation | bool }},
+}
 OPENSTACK_BLAZAR_HOST_RESERVATION = {
   'enabled': {{ enable_nova | bool }},
   'url_format': '{{ blazar_host_url_format }}',
