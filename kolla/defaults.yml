@@ -415,3 +415,8 @@ chameleon_vendordata_read_timeout: 10
 
 #M.S. 2026/08/19 Disable proxysql until hammers and periodic tasks are updated
 enable_proxysql: false
+
+# baremetal site default flags
+chameleon_enable_baremetal: true
+chameleon_enable_vms: false
+chameleon_hide_security_groups: true

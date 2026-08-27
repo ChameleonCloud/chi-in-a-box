@@ -198,3 +198,7 @@ X_FRAME_OPTIONS = 'SAMEORIGIN'
 
 # disable usage report on overview page
 OPENSTACK_USE_SIMPLE_TENANT_USAGE = False
+
+CHAMELEON_ENABLE_BAREMETAL = {{ chameleon_enable_baremetal | bool }}
+CHAMELEON_ENABLE_VMS = {{ chameleon_enable_vms | bool }}
+CHAMELEON_HIDE_SECURITY_GROUPS = {{ chameleon_hide_security_groups | bool }}
