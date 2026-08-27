@@ -84,6 +84,8 @@ blazar_network_polling_monitor_dry_run: true
 blazar_randomize_hosts: true
 blazar_cleaning_time_minutes: 5
 
+blazar_enable_flavor_reservation: false
+
 # enable to use https://github.com/ChameleonCloud/nova/pull/9
 # workaround for https://bugs.launchpad.net/nova/+bug/1542491
 use_blazar_prefilter: false
