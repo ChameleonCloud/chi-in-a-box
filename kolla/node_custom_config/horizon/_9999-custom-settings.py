@@ -158,7 +158,7 @@ LAUNCH_INSTANCE_DEFAULTS = {
     'create_volume': False,
     'enable_metadata': False,
     'enable_net_ports': True,
-    'enable_secgroups': False,
+    'enable_secgroups': {{ not (chameleon_hide_security_groups | bool) }},
     'enable_servergroups': False,
     'default_flavor_name': 'baremetal',
 }
