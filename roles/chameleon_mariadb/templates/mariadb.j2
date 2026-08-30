@@ -11,10 +11,13 @@ BACKUP_VOLUME="{{ backup_location }}"
 PREFIX=mysqlbackup-
 
 cleanup() {
-  # on exit, rotate backups keeping the last $ROTATE days
+  # on exit, delete local backups older than $ROTATE days. Two layouts:
+  # Kolla pre-2025.1: /backup/${PREFIX}* 
+  # Kolla 2025.1: each backup is in a subdirectory, full-*/ or incr-*/
   docker run -u 0 --rm -v ${BACKUP_VOLUME}:/backup "{{ kolla_toolbox_image_full }}" \
   /bin/bash -c \
-  "find /backup -maxdepth 1 -type f -name "${PREFIX}*" -mtime +${ROTATE} -print0 | xargs -0 -r rm -v -f"
+  "find /backup -mindepth 1 -maxdepth 1 -type d \( -name 'full-*' -o -name 'incr-*' \) -mtime +${ROTATE} -print0 | xargs -0 -r rm -v -rf; \
+   find /backup -maxdepth 1 -type f -name "${PREFIX}*" -mtime +${ROTATE} -print0 | xargs -0 -r rm -v -f"
 }
 
 
