@@ -89,6 +89,10 @@ blazar_cleaning_time_minutes: 5
 # enable to use https://github.com/ChameleonCloud/nova/pull/9
 # workaround for https://bugs.launchpad.net/nova/+bug/1542491
 use_blazar_prefilter: false
+# If true, prefilter will reject any scheduling request without a reservation hint.
+# Turn off to permit scheduling instances onto non-blazar hosts
+# Turn off to permit flavor reservations at all # TODO fix this.
+blazar_prefilter_require_reservation_hint: true
 
 # Cinder
 enable_cinder: no

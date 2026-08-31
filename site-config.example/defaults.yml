@@ -213,3 +213,15 @@ neutron_networks:
 #       community_string: "{{ dell_switch_community_string }}"
 #     ngs_config:
 #       fast_cli: True
+
+######################
+# Blazar configuration
+######################
+
+# Use the Blazar scheduler prefilter instead of BlazarFilter.
+# use_blazar_prefilter: false
+
+# Reject scheduling requests that carry no physical:host reservation hint.
+# Set false on hybrid sites: a VM launched from a flavor reservation carries
+# its reservation in the flavor and sends no hint.
+# blazar_prefilter_require_reservation_hint: true
