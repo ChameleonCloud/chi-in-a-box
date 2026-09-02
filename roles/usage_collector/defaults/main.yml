@@ -10,7 +10,7 @@ usage_collector_timer: "*-*-* 00:00:00" # collect daily at midnight
 usage_collector_site_key: "{{ chameleon_site_name }}" # from defaults.yml or site-config
 usage_collector_site_name: "{{ openstack_region_name }}"
 
-usage_collector_mysql_user: cc_usage # Read only user
+usage_collector_mysql_user: cc_usage_collector # Read only user
 #usage_collector_mysql_password:
 
 usage_collector_db_uri: "mysql://{{ usage_collector_mysql_user }}:{{ usage_collector_mysql_password }}@{{ database_address }}"
