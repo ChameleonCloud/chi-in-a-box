@@ -39,7 +39,7 @@
   become: yes
   template:
     src: chameleon-image-deploy.service.j2
-    dest: /etc/systemd/system/chameleon-image-deploy.service
+    dest: /etc/systemd/system/{{ chameleon_site_name }}-chameleon-image-deploy.service
     mode: '0644'
   when: enable_image_deployer | bool
 
