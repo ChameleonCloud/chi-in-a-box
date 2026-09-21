@@ -17,7 +17,7 @@ COPY .git .git
 COPY src src
 COPY roles roles
 COPY playbooks playbooks
-COPY requirements.txt requirements.yml cc-ansible .
+COPY requirements.txt requirements.yml ansible.cfg cc-ansible .
 
 # install_deps: creates venv, installs kolla-ansible, ansible, yq, galaxy roles
 RUN ./cc-ansible install_deps -vv
