@@ -70,7 +70,7 @@ def _build_site_config(dest, profile_dirs):
     shutil.copytree(CIAB_DIR / "site-config.example", dest)
 
     # Substitute <host> with localhost in the example inventory.
-    hosts = dest / "inventory" / "hosts"
+    hosts = dest / "inventory" / "10-base-hosts"
     hosts.write_text(
         hosts.read_text().replace("<host>", "localhost ansible_connection=local")
     )

@@ -17,6 +17,11 @@ def ciab_dir():
 
 
 @pytest.fixture(scope="session")
+def example_inventory():
+    return CIAB_DIR / "site-config.example" / "inventory"
+
+
+@pytest.fixture(scope="session")
 def ciab_defaults_path():
     return CIAB_DIR / "kolla" / "defaults.yml"
 
