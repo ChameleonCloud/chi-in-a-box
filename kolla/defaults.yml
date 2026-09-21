@@ -368,7 +368,14 @@ es_java_opts: "-Xms{{ es_heap_size }} -Xmx{{ es_heap_size }} -Dlog4j2.formatMsgN
 es_enable_painless_regex: no
 enable_grafana: no
 
+external_loki_enabled: "{{ upload_logs_chameleon | bool }}"
 loki_url: "https://logs.chameleoncloud.org"
+# Loki and Prometheus share the central-monitoring credentials.
+loki_username: "{{ prometheus_remote_write_username }}"
+loki_password: "{{ prometheus_remote_write_password }}"
+loki_custom_labels:
+  keystone_idp_client_id: "{{ keystone_idp_client_id }}"
+  chameleon_site_name: "{{ chameleon_site_name }}"
 prometheus_remote_write_url: "https://metrics.chameleoncloud.org/api/v1/push"
 prometheus_remote_write_username: "{{ keystone_idp_client_id }}"
 upload_logs_chameleon: false
