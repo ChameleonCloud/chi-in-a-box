@@ -10,4 +10,4 @@ neutron_external_interface: eth1
 kolla_base_distro: ubuntu
 # Bypass /etc/ansible/venv/bin/python (created by bootstrap-servers on
 # real hosts but not present in the test container).
-ansible_python_interpreter: python3
+virtualenv: ""
