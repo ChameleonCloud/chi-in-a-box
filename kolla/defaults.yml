@@ -333,6 +333,14 @@ prometheus_port: "9090"
 prometheus_user: "prometheus"
 prometheus_alertmanager_slack_channel: "#notifications"
 
+# Services whose auto-generated blackbox probe doesn't work here:
+#   horizon  - federated login auto-redirects, so the probe never sees a 2xx
+#   blazar   - version endpoint sits behind keystone auth
+#   ceph_rgw - probe fails, cause not yet identified
+enable_blackbox_exporter_ceph_rgw: false
+enable_blackbox_exporter_horizon: false
+enable_blackbox_exporter_blazar: false
+
 # workaround for https://github.com/openstack-exporter/openstack-exporter/issues/268
 prometheus_openstack_exporter_compute_api_version: "2.87"
 
