@@ -9,30 +9,35 @@ import yaml
 import pytest
 
 
-def _parse_ini_groups(path):
-    """Extract group names from an ansible inventory file."""
+def _inventory_files(inventory):
+    """The files Ansible reads from an inventory directory."""
+    return sorted(p for p in inventory.iterdir() if p.is_file())
+
+
+def _parse_ini_groups(paths):
+    """Group names declared across the given inventory files."""
     groups = set()
-    for line in path.read_text().splitlines():
-        m = re.match(r'^\[([^\]:]+)', line)
-        if m:
-            groups.add(m.group(1))
+    for path in paths:
+        for line in path.read_text().splitlines():
+            m = re.match(r'^\[([^\]:]+)', line)
+            if m:
+                groups.add(m.group(1))
     return groups
 
 
 class TestInventorySync:
     """Ensure chi-in-a-box example inventory has all groups kolla-ansible expects."""
 
-    def test_example_inventory_exists(self, ciab_dir):
-        assert (ciab_dir / "site-config.example" / "inventory" / "hosts").exists()
+    def test_example_inventory_exists(self, example_inventory):
+        assert _inventory_files(example_inventory)
 
-    def test_no_missing_groups(self, ciab_dir, kolla_ansible_dir):
+    def test_no_missing_groups(self, example_inventory, kolla_ansible_dir):
         kolla_multinode = kolla_ansible_dir / "ansible" / "inventory" / "multinode"
         if not kolla_multinode.exists():
             pytest.skip("kolla-ansible multinode inventory not found")
 
-        kolla_groups = _parse_ini_groups(kolla_multinode)
-        ciab_groups = _parse_ini_groups(
-            ciab_dir / "site-config.example" / "inventory" / "hosts")
+        kolla_groups = _parse_ini_groups([kolla_multinode])
+        ciab_groups = _parse_ini_groups(_inventory_files(example_inventory))
 
         missing = kolla_groups - ciab_groups
         allowed_missing = {"connection-plugin"}
