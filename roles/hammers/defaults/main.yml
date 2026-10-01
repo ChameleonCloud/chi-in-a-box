@@ -6,6 +6,13 @@ hammers_kubeconfig_path: /etc/hammers/kubeconfig.yml
 hammers_mysql_user: cc_hammers
 hammers_mysql_host: "{{ database_address }}"
 
+# SMTP relay for hammers notifications. Defaults to Blazar's relay settings.
+hammers_smtp_host: "{{ blazar_email_relay | default('127.0.0.1') }}"
+hammers_smtp_port: "{{ blazar_email_port | default('') }}"
+hammers_smtp_ssl: "{{ blazar_email_ssl | default(false) | bool }}"
+hammers_smtp_user: "{{ blazar_email_user | default('') }}"
+hammers_smtp_password: "{{ blazar_email_password | default('') }}"
+
 hammers:
   # Networking/Neutron
   floating_ip_reaper:
