@@ -1,7 +1,0 @@
-#!/usr/bin/env bash
-# Push metric cron_last_success with labels {job="cron", name="<name of hammer>"}
-curl --data-binary @- "{{ prometheus_push_gateway }}/metrics/job/cron/name/$1" <<DATA
-# TYPE cron_last_success gauge
-# HELP cron_last_success The timestamp of the last time this cron job completed successfully.
-cron_last_success $(date +%s)
-DATA
