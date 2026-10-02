@@ -8,6 +8,12 @@ CHI-in-a-Box comes with several automated periodic tasks called "hammers", which
 
 The [hammers](https://github.com/chameleoncloud/hammers) repository goes into more detail about what each of these hammers does, and why they exist.
 
+There are two generations of hammers, each running from its own container image:
+- The original hammers come from the [hammers](https://github.com/chameleoncloud/hammers) repo. Their image is pinned by `chameleon_hammers_tag`.
+- v2 hammers come from the [hammers-v2](https://github.com/chameleoncloud/hammers-v2) repo. They run from the site tools image, pinned by `chameleon_site_tools_tag`.
+
+See [Chameleon tools](../README.md) for how to update either one at a site.
+
 ### Listing all hammers
 
 Hammers are by default installed onto the `control` node in the site configuration Ansible inventory. This is usually the node that runs the bulk of the services. You can list all the installed hammers by enumerating the systemd [timers](https://wiki.archlinux.org/index.php/Systemd/Timers).

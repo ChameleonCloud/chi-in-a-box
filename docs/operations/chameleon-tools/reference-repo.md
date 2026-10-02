@@ -18,8 +18,8 @@ run the tool by executing the `chameleon_reference_repo` playbook.
 cc-ansible --playbook playbooks/chameleon_reference_repo.yml
 ```
 
-The playbook will pull the latest chameleon_reference_repo Docker image to
-run the tool.
+The playbook pulls the site tools image at the version set by
+`chameleon_site_tools_tag`. See [Chameleon tools](README.md) for how to update it.
 
 ## Required Environment Variables
 
