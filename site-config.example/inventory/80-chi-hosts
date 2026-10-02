@@ -8,9 +8,6 @@ control
 [frontends:children]
 control
 
-[jenkins_slave:children]
-deployment
-
 [metric_collector:children]
 control
 
