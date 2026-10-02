@@ -17,10 +17,6 @@ control
 [chameleon_usage:children]
 mariadb
 
-# Experiment precis service(s)
-[precis:children]
-control
-
 [redfish-monitor:children]
 control
 

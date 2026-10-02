@@ -102,7 +102,6 @@ case "${POSARGS[0]}" in
       neutron_openvswitch_agent >/dev/null
 
     echo "Stopping custom infrastructure"
-    systemctl stop 'experiment-precis-*'
     systemctl stop chameleon-vendordata
 
     echo "Stopping databases"
@@ -129,7 +128,6 @@ case "${POSARGS[0]}" in
 
     echo "Starting custom infrastructure"
     ./cc-ansible --playbook playbooks/prometheus.yml
-    systemctl restart 'experiment-precis-*'
     systemctl restart chameleon-vendordata
 
     echo "Starting core infrastructure containers"

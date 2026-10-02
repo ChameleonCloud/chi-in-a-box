@@ -1,7 +1,0 @@
----
-- name: Install and configure services for Precis
-  hosts: precis
-  roles:
-    - role: precis
-      tags:
-        - "precis"

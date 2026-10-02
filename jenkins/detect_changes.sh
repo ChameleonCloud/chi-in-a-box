@@ -32,7 +32,6 @@ done | sort | uniq)"
 playbooks=(
   frontends
   metric_collector
-  precis
   prometheus
   vendordata
 )

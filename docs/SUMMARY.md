@@ -79,7 +79,6 @@
   * [OpenStack API Down](runbooks/OpenStackAPIDown.md)
   * [PeriodicTask No Recent Success](runbooks/PeriodicTaskNoRecentSuccess.md)
   * [Portal Down](runbooks/PortalDown.md)
-  * [Precis Parsed Events Low](runbooks/PrecisParsedEventsLow.md)
   * [Provider Conflict](runbooks/provider-conflict.md)
   * [Runbook Template](runbooks/Template.md)
 * [User support guide](operations/user-support-guide.md)

@@ -52,10 +52,6 @@
     - role: chameleon_usage
       when: enable_usage_reporting | bool
 
-- name: Install and configure services for Precis
-  hosts: precis
-  roles: [precis]
-
 - hosts: manila-nfs-ganesha
   roles:
     - role: filesystem
