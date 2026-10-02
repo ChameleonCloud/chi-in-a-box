@@ -27,11 +27,6 @@ src/*/build/
 kolla/certificates
 kolla/node_custom_config/certificates
 
-# Vagrant development environment
-vagrant/.vagrant
-vagrant/storage
-vagrant/vagrantkey*
-
 # Python build files
 *.pyc
 **/__pycache__/
