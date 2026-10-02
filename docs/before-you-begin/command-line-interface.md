@@ -17,14 +17,14 @@ export CC_ANSIBLE_SITE=/path/to/site-config
 
 #### Applying playbooks
 
-Playbooks are set up to target a host group with the same name. This means the `grafana` playbook will target the `grafana` host group etc. To run a playbook, you can use the `./cc-ansible` wrapper script, which just sets up two important parameters for you: the Ansible Vault configuration, and the inventory path.
+Playbooks are set up to target a host group with the same name. This means the `hammers` playbook will target the `hammers` host group etc. To run a playbook, you can use the `./cc-ansible` wrapper script, which just sets up two important parameters for you: the Ansible Vault configuration, and the inventory path.
 
 ```bash
-# Run the 'grafana' playbook (deploys/updates grafana)
-./cc-ansible --playbook playbooks/grafana.yml
-# Run only the tasks tagged 'configuration' in the 'grafana' playbook
+# Run the 'hammers' playbook (deploys/updates the hammers periodic tasks)
+./cc-ansible --playbook playbooks/hammers.yml
+# Preview what the 'hammers' playbook would change, without applying it
 # (Any arguments normally passed to ansible-playbook can be passed here.)
-./cc-ansible --playbook playbooks/grafana.yml --tags configuration
+./cc-ansible --playbook playbooks/hammers.yml --check --diff
 ```
 
 #### Running Kolla-Ansible actions
