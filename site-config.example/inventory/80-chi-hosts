@@ -5,17 +5,8 @@
 [hammers:children]
 control
 
-[frontends:children]
-control
-
-[metric_collector:children]
-control
-
 [chameleon_usage:children]
 mariadb
-
-[redfish-monitor:children]
-control
 
 # Chameleon vendordata service
 [vendordata:children]
