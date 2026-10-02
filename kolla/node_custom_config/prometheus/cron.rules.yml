@@ -1,12 +1,6 @@
 groups:
   - name: cron
     rules:
-      - record: cron_last_success_threshold
-        # This job runs once a month, check that it has run in last 32 days.
-        expr: 3600 * 24 * 32
-        labels:
-          name: precis_cleanup
-
       - alert: CronJobNoRecentSuccess
         expr: |
           time() - cron_last_success
@@ -25,12 +19,6 @@ groups:
 
   - name: periodic_task
     rules:
-      - record: periodic_task_last_success_threshold
-        # This job runs once a month, check that it has run in last 32 days.
-        expr: 3600 * 24 * 32
-        labels:
-          name: precis_cleanup
-
       - alert: PeriodicTaskNoRecentSuccess
         expr: |
           time() - periodic_task_last_success

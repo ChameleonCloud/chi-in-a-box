@@ -319,35 +319,6 @@ chameleon_portal_mysql_host: udcc-db01.tacc.utexas.edu
 chameleon_portal_mysql_user: chameleon_ro
 chameleon_portal_mysql_database: chameleon_prod
 
-# Experient Precis
-enable_precis: no
-# Precis reads messagingv2 notifications from the notifications topic.
-# Each list copies kolla's default and adds enable_precis.
-blazar_notification_topics:
-  - name: notifications
-    enabled: "{{ enable_ceilometer | bool or enable_precis | bool }}"
-glance_notification_topics:
-  - name: notifications
-    enabled: "{{ enable_ceilometer | bool or enable_precis | bool }}"
-heat_notification_topics:
-  - name: notifications
-    enabled: "{{ enable_ceilometer | bool or enable_precis | bool }}"
-ironic_notification_topics:
-  - name: notifications
-    enabled: "{{ enable_ceilometer | bool or enable_precis | bool }}"
-# Copied from upstream neutron defaults: the infoblox condition and the designate topic.
-neutron_notification_topics:
-  - name: notifications
-    enabled: "{{ enable_ceilometer | bool or enable_neutron_infoblox_ipam_agent | bool or enable_precis | bool }}"
-  - name: "{{ designate_notifications_topic_name }}"
-    enabled: "{{ designate_enable_notifications_sink | bool }}"
-# Copied from upstream nova and nova-cell defaults: the infoblox condition and the designate topic.
-nova_notification_topics:
-  - name: notifications
-    enabled: "{{ enable_ceilometer | bool or enable_neutron_infoblox_ipam_agent | bool or enable_precis | bool }}"
-  - name: "{{ designate_notifications_topic_name }}"
-    enabled: "{{ designate_enable_notifications_sink | bool }}"
-
 # Prometheus
 enable_prometheus: yes
 enable_prometheus_external: no

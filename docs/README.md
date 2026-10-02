@@ -44,7 +44,6 @@ In this scenario a provider wants to create a testbed that is in every way separ
 Chameleon additionally provides a few useful extra pieces for all users of CHI-in-a-Box associate sites:
 
 * Integration with the [Chameleon shared Jupyter environment](https://chameleoncloud.readthedocs.io/en/latest/technical/jupyter.html), to allow orchestrating experiments via Jupyter notebooks.
-* [Experiment Precis](https://chameleoncloud.readthedocs.io/en/latest/technical/ep.html) provides automatic environment capture for documentation and reproducibility.
 * Login with existing host credential accounts--no need to create another account or password to access Chameleon infrastructure. Take one account and use it on any Chameleon site.
 
 **For operators**: A suite of additional tools to help you administer your testbed with confidence "as cheaply as possible."
