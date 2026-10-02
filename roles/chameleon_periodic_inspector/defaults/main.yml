@@ -1,5 +1,5 @@
 ---
-chameleon_resource_discovery_docker_image: ghcr.io/chameleoncloud/chameleon_site_tools:sha-384af41
+chameleon_resource_discovery_docker_image: "{{ chameleon_site_tools_image_full }}"
 chameleon_resource_discovery_config_dir: /etc/hammers
 
 chameleon_resource_discovery_parallel: 5

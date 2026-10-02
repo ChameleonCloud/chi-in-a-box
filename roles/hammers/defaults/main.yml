@@ -78,7 +78,7 @@ hammers:
 
 hammers_slack_webhook: "{{ slack_api_url }}"
 
-hammers_v2_docker_image: ghcr.io/chameleoncloud/chameleon_site_tools:main
+hammers_v2_docker_image: "{{ chameleon_site_tools_image_full }}"
 hammers_v2:
   floating_ip_network_reaper:
     description: "Clean up networks for expired projects."

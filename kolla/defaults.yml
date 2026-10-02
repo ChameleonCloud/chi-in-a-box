@@ -444,6 +444,12 @@ enable_vendordata: "{{ enable_nova | bool }}"
 chameleon_vendordata_tag: "v1.3"
 chameleon_vendordata_read_timeout: 10
 
+# Chameleon site tools image, shared by hammers v2, image tools,
+# periodic inspector and reference repo
+chameleon_site_tools_image: ghcr.io/chameleoncloud/chameleon_site_tools
+chameleon_site_tools_tag: "v0.2"
+chameleon_site_tools_image_full: "{{ chameleon_site_tools_image }}:{{ chameleon_site_tools_tag }}"
+
 #M.S. 2026/08/19 Disable proxysql until hammers and periodic tasks are updated
 enable_proxysql: false
 
