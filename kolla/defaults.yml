@@ -127,6 +127,10 @@ glance_allow_anonymous_access: no
 glance_enable_property_protection: true
 
 # Hammers
+# v1 hammers image. v2 hammers use the Chameleon site tools image.
+chameleon_hammers_image: ghcr.io/chameleoncloud/hammers
+chameleon_hammers_tag: "v0.3.8"
+chameleon_hammers_image_full: "{{ chameleon_hammers_image }}:{{ chameleon_hammers_tag }}"
 hammers_enable_dirty_ports: "{{ enable_ironic | bool }}"
 hammers_enable_ironic_error_resetter: "{{ enable_ironic | bool }}"
 hammers_enable_lease_stacking: "{{ enable_blazar | bool }}"
@@ -393,7 +397,9 @@ default_share_type: cephfsnfstype
 
 # Vendordata
 enable_vendordata: "{{ enable_nova | bool }}"
+chameleon_vendordata_image: ghcr.io/chameleoncloud/chameleon-vendordata-service
 chameleon_vendordata_tag: "v1.3"
+chameleon_vendordata_image_full: "{{ chameleon_vendordata_image }}:{{ chameleon_vendordata_tag }}"
 chameleon_vendordata_read_timeout: 10
 
 # Chameleon site tools image, shared by hammers v2, image tools,

@@ -14,7 +14,7 @@ The image tools are by default installed onto the `control` node in the site con
 cc-ansible --playbook playbooks/chameleon_image_tools.yml
 ```
 
-The configuration steps will pull the latest `chameleon_image_tools` docker image and prepare the configuration file that is required for using the tools.
+The configuration steps pull the site tools image at the version set by `chameleon_site_tools_tag`, and prepare the configuration file the tools need. See [Chameleon tools](README.md) for how to update the image.
 
 ### Deployer
 
@@ -33,6 +33,9 @@ systemctl start chameleon-image-deploy.service
 ```
 
 ### IPA Image Tester
+
+> **Outdated:** the commands in this section use the retired `chameleon_image_tools` image. The site tools image has no `ipa_test` command.
+
 Ironic Python Agent (IPA) is an agent for controlling and deploying Ironic controlled baremetal nodes. In order to support various hardware types, Chameleon builds and deploys
 custom IPA images based on OpenStack upstream releases. To deploy Chameleon IPA images to site Glance, please use the [deployer tool](#deployer).
 

@@ -19,5 +19,5 @@ run the image tools by executing the `chameleon_periodic_inspector` playbook.
 cc-ansible --playbook playbooks/chameleon_periodic_inspector.yml
 ```
 
-The playbook will pull the latest `chameleon_periodic_inspector` Docker image
-to run the tool.
+The playbook pulls the site tools image at the version set by
+`chameleon_site_tools_tag`. See [Chameleon tools](README.md) for how to update it.
