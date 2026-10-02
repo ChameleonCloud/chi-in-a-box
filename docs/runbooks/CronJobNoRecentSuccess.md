@@ -9,9 +9,3 @@
 1. Try running the failing job manually (see its entry via `crontab -l`) to see what type of error is generated. If it is an authentication error, see if the user (defined as the `hammers_openstack_user` var) is disabled/missing.
 
 **Runtime error**: A job may encounter input is unfamiliar with. The code for the job will have to be fixed; an issue should be raised for this.
-
-### Job-specific runbooks
-
-#### `keycloak_tas_sync`
-
-If the sync is running for a while but then encounters a 401 unauthorized error, it can be because the service account's token has too short of an expiration. The current configured TTL is in the configuration for the "user-group-import" client in the master Keycloak realm as an advanced setting (Access Token Lifespan).

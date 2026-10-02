@@ -21,18 +21,6 @@ control
 [vendordata:children]
 control
 
-[keycloak:children]
-control
-
-[keycloak_server:children]
-keycloak
-
-[keycloak_db:children]
-keycloak
-
-[keycloak_tas_sync:children]
-keycloak
-
 # used for executing Tempest functional tests against a site
 [tempest:children]
 deployment
