@@ -326,6 +326,11 @@ enable_blackbox_exporter_blazar: false
 # workaround for https://github.com/openstack-exporter/openstack-exporter/issues/268
 prometheus_openstack_exporter_compute_api_version: "2.87"
 
+# --disable-slow-metrics: skip metrics which require iterating per-project, causes scrape timeouts
+# These include nova server_local_gb and limits_*, cinder limits_*, glance image_bytes and image_created_at
+# --collect-metric-time: export openstack_metric_collect_seconds per collector.
+prometheus_openstack_exporter_cmdline_extras: "--disable-slow-metrics --collect-metric-time"
+
 enable_ironic_prometheus_exporter: no
 
 # Swift
