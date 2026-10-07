@@ -1,0 +1,4 @@
+---
+# CHI: Allow users to make their own images public. Needed since retirement of appliance catalog.
+# Chameleon supported images already indicated with `chameleon-supported` protected property.
+publicize_image: role:admin or (role:member and project_id:%(project_id)s)
