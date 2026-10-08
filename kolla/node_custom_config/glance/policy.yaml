@@ -16,3 +16,7 @@ get_metadef_property: role:admin or (rule:member_or_reader and (project_id:%(pro
 get_metadef_properties: role:admin or (rule:member_or_reader and (project_id:%(project_id)s or 'public':%(visibility)s))
 get_metadef_tag: role:admin or (rule:member_or_reader and (project_id:%(project_id)s or 'public':%(visibility)s))
 get_metadef_tags: role:admin or (rule:member_or_reader and (project_id:%(project_id)s or 'public':%(visibility)s))
+
+# CHI: Allow users to make their own images public. Needed since retirement of appliance catalog.
+# Chameleon supported images already indicated with `chameleon-supported` protected property.
+publicize_image: role:admin or (role:member and project_id:%(project_id)s)
