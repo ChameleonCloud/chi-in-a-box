@@ -279,7 +279,9 @@ enable_openvswitch: yes
 enable_neutron_fwaas: no
 neutron_fwaas_version: v2
 enable_neutron_wireguard: false
-neutron_type_drivers: flat,vlan
+# post-deploy creates caliconet (k3s) and tunelo-calico (wireguard) as local networks.
+neutron_enable_local_networks: "{{ enable_k3s | bool or enable_neutron_wireguard | bool }}"
+neutron_type_drivers: "flat,vlan{{ ',local' if neutron_enable_local_networks | bool else '' }}"
 neutron_tenant_network_types: vlan
 # Only relevant when running in debug mode, but allows
 # debugging the NGS plugin.
