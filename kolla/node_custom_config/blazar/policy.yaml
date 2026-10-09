@@ -36,4 +36,4 @@
 # GET  /{api_version}/plugins
 "blazar:plugins:get": "@"
 # PUT  /{api_version}/networks/{network_id}
-"blazar:networks:put": "rule:admin_or_owner"
+"blazar:networks:put": "rule:admin"
