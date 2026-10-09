@@ -16,10 +16,6 @@ control
 [tempest:children]
 deployment
 
-# OSG
-[osg:children]
-control
-
 # Image
 [chameleon-image-tools:children]
 control
