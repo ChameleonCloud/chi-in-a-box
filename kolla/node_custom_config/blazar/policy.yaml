@@ -41,6 +41,9 @@
 "blazar:devices:get_resource_properties": "@"
 
 "default": "!"
+# GET  /{api_version}/plugins
+# Blazar has no built-in value for this rule. Without this line, blazar
+# uses "default" ("!") from this file, which denies every request.
 "blazar:plugins:get": "@"
 # PUT  /{api_version}/networks/{network_id}
 # Blazar has no built-in value for this rule. Without this line, blazar
