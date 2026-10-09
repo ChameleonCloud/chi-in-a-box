@@ -1,35 +1,12 @@
-# Default rule for most Admin APIs.
-#"admin": "is_admin:True or role:admin"
-
-# Default rule for most non-Admin APIs.
-"admin_or_owner": "rule:admin or project_id:%(project_id)s"
-
-# Policy rule for List/Show Lease(s) API.
-# GET  /{api_version}/leases
-# GET  /{api_version}/leases/{lease_id}
-#"blazar:leases:get": "rule:admin_or_owner"
-
-# Policy rule for Delete Lease API.
-# DELETE  /{api_version}/leases/{lease_id}
-#"blazar:leases:delete": "rule:admin_or_owner"
-
 # Policy rule for List/Show Host(s) API.
 # GET  /{api_version}/os-hosts
 # GET  /{api_version}/os-hosts/{host_id}
 "blazar:oshosts:get": "rule:admin_or_owner"
 
-# Policy rule for Delete Host API.
-# DELETE  /{api_version}/os-hosts/{host_id}
-"blazar:oshosts:delete": "rule:admin_api"
-
 # Policy rule for List/Get Host(s) Allocations API.
 # GET  /{api_version}/os-hosts/allocations
 # GET  /{api_version}/os-hosts/{host_id}/allocation
 "blazar:oshosts:get_allocations": "rule:admin_or_owner"
-
-# Policy rule for Reallocate Host API.
-# PUT  /{api_version}/os-hosts/{host_id}/allocation
-"blazar:oshosts:reallocate": "rule:admin_api"
 
 # Policy rule for Resource Properties API.
 # GET  /{api_version}/os-hosts/resource_properties
@@ -39,10 +16,6 @@
 # GET  /{api_version}/networks
 # GET  /{api_version}/networks/{network_id}
 "blazar:networks:get": "rule:admin_or_owner"
-
-# Policy rule for Delete Network API.
-# DELETE  /{api_version}/networks/{network_id}
-"blazar:networks:delete": "rule:admin_api"
 
 # Policy rule for List/Get Network(s) Allocations API.
 # GET  /{api_version}/networks/allocations
@@ -58,14 +31,6 @@
 # GET  /{api_version}/devices/{device_id}
 "blazar:devices:get": "rule:admin_or_owner"
 
-# Policy rule for Update Host API.
-# PUT  /{api_version}/devices/{device_id}
-"blazar:devices:put": "rule:admin_api"
-
-# Policy rule for Delete Device API.
-# DELETE  /{api_version}/devices/{device_id}
-"blazar:devices:delete": "rule:admin_api"
-
 # Policy rule for List/Get Device(s) Allocations API.
 # GET  /{api_version}/devices/allocations
 # GET  /{api_version}/devices/{device_id}/allocation
@@ -76,7 +41,6 @@
 "blazar:devices:get_resource_properties": "@"
 
 "default": "!"
-"admin_api": "role:admin"
 "blazar:plugins:get": "@"
 # PUT  /{api_version}/networks/{network_id}
 # Blazar has no built-in value for this rule. Without this line, blazar
