@@ -97,7 +97,10 @@
 "blazar:oshosts:list_allocations": "rule:admin_or_owner"
 "blazar:networks:create": "rule:admin_api"
 "blazar:networks:update": "rule:admin_api"
-"blazar:networks:put": "rule:admin_or_owner"
+# PUT  /{api_version}/networks/{network_id}
+# Blazar has no built-in value for this rule. Without this line, blazar
+# uses "default" ("!") from this file, which denies every request.
+"blazar:networks:put": "rule:admin"
 "blazar:networks:list_allocations": "rule:admin_or_owner"
 "blazar:devices:create": "rule:admin_api"
 "blazar:devices:update": "rule:admin_api"
