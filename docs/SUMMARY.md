@@ -83,6 +83,7 @@
   * [Runbook Template](runbooks/Template.md)
 * [User support guide](operations/user-support-guide.md)
 * [Upgrading to a new Release](operations/upgrading-to-a-new-release.md)
+* [Upgrading from 2023.1 to 2025.1](operations/upgrading-2023.1-to-2025.1.md)
 
 ## Development
 
