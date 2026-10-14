@@ -135,6 +135,9 @@ def minimal_config(tmp_path_factory):
 @pytest.fixture(scope="session")
 def kvm_config(tmp_path_factory):
     """Assembled site-config with _base + kvm fragments."""
+    # genconfig fails on [compute] hosts since kolla-ansible If635577f
+    # (bug #2051011): nova-cell queries the live Nova API for compute_id.
+    pytest.skip("kvm genconfig needs a live Nova API since If635577f")
     return _run_genconfig(
         tmp_path_factory.mktemp("kvm"),
         [BASE_PROFILE_DIR, PROFILES_DIR / "kvm"],
