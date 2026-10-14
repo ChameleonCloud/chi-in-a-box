@@ -8,7 +8,7 @@ When a user creates a resource reservation, they include properties they want th
 
 The following configuration options can be set in `defaults.yml`
 
-* `blazar_host_default_resource_properties` is the resource property array to use when none is given when creating a host reservation. Note that the `$` character must be escaped to `\$`. Setting this to  `'[]'` and changing `blazar_host_retry_without_default_resources` to false will use no default resource properties.&#x20;
-* `blazar_host_retry_without_default_resources` is a boolean value, whether any defaults should be used if the allocation using default resource properties fails.&#x20;
-* `blazar_network_default_resource_properties` is the resource property array to use when none is given when creating a network reservation. Note that the `$` character must be escaped to `\$`. Setting this to  `'[]'` and changing `blazar_network_retry_without_default_resources` to false will use no default resource properties.&#x20;
-* `blazar_network_retry_without_default_resources` is a boolean value, whether any defaults should be used if the allocation using default resource properties fails.&#x20;
+* `blazar_host_default_resource_properties` is the resource property array to use when none is given when creating a host reservation. Note that the `$` character must be escaped to `\$`. Setting this to  `'[]'` and changing `blazar_host_retry_without_default_resources` to false will use no default resource properties.
+* `blazar_host_retry_without_default_resources` is a boolean value, whether any defaults should be used if the allocation using default resource properties fails.
+* `blazar_network_default_resource_properties` is the resource property array to use when none is given when creating a network reservation. Note that the `$` character must be escaped to `\$`. Setting this to  `'[]'` and changing `blazar_network_retry_without_default_resources` to false will use no default resource properties.
+* `blazar_network_retry_without_default_resources` is a boolean value, whether any defaults should be used if the allocation using default resource properties fails.

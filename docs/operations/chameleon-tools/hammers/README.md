@@ -9,6 +9,7 @@ CHI-in-a-Box comes with several automated periodic tasks called "hammers", which
 The [hammers](https://github.com/chameleoncloud/hammers) repository goes into more detail about what each of these hammers does, and why they exist.
 
 There are two generations of hammers, each running from its own container image:
+
 - The original hammers come from the [hammers](https://github.com/chameleoncloud/hammers) repo. Their image is pinned by `chameleon_hammers_tag`.
 - v2 hammers come from the [hammers-v2](https://github.com/chameleoncloud/hammers-v2) repo. They run from the site tools image, pinned by `chameleon_site_tools_tag`.
 

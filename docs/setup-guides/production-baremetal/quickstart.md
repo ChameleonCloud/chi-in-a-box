@@ -4,23 +4,21 @@
 
 Commands in this section will use the system package manager, and run with root privileges. It is recommended to use python virtual environments to install chi-in-a-box and kolla-ansible.
 
-{% tabs %}
-{% tab title="Ubuntu 20.04" %}
-* Install Python dependencies and [jq](https://stedolan.github.io/jq/)
+=== "Ubuntu 20.04"
 
-```
-sudo apt update && sudo apt install -f -y \
-    python3 python3-virtualenv python3-venv virtualenv \
-    jq
-```
+    * Install Python dependencies and [jq](https://stedolan.github.io/jq/)
 
-* Ensure `/usr/bin/python` links to `python3`
+    ```
+    sudo apt update && sudo apt install -f -y \
+        python3 python3-virtualenv python3-venv virtualenv \
+        jq
+    ```
 
-```
-update-alternatives --install /usr/bin/python python /usr/bin/python3 1
-```
-{% endtab %}
-{% endtabs %}
+    * Ensure `/usr/bin/python` links to `python3`
+
+    ```
+    update-alternatives --install /usr/bin/python python /usr/bin/python3 1
+    ```
 
 ### Initialize cc-ansible's virtualenv and deps
 
@@ -29,7 +27,6 @@ update-alternatives --install /usr/bin/python python /usr/bin/python3 1
 ```bash
 ./cc-ansible install_deps
 ```
-
 
 ### Initialize the site configuration
 
@@ -69,9 +66,7 @@ update-alternatives --install /usr/bin/python python /usr/bin/python3 1
 
 If you are only using two interfaces, you must do some additional configuration to avoid losing access during install (and other, hard to debug issues)
 
-{% content-ref url="hostnetworking.md" %}
 [hostnetworking.md](hostnetworking.md)
-{% endcontent-ref %}
 
 ### Site-Specific Configuration
 
@@ -183,6 +178,7 @@ cat certificate.crt intermediates.pem private.key \
     This will install Docker on your target node and put SELinux into permissive mode
 
     > currently [Kolla containers do not have working SELinux profiles.](https://bugs.launchpad.net/kolla-ansible/+bug/1797277)
+
 2. Reboot if needed to apply SELinux changes
 3.  If you plan to run the provisioning tools as a non-root user, you will need to allow access to Docker. One easy way is to add the user to the `docker` group, though this effectively gives the user root access. The deploy will install docker, but at this point you'll need to create the group manually.
 

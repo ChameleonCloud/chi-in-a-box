@@ -1,22 +1,20 @@
 # Glance Image Storage
 
-
-
 All images used to launch instances are stored by Glance. However, glance holds the metadata, and delegates the actual data storage to one or more backends. Configuration and best practices are summarized below.
 
 The kolla-ansible docs with details are listed here: [https://docs.openstack.org/kolla-ansible/xena/reference/shared-services/glance-guide.html](https://docs.openstack.org/kolla-ansible/xena/reference/shared-services/glance-guide.html)
 
-{% hint style="warning" %}
-Images saved using cc-snapshot are also stored in Glance. This means that it contains user-data, and should be treated with care.
-{% endhint %}
+!!! warning
+
+    Images saved using cc-snapshot are also stored in Glance. This means that it contains user-data, and should be treated with care.
 
 ### File Backend
 
-If not configured, Glance defaults to storing image data on the controller node, in the path `/var/lib/glance/images`.&#x20;
+If not configured, Glance defaults to storing image data on the controller node, in the path `/var/lib/glance/images`.
 
-{% hint style="danger" %}
-Make sure you back up this directory!
-{% endhint %}
+!!! danger
+
+    Make sure you back up this directory!
 
 Customize this path by setting:
 

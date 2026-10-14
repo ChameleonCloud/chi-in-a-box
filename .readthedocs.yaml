@@ -1,0 +1,21 @@
+version: 2
+
+build:
+  os: ubuntu-24.04
+  tools:
+    python: "3.13"
+  jobs:
+    install:
+      - pip install -r requirements-docs.txt
+    pre_build:
+      # zensical.toml has no variable interpolation, so point site_url and the
+      # "edit this page" link at the version being built. A bare root site_url
+      # breaks asset paths on the 404 page and the canonical links under /en/<version>/.
+      - sed -i "s|^site_url = .*|site_url = \"${READTHEDOCS_CANONICAL_URL}\"|" zensical.toml
+      - sed -i "s|^edit_uri = .*|edit_uri = \"edit/${READTHEDOCS_GIT_IDENTIFIER}/docs/\"|" zensical.toml
+    build:
+      html:
+        - zensical build --clean --strict
+    post_build:
+      - mkdir -p "${READTHEDOCS_OUTPUT}/html/"
+      - cp --recursive site/* "${READTHEDOCS_OUTPUT}/html/"

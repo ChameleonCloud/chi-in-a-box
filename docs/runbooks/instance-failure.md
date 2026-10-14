@@ -3,19 +3,19 @@ Nova can fail to launch instances inside a reservation that clearly still has fr
 This can be caused by multiple reasons:
 
 1. get the list of baremetal nodes in the lease.
-   ```
-   chameleon lease resource list <lease_id>
-   ```
+    ```
+    chameleon lease resource list <lease_id>
+    ```
 1. If a subset of these nodes are failing, then check the specific node:
-   ```
-   openstack baremetal node show <uuid>
-   ```
+    ```
+    openstack baremetal node show <uuid>
+    ```
 1. Check if its in maintenance mode
-   1. If yes, check the reason
+    1. If yes, check the reason
 1. Check to see if it still has an associated instance ID. If so, run:
-   ```
-   openstack baremetal node undeploy <uuid>
-   ```
+    ```
+    openstack baremetal node undeploy <uuid>
+    ```
 
 If these don't show an issue, its time to look at the logs. They can seen in `/var/log/kolla` on your admin node,
 or via kibana at `<site_url>:5601`

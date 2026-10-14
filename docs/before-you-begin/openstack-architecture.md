@@ -8,29 +8,32 @@ This page describes the overall architecture for our "standard" deployment of Op
 
 ## OpenStack API Networking
 
-There are two API networks to consider.&#x20;
+There are two API networks to consider.
 
-First is the **internal api network**, used for internal communication between OpenStack services and Databases. We refer to this interface as the `api_interface` in configuration, as each OpenStack service binds to the system configured IP address on this interface. Exposing this either to users, or externally can be a security risk, so we require a dedicated network and subnet.&#x20;
+First is the **internal api network**, used for internal communication between OpenStack services and Databases. We refer to this interface as the `api_interface` in configuration, as each OpenStack service binds to the system configured IP address on this interface. Exposing this either to users, or externally can be a security risk, so we require a dedicated network and subnet.
 
 The second is the **public api** network, which is how users and user instances communicate with the OpenStack services. We refer to this interface as the `kolla_external_vip_interface` in configuration.
 
 Each of the above networks require an interface, subnet, and IP address configured on the controller node. HAProxy will then bind an **additional** IP address to each of the interfaces, and forward traffic as needed to the backend OpenStack services.
 
-<figure><img src="../.gitbook/assets/Neutron Networking-API Networks.drawio (1).svg" alt=""><figcaption><p>Diagram of Public and Management API connectivity</p></figcaption></figure>
+<figure markdown="span">
+  ![Diagram of Public and Management API connectivity](../assets/neutron-api-networks.drawio.svg)
+  <figcaption>Diagram of Public and Management API connectivity</figcaption>
+</figure>
 
 ## OpenStack Neutron Networking
 
 Independent from the API networking, OpenStack Neutron manages networking for tenants, connecting Baremetal Nodes to each other, as well as providing internet access via NAT, and Floating IPs.
 
-<figure><img src="../.gitbook/assets/Neutron Networking-Neutron Networks.drawio (1).svg" alt=""><figcaption></figcaption></figure>
+![](../assets/neutron-networks.drawio.svg)
 
 Here, `Tenant Public Network` refers to a network where tenants can request Floating IPs, and that their instances can use to reach the internet. So long as IP addresses do not overlap, this can be the same network as the Public API network above, but does not need to be.
 
-{% hint style="danger" %}
-You CANNOT directly use the **same interface** for the public API and the neutron external interface. They must either be two separate interfaces, connected to the same network, OR use a virtual interface (veth) pair to connect them internally.
+!!! danger
 
-Without doing this, external host networking will depend on the openvswitch container running, causing a circular dependency. Debugging this will likely lock you out of the system, and cause an outage.
-{% endhint %}
+    You CANNOT directly use the **same interface** for the public API and the neutron external interface. They must either be two separate interfaces, connected to the same network, OR use a virtual interface (veth) pair to connect them internally.
+
+    Without doing this, external host networking will depend on the openvswitch container running, causing a circular dependency. Debugging this will likely lock you out of the system, and cause an outage.
 
 The `Tenant Internal Network(s)` refers to the range of networks that tenants may allocate, local to the cluster.
 
@@ -46,19 +49,19 @@ Although the diagram shows two physical networks, the same could be accomplished
 
 ### Tenant Internal Networks
 
-In addition to the tenant created and managed networks, two "special" networks are created by the administrative project in the same Physical Network.&#x20;
+In addition to the tenant created and managed networks, two "special" networks are created by the administrative project in the same Physical Network.
 
 #### Ironic Provisioning / Cleaning Network
 
 This network is used for loading an image onto a baremetal node, as well as optionally cleaning them between users. When an instance is launched, the baremetal node will be attached to this network, netboot an agent, download a new disk image, and finally be attached to a target tenant network.
 
-{% hint style="info" %}
-Provisioned user instances should **not** be on this network, as its a security risk. However, this is unavoidable if baremetal nodes are used without a network supporting VLANs.
-{% endhint %}
+!!! info
+
+    Provisioned user instances should **not** be on this network, as its a security risk. However, this is unavoidable if baremetal nodes are used without a network supporting VLANs.
 
 Since the agent must communicate with the internal api interface on the controller node, the ironic provisioning network must be able to route to the internal api network. The simplest way to accomplish this is to route via an additional vlan interface on the controller node.
 
-<figure><img src="../.gitbook/assets/Neutron Networking-Ironic Provisioning.drawio.svg" alt=""><figcaption></figcaption></figure>
+![](../assets/neutron-ironic-provisioning.drawio.svg)
 
 #### Sharednet
 
@@ -84,11 +87,11 @@ You will likely want to ssh into your controller nodes for administrative purpos
 
 ## Putting it all together
 
-<figure><img src="../.gitbook/assets/Neutron Networking-Putting it all together.drawio (2).svg" alt=""><figcaption></figcaption></figure>
+![](../assets/neutron-putting-it-all-together.drawio.svg)
 
-{% hint style="info" %}
-Interface Names and Vlan IDs here are only examples, customize as needed
-{% endhint %}
+!!! info
+
+    Interface Names and Vlan IDs here are only examples, customize as needed
 
 Putting it all together, you can see there are plenty of moving parts. We'll define the following network name -> vlan mapping:
 
@@ -103,9 +106,9 @@ Putting it all together, you can see there are plenty of moving parts. We'll def
 Here we show an example with three physical interfaces. On the host OS, the following configuration is needed:
 
 * 3 vlan interfaces are attached to Eth0
-  * Eth0.1000 used for the Public API interface, with an IP address assigned
-  * Eth0.1001 used for the Internal API interface, with an IP address assigned
-  * Eth0.1002 used for the Ironic Provisioning interface, with an IP address assigned
+    * Eth0.1000 used for the Public API interface, with an IP address assigned
+    * Eth0.1001 used for the Internal API interface, with an IP address assigned
+    * Eth0.1002 used for the Ironic Provisioning interface, with an IP address assigned
 * Eth1 left unconfigured, it will be managed by Neutron as the external interface for the Physical Network Physnet1
 * Eth2 is used to access the dataplane switch mgmt interface, as well as IPMI on the compute nodes. An IP address in should be assigned in the same subnet as those devices.
 
@@ -118,9 +121,9 @@ For this diagram, we assume that the above networks are all present on the clust
 * Trunk for Neutron external interface, carrying vlans 1000,1002-1200
 * Switchport connected to eth0 on each Baremetal Node, configured as an untagged, access port. The Neutron service will dynamically configure the access vlan on these ports, from the range 1002-1200.
 
-{% hint style="info" %}
-If needed, the Public API and Public Tenant networks can be provided via a separate switch and physical interface on the controller node.
-{% endhint %}
+!!! info
+
+    If needed, the Public API and Public Tenant networks can be provided via a separate switch and physical interface on the controller node.
 
 The switch must be configured to allow SSH login via the separate, out-of-band management interface, and that interface and IP address reachable by the controller node.
 
@@ -132,9 +135,6 @@ A separate, **1G management switch** carries the following networks, either as v
 * Controller Node access to Dataplane Switch's SSH management interface
 * Local administrative SSH access, if desired
 
-{% hint style="warning" %}
-IP addresses and DHCP for IPMI, Switch Management, and administrative access are **NOT** managed by CHI-in-a-box. You'll need to configure static IPs, run your own DHCP server, or rely on an external service.
-{% endhint %}
+!!! warning
 
-
-
+    IP addresses and DHCP for IPMI, Switch Management, and administrative access are **NOT** managed by CHI-in-a-box. You'll need to configure static IPs, run your own DHCP server, or rely on an external service.

@@ -6,31 +6,29 @@ description: Guide to setting up an edge device testbed site such as CHI@Edge
 
 ## Intro
 
-The following guide is meant to provide concise steps on how to setup an edge device testbed similar to [CHI@Edge](https://chi.edge.chameleoncloud.org/), the Chameleon edge research testbed.&#x20;
+The following guide is meant to provide concise steps on how to setup an edge device testbed similar to [CHI@Edge](https://chi.edge.chameleoncloud.org/), the Chameleon edge research testbed.
 
-This guide assumes prior knowledge of how to use Chi-in-a-Box, we recommend at least reading and familiarizing yourself with the other&#x20;
+This guide assumes prior knowledge of how to use Chi-in-a-Box, we recommend at least reading and familiarizing yourself with the other
 
 ### Install Dependencies on the controller node
 
 Commands in this section will use the system package manager, and run with root privileges. It is recommended to use python virtual environments to install chi-in-a-box and kolla-ansible.
 
-{% tabs %}
-{% tab title="Ubuntu 20.04" %}
-* Install Python dependencies and [jq](https://stedolan.github.io/jq/)
+=== "Ubuntu 20.04"
 
-```
-sudo apt update && sudo apt install -f -y \
-    python3 python3-virtualenv python3-venv virtualenv \
-    jq
-```
+    * Install Python dependencies and [jq](https://stedolan.github.io/jq/)
 
-* Ensure `/usr/bin/python` links to `python3`
+    ```
+    sudo apt update && sudo apt install -f -y \
+        python3 python3-virtualenv python3-venv virtualenv \
+        jq
+    ```
 
-```
-update-alternatives --install /usr/bin/python python /usr/bin/python3 1
-```
-{% endtab %}
-{% endtabs %}
+    * Ensure `/usr/bin/python` links to `python3`
+
+    ```
+    update-alternatives --install /usr/bin/python python /usr/bin/python3 1
+    ```
 
 ### Initialize the site configuration
 
@@ -70,9 +68,7 @@ update-alternatives --install /usr/bin/python python /usr/bin/python3 1
 
 If you are only using two interfaces, you must do some additional configuration to avoid losing access during install (and other, hard to debug issues)
 
-{% content-ref url="production-baremetal/hostnetworking.md" %}
 [hostnetworking.md](production-baremetal/hostnetworking.md)
-{% endcontent-ref %}
 
 In addition to the above setup, edge-in-a-box requires the following physical networks to be set for the neutron flat networks to attach to:
 
@@ -83,7 +79,6 @@ In addition to the above setup, edge-in-a-box requires the following physical ne
 # public: where floating-ips live
 # caliconet: where container private ips live
 # tunelo-calico: "shadow network" used for wireguard IP assignment by tunelo "IPAM"
-
 
 # neutron physical networks: mapping logical networks to real interfaces
 # physnet1: where public logical network maps
@@ -134,7 +129,7 @@ enable_heat: no
 
 ### K3S, the container backend
 
-Edge-in-a-Box uses Kubernetes as a backend to enable users to deploy their containerized workloads. The K3S ansible role and playbook comprised in Chi-in-a-Box is a core component of Edge-in-a-Box responsible for setting up a k3s cluster with the Calico CNI. To set up K3S, add the following options to&#x20;
+Edge-in-a-Box uses Kubernetes as a backend to enable users to deploy their containerized workloads. The K3S ansible role and playbook comprised in Chi-in-a-Box is a core component of Edge-in-a-Box responsible for setting up a k3s cluster with the Calico CNI. To set up K3S, add the following options to
 
 #### `${CC_ANSIBLE_SITE}/defaults.yml`
 
@@ -149,7 +144,7 @@ k3s_server_port: "6443"
 
 ### Zun, the container interface for Openstack
 
-To drive the Kubernetes backend through an openstack interface, Edge-in-a-Box uses Openstack Zun, the dedicated container service in conjunction with a k8s compute driver developped by the Chameleon team for Zun to provide container services through an Openstack cloud layer. After enabling K3S, it is essential to enable zun as well as the K8S compute module for it. Add the following config options to&#x20;
+To drive the Kubernetes backend through an openstack interface, Edge-in-a-Box uses Openstack Zun, the dedicated container service in conjunction with a k8s compute driver developped by the Chameleon team for Zun to provide container services through an Openstack cloud layer. After enabling K3S, it is essential to enable zun as well as the K8S compute module for it. Add the following config options to
 
 &#x20; **`${CC_ANSIBLE_SITE}/defaults.yml`**
 
@@ -160,13 +155,13 @@ enable_zun_compute_k8s: yes
 
 ### Wireguard tunnel management: Tunelo and Neutron-Wireguard
 
-To enable secure networking to containers, Edge-in-a-Box sets up [Tunelo](https://github.com/ChameleonCloud/tunelo), a Chameleon-developed service that creates wireguard tunnels on demand, this service uses the neutron api to access the `tunelo-calico` neutron network where it creates ports for each tunnel it maintains.&#x20;
+To enable secure networking to containers, Edge-in-a-Box sets up [Tunelo](https://github.com/ChameleonCloud/tunelo), a Chameleon-developed service that creates wireguard tunnels on demand, this service uses the neutron api to access the `tunelo-calico` neutron network where it creates ports for each tunnel it maintains.
 
 On the neutron side of things, a [Neutron ML2 driver ](https://github.com/ChameleonCloud/networking-wireguard)that represents Wireguard tunnels as a set of interconnected ports handles tunelo's requests. This Chameleon-developed driver is denoted as neutron-wireguard and is necessary to the functioning of wireguard tunnels in edge-in-a-box.
 
-The result is that edge-in-a-Box maintaints a Hub and Spoke network configuration where the controller host acts as the wireguard hub and relays wireguard packets to the spokes (edge devices) .&#x20;
+The result is that edge-in-a-Box maintaints a Hub and Spoke network configuration where the controller host acts as the wireguard hub and relays wireguard packets to the spokes (edge devices) .
 
-To enable Tunelo and neutron wireguard, add the following options to&#x20;
+To enable Tunelo and neutron wireguard, add the following options to
 
 &#x20; **`${CC_ANSIBLE_SITE}/defaults.yml`**
 
@@ -175,7 +170,7 @@ enable_neutron_wireguard: yes
 enable_tunelo: yes
 ```
 
-**Note:** if you intend to only create one single wireguard hub port, it is important to scope it to the controller host's root network namespace. Add the following line to&#x20;
+**Note:** if you intend to only create one single wireguard hub port, it is important to scope it to the controller host's root network namespace. Add the following line to
 
 **`${CC_ANSIBLE_SITE}/defaults.yml`**
 
@@ -185,7 +180,7 @@ neutron_wireguard_create_hub_in_root_netns: True
 
 ### Device reservation management: Blazar
 
-To enable advance reservation of edge devices, Edge-in-a-Box deploys Openstack Blazar. Using the chameleon-developed Kubernetes plugin for it, Blazar can set reservation labels on worker nodes in Kubernetes. To enable blazar and its Kubernetes plugin, add the following lines to&#x20;
+To enable advance reservation of edge devices, Edge-in-a-Box deploys Openstack Blazar. Using the chameleon-developed Kubernetes plugin for it, Blazar can set reservation labels on worker nodes in Kubernetes. To enable blazar and its Kubernetes plugin, add the following lines to
 
 &#x20; **`${CC_ANSIBLE_SITE}/defaults.yml`**
 
@@ -201,9 +196,9 @@ Edge-in-a-Box deploys Doni to manage edge device enrollment. Doni is essentially
 * Wireguard Tunnel state per device
 * Setting several Kubernetes settings such as authentication tokens, node labels/taints, and more
 * Registration of the device with the Blazar reservation service
-* Balena-cloud device enrollment and setting of environment variables and configuration&#x20;
+* Balena-cloud device enrollment and setting of environment variables and configuration
 
-To deploy Doni and configure it, add the following option to&#x20;
+To deploy Doni and configure it, add the following option to
 
 &#x20; **`${CC_ANSIBLE_SITE}/defaults.yml`**
 
@@ -213,7 +208,7 @@ enable_doni: yes
 
 #### Device hardware management: Balena Cloud
 
-To manage edge devices without physical access, edge-in-a-box assumes the existence of a balena cloud deployment. Doni then handles the responsibility of enrolling devices in balena. The setup of Balena-Cloud is entirely up to the operator but once done, to point Doni to the right balena-cloud fleet, add the following option to&#x20;
+To manage edge devices without physical access, edge-in-a-box assumes the existence of a balena cloud deployment. Doni then handles the responsibility of enrolling devices in balena. The setup of Balena-Cloud is entirely up to the operator but once done, to point Doni to the right balena-cloud fleet, add the following option to
 
 &#x20; **`${CC_ANSIBLE_SITE}/defaults.yml`**
 
@@ -232,6 +227,7 @@ default_balena_fleet: <name_of_your_balena_fleet>
     This will install Docker on your target node and put SELinux into permissive mode
 
     > currently [Kolla containers do not have working SELinux profiles.](https://bugs.launchpad.net/kolla-ansible/+bug/1797277)
+
 2. Reboot if needed to apply SELinux changes
 3.  If you plan to run the provisioning tools as a non-root user, you will need to allow access to Docker. One easy way is to add the user to the `docker` group, though this effectively gives the user root access. The deploy will install docker, but at this point you'll need to create the group manually.
 
@@ -255,7 +251,7 @@ default_balena_fleet: <name_of_your_balena_fleet>
     ./cc-ansible prechecks
     ```
 * For example, if the subnets configured in `defaults.yml` do not match your interfaces, an error will be thrown here.
-* Similarly, kolla-ansible is not compatible with the service `nscd`, and will require that it be disabled before succeeding.&#x20;
+* Similarly, kolla-ansible is not compatible with the service `nscd`, and will require that it be disabled before succeeding.
 
 ### Pull container images
 
@@ -284,18 +280,18 @@ The K3S playbook performs a bulk of essential tasks in Edge-in-a-Box. Here is an
 * Config K3S service:  Installs K3S, starts the K3S service, and generates the kubeconfig
 * Config K3S client: sets up node token file, and creates symlinks for Kubernetes command line utilities
 * Config Calico: Downloads and installs [Calico](https://www.tigera.io/project-calico/) container network runtime, and applies the following global network policies
-  * allow-ping: Allow ICMP ping over ipv4 and ipv6
-  * default-deny: allow all namespaces to communicate to DNS pods
+    * allow-ping: Allow ICMP ping over ipv4 and ipv6
+    * default-deny: allow all namespaces to communicate to DNS pods
 * Config device plugins: configures [nvidia-device-plugin](https://github.com/NVIDIA/k8s-device-plugin) and [smarter-device-manager](https://github.com/smarter-project/smarter-device-manager) plugin daemonsets on the worker-nodes
 * Config Neutron: Essential step to enable wireguard connectivity and floating ip connectivity to worker containers:
-  * Sets up the three essential neutron networks for edge-in-a-box:
-    * `public`: manages publicly routable floating ips
-    * `caliconet`: manages container private ips
-    * `tunelo-calico`: "shadow network" used for wireguard IP assignment by tunelo "IPAM"
-  * **Manual step needed by operator to enable floating ip connectivity**
-    * add the `caliconet-subnet` as an internal interface to the admin router
-    * Add an external gateway to the `public` network to the admin router
-  * Finally, the config-neutron task generate a Calico/Neutron connection script which creates routing rules for traffic incoming for caliconet ports through public floating ips
+    * Sets up the three essential neutron networks for edge-in-a-box:
+        * `public`: manages publicly routable floating ips
+        * `caliconet`: manages container private ips
+        * `tunelo-calico`: "shadow network" used for wireguard IP assignment by tunelo "IPAM"
+    * **Manual step needed by operator to enable floating ip connectivity**
+        * add the `caliconet-subnet` as an internal interface to the admin router
+        * Add an external gateway to the `public` network to the admin router
+    * Finally, the config-neutron task generate a Calico/Neutron connection script which creates routing rules for traffic incoming for caliconet ports through public floating ips
 
 To deploy K3S playbook, run the following command
 
@@ -319,9 +315,9 @@ The following services require a `kubeconfig` file to access the Kubernetes clus
 
 ### Enabling Kubernetes worker-node tainting
 
-To ensure that Kubernetes core services and any unintended services do not get scheduled on worker nodes. Edge-in-a-Box supports adding a special taint that is applied through Doni to every worker node. Furthermore, every user container launched by Zun tolerates this taint if enabled.&#x20;
+To ensure that Kubernetes core services and any unintended services do not get scheduled on worker nodes. Edge-in-a-Box supports adding a special taint that is applied through Doni to every worker node. Furthermore, every user container launched by Zun tolerates this taint if enabled.
 
-#### Deployment strategy for a new edge site&#x20;
+#### Deployment strategy for a new edge site
 
 Add the worker node taint to
 
@@ -336,7 +332,7 @@ zun_tolerate_worker_taint: True # Tells Zun to add tolerations to the taint
 doni_enable_worker_taint: True # Tells Doni add the taint every worker node
 ```
 
-#### Deployment strategy for a running edge site&#x20;
+#### Deployment strategy for a running edge site
 
 To avoid any downtime of core services or eviction of existing user pods, follow these steps in order to enable worker node tainting for a running edge-in-a-box deployment:
 

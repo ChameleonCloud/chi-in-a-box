@@ -1,22 +1,26 @@
 # Developing OpenStack Services
 
-## Enable dev mode for a service:
+## Changing what's in a service container
+
+The following methods are listed in order of roughly "easiest to hardest".
+
+### Enable dev mode for a service:
 
 In the `defaults.yml`, specify `kolla_dev_repos_git` as a git URL prefix, and for each service to enable dev mode in, create options `NAME_dev_mode` and `NAME_source_version`. For example, to enable blazar dev mode:
 
 ```
 kolla_dev_repos_git: https://github.com/chameleoncloud # git URL prefix
 blazar_dev_mode: yes
-blazar_source_version: chameleoncloud/train # git branch 
+blazar_source_version: chameleoncloud/2025.1 # git branch
 ```
 
-Then run `./cc-ansible --tags blazar reconfigure`. The source will be places in `/opt/stack/blazar`, and mounted into the container. After updating the source, you can restart the docker container for the service, and the changes will be reloaded.
+Then run `./cc-ansible --tags blazar reconfigure`. The source will be placed in `/opt/stack/blazar`, and mounted into the container. After updating the source, you can restart the docker container for the service, and the changes will be reloaded.
 
 ```
 // example for neutron + neutron plugin
 kolla_dev_repos_git: https://github.com/chameleoncloud
 neutron_dev_mode: yes
-neutron_source_version: chameleoncloud/train
+neutron_source_version: chameleoncloud/2025.1
 
 neutron_dev_plugins:
   - name: networking-generic-switch
@@ -25,6 +29,86 @@ neutron_dev_plugins:
     packages:
       - networking_generic_switch
 ```
+
+If you need to install new packages in a container, modify the entrypoints of a python module, or make other changes that are difficult to do via the dev-mode bind-mount, see [Modifying contents of a Kolla container without rebuilding them all](#modifying-contents-of-a-kolla-container-without-rebuilding-them-all) or [Modifying container build recipes](#modifying-container-build-recipes).
+
+### Modifying contents of a Kolla container without rebuilding them all
+
+This is the "quick way" to edit a container's contents, without going through the whole build procedure.
+
+As an example, we'll reference horizon:
+
+```
+FROM ghcr.io/chameleoncloud/kolla/horizon:2025.1-ubuntu-noble
+
+COPY new_package /src/new_package
+RUN <install_some_stuff>
+...
+```
+
+Make a new dockerfile which inherits from the current service container image and tag, make whatever changes you need, and then build it with `docker build -t <image_name>:<image_tag>`. Ideally, use the same URL as the current image, and only change the tag, e.g. `ghcr.io/chameleoncloud/kolla/horizon:<my_custom_tag_here>`.
+
+This will allow you to override only `horizon_tag: <my_custom_tag_here>` in your defaults.yml, then run `cc-ansible deploy --tags horizon` to run the service from the new image.
+
+This is often very useful in combination with dev-mode, to do things like install additional or different versions of dependencies, to reinstall a python module which has edited entrypoints, or to add in debugging scripts or other temporary hacks, since this process is much faster than rebuilding the tree of containers via `kolla build`, below.
+
+### Modifying container build recipes
+
+CHI-in-a-box, kolla-ansible, and kolla allow for customization at many levels.
+
+#### Kolla
+
+The containers and their dockerfiles are defined in the [kolla repository](https://github.com/ChameleonCloud/kolla), for example, [certbot](https://github.com/ChameleonCloud/kolla/blob/chameleoncloud/xena/docker/letsencrypt/letsencrypt-certbot/Dockerfile.j2).\
+These dockerfiles contain macros and support templating.
+
+```
+{% block letsencrypt_certbot_header %}{% endblock %}
+```
+
+#### Kolla-containers
+
+The Build-time customization is done in the [kolla-containers](https://github.com/ChameleonCloud/kolla-containers) repository. We maintain a file, `template-overrides.j2`, with per-service overrides. In addition, the [kolla-build.conf](https://github.com/ChameleonCloud/kolla-containers/blob/xena/kolla-build.conf.j2) sets build-wide settings, including the git repos and branches to use for each service build.
+
+We have an extra layer of templating in place, as we maintain multiple variants of this build config. Currently, we have the following variants.
+
+| OpenStack Release | Operating System | Architecture | Variant   |
+| ----------------- | ---------------- | ------------ | --------- |
+| 2023.1            | Ubuntu 22.04     | x86\_64      | Baremetal |
+| 2023.1            | Ubuntu 22.04     | x86\_64      | KVM       |
+| Xena              | Ubuntu 20.04     | x86\_64      | CHI@Edge  |
+
+#### Kolla-Ansible
+
+[Kolla-ansible](https://github.com/ChameleonCloud/kolla-ansible) defines run-time defaults, configuration, and tooling. Each service has a set of roles, corresponding to deployment phases. [See Letsencrypt example.](https://github.com/ChameleonCloud/kolla-ansible/tree/chameleoncloud/xena/ansible/roles/letsencrypt/tasks)
+
+They template configuration files from ansible key-value pairs into a configuration directory, usually `/etc/kolla/service`. The source for said configuration can be selectively overridden. `merge_configs` will combine ini-like config from the entries, while `with_first_found` will do as its name suggests.
+
+```yaml
+merge_configs:
+  sources:
+    - "{{ role_path }}/templates/doni.conf.j2"
+    - "{{ node_custom_config }}/global.conf"
+    - "{{ node_custom_config }}/doni.conf"
+    - "{{ node_custom_config }}/doni/{{ item.key }}.conf"
+    - "{{ node_custom_config }}/doni/{{ inventory_hostname }}/doni.conf"
+```
+
+Finally, each time a container starts, it uses a `config.json` file to define what volumes to load, and what config files to copy from said volume into its runtime location. Example for [Doni-worker](https://github.com/ChameleonCloud/kolla-ansible/blob/chameleoncloud/xena/ansible/roles/doni/templates/doni-worker.json.j2).
+
+Upstream documentation: [https://docs.openstack.org/kolla/latest/admin/kolla\_api.html](https://docs.openstack.org/kolla/latest/admin/kolla\_api.html)
+
+#### CHI-in-a-box
+
+Finally, the [chi-in-a-box repository](https://github.com/ChameleonCloud/chi-in-a-box) sets the key-value pairs used by kolla-ansbile for configuration, as well as provides templated configuration files, using by the above `merge_configs` or `with_first_found` methods.
+
+Configuration files are applied in the following order, with more specific replacing less specific.
+
+* defaults from kolla-ansible
+* `node_custom_config/service.conf`
+* `node_custom_config/service/service.conf`
+* `node_custom_config/service/hostname/service.conf`
+
+See the [kolla-ansible docs](https://docs.openstack.org/kolla-ansible/latest/admin/advanced-configuration.html#openstack-service-configuration-in-kolla) for more.
 
 ## Fake hypervisors
 
@@ -89,69 +173,6 @@ root = logging.getLogger()
 root.logger.addHandler(default_handler)
 ```
 
-## Customizing Containers
-
-CHI-in-a-box, kolla-ansible, and kolla allow for customization at many levels.
-
-#### Kolla
-
-The containers and their dockerfiles are defined in the [kolla repository](https://github.com/ChameleonCloud/kolla), for example,  [certbot](https://github.com/ChameleonCloud/kolla/blob/chameleoncloud/xena/docker/letsencrypt/letsencrypt-certbot/Dockerfile.j2).\
-These dockerfiles contain macros and support templating.
-
-```
-{% raw %}
-{% block letsencrypt_certbot_header %}{% endblock %}
-{% endraw %}
-```
-
-#### Kolla-containers
-
-The Build-time customization is done in the [kolla-containers](https://github.com/ChameleonCloud/kolla-containers) repository. We maintain a file, `template-overrides.j2`, with per-service overrides. In addition, the [kolla-build.conf](https://github.com/ChameleonCloud/kolla-containers/blob/xena/kolla-build.conf.j2) sets build-wide settings, including the git repos and branches to use for each service build.&#x20;
-
-We have an extra layer of templating in place, as we maintain multiple variants of this build config. Currently, we have the following variants.
-
-| OpenStack Release | Operating System | Architecture | Variant   |
-| ----------------- | ---------------- | ------------ | --------- |
-| Xena              | Ubuntu 20.04     | x86\_64      | Baremetal |
-| Xena              | Ubuntu 20.04     | x86\_64      | CHI@Edge  |
-| Train             | Centos7          | x86\_64      | KVM       |
-
-All Centos8 variants are deprecated, as are the arm64 builds for CHI@Edge.
-
-#### Kolla-Ansible
-
-[Kolla-ansible](https://github.com/ChameleonCloud/kolla-ansible) defines run-time defaults, configuration, and tooling. Each service has a set of roles, corresponding to deployment phases. [See Letsencrypt example.](https://github.com/ChameleonCloud/kolla-ansible/tree/chameleoncloud/xena/ansible/roles/letsencrypt/tasks)
-
-They template configuration files from ansible key-value pairs into a configuration directory, usually `/etc/kolla/service`. The source for said configuration can be selectively overridden. `merge_configs` will combine ini-like config from the entries, while `with_first_found` will do as its name suggests.
-
-```yaml
-merge_configs:
-  sources:
-    - "{{ role_path }}/templates/doni.conf.j2"
-    - "{{ node_custom_config }}/global.conf"
-    - "{{ node_custom_config }}/doni.conf"
-    - "{{ node_custom_config }}/doni/{{ item.key }}.conf"
-    - "{{ node_custom_config }}/doni/{{ inventory_hostname }}/doni.conf"
-```
-
-Finally, each time a container starts, it uses a `config.json` file to define what volumes to load, and what config files to copy from said volume into its runtime location. Example for [Doni-worker](https://github.com/ChameleonCloud/kolla-ansible/blob/chameleoncloud/xena/ansible/roles/doni/templates/doni-worker.json.j2).
-
-Upstream documentation: [https://docs.openstack.org/kolla/latest/admin/kolla\_api.html](https://docs.openstack.org/kolla/latest/admin/kolla\_api.html)
-
-#### CHI-in-a-box
-
-Finally, the [chi-in-a-box repository](https://github.com/ChameleonCloud/chi-in-a-box) sets the key-value pairs used by kolla-ansbile for configuration, as well as provides templated configuration files, using by the above `merge_configs` or `with_first_found` methods.&#x20;
-
-Configuration files are applied in the following order, with more specific replacing less specific.
-
-* defaults from kolla-ansible
-* `node_custom_config/service.conf`
-* `node_custom_config/service/service.conf`
-* `node_custom_config/service/hostname/service.conf`
-
-See the [kolla-ansible docs](https://docs.openstack.org/kolla-ansible/latest/admin/advanced-configuration.html#openstack-service-configuration-in-kolla) for more.&#x20;
-
-
 ## Running end-to-end functional tests with Tempest
 
 Openstack Tempest is a framework to exercise the API of a deployed Openstack site. You can utilize this to make sure that your changes have not broken the API's compatibility, and generally that tasks such as a creating a network or launching an instance work as expected.
@@ -162,7 +183,6 @@ WARNING: Do NOT run this against a production site, or one with user instances/d
 
 For this reason, we currently recommend running these tests only against a development site, or before releasing a site to end-users. 
 We are working on a "safe subset" configuration, but it's not ready yet.
-
 
 After setting your site up, including `post-deploy`, set the following parameters in your defaults.yml:
 

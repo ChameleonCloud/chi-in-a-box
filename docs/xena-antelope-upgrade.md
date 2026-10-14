@@ -18,16 +18,19 @@ Welcome to the Antelope/2023.1 Release of CHI-in-a-Box! This release rolls up a 
 ### Selected features from Kolla-Ansible
 
 #### [2023.2 backports](https://docs.openstack.org/releasenotes/kolla-ansible/2023.2.html#):
+
 * (Replaced our fork) Add Lets Encrypt TLS certificate service integration into Openstack deployment. Enables trusted TLS certificate generation option for secure communcation with OpenStack HAProxy instances using letsencrypt_email, kolla_internal_fqdn and/or kolla_external_fqdn is required. One container runs an Apache ACME client webserver and one runs Lego for certificate retrieval and renewal. The Lego container starts a cron job which attempts to renew certificates every 12 hours.
 * (Replaced our fork) Adds support for deploying the ironic-prometheus-exporter, ‘a Tool to expose hardware sensor data in the Prometheus format through an HTTP endpoint’. See https://opendev.org/openstack/ironic-prometheus-exporter for more details about the exporter.
 
 #### [2023.1](https://docs.openstack.org/releasenotes/kolla-ansible/2023.1.html#)
+
 * Add skyline ansible role
 * Adds support for container state control through systemd in kolla_docker. Every container logs only to journald and has it’s own unit file in /etc/systemd/system named `kolla-<container name>-container.service`. Systemd control is implemented in new file `ansible/module_utils/kolla_systemd_worker.py`.
 * If credentials are updated in passwords.yml kolla-ansible is now able to update these credentials in the keystone database and in the on disk config files. 
-  The changes to passwords.yml are applied once kolla-ansible -i INVENTORY reconfigure has been run.
+    The changes to passwords.yml are applied once kolla-ansible -i INVENTORY reconfigure has been run.
 
 #### [Zed](https://docs.openstack.org/releasenotes/kolla-ansible/zed.html#)
+
 * Enables configuring firewalld for external API services. Extracts the required services and checks the external port, then adds the ports to a firewalld zone. Assumes that firewalld has been installed and configured beforehand. The variable disable_firewall, is disabled by default to preserve backwards compatibility. But its good practice to have the system firewall configured.
 * (Replaced our fork) Adds possibility for inlcuding custom alert notification templates with Prometheus Alertmanager.
 * (Replaced our fork) Adds variables to configure whether monitoring services should be exposed externally: `enable_grafana_external`,`enable_kibana_external`,`enable_prometheus_alertmanager_external`
@@ -37,6 +40,7 @@ Welcome to the Antelope/2023.1 Release of CHI-in-a-Box! This release rolls up a 
 * Networking Generic Switch: support for `SONiC` switch operating system
 
 #### [Yoga](https://docs.openstack.org/releasenotes/kolla-ansible/yoga.html#)
+
 * Adds support for deploying OpenSearch and OpenSearch dashboards. These services directly replace ElasticSearch and Kibana which are now end-of-life. Support for sending logs to a remote ElasticSearch (or OpenSearch) cluster is maintained.
 * Horizon themes can now be customized at deploy-time, rather than at build-time. 
 * Healthchecks added to ironic-neutron-agent service
@@ -46,17 +50,19 @@ Welcome to the Antelope/2023.1 Release of CHI-in-a-Box! This release rolls up a 
 ## Upgrade Notes
 
 ### Host OS: 
+
 * Interface name changes during release-upgrade: Dependng on the network card driver in use, the "stable interface name" may change unexpectly after the upgrade, potentially breaking remote acess to the controller node. To avoid this, ensure each interface in netplan has a `match` stanza, like the following:
-    ```
-    dataplane1:
-      match:
-        macaddress: 04:3f:72:ff:9b:33
-        driver: mlx5_core
-    set-name: dataplane1
-    ```
-    This will ensure that even if the “stable interface name” reported by udev changes, the interface will still be configured as expected. Both macaddress AND driver must be specified, as otherwise vlan interfaces may also match the macaddress.
+      ```
+      dataplane1:
+        match:
+          macaddress: 04:3f:72:ff:9b:33
+          driver: mlx5_core
+      set-name: dataplane1
+      ```
+      This will ensure that even if the “stable interface name” reported by udev changes, the interface will still be configured as expected. Both macaddress AND driver must be specified, as otherwise vlan interfaces may also match the macaddress.
 
 ### Nova:
+
 * nova hypervisors with uuid!=hypervisor_hostname
 * Nova-compute-ironic version on upgrade
 
@@ -64,27 +70,28 @@ Welcome to the Antelope/2023.1 Release of CHI-in-a-Box! This release rolls up a 
 
 * Boot mode default changed from BIOS -> UEFI: To prevent breakage, please ensure all nodes have the `boot_mode` capability set prior to upgrading.
 
-    Detection: list ironic nodes and exclude any that have the `boot_mode` capability set"
-    ```
-    baremetal node list --fields name properties -f value | grep -v "boot_mode"
-    # P3-CPU-017 {'capabilities': 'cpu_arch': 'x86_64', 'vendor': 'dell inc'}
-    ```
-    fix: while still on the xena release, for each node identified above, execute:
-    ```
-    openstack baremetal node set --property capabilities="boot_mode:bios" $node_name_or_uuid
-    ```
+      Detection: list ironic nodes and exclude any that have the `boot_mode` capability set"
+      ```
+      baremetal node list --fields name properties -f value | grep -v "boot_mode"
+      # P3-CPU-017 {'capabilities': 'cpu_arch': 'x86_64', 'vendor': 'dell inc'}
+      ```
+      fix: while still on the xena release, for each node identified above, execute:
+      ```
+      openstack baremetal node set --property capabilities="boot_mode:bios" $node_name_or_uuid
+      ```
 
 ### Keystone:
 
 * the `admin` keystone endpoint has been deprecated. Existing users of this endpoint should use the internal endpoint instead. To remove the now unused admin endpoints, run the following:
-    ```
-    openstack endpoint list --interface admin -f value | \
-    awk '!/keystone/ {print $1}' | xargs openstack endpoint delete
-    ```
+      ```
+      openstack endpoint list --interface admin -f value | \
+      awk '!/keystone/ {print $1}' | xargs openstack endpoint delete
+      ```
 
 * default user role changed from `_member_` to `member`. This was a transitional role during prior keystone database migrations, and has been deprecated for several openstack releases. It has now been fully removed, which will break any consumers that depend on it. To fix this, those consumers should use the `member` role instead.
 
 ### Networking-Generic-Switch:
+
 * Dell OS10 switch port names": We are now targeting the upstream release of networking-generic-switch. For compatiblity, all nodes with an ironic port connected to a Dell OS10-based switch will need to change the switchport name from the format `1/2/3:4` to `ethernet 1/2/3:4`.
 
 ### RabbitMQ
@@ -129,22 +136,22 @@ After deploying the new version, you will instead see containers named `letsencr
 ## Prior to beginning upgrade
 
 1. Set boot_mode capability for all ironic nodes
-   * in xena: if boot mode not set, then set it to BIOS
-   * `baremetal node list --fields properties -f json | jq '.[] | .Properties.capabilities'`
-   * for each node, `baremetal node set  --property capabilities="boot_mode:bios"`
+    * in xena: if boot mode not set, then set it to BIOS
+    * `baremetal node list --fields properties -f json | jq '.[] | .Properties.capabilities'`
+    * for each node, `baremetal node set  --property capabilities="boot_mode:bios"`
 1. Set cpu_arch capability for all ironic nodes (minor, avoids a warning)
 1. Ensure all ironic ports for dell os10 switches have the switchport renamed from (1/2/3:4) to (ethernet 1/2/3:4), using `openstack baremetal port set --fields uuid node_uuid local_link_connection`
 1. fix for any nova compute hosts with uuid!=hypervisor_hostname
-   1. find hosts affected by the issue
-      ```
-      use nova;
-      select hypervisor_hostname,uuid from compute_nodes WHERE hypervisor_type='ironic' AND isnull(deleted_at)  AND uuid!=hypervisor_hostname limit 100;
-      ```
-   1. for each host found with the issue, set reservation=disabled. the `hypervisor_hostname` is the ironic node uuid, and so it can be used for the lease.
-   1. Once the host is not in an active reservation:
-      1. delete it from blazar
-      1. delete it from ironic
-      1. run `openstack hardware sync` to have Doni re-create the node's entries, without the conflicts this time.
+    1. find hosts affected by the issue
+        ```
+        use nova;
+        select hypervisor_hostname,uuid from compute_nodes WHERE hypervisor_type='ironic' AND isnull(deleted_at)  AND uuid!=hypervisor_hostname limit 100;
+        ```
+    1. for each host found with the issue, set reservation=disabled. the `hypervisor_hostname` is the ironic node uuid, and so it can be used for the lease.
+    1. Once the host is not in an active reservation:
+        1. delete it from blazar
+        1. delete it from ironic
+        1. run `openstack hardware sync` to have Doni re-create the node's entries, without the conflicts this time.
    
 
 
@@ -171,15 +178,16 @@ After deploying the new version, you will instead see containers named `letsencr
 1. Make a backup of:
     1. Deploy host: chi-in-a-box and site-config directories
     1. Control node: move /etc/kolla directory out of the way
-       ```
-       mv /etc/kolla /etc/kolla.bak
-       ```
+        ```
+        mv /etc/kolla /etc/kolla.bak
+        ```
 1. Use ./cc-ansible mariadb_backup to create a full DB backup
 1. Copy DB backup from mariadb_backup container to somewhere else
 
 ### Execute:
 
 #### On target control node:
+
 1. Get to the latest stable package versions and clean up old kernels:
     1. `apt-get update && apt-get dist-upgrade`
     1. Reboot, then `apt-get autoremove`
@@ -189,27 +197,28 @@ After deploying the new version, you will instead see containers named `letsencr
 1. Check on interface definitions and any apt sources that need updating
 1. Delete kolla virtualenv from `/etc/ansible/venv`
 1. shut down containers which have had their names changed:
-    ```
-    docker stop letsencrypt_certbot
-    docker stop letsencrypt_acme
-    docker stop ironic_pxe
-    docker stop ironic_ipxe
-    ```
+     ```
+     docker stop letsencrypt_certbot
+     docker stop letsencrypt_acme
+     docker stop ironic_pxe
+     docker stop ironic_ipxe
+     ```
 
 #### On deploy host:
+
 1. Delete chi-in-a-box venv from `chi-in-a-box/venv`
 1. Delete any tools venv from site-config
 1. Delete any venv from `/etc/ansible/venv`
 1. Update chi-in-a-box via:
-   ```
-   git checkout stable/2023.1
-   git pull
-   git submodule update --init
-   ```
+    ```
+    git checkout stable/2023.1
+    git pull
+    git submodule update --init
+    ```
 1. Install new tools into venv via:
     1. `cc-ansible install_deps` # this doesn’t need a site-config
     1. Source the new venv:
-       `source venv/bin/activate`
+        `source venv/bin/activate`
 1. Update site-config/inventory/hosts by:
     1. mv inventory/hosts inventory/hosts.bak
     1. cp chi-in-a-box/site-config.example/inventory/hosts site-config/inventory/hosts
@@ -230,20 +239,20 @@ After deploying the new version, you will instead see containers named `letsencr
 1. Cc-ansible pull
 1. run `cc-ansible upgrade` (this will fail at nova, this is expected)
 1. Manually edit nova compute service “version” in the db to 61, [the oldest allowed in the upgrade check](https://github.com/openstack/nova/commit/a1731927ccd17aeb634c4eed61dce16de16fa7b3#diff-c0b6a5928be3ac40200a2078b084341bb9187a12b1f959ad862e0038c9029193L233)
-   ```
-   USE nova;
+    ```
+    USE nova;
 
-   UPDATE services 
-   SET version=61 
-   WHERE services.deleted=0 
-   AND services.topic="compute" 
-   AND services.version < 61;
-   ```
+    UPDATE services 
+    SET version=61 
+    WHERE services.deleted=0 
+    AND services.topic="compute" 
+    AND services.version < 61;
+    ```
 1. rerun `cc-ansible deploy --tags nova` to create service user
 1. rerun `cc-ansible upgrade` this should now pass nova and continue.
 1. Apply cleanups for keystone admin endpoints:
     1. Cc-ansible deploy –tags keystone
-    ```
-    openstack endpoint list --interface admin -f value | \
-    awk '!/keystone/ {print $1}' | xargs openstack endpoint delete
-    ```
+     ```
+     openstack endpoint list --interface admin -f value | \
+     awk '!/keystone/ {print $1}' | xargs openstack endpoint delete
+     ```

@@ -21,9 +21,9 @@ You must have a user account on the machine with passwordless sudo.
 If launching a VM on Chameleon to host this, follow the following steps.
 
 1. Launch an instance on KVM
-   flavor: m1.xlarge
-   image: CC-Ubuntu20.04
-   network: sharednet1
+    flavor: m1.xlarge
+    image: CC-Ubuntu20.04
+    network: sharednet1
 2. Attach a floating IP
 3. Allow SSH via the floating IP (by applying the appropriate security group)
 4. SSH into the node as cc@floating-ip
@@ -117,32 +117,32 @@ If launching a VM on Chameleon to host this, follow the following steps.
         sudo systemctl disable --now nscd.service
         ```
 8. At this point, we should be ready to "deploy".
-    ```
-    ./cc-ansible deploy
-    ```
-   Deploy is a composite action, executing the following sub-actions:
-   * `pull`: download relevant docker container images.
+     ```
+     ./cc-ansible deploy
+     ```
+    Deploy is a composite action, executing the following sub-actions:
+    * `pull`: download relevant docker container images.
 
-     Deploy will not pull newer images if one is in the cache already. You can execute `pull` directly if you need to explicitly pull a newer version.
+        Deploy will not pull newer images if one is in the cache already. You can execute `pull` directly if you need to explicitly pull a newer version.
 
-   * `genconfig`: template and copy config files into /etc/kolla, but don't restart services to apply yet
+    * `genconfig`: template and copy config files into /etc/kolla, but don't restart services to apply yet
 
-     This will combine the upstream defaults, contents of `chi-in-a-box`, and your `site-config`, and template config files into `/etc/kolla/<service_name>`.
-     If you've added additional configuration, this step can warn you about invalid or missing config values, before actually modifying any running containers.
-     Even if the step passes, you may want to inspect files under `/etc/kolla/` to make sure they match your expectations.
+        This will combine the upstream defaults, contents of `chi-in-a-box`, and your `site-config`, and template config files into `/etc/kolla/<service_name>`.
+        If you've added additional configuration, this step can warn you about invalid or missing config values, before actually modifying any running containers.
+        Even if the step passes, you may want to inspect files under `/etc/kolla/` to make sure they match your expectations.
 
 
-   * `deploy-containers`: check and if necessary update running containers. This can be run separately if you want to make sure containers are running, but explicitly don't want to touch the templated configuration, for example if you've made edits to your site config, or temporary changes directly in /etc/kolla.
+    * `deploy-containers`: check and if necessary update running containers. This can be run separately if you want to make sure containers are running, but explicitly don't want to touch the templated configuration, for example if you've made edits to your site config, or temporary changes directly in /etc/kolla.
 
 9. If all the steps so far have passed, all the core services should now be running! However, this isn't everything needed for a useful cloud. `post-deploy` consists of all the steps that require a functioning control plane. These include:
     * Creating default networks
     * Creating compute "flavors"
     * Uploading default disk images for users to use
     * Installing various hammers and other utility services/cron-jobs.
-    To run this step, execute:
-    ```
-    ./cc-ansible post-deploy
-    ```
+     To run this step, execute:
+     ```
+     ./cc-ansible post-deploy
+     ```
 
 10. Now, we'll create some "virtual" baremetal nodes, used to test out the site. These are just VMs run with libvirt, but are
 configured via IPMI and pxe network booted like a baremetal node, so we can exercise Ironic. The following playbook will install and configure the `tenks` utility to accomplish this. At the end of the invocation, it will print out some commands for you to run yourself to finish the setup.
@@ -174,31 +174,32 @@ sudo ip addr add 10.205.10.1/24 dev brtenks0
 12. At this point, it should all be up and running! Try out one of the "baremetal nodes"
 
     * `openstack baremetal node list`
-      ```
-      +--------------------------------------+------+---------------+-------------+--------------------+-------------+
-      | UUID                                 | Name | Instance UUID | Power State | Provisioning State | Maintenance |
-      +--------------------------------------+------+---------------+-------------+--------------------+-------------+
-      | 44d0ac06-77d6-4444-93ce-7c8db5b54fff | tk0  | None          | power off   | available          | False       |
-      +--------------------------------------+------+---------------+-------------+--------------------+-------------+
-      ```
+        ```
+        +--------------------------------------+------+---------------+-------------+--------------------+-------------+
+        | UUID                                 | Name | Instance UUID | Power State | Provisioning State | Maintenance |
+        +--------------------------------------+------+---------------+-------------+--------------------+-------------+
+        | 44d0ac06-77d6-4444-93ce-7c8db5b54fff | tk0  | None          | power off   | available          | False       |
+        +--------------------------------------+------+---------------+-------------+--------------------+-------------+
+        ```
     * let's trigger an inspection.
-      ```
-      openstack baremetal node manage tk0
-      openstack baremetal node inspect tk0
-      ```
+        ```
+        openstack baremetal node manage tk0
+        openstack baremetal node inspect tk0
+        ```
     * to see what's happening on the controller:
-      ```
-      sudo tail -f /var/log/kolla/ironic/ironic-conductor.log
-      ```
+        ```
+        sudo tail -f /var/log/kolla/ironic/ironic-conductor.log
+        ```
     * once you see a line like
-      > Successfully set node 44d0ac06-77d6-4444-93ce-7c8db5b54fff power state to power on by power on.
 
-      this means that the VM has been successfully "powered on".
+        > Successfully set node 44d0ac06-77d6-4444-93ce-7c8db5b54fff power state to power on by power on.
+
+        this means that the VM has been successfully "powered on".
     * to watch the machine's "serial console", execute:
-      ```
-      sudo virsh console tk0
-      ```
-      Note: to exit this shell, press `ctrl+]`
+        ```
+        sudo virsh console tk0
+        ```
+        Note: to exit this shell, press `ctrl+]`
 
 13. Download some real images to use! To avoid downloading "all" the images, we'll manually invoke the chameleon image download tool.
     ```
@@ -213,20 +214,20 @@ sudo ip addr add 10.205.10.1/24 dev brtenks0
 
 14. Lets launch a real instance. NOTE!: At this point, we've configured the node in ironic, but NOT in blazar, so we can launch instances without a reservation.
     * Our node should have finished inspection, so we'll need to move it from `manageable` back to `available`
-      ```
-      openstack baremetal node provide tk0
-      ```
+        ```
+        openstack baremetal node provide tk0
+        ```
     * Now that it's "available", we can launch a server on it.
-      ```
-      openstack server create --flavor baremetal --image CC-Ubuntu22.04 --network sharednet1 test-instance
-      ```
-      If you access the console again via `sudo virsh console tk0`, you should see the image get written to disk, then the VM reboot into the final image.
+        ```
+        openstack server create --flavor baremetal --image CC-Ubuntu22.04 --network sharednet1 test-instance
+        ```
+        If you access the console again via `sudo virsh console tk0`, you should see the image get written to disk, then the VM reboot into the final image.
 
 15. Access your site! You can access it by the following methods:
 
     1. All services are listening on the haproxy VIP on "ext_api_veth" interface, so you need a way to get to 192.168.100.0/24.
-       We recommend using `sshuttle` on your local machine, invoked as:
-       `sshuttle -r cc@<floating_ip_address> 192.168.100.0/24`
+        We recommend using `sshuttle` on your local machine, invoked as:
+        `sshuttle -r cc@<floating_ip_address> 192.168.100.0/24`
 
     2.  HAProxy and thus Horizon are listening on 192.168.100.254:80, which you can access after starting sshuttle. The username is `admin`, and the password can be viewed by running the following command:
 

@@ -15,13 +15,13 @@ Each tag variable sits next to an `_image` variable (the image name) and an `_im
 1. Release a new version in the source repo, following its README: [hammers](https://github.com/ChameleonCloud/hammers#building-and-deploying), [hammers-v2](https://github.com/ChameleonCloud/hammers-v2#building-and-deploying), [chameleon-vendordata](https://github.com/ChameleonCloud/chameleon-vendordata#building-and-deploying). A release pushes a `vX.Y` image tag.
 2. Set the tag variable in `kolla/defaults.yml` to the new version. Open a PR against each release branch that sites deploy from.
 3. On the site's deploy host, pull chi-in-a-box. Then run post-deploy, which runs all the playbooks above:
-   ```shell
-   ./cc-ansible --site /opt/site-config post-deploy
-   ```
-   Or run only the playbooks for the image that changed:
-   ```shell
-   ./cc-ansible --site /opt/site-config --playbook playbooks/vendordata.yml
-   ```
+    ```shell
+    ./cc-ansible --site /opt/site-config post-deploy
+    ```
+    Or run only the playbooks for the image that changed:
+    ```shell
+    ./cc-ansible --site /opt/site-config --playbook playbooks/vendordata.yml
+    ```
 
 A site switches to the new version when a playbook rewrites its timers and services to use the new tag. Until then they keep running the old version. Most of these playbooks also pull the new image. `playbooks/hammers.yml` only pulls the v1 hammers image, so after a site tools bump, `docker run` pulls the new image the first time a v2 hammer runs.
 

@@ -97,3 +97,45 @@ Create a new reservable floating IP
 ```
 openstack reservation floatingip create <NETWORK_ID> <FLOATING_IP_ADDRESS>
 ```
+
+## Disabling Resources
+
+### Hosts
+
+To disable a host for maintenance, run the following command. This makes the host unreservable for users, while still allowing administrators to create leases on it. The healing monitor does not flip `reservable` for hosts that are flagged as disabled.
+
+```
+openstack reservation host set <host id/name> --extra disabled=true
+```
+
+Disabling a host also sets it as unreservable. For example, `openstack reservation host list` should show the disabled host with `disabled` set to True:
+
+```
+openstack reservation host list -c hypervisor_hostname -c disabled -c reservable
++--------------------------------------+------------+----------+
+| hypervisor_hostname                  | reservable | disabled |
++--------------------------------------+------------+----------+
+| 328aa140-e8cb-48a8-a789-fb293bfb8f74 | True       | False    |
+| 8576d7ad-7f34-4588-a868-9075ac8d2c9f | True       | False    |
+| c3ce27b8-85b2-441d-ace1-078fd187f637 | False      | True     |
++--------------------------------------+------------+----------+
+```
+
+To enable the host again after maintenance, unset the disabled flag:
+
+```
+openstack reservation host unset <host id/name> --extra disabled
+```
+
+This does not turn `reservable` back on immediately, but the healing monitor should set it to True eventually.
+
+```
+openstack reservation host list -c hypervisor_hostname -c disabled -c reservable
++--------------------------------------+------------+----------+
+| hypervisor_hostname                  | reservable | disabled |
++--------------------------------------+------------+----------+
+| 328aa140-e8cb-48a8-a789-fb293bfb8f74 | True       | False    |
+| 8576d7ad-7f34-4588-a868-9075ac8d2c9f | True       | False    |
+| c3ce27b8-85b2-441d-ace1-078fd187f637 | False      | False    |
++--------------------------------------+------------+----------+
+```

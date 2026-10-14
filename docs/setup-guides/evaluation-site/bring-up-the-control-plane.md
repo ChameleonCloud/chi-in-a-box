@@ -29,68 +29,66 @@ Mem:           125G        3.6G        106G         39M         15G        121G
 Swap:          4.0G          0B        4.0G
 ```
 
-{% tabs %}
-{% tab title="Separate Public and Internal/Admin API Interfaces" %}
-#### Check and configure networking for the Public API
+=== "Separate Public and Internal/Admin API Interfaces"
 
-Identify which network interface(s) you plan to use for the public API and ssh. We will refer to this as  `kolla_external_vip_interface`
+    #### Check and configure networking for the Public API
 
-For this example, we've made the following assumptions, but you will need to customize to your own values.
+    Identify which network interface(s) you plan to use for the public API and ssh. We will refer to this as  `kolla_external_vip_interface`
 
-* `kolla_external_vip_interface`: `eth_public_api`
-* interface ip address: `192.5.87.10/23`
-* `kolla_external_vip_address`: `192.5.87.254`
-* system hostname: `dev01`
-* Here, we have chosen an interface named `eth_public_api` to act as the `kolla_external_vip_interface`
+    For this example, we've made the following assumptions, but you will need to customize to your own values.
 
-```
-[root@dev01 ~]# ip addr show eth_public_api
-2: em1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP group default qlen 1000
-    link/ether 44:a8:42:26:ef:aa brd ff:ff:ff:ff:ff:ff
-    inet 192.5.87.10/23 brd 192.5.87.255 scope global eth_public_api
-       valid_lft forever preferred_lft forever
-```
+    * `kolla_external_vip_interface`: `eth_public_api`
+    * interface ip address: `192.5.87.10/23`
+    * `kolla_external_vip_address`: `192.5.87.254`
+    * system hostname: `dev01`
+    * Here, we have chosen an interface named `eth_public_api` to act as the `kolla_external_vip_interface`
 
-We see that it has an address configured, and that `kolla_external_vip_address` is **not** present. This is correct, as `keepalived` will manage the VIP address.
+    ```
+    [root@dev01 ~]# ip addr show eth_public_api
+    2: em1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP group default qlen 1000
+        link/ether 44:a8:42:26:ef:aa brd ff:ff:ff:ff:ff:ff
+        inet 192.5.87.10/23 brd 192.5.87.255 scope global eth_public_api
+           valid_lft forever preferred_lft forever
+    ```
 
-#### Check and configure networking for the Internal/Admin API
+    We see that it has an address configured, and that `kolla_external_vip_address` is **not** present. This is correct, as `keepalived` will manage the VIP address.
 
-Identify which network interface(s) you plan to use for the Admin/Internal API. We will refer to this as  `network_interface`
+    #### Check and configure networking for the Internal/Admin API
 
-For this example, we've made the following assumptions, but you will need to customize to your own values.
+    Identify which network interface(s) you plan to use for the Admin/Internal API. We will refer to this as  `network_interface`
 
-* `network_interface`: `eth_internal_api`
-* interface ip address: `10.20.111.10/23`
-* `kolla_internal_vip_address`: `10.20.111.254`
-* system hostname: `dev01`
-* Here, we have chosen an interface named `eth_internal_api` to act as the `kolla_internal_vip_address`
+    For this example, we've made the following assumptions, but you will need to customize to your own values.
 
-```
-[root@dev01 ~]# ip addr show eth_internal_api
-2: em1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP group default qlen 1000
-    link/ether 44:a8:42:26:ef:aa brd ff:ff:ff:ff:ff:ff
-    inet 10.20.111.10/23 brd 10.20.111.255 scope global eth_internal_api
-       valid_lft forever preferred_lft forever
-```
+    * `network_interface`: `eth_internal_api`
+    * interface ip address: `10.20.111.10/23`
+    * `kolla_internal_vip_address`: `10.20.111.254`
+    * system hostname: `dev01`
+    * Here, we have chosen an interface named `eth_internal_api` to act as the `kolla_internal_vip_address`
 
-We see that it has an address configured, and that `kolla_internal_vip_address` is not present. This is correct, as `keepalived` will manage the VIP address.
+    ```
+    [root@dev01 ~]# ip addr show eth_internal_api
+    2: em1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP group default qlen 1000
+        link/ether 44:a8:42:26:ef:aa brd ff:ff:ff:ff:ff:ff
+        inet 10.20.111.10/23 brd 10.20.111.255 scope global eth_internal_api
+           valid_lft forever preferred_lft forever
+    ```
 
-#### Check and configure the system hostname
+    We see that it has an address configured, and that `kolla_internal_vip_address` is not present. This is correct, as `keepalived` will manage the VIP address.
 
-It's important that the system hostname resolves to the interface IP addresses, not to one of the VIPs
+    #### Check and configure the system hostname
 
-```
-[root@dev01 ~]# hostname
-dev01
-[root@dev01 ~]# getent hosts dev01
-10.20.111.254     dev01.chameleoncloud.org dev01
-```
+    It's important that the system hostname resolves to the interface IP addresses, not to one of the VIPs
 
-Note that the system hostname should **not** point to the `kolla_internal_vip_address`
+    ```
+    [root@dev01 ~]# hostname
+    dev01
+    [root@dev01 ~]# getent hosts dev01
+    10.20.111.254     dev01.chameleoncloud.org dev01
+    ```
 
-If it does not resolve to the interface IP, this will be fixed during bootstrap later.&#x20;
-{% endtab %}
-{% endtabs %}
+    Note that the system hostname should **not** point to the `kolla_internal_vip_address`
+
+    If it does not resolve to the interface IP, this will be fixed during bootstrap later.
 
 ### Set up Linux users and permissions
 
@@ -181,7 +179,7 @@ localhost ansible_connection=local
 
 In your site config directory, `/opt/site-config`, you now have a file called `defaults.yml`
 
-For a minimal deployment, you only need the following lines uncommented. The values are from the prior section.&#x20;
+For a minimal deployment, you only need the following lines uncommented. The values are from the prior section.
 
 ```
 # /opt/site-config/defaults.yml
@@ -229,7 +227,7 @@ Make sure that the user executing on the controller node can run `sudo` without 
 #### Fail if nscd is running
 
 The nscd service will prevent parts of the deployment from completing successfully.\
-Disable it by running `sudo systemctl disable --now nscd.service`&#x20;
+Disable it by running `sudo systemctl disable --now nscd.service`
 
 #### Checking host OS distribution / Checking host OS release or version
 
@@ -268,8 +266,6 @@ Run `./cc-ansible --site /opt/site-config pull`
 If you see an error message like the following, please contact us. It likely means that the container image is missing from our registry, and sometimes happens after CI errors.
 
 `404 Client Error for http+docker://localhost/v1.41/images/create?tag=xena&fromImage=docker.chameleoncloud.org%2Fkolla%2Fubuntu-source-keystone: Not Found ("manifest for docker.chameleoncloud.org/kolla/ubuntu-source-keystone:xena not found: manifest unknown: manifest unknown")`
-
-
 
 </details>
 

@@ -4,9 +4,9 @@
 
 If the hostname on a Nova compute node changes, it can be very difficult to figure out how to "flush out" the old hostname. The system will cache it in some unexpected places. The following procedures should wipe it out. Importantly, existing service containers **must** be stopped and removed in order to prompt a recreate; otherwise the container will still have the hostname it was originally created with, which will be stale.
 
-{% hint style="warning" %}
-Ensure you have already set the hostname to its new value.
-{% endhint %}
+!!! warning
+
+    Ensure you have already set the hostname to its new value.
 
 Run the following on the compute node:
 

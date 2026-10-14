@@ -27,7 +27,7 @@ If everything has gone well, you'll get a 404 from nginx.
 
 #### Initial certificate generation
 
-Currently, the initial certificate generation is not yet automated ([https://github.com/ChameleonCloud/chi-in-a-box/issues/116](Certificate-management.md#116)). You must perform the following steps:
+Currently, the initial certificate generation is not yet automated ([https://github.com/ChameleonCloud/chi-in-a-box/issues/116](https://github.com/ChameleonCloud/chi-in-a-box/issues/116)). You must perform the following steps:
 
 ```shell
 # Make a directory for your certs
@@ -48,7 +48,7 @@ And reconfigure `./cc-ansible reconfigure --tags haproxy`
 
 #### Certificate renewal
 
-Any LetsEncrypt certificates will be automatically renewed. **However**, HAProxy will not automatically restart when this happens, meaning it will not detect or pick up the new certificates (see [https://github.com/ChameleonCloud/chi-in-a-box/issues/125](Certificate-management.md#125)). For the time being, you may wish to set up a periodic task to restart HAProxy every few weeks.
+Any LetsEncrypt certificates will be automatically renewed. **However**, HAProxy will not automatically restart when this happens, meaning it will not detect or pick up the new certificates (see [https://github.com/ChameleonCloud/chi-in-a-box/issues/125](https://github.com/ChameleonCloud/chi-in-a-box/issues/125)). For the time being, you may wish to set up a periodic task to restart HAProxy every few weeks.
 
 ### Bring your own certificate
 

@@ -9,16 +9,16 @@ Ensure you have a consistent starting point on release 2023.1 and Ubuntu 22.04.
 ### Ensure the site is running the latest 2023.1 codebase
 
 * Site-config: remove anything that pins the deployed version of OpenStack code, for example:
-  * `openstack_release`
-  * `openstack_tag`
-  * `horizon_tag`, `blazar_tag`, `ironic_tag`
-  * `horizon_image`
-  * `horizon_image_full`
-  * `blazar_dev_mode`
-  * `ironic_dev_mode`
+    * `openstack_release`
+    * `openstack_tag`
+    * `horizon_tag`, `blazar_tag`, `ironic_tag`
+    * `horizon_image`
+    * `horizon_image_full`
+    * `blazar_dev_mode`
+    * `ironic_dev_mode`
 * Site-config: clean duplicates from `node_custom_config`. Files in your site-config's custom config replace the ones in chi-in-a-box, so remove anything that duplicates a chi-in-a-box file with minor modifications. For example:
-  * Not OK: `ironic.conf`, `nova.conf`, …
-  * OK: non-overlapping files such as fluentd or haproxy drop-ins, ceph keyrings, …
+    * Not OK: `ironic.conf`, `nova.conf`, …
+    * OK: non-overlapping files such as fluentd or haproxy drop-ins, ceph keyrings, …
 * Ensure chi-in-a-box is clean and up to date:
 
 ```
@@ -48,19 +48,19 @@ OpenStack 2024.1 changes the default queue type to durable quorum queues, which 
 Migrating requires stopping all services that talk to RabbitMQ, updating their config, clearing the old queues out of RabbitMQ, and then starting the services back up. If the services are active, they'll recreate the queues with the old settings and prevent the migration.
 
 1. Identify all services that may talk to RabbitMQ. Under `/etc/kolla` on the control node:
-   1. List them: `grep -R oslo_messaging_rabbit | cut -d "/" -f 1 | sort -u`
-   2. Turn the list into kolla tags: `grep -R oslo_messaging_rabbit | cut -d "/" -f 1 | cut -d "-" -f 1 | sort -u | paste -s -d ","`
+    1. List them: `grep -R oslo_messaging_rabbit | cut -d "/" -f 1 | sort -u`
+    2. Turn the list into kolla tags: `grep -R oslo_messaging_rabbit | cut -d "/" -f 1 | cut -d "-" -f 1 | sort -u | paste -s -d ","`
 2. Stop all services that talk to RabbitMQ. (Very important!)
 
-   ```
-   ./cc-ansible stop --yes-i-really-really-mean-it --tags <kolla tags from 1.2>
-   ```
+    ```
+    ./cc-ansible stop --yes-i-really-really-mean-it --tags <kolla tags from 1.2>
+    ```
 3. Verify the containers are stopped in `docker ps --all`.
-   1. If any are not stopped, use `systemctl stop <kolla-service-unit-name>` to stop them:
+    1. If any are not stopped, use `systemctl stop <kolla-service-unit-name>` to stop them:
 
-      ```
-      systemctl | egrep '^\s*kolla-' | tr -s ' ' | cut -d ' ' -f 2 | xargs systemctl stop
-      ```
+        ```
+        systemctl | egrep '^\s*kolla-' | tr -s ' ' | cut -d ' ' -f 2 | xargs systemctl stop
+        ```
 4. Set `om_enable_rabbitmq_quorum_queues: true` in `site-config/defaults.yml`.
 5. `./cc-ansible genconfig`
 6. `./cc-ansible reconfigure --tags rabbitmq`
@@ -74,15 +74,15 @@ See the [kolla-ansible docs on SLURP upgrades](https://docs.openstack.org/kolla-
 
 1. In `defaults.yml`, set:
 
-   ```
-   rabbitmq_image: ghcr.io/chameleoncloud/kolla/rabbitmq-3-12
-   ```
+    ```
+    rabbitmq_image: ghcr.io/chameleoncloud/kolla/rabbitmq-3-12
+    ```
 2. Run `./cc-ansible upgrade --tags rabbitmq`
 3. In `defaults.yml`, set:
 
-   ```
-   rabbitmq_image: ghcr.io/chameleoncloud/kolla/rabbitmq-3-13
-   ```
+    ```
+    rabbitmq_image: ghcr.io/chameleoncloud/kolla/rabbitmq-3-13
+    ```
 4. Run `./cc-ansible upgrade --tags rabbitmq`
 
 ### Prepare for the Ubuntu upgrade
@@ -117,20 +117,20 @@ Ensure you can connect to serial-over-LAN and/or the HTML5 console, and that you
 
 1. Make a copy of `/etc/kolla` from the controller node:
 
-   ```
-   tar -czvf /root/kolla-etc-2023-1.tgz /etc/kolla
-   ```
+    ```
+    tar -czvf /root/kolla-etc-2023-1.tgz /etc/kolla
+    ```
 2. Make a copy of the most recent DB backup:
 
-   ```
-   cp /var/lib/docker/volumes/mariadb_backup/_data/<todays_backup> \
-     /root/kolla-db-2023-1
-   ```
+    ```
+    cp /var/lib/docker/volumes/mariadb_backup/_data/<todays_backup> \
+      /root/kolla-db-2023-1
+    ```
 3. Make a copy of chi-in-a-box and site-config:
 
-   ```
-   tar -czvf ciab-2023-1.tgz chi-in-a-box/ site-config/
-   ```
+    ```
+    tar -czvf ciab-2023-1.tgz chi-in-a-box/ site-config/
+    ```
 
 ## OpenStack 2023.1 -> 2024.1
 
@@ -160,14 +160,14 @@ Ansible merges these in alphabetical order, with later files overriding earlier 
 1. Diff your current `site-config/inventory/hosts` against the [2023.1 chi-in-a-box inventory](https://raw.githubusercontent.com/ChameleonCloud/chi-in-a-box/refs/heads/stable/2023.1/site-config.example/inventory/hosts), and check whether anything is surprising.
 2. Copy the new inventory files:
 
-   ```
-   cp chi-in-a-box/site-config.example/inventory/10-base-hosts \
-     $SITE_CONFIG/inventory/
-   cp chi-in-a-box/site-config.example/inventory/50-kolla-hosts \
-     $SITE_CONFIG/inventory/
-   cp chi-in-a-box/site-config.example/inventory/80-chi-hosts \
-     $SITE_CONFIG/inventory/
-   ```
+    ```
+    cp chi-in-a-box/site-config.example/inventory/10-base-hosts \
+      $SITE_CONFIG/inventory/
+    cp chi-in-a-box/site-config.example/inventory/50-kolla-hosts \
+      $SITE_CONFIG/inventory/
+    cp chi-in-a-box/site-config.example/inventory/80-chi-hosts \
+      $SITE_CONFIG/inventory/
+    ```
 3. Most likely, customize `10-base-hosts` with your changes. If necessary, apply customizations to `50-kolla-hosts` or `80-chi-hosts` as well.
 
 #### Update passwords
@@ -208,31 +208,31 @@ All containers are tagged `2024.1-ubuntu-jammy`.
 
 1. In `defaults.yml`, set:
 
-   ```
-   kolla_base_distro_version: noble
-   distro_python_version: "3.12"
-   ```
+    ```
+    kolla_base_distro_version: noble
+    distro_python_version: "3.12"
+    ```
 2. On control nodes and hypervisors, recreate the venv with Python 3.12:
 
-   ```
-   rm -rf /etc/ansible/venv
-   python3 -m venv /etc/ansible/venv
-   ```
+    ```
+    rm -rf /etc/ansible/venv
+    python3 -m venv /etc/ansible/venv
+    ```
 3. Download the updated Docker and populate the venv:
 
-   ```
-   ./cc-ansible bootstrap-servers
-   ```
+    ```
+    ./cc-ansible bootstrap-servers
+    ```
 4. Pull the 24.04 containers:
 
-   ```
-   ./cc-ansible pull
-   ```
+    ```
+    ./cc-ansible pull
+    ```
 5. Deploy the 24.04 containers:
 
-   ```
-   ./cc-ansible deploy
-   ```
+    ```
+    ./cc-ansible deploy
+    ```
 
 ### Verification
 
@@ -244,20 +244,20 @@ Check that all running containers are tagged `2024.1-ubuntu-noble`.
 
 1. Make a copy of `/etc/kolla` from the controller node:
 
-   ```
-   tar -czvf /root/kolla-etc-2024-1.tgz /etc/kolla
-   ```
+    ```
+    tar -czvf /root/kolla-etc-2024-1.tgz /etc/kolla
+    ```
 2. Make a copy of the most recent DB backup:
 
-   ```
-   cp /var/lib/docker/volumes/mariadb_backup/_data/<todays_backup> \
-     /root/kolla-db-2024-1
-   ```
+    ```
+    cp /var/lib/docker/volumes/mariadb_backup/_data/<todays_backup> \
+      /root/kolla-db-2024-1
+    ```
 3. Make a copy of chi-in-a-box and site-config:
 
-   ```
-   tar -czvf ciab-2024-1.tgz chi-in-a-box/ site-config/
-   ```
+    ```
+    tar -czvf ciab-2024-1.tgz chi-in-a-box/ site-config/
+    ```
 
 ### RabbitMQ: more queue migration
 
@@ -275,32 +275,32 @@ om_enable_rabbitmq_stream_fanout: true
 1. `./cc-ansible genconfig`
 2. Stop all services that talk to RabbitMQ. (Very important!)
 
-   ```
-   ./cc-ansible stop --yes-i-really-really-mean-it --tags blazar,glance,heat,ironic,keystone,neutron,nova
-   ```
+    ```
+    ./cc-ansible stop --yes-i-really-really-mean-it --tags blazar,glance,heat,ironic,keystone,neutron,nova
+    ```
 3. Update RabbitMQ settings:
 
-   ```
-   ./cc-ansible reconfigure --tags rabbitmq
-   ```
+    ```
+    ./cc-ansible reconfigure --tags rabbitmq
+    ```
 4. Clear the old queues:
 
-   ```
-   ./cc-ansible rabbitmq-reset-state
-   ```
+    ```
+    ./cc-ansible rabbitmq-reset-state
+    ```
 5. Start the services back up with the new queue config:
 
-   ```
-   ./cc-ansible deploy --tags blazar,glance,heat,ironic,keystone,neutron,nova
-   ```
+    ```
+    ./cc-ansible deploy --tags blazar,glance,heat,ironic,keystone,neutron,nova
+    ```
 
 Verification:
 
 1. Run `./cc-ansible prechecks`. It will warn if old queues persist for a service. If so, repeat these steps:
-   1. `./cc-ansible stop --yes-i-really-really-mean-it --tags <service>`, and wait for the containers to exit
-   2. `./cc-ansible rabbitmq-reset-state`
-   3. `./cc-ansible deploy --tags <service>`
-   4. `./cc-ansible prechecks`
+    1. `./cc-ansible stop --yes-i-really-really-mean-it --tags <service>`, and wait for the containers to exit
+    2. `./cc-ansible rabbitmq-reset-state`
+    3. `./cc-ansible deploy --tags <service>`
+    4. `./cc-ansible prechecks`
 
 ### RabbitMQ: upgrade 3.x to 4.x
 
@@ -308,9 +308,9 @@ See the [kolla-ansible docs](https://docs.openstack.org/kolla-ansible/2025.1/ref
 
 1. In `defaults.yml`, set:
 
-   ```
-   rabbitmq_image: ghcr.io/chameleoncloud/kolla/rabbitmq-4-1
-   ```
+    ```
+    rabbitmq_image: ghcr.io/chameleoncloud/kolla/rabbitmq-4-1
+    ```
 2. Run `./cc-ansible upgrade --tags rabbitmq`
 
 Leave `rabbitmq_image` set for the 2025.1 upgrade below: the kolla-ansible docs say it must stay overridden, or the upgrade downgrades RabbitMQ to 4.0.
@@ -341,12 +341,12 @@ Ansible merges these in alphabetical order, with later files overriding earlier 
 1. Diff your current `site-config/inventory/{10-base,50-kolla,80-chi}-hosts` against the [2024.1 chi-in-a-box inventory in site-config.example](https://github.com/ChameleonCloud/chi-in-a-box/tree/chameleoncloud/2024.1/site-config.example/inventory). It is likely that only `10-base-hosts` differs.
 2. After making a backup, copy the new inventory files:
 
-   ```
-   cp chi-in-a-box/site-config.example/inventory/50-kolla-hosts \
-     $SITE_CONFIG/inventory/
-   cp chi-in-a-box/site-config.example/inventory/80-chi-hosts \
-     $SITE_CONFIG/inventory/
-   ```
+    ```
+    cp chi-in-a-box/site-config.example/inventory/50-kolla-hosts \
+      $SITE_CONFIG/inventory/
+    cp chi-in-a-box/site-config.example/inventory/80-chi-hosts \
+      $SITE_CONFIG/inventory/
+    ```
 
 #### Update passwords
 

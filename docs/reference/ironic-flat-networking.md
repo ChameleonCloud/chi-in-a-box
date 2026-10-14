@@ -1,8 +1,8 @@
 # Ironic Flat Networking
 
-{% hint style="danger" %}
-This method carries security risks! Nodes all share the same L2 and L3 domain with the controller, so you must implement security methods outside the scope of Openstack.
-{% endhint %}
+!!! danger
+
+    This method carries security risks! Nodes all share the same L2 and L3 domain with the controller, so you must implement security methods outside the scope of Openstack.
 
 To use a single network for API, provisioning, and tenant networking, you'll need the following configuration options in your defaults.yml
 
@@ -18,7 +18,7 @@ When configuring your network, make sure to set the network-type to 'flat'
       allocation_pools:
         - start: '172.40.0.129'
           end: '172.40.0.254'
-          
+
 ```
 
 You'll also need to override two defaults
