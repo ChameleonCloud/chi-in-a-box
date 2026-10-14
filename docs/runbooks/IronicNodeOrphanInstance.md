@@ -64,7 +64,7 @@ $ openstack server show <instance_uuid> -c name -c id -c status -c OS-EXT-SRV-AT
 openstack baremetal node undeploy <node>
 ```
 
-Once the node leaves `deleting`/`cleaning`, check it is `available` with no `instance_uuid` and no `last_error`. If it goes to `error` or `deploy failed`, park it. Do not retry in a loop.
+Once the node leaves `deleting`/`cleaning`, check it is `available` with no `instance_uuid` and no `last_error`. If it goes to `error`, `deploy failed` or `clean failed`, park it. Do not retry in a loop.
 
 ### Park
 
