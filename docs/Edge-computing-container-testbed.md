@@ -1,9 +1,8 @@
----
-⚠️ **Warning!** The *edge computing* flavor of CHI-in-a-Box is in alpha preview and is not part of the standard offering yet. ⚠️ 
-
----
-
 # Deploying a testbed for edge computing
+
+!!! warning
+
+    The *edge computing* flavor of CHI-in-a-Box is in alpha preview and is not part of the standard offering yet.
 
 CHI-in-a-Box supports deploying a "flavor" of the Chameleon testbed optimized for edge computing experimentation. This type of testbed provides the following capabilities:
 

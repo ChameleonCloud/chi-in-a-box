@@ -16,6 +16,6 @@ sudo cc-hammer python3 hammers/scripts/maintenance_reservation.py \
 
 It will attempt to create a lease for each node in `list,of_node,names` starting at `start-time`, and with the duration of `estimate-hours`. Users will be able to make leases either before or after this duration.
 
-{% hint style="info" %}
-Remove --dry-run to actually make the leases!
-{% endhint %}
+!!! info
+
+    Remove --dry-run to actually make the leases!

@@ -46,6 +46,17 @@ Openstack has many features, and it's impossible for us to robustly support ever
 
 Local development depends on having a running Chi-in-a-box site. You can follow the Quickstart guide to bring one up on your own hardware, or, if you have a Chameleon account already, use our [Trovi Artifact](https://chameleoncloud.org/experiment/share/35) to run a development node on top of another Chameleon site.
 
+### Documentation
+
+The operator docs live in [`docs/`](docs/) as Markdown. They are built with [Zensical](https://zensical.org/) and published on [Read the Docs](https://chi-in-a-box.readthedocs.io/), using the build steps in [`.readthedocs.yaml`](.readthedocs.yaml). The site navigation is defined in [`zensical.toml`](zensical.toml), so add new pages there. To preview changes locally:
+
+```
+pip install -r requirements-docs.txt
+zensical serve
+```
+
+Pull requests that touch the docs are built in CI with `zensical build --strict`, which fails on broken links and anchors.
+
 ### Pull Requests
 
 Submitting a pull request will trigger our CI, including some basic linting, as well as sanity checks around deployment use-cases.

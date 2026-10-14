@@ -8,22 +8,22 @@ Openstack, and CHI-in-a-Box, have very specific requirements of the host network
 * [ ] Internal Neutron Interface: interface that neutron will map tenant networks onto
 * [ ] Admin SSH interface (optional): It can be useful to have an extra way in, especially if the other interfaces are shared.
 
-{% hint style="warning" %}
-Note that there are 4+ interfaces here! These can be separate physical interfaces, but must at least be separate logical interfaces.
-{% endhint %}
+!!! warning
+
+    Note that there are 4+ interfaces here! These can be separate physical interfaces, but must at least be separate logical interfaces.
 
 ## Separate Physical Interfaces
 
 This has the most physical complexity, but least logical complexity. Assuming the host has 4 interfaces:
 
 * eno1: connected to public network segment on external switch
-  * Bind a public IP address to this interface, and set default gateway
+    * Bind a public IP address to this interface, and set default gateway
 * eno2: connected to public network segment on external switch
-  * ensure it is not managed by the host (exclude from networkmanager, etc)
+    * ensure it is not managed by the host (exclude from networkmanager, etc)
 * eno3: connected to private network segment on a switch
-  * Bind a private IP address to this interface
+    * Bind a private IP address to this interface
 * eno4: connected to VLAN trunk on the dataplane switch
-  * ensure it is not managed by the host (exclude from networkmanager, etc)
+    * ensure it is not managed by the host (exclude from networkmanager, etc)
 
 ### Variables for use in site-configuration
 
@@ -61,22 +61,22 @@ neutron_networks:
 
 It can be inconvenient to use so many physical interfaces. To economize here, we recommend the following logical -> physical mapping, again assuming interfaces `eno1` and `eno2`.
 
-{% hint style="warning" %}
-We strongly recommend having an extra interface to SSH to, or other way to recover access in the case of misconfiguration.
-{% endhint %}
+!!! warning
+
+    We strongly recommend having an extra interface to SSH to, or other way to recover access in the case of misconfiguration.
 
 * eno1: Public Physical Interface
-  * Public API interface
-  * Neutron External Interface
+    * Public API interface
+    * Neutron External Interface
 * eno2: Private Physical Interface
-  * Private API interface
-  * Neutron physical networks
+    * Private API interface
+    * Neutron physical networks
 
 ### Safely connecting the linux networks to neutron networks
 
-{% hint style="warning" %}
-Because the public and private interfaces are pulling double duty, care must be taken when attaching the neutron openvswitch bridge to the linux interface.
-{% endhint %}
+!!! warning
+
+    Because the public and private interfaces are pulling double duty, care must be taken when attaching the neutron openvswitch bridge to the linux interface.
 
 The specific method depends on what network configuration tool your host OS is using. In general, for each physical interface to be shared between usage on the host (including API addresses), and usage by a Neutron network, the following must be done:
 
@@ -88,135 +88,133 @@ The specific method depends on what network configuration tool your host OS is u
 
 Example configurations are below for each supported OS, but you're free to use your preferred methods.
 
-{% tabs %}
-{% tab title="Ubuntu 18.04" %}
-**Create veth pairs**
+=== "Ubuntu 18.04"
 
-First, we'll make two pairs of virtual interfaces. These will be used to connect the host network to the neutron networks.
+    **Create veth pairs**
 
-In `/etc/systemd/network/`, create two files:
+    First, we'll make two pairs of virtual interfaces. These will be used to connect the host network to the neutron networks.
 
-`20-veth-public.netdev`
+    In `/etc/systemd/network/`, create two files:
 
-```
-[NetDev]
-Name=veth-publica
-Kind=veth
-[Peer]
-Name=veth-publicb
-```
+    `20-veth-public.netdev`
 
-`20-veth-private.netdev`
+    ```
+    [NetDev]
+    Name=veth-publica
+    Kind=veth
+    [Peer]
+    Name=veth-publicb
+    ```
 
-```
-[NetDev]
-Name=veth-privatea
-Kind=veth
-[Peer]
-Name=veth-privateb
-```
+    `20-veth-private.netdev`
 
-**Create Linux Bridges**
+    ```
+    [NetDev]
+    Name=veth-privatea
+    Kind=veth
+    [Peer]
+    Name=veth-privateb
+    ```
 
-Ubuntu 18.04 is using Netplan for configuration. Your netplan config file should contain the following (although it can have more, of course.)
+    **Create Linux Bridges**
 
-Adding the veth names to `ethernets` is required to make them usable in the rest of the netplan config, and the `{}` will keep netplan from otherwise configuring them.
+    Ubuntu 18.04 is using Netplan for configuration. Your netplan config file should contain the following (although it can have more, of course.)
 
-{% hint style="warning" %}
-Note the bridge names do not contain a `-` or `_`. There's an issue in how ansible renders strings containing these values, and it will cause prechecks to fail.
-{% endhint %}
+    Adding the veth names to `ethernets` is required to make them usable in the rest of the netplan config, and the `{}` will keep netplan from otherwise configuring them.
 
-```
-network:
-  version: 2
-  ethernets:
-    eno1: {}
-    eno2: {}
-    veth-publica: {}
-    veth-publicb: {}
-    veth-privatea: {}
-    veth-privateb: {}
-  bridges:
-    brpublic:
-      interfaces:
-        - eno1
-        - veth-publica
-      addresses:
-        - <public_ip_address/netmask>
-      gateway4: <gateway_on_public_subnet>
-      nameservers:
-        addresses:
-          - 8.8.8.8
-          - 8.8.4.4
-    brinternal:
-      interfaces:
-        - eno2
-        - veth-privatea
-      addresses:
-        - 192.5.87.4/23
-```
-{% endtab %}
+    !!! warning
 
-{% tab title="Centos8" %}
-{% hint style="danger" %}
-Warning, centos seems to have MANY edge cases here due to incomplete support for veths in NetworkManager or network-scripts. Use with caution.
-{% endhint %}
+        Note the bridge names do not contain a `-` or `_`. There's an issue in how ansible renders strings containing these values, and it will cause prechecks to fail.
 
-**/etc/NetworkManager/NetworkManager.conf**
+    ```
+    network:
+      version: 2
+      ethernets:
+        eno1: {}
+        eno2: {}
+        veth-publica: {}
+        veth-publicb: {}
+        veth-privatea: {}
+        veth-privateb: {}
+      bridges:
+        brpublic:
+          interfaces:
+            - eno1
+            - veth-publica
+          addresses:
+            - <public_ip_address/netmask>
+          gateway4: <gateway_on_public_subnet>
+          nameservers:
+            addresses:
+              - 8.8.8.8
+              - 8.8.4.4
+        brinternal:
+          interfaces:
+            - eno2
+            - veth-privatea
+          addresses:
+            - 192.5.87.4/23
+    ```
 
-Networkmanager must have its default configuration modified to support autoconnection of veth devices. Add the following at the end of your NetworkManager.conf file
+=== "Centos8"
 
-```
-[device-veth-public]
-match-device=interface-name:veth-public*
-managed=1
-keep-configuration=no
+    !!! danger
 
-[device-veth-private]
-match-device=interface-name:veth-private*
-managed=1
-keep-configuration=no
-```
+        Warning, centos seems to have MANY edge cases here due to incomplete support for veths in NetworkManager or network-scripts. Use with caution.
 
-This overrides a udev rule that would otherwise prevent networkmanager from controlling these
+    **/etc/NetworkManager/NetworkManager.conf**
 
-**Create Bridges**
+    Networkmanager must have its default configuration modified to support autoconnection of veth devices. Add the following at the end of your NetworkManager.conf file
 
-```
-sudo nmcli connection add type bridge \
-    con-name brpublic ifname brpublic \
-    ipv4.method manual ipv4.dns 8.8.8.8 ipv4.gateway <gateway_ip> \
-    ipv4.addresses <public_bind_address>
-sudo nmcli connection add type bridge \
-    con-name brinternal ifname brinternal \
-    ipv4.method manual ipv4.addresses <internal_bind_address>
-```
+    ```
+    [device-veth-public]
+    match-device=interface-name:veth-public*
+    managed=1
+    keep-configuration=no
 
-**Create the veth connection profiles:**
+    [device-veth-private]
+    match-device=interface-name:veth-private*
+    managed=1
+    keep-configuration=no
+    ```
 
-```
-#Public Veth Pair
-sudo nmcli connection add type veth \
-    connection.master brpublic connection.slave-type bridge \
-    ipv4.method disabled ipv6.method disabled \
-    con-name veth-publica  ifname veth-publica veth.peer veth-publicb
-sudo nmcli connection add type veth \
-    ipv4.method disabled ipv6.method disabled \
-    con-name veth-publicb  ifname veth-publicb veth.peer veth-publica
-```
+    This overrides a udev rule that would otherwise prevent networkmanager from controlling these
 
-```
-#Private Veth Pair
-sudo nmcli connection add type veth \
-    connection.master brinternal connection.slave-type bridge \
-    ipv4.method disabled ipv6.method disabled \
-    con-name veth-privatea  ifname veth-privatea veth.peer veth-privateb
-sudo nmcli connection add type veth \
-    ipv4.method disabled ipv6.method disabled \
-    con-name veth-privateb  ifname veth-privateb veth.peer veth-privatea 
-```
-{% endtab %}
-{% endtabs %}
+    **Create Bridges**
+
+    ```
+    sudo nmcli connection add type bridge \
+        con-name brpublic ifname brpublic \
+        ipv4.method manual ipv4.dns 8.8.8.8 ipv4.gateway <gateway_ip> \
+        ipv4.addresses <public_bind_address>
+    sudo nmcli connection add type bridge \
+        con-name brinternal ifname brinternal \
+        ipv4.method manual ipv4.addresses <internal_bind_address>
+    ```
+
+    **Create the veth connection profiles:**
+
+    ```
+    #Public Veth Pair
+    sudo nmcli connection add type veth \
+        connection.master brpublic connection.slave-type bridge \
+        ipv4.method disabled ipv6.method disabled \
+        con-name veth-publica  ifname veth-publica veth.peer veth-publicb
+    sudo nmcli connection add type veth \
+        ipv4.method disabled ipv6.method disabled \
+        con-name veth-publicb  ifname veth-publicb veth.peer veth-publica
+    ```
+
+    ```
+    #Private Veth Pair
+    sudo nmcli connection add type veth \
+        connection.master brinternal connection.slave-type bridge \
+        ipv4.method disabled ipv6.method disabled \
+        con-name veth-privatea  ifname veth-privatea veth.peer veth-privateb
+    sudo nmcli connection add type veth \
+        ipv4.method disabled ipv6.method disabled \
+        con-name veth-privateb  ifname veth-privateb veth.peer veth-privatea 
+    ```
 
 ### Variables for use in site-configuration
 

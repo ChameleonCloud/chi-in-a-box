@@ -1,6 +1,6 @@
 # What is CHI-in-a-Box?
 
-![](chi-in-a-box.png)
+![](assets/chi-in-a-box.png)
 
 CHI-in-a-box is a packaging of the core services that together constitute the [Chameleon](https://www.chameleoncloud.org) testbed for experimental Computer Science research. These services allow Chameleon users to discover information about Chameleon resources, allocate those resources for present and future use, configure them in various ways, and monitor various types of metrics.
 
@@ -31,10 +31,10 @@ In this scenario a provider wants to create a testbed that is in every way separ
 **For users**: A full-featured cloud deployment optimized for bare metal reservations and provisioning, including the following OpenStack services by default:
 
 * Ironic (bare metal deployment)
-  * Including support for bare metal snapshots (not yet an OpenStack-provided capability)
+    * Including support for bare metal snapshots (not yet an OpenStack-provided capability)
 * Blazar (advanced reservation for resources such as bare metal nodes and public IP addresses or layer-2 circuits)
 * Nova (instance deployment in conjunction w/ Ironic)
-  * Including custom vendordata service for automatic experiment metrics collection
+    * Including custom vendordata service for automatic experiment metrics collection
 * Neutron (networking)
 * Glance (disk image storage)
 * Keystone (authentication and authorization)
@@ -70,4 +70,4 @@ We hope the above list continues to shrink ;)
 ## Next Steps
 
 * Let us know on our [GitHub discussions board!](https://github.com/ChameleonCloud/chi-in-a-box/discussions)
-* [Check out the docs!](https://chameleoncloud.gitbook.io/chi-in-a-box)
+* [Check out the docs!](https://chi-in-a-box.readthedocs.io/)

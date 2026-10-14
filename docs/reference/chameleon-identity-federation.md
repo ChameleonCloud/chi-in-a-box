@@ -16,16 +16,16 @@ Before an associate site can enable federation, that site must obtain a client i
 * The Client ID is configured in `defaults.yml` as `keystone_idp_client_id`. To satisfy requirements of the deployment tool, the encrypted passwords file should set `keystone_idp_client_secret` should to "public".
 * Use `cc-ansible reconfigure` to apply the changes and generate a new keystone domain called "chameleon". At this point, federated login should now be available on the site.
 * Add the "admin" role and operator user.
-  *   Find and take note of the desired user and group UUIDs. Be sure to query the user and project entities in the "chameleon" domain.
+    *   Find and take note of the desired user and group UUIDs. Be sure to query the user and project entities in the "chameleon" domain.
 
-      ```
-      openstack user show --domain chameleon <username>
-      openstack project show --domain chameleon openstack
-      ```
-  *   Make the role assignment
+        ```
+        openstack user show --domain chameleon <username>
+        openstack project show --domain chameleon openstack
+        ```
+    *   Make the role assignment
 
-      ```
-      openstack role add --user <user_uuid> --project <project_uudi> admin
-      ```
+        ```
+        openstack role add --user <user_uuid> --project <project_uudi> admin
+        ```
 
 ###

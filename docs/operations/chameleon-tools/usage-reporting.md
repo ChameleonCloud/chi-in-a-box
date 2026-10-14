@@ -1,8 +1,8 @@
 # Usage reporting
 
-{% hint style="info" %}
-This feature can only be enabled by the [Chameleon associate sites](../../).
-{% endhint %}
+!!! info
+
+    This feature can only be enabled by the [Chameleon associate sites](../../).
 
 The usage reporting is used to monitor the daily bare metal node usage of an associate site. The tool will read data from the backups of the OpenStack databases, process the data, and store the usage data into a database named `chameleon_usage` (co-located with the OpenStack databases). The tool will also upload the usage data to a centralized location at TACC, so that the Chameleon Team can monitor the node usage from all Chameleon sites.
 

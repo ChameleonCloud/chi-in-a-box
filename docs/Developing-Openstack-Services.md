@@ -99,14 +99,12 @@ The containers and their dockerfiles are defined in the [kolla repository](https
 These dockerfiles contain macros and support templating.
 
 ```
-{% raw %}
 {% block letsencrypt_certbot_header %}{% endblock %}
-{% endraw %}
 ```
 
 #### Kolla-containers
 
-The Build-time customization is done in the [kolla-containers](https://github.com/ChameleonCloud/kolla-containers) repository. We maintain a file, `template-overrides.j2`, with per-service overrides. In addition, the [kolla-build.conf](https://github.com/ChameleonCloud/kolla-containers/blob/xena/kolla-build.conf.j2) sets build-wide settings, including the git repos and branches to use for each service build.&#x20;
+The Build-time customization is done in the [kolla-containers](https://github.com/ChameleonCloud/kolla-containers) repository. We maintain a file, `template-overrides.j2`, with per-service overrides. In addition, the [kolla-build.conf](https://github.com/ChameleonCloud/kolla-containers/blob/xena/kolla-build.conf.j2) sets build-wide settings, including the git repos and branches to use for each service build.
 
 We have an extra layer of templating in place, as we maintain multiple variants of this build config. Currently, we have the following variants.
 
@@ -140,7 +138,7 @@ Upstream documentation: [https://docs.openstack.org/kolla/latest/admin/kolla\_ap
 
 #### CHI-in-a-box
 
-Finally, the [chi-in-a-box repository](https://github.com/ChameleonCloud/chi-in-a-box) sets the key-value pairs used by kolla-ansbile for configuration, as well as provides templated configuration files, using by the above `merge_configs` or `with_first_found` methods.&#x20;
+Finally, the [chi-in-a-box repository](https://github.com/ChameleonCloud/chi-in-a-box) sets the key-value pairs used by kolla-ansbile for configuration, as well as provides templated configuration files, using by the above `merge_configs` or `with_first_found` methods.
 
 Configuration files are applied in the following order, with more specific replacing less specific.
 
@@ -149,8 +147,7 @@ Configuration files are applied in the following order, with more specific repla
 * `node_custom_config/service/service.conf`
 * `node_custom_config/service/hostname/service.conf`
 
-See the [kolla-ansible docs](https://docs.openstack.org/kolla-ansible/latest/admin/advanced-configuration.html#openstack-service-configuration-in-kolla) for more.&#x20;
-
+See the [kolla-ansible docs](https://docs.openstack.org/kolla-ansible/latest/admin/advanced-configuration.html#openstack-service-configuration-in-kolla) for more.
 
 ## Running end-to-end functional tests with Tempest
 
@@ -162,7 +159,6 @@ WARNING: Do NOT run this against a production site, or one with user instances/d
 
 For this reason, we currently recommend running these tests only against a development site, or before releasing a site to end-users. 
 We are working on a "safe subset" configuration, but it's not ready yet.
-
 
 After setting your site up, including `post-deploy`, set the following parameters in your defaults.yml:
 

@@ -12,4 +12,4 @@ Every CHI-in-a-Box deployment is highly configurable, though many settings are d
 
 A directory with examples is located in the CHI-in-a-Box repo at `./site-config.example`
 
-{% embed url="https://github.com/ChameleonCloud/chi-in-a-box/tree/stable/xena/site-config.example" %}
+[site-config.example](https://github.com/ChameleonCloud/chi-in-a-box/tree/chameleoncloud/2025.1/site-config.example)

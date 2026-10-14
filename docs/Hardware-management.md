@@ -117,11 +117,11 @@ openstack hardware create [--dry_run] \
 
 It's often more convenient to describe hardware to import as structured data, rather than shell wrangling. python-doniclient supports using `json` as input for creating one or more nodes.
 
-To do so, use the `hardware import` command, and specify a json, structured as an array of objects.&#x20;
+To do so, use the `hardware import` command, and specify a json, structured as an array of objects.
 
-{% hint style="info" %}
-In the example below, items enclosed in `<..>` should be replaced by your actual value.
-{% endhint %}
+!!! info
+
+    In the example below, items enclosed in `<..>` should be replaced by your actual value.
 
 ```json
 [
