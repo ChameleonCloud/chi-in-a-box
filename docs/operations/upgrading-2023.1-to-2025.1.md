@@ -14,8 +14,7 @@ Ensure you have a consistent starting point on release 2023.1 and Ubuntu 22.04.
     * `horizon_tag`, `blazar_tag`, `ironic_tag`
     * `horizon_image`
     * `horizon_image_full`
-    * `blazar_dev_mode`
-    * `ironic_dev_mode`
+    * any `<service>_dev_mode`, e.g. `blazar_dev_mode`, `ironic_dev_mode`, `zun_dev_mode`, along with its `<service>_git_repository` and `<service>_source_version`. Dev mode bind-mounts `/opt/stack/<service>` over the installed package, so a missing or stale checkout there breaks the service.
 * Site-config: clean duplicates from `node_custom_config`. Files in your site-config's custom config replace the ones in chi-in-a-box, so remove anything that duplicates a chi-in-a-box file with minor modifications. For example:
     * Not OK: `ironic.conf`, `nova.conf`, …
     * OK: non-overlapping files such as fluentd or haproxy drop-ins, ceph keyrings, …
@@ -47,9 +46,11 @@ OpenStack 2024.1 changes the default queue type to durable quorum queues, which 
 
 Migrating requires stopping all services that talk to RabbitMQ, updating their config, clearing the old queues out of RabbitMQ, and then starting the services back up. If the services are active, they'll recreate the queues with the old settings and prevent the migration.
 
-1. Identify all services that may talk to RabbitMQ. Under `/etc/kolla` on the control node:
-    1. List them: `grep -R oslo_messaging_rabbit | cut -d "/" -f 1 | sort -u`
-    2. Turn the list into kolla tags: `grep -R oslo_messaging_rabbit | cut -d "/" -f 1 | cut -d "-" -f 1 | sort -u | paste -s -d ","`
+1. Identify all services that may talk to RabbitMQ. On the control node, as root, `cd /etc/kolla`, then:
+    1. List them: `grep -Rl oslo_messaging_rabbit | cut -d "/" -f 1 | sort -u`
+    2. Turn the list into kolla tags: `grep -Rl oslo_messaging_rabbit | cut -d "/" -f 1 | cut -d "-" -f 1 | sort -u | paste -s -d ","`
+
+    For example, a CHI@Edge site gives `blazar,keystone,neutron,zun`. Keystone is in the list, so the APIs are down from step 2 until step 8.
 2. Stop all services that talk to RabbitMQ. (Very important!)
 
     ```shell
@@ -66,7 +67,13 @@ Migrating requires stopping all services that talk to RabbitMQ, updating their c
 6. `./cc-ansible reconfigure --tags rabbitmq`
 7. `./cc-ansible rabbitmq-reset-state`
 8. `./cc-ansible deploy --tags <kolla tags from 1.2>`
-9. Verify that services start without errors about RabbitMQ in their logs, and that RabbitMQ does not log errors about durable queues.
+9. Verify that services start without errors about RabbitMQ in their logs, and that RabbitMQ does not log errors about durable queues. Check the queue types:
+
+    ```shell
+    docker exec rabbitmq rabbitmqctl list_queues -q type durable | sort | uniq -c
+    ```
+
+    Most queues should now be `quorum true`. `*_fanout_*` and `reply_*` queues stay `classic false` on 2023.1 and 2024.1, which is expected; they are migrated in the 2025.1 stage.
 
 ### Upgrade RabbitMQ versions
 
@@ -84,6 +91,10 @@ See the [kolla-ansible docs on SLURP upgrades](https://docs.openstack.org/kolla-
     rabbitmq_image: ghcr.io/chameleoncloud/kolla/rabbitmq-3-13
     ```
 4. Run `./cc-ansible upgrade --tags rabbitmq`
+
+After each upgrade, verify the version with `docker exec rabbitmq rabbitmqctl version`, and check that services reconnect. Each restart causes a brief burst of `AMQP server ... is unreachable` errors in service logs, which should stop within a minute.
+
+Remove the `rabbitmq_image` override before upgrading to 2024.1. The `rabbitmq-3-13` image is only published for 2023.1, so the 2024.1 `pull` would fail. The default 2024.1 `rabbitmq` image is already 3.13. (This differs from the 2025.1 stage below, where the override must stay set.)
 
 ### Prepare for the Ubuntu upgrade
 
@@ -120,16 +131,18 @@ Ensure you can connect to serial-over-LAN and/or the HTML5 console, and that you
     ```shell
     tar -czvf /root/kolla-etc-2023-1.tgz /etc/kolla
     ```
-2. Make a copy of the most recent DB backup:
+2. Take a DB backup, then copy it out of the docker volume:
 
     ```shell
+    ./cc-ansible mariadb_backup
     cp /var/lib/docker/volumes/mariadb_backup/_data/<todays_backup> \
       /root/kolla-db-2023-1
     ```
-3. Make a copy of chi-in-a-box and site-config:
+3. Make a copy of chi-in-a-box and site-config. This includes `vault_password` and `passwords.yml`, so restrict access to it:
 
     ```shell
     tar -czvf ciab-2023-1.tgz chi-in-a-box/ site-config/
+    chmod 600 ciab-2023-1.tgz
     ```
 
 ## OpenStack 2023.1 -> 2024.1
@@ -137,7 +150,9 @@ Ensure you can connect to serial-over-LAN and/or the HTML5 console, and that you
 ### Update chi-in-a-box
 
 ```shell
+git fetch
 git checkout chameleoncloud/2024.1
+git pull --ff-only
 rm -rf venv
 git submodule update --init --recursive
 ./cc-ansible install_deps
@@ -168,7 +183,12 @@ Ansible merges these in alphabetical order, with later files overriding earlier 
     cp chi-in-a-box/site-config.example/inventory/80-chi-hosts \
       $SITE_CONFIG/inventory/
     ```
-3. Most likely, customize `10-base-hosts` with your changes. If necessary, apply customizations to `50-kolla-hosts` or `80-chi-hosts` as well.
+3. Most likely, customize `10-base-hosts` with your changes. If necessary, apply customizations to `50-kolla-hosts` or `80-chi-hosts` as well. Don't carry over groups for retired services, such as `[jupyterhub:children]`.
+4. Move the old `inventory/hosts` out of the inventory directory. Ansible reads every file there, so leaving it in place merges it with the new files:
+
+    ```shell
+    mv $SITE_CONFIG/inventory/hosts $SITE_CONFIG/inventory-hosts-2023.1.bak
+    ```
 
 #### Update passwords
 
@@ -195,7 +215,17 @@ Run:
 
 ### Verification
 
-All containers are tagged `2024.1-ubuntu-jammy`.
+All containers are tagged `2024.1-ubuntu-jammy`, except containers that 2024.1 no longer manages, which keep running their 2023.1 image:
+
+* `prometheus_ipmi_exporter`: once you've confirmed you don't need it, remove it on each host that runs it. Its kolla systemd unit restarts the container, so stop the unit rather than the container, then remove the unit file, the container, and its config:
+
+    ```shell
+    systemctl disable --now kolla-prometheus_ipmi_exporter-container.service
+    rm /etc/systemd/system/kolla-prometheus_ipmi_exporter-container.service
+    systemctl daemon-reload
+    docker rm prometheus_ipmi_exporter
+    rm -rf /etc/kolla/prometheus-ipmi-exporter
+    ```
 
 ## Ubuntu 22.04 -> 24.04
 
