@@ -66,6 +66,7 @@
   * [Security incident triage](operations/troubleshooting/security-incident-triage.md)
   * [Troublesome Hardware](operations/troubleshooting/troublesome-hardware.md)
 * [Alert runbooks](runbooks/README.md)
+  * [Ceph RGW Quotas](runbooks/RgwQuota.md)
   * [Cron Job No Recent Success](runbooks/CronJobNoRecentSuccess.md)
   * [Instance Failure](runbooks/instance-failure.md)
   * [Image Cache Space](runbooks/IronicLowImageCacheSpace.md)
