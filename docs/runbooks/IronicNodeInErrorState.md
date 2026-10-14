@@ -17,7 +17,7 @@
 
 ### Clearing the error state
 
-Before you undeploy, check that the node has no Nova server (in any status, including `ERROR`) and no tenant port bound to it. Undeploying a node that still has a live Nova server destroys that user's instance. A leftover `ERROR` server or bound port also means the cause of the failed teardown may still be there. See [Ironic Node Stuck](IronicNodeStuck.md#error-or-deploy-failed-after-a-teardown) for the checks and the other stuck states.
+Before you undeploy, check that the node has no Nova server (in any status, including `ERROR`) and no tenant port bound to it. Undeploying a node that still has a live Nova server destroys that user's instance. A leftover `ERROR` server or bound port also means the cause of the failed teardown may still be there. See [Ironic Node Stuck](IronicNodeStuck.md#error-or-deploy-failed) for the checks and the other stuck states.
 
 To put the node back into the `available` state, you can trigger an `undeploy` of the node. This works even if the node doesn't have an instance; it essentially performs a `clean` and then `delete` if there is an instance, then resets the state.
 
