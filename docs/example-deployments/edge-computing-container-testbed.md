@@ -11,7 +11,7 @@ CHI-in-a-Box supports deploying a "flavor" of the Chameleon testbed optimized fo
 * Secure encrypted communication to enrolled devices over NAT and WAN--devices do not have to be colocated with the control plane
 * Various container-focused interfaces such as interactive console, remote log access, bind mounts and snapshots
 
-![The Containers page in the CHI@Edge Horizon dashboard](assets/edge-horizon-containers.png)
+![The Containers page in the CHI@Edge Horizon dashboard](../assets/edge-horizon-containers.png)
 
 ### Pre-deployment
 

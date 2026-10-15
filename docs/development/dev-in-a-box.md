@@ -1,2 +1,0 @@
-# Dev-in-a-box
-

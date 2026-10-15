@@ -1,4 +1,4 @@
-# quickstart
+# Quickstart
 
 
 1. clone this repo, we use the path `/opt/chi-in-a-box` by convention.

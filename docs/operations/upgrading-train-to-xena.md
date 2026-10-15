@@ -1,10 +1,8 @@
-# Upgrading to a new Release
-
-## Train -> Xena
+# Upgrading from Train to Xena
 
 If you're running centos7, this will be annoying. This involves a major openstack version upgrade, python2->python3 upgrade, and host-os upgrade.
 
-### Backup
+## Backup
 
 On the controller node, back up the following.
 
@@ -12,7 +10,7 @@ On the controller node, back up the following.
 * `/etc/kolla`
 * your mysql DB
 
-#### mariadb
+### mariadb
 
 [https://docs.openstack.org/kolla-ansible/latest/admin/mariadb-backup-and-restore.html](https://docs.openstack.org/kolla-ansible/latest/admin/mariadb-backup-and-restore.html#full)
 
@@ -33,9 +31,9 @@ On the Deploy node, back up the following:
 * your git checkout of `chi-in-a-box`
 * your `site-config` directory, especially including the `vault_password`
 
-### Clean up the controller nodes
+## Clean up the controller nodes
 
-#### Ubuntu 20.04
+### Ubuntu 20.04
 
 ```shell
 # Run these on your controller node, after making a backup.
@@ -43,7 +41,7 @@ mv /etc/ansible /etc/ansible.bak
 mv /etc/kolla /etc/kolla.bak
 ```
 
-### Check out new chi-in-a-box
+## Check out new chi-in-a-box
 
 Once you've backed up your `chi-in-a-box` directory, run the following commands to get the latest code, and clean up leftover files.
 
@@ -57,7 +55,7 @@ rm -rf .facts
 ./cc-ansible bootstrap-servers
 ```
 
-#### Update passwords.yml
+### Update passwords.yml
 
 We need to set some new passwords that the new version requires. The `kolla-mergepwd` command will pull in values that are set in `site-config.example`, but missing from your passwords file.
 
@@ -90,7 +88,7 @@ cd $CHI_IN_A_BOX
 
 each line that looks like: `key: null` should be modified to look like `key:`
 
-#### Update inventory/hosts
+### Update inventory/hosts
 
 ```shell
 # make a backup of your inventory
@@ -103,7 +101,7 @@ cp $CHI_IN_A_BOX/site-config.example/inventory/hosts \
 vim $SITE_CONFIG/inventory/hosts
 ```
 
-### Get new containers, and deploy services
+## Get new containers, and deploy services
 
 ```shell
 cd $CHI_IN_A_BOX

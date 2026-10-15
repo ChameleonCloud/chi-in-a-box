@@ -68,12 +68,12 @@ nav = [
     ] },
   ] },
   { "Example Deployments" = [
-    { "ARM/x86 mixed architecture" = "ARM-and-x86-mixed-architecture.md" },
+    { "ARM/x86 mixed architecture" = "example-deployments/arm-and-x86-mixed-architecture.md" },
     { "Edge computing/container testbed" = "Edge-computing-container-testbed.md" },
   ] },
   { "Operations" = [
-    { "Hardware management" = "Hardware-management.md" },
-    { "Certificate management" = "Certificate-management.md" },
+    { "Hardware management" = "operations/hardware-management.md" },
+    { "Certificate management" = "operations/certificate-management.md" },
     { "Chameleon tools" = [
       "operations/chameleon-tools/README.md",
       { "Hammers 🔨" = [
@@ -118,12 +118,12 @@ nav = [
       { "Runbook Template" = "runbooks/Template.md" },
     ] },
     { "User support guide" = "operations/user-support-guide.md" },
-    { "Upgrading to a new Release" = "operations/upgrading-to-a-new-release.md" },
     { "Upgrading from 2023.1 to 2025.1" = "operations/upgrading-2023.1-to-2025.1.md" },
-    { "Upgrading from Xena to 2023.1" = "xena-antelope-upgrade.md" },
+    { "Upgrading from Xena to 2023.1" = "operations/upgrading-xena-to-2023.1.md" },
+    { "Upgrading from Train to Xena" = "operations/upgrading-train-to-xena.md" },
   ] },
   { "Development" = [
-    { "Developing OpenStack Services" = "Developing-Openstack-Services.md" },
+    { "Developing OpenStack Services" = "development/developing-openstack-services.md" },
     { "Dev-in-a-box" = "development/dev-in-a-box.md" },
   ] },
 ]

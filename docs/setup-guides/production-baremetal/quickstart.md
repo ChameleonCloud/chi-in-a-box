@@ -312,4 +312,4 @@ It's recommended to use individual user accounts to log in, rather than the buil
 
 ### Enroll Baremetal nodes
 
-Follow the steps in [Hardware-management.md](../../Hardware-management.md "mention") to enroll nodes in your testbed.
+Follow the steps in [Hardware-management.md](../../operations/hardware-management.md "mention") to enroll nodes in your testbed.
