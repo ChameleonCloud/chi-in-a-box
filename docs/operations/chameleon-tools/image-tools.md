@@ -26,6 +26,16 @@ By default, the automatic deployment task is _disabled_. To enable the task, set
 systemctl list-timers 'chameleon-image-deploy'
 ```
 
+To deploy only some images, set `image_deployer_images` in the site `defaults.yml`:
+
+```yaml
+image_deployer_images:
+  - CC-Ubuntu24.04
+  - CC-Ubuntu24.04-CUDA
+```
+
+The deployer archives the site's copy of any image not on the list.
+
 You can also deploy the images manually by running the following command:
 
 ```shell
