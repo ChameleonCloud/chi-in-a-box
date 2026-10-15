@@ -67,4 +67,4 @@ Chameleon additionally provides a few useful extra pieces for all users of CHI-i
 2. Bring up a single-host [Evaluation Site](setup-guides/evaluation-site/README.md) to try it out.
 3. When you're ready for real hardware, follow the [Production Baremetal](setup-guides/production-baremetal/README.md) guide, the default configuration for associate sites.
 
-Questions? Ask on [GitHub Discussions](https://github.com/ChameleonCloud/chi-in-a-box/discussions).
+Questions? Ask in the [CHI-in-a-Box category](https://forum.chameleoncloud.org/c/chi-in-a-box/7) of the Chameleon forum.

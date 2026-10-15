@@ -11,7 +11,7 @@ CHI-in-a-Box packages the services behind the [Chameleon](https://www.chameleonc
 
 ## Getting help
 
-- Questions and discussion: [GitHub Discussions](https://github.com/ChameleonCloud/chi-in-a-box/discussions)
+- Questions and discussion: [Chameleon forum, CHI-in-a-Box category](https://forum.chameleoncloud.org/c/chi-in-a-box/7)
 - Bugs: [GitHub Issues](https://github.com/ChameleonCloud/chi-in-a-box/issues)
 
 ## Contributing
