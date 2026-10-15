@@ -6,3 +6,6 @@ image_type: {{ image_type }}
 image_prefix: {{ image_prefix }}
 scope: {{ image_scope }}
 object_store_url: {{ image_object_store_url }}
+{% if image_deployer_images is defined %}
+images: {{ image_deployer_images | to_json }}
+{% endif %}
