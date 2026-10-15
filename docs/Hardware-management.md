@@ -182,7 +182,9 @@ It's possible to "block out" a period of time for a bare metal node so that user
 
 For each availability window, a maintenance lease is created in the reservation system. This lease will show up in the host calendar so that users can see when the node will be available once again.
 
-> **Note**: avoid manually updating the maintenance leases or deleting them in Blazar! Instead, manage them via the inventory service.
+!!! warning
+
+    Avoid manually updating the maintenance leases or deleting them in Blazar! Instead, manage them via the inventory service.
 
 ```shell
 # Note: obtain the hardware's $UUID by, e.g., openstack hardware list

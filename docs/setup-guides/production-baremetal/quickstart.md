@@ -96,7 +96,9 @@ If you are only using two interfaces, you must do some additional configuration 
     localhost ansible_connection=local
     ```
 
-    > **Note** If you used `./cc-ansible init` this may have been done automatically for you.
+    !!! note
+
+        If you used `./cc-ansible init` this may have been done automatically for you.
 
 #### `${CC_ANSIBLE_SITE}/inventory/host_vars/<hostname>`
 
@@ -177,7 +179,9 @@ cat certificate.crt intermediates.pem private.key \
 
     This will install Docker on your target node and put SELinux into permissive mode
 
-    > currently [Kolla containers do not have working SELinux profiles.](https://bugs.launchpad.net/kolla-ansible/+bug/1797277)
+    !!! note
+
+        Currently [Kolla containers do not have working SELinux profiles.](https://bugs.launchpad.net/kolla-ansible/+bug/1797277)
 
 2. Reboot if needed to apply SELinux changes
 3.  If you plan to run the provisioning tools as a non-root user, you will need to allow access to Docker. One easy way is to add the user to the `docker` group, though this effectively gives the user root access. The deploy will install docker, but at this point you'll need to create the group manually.
@@ -228,7 +232,9 @@ Once the images are pulled, you can run the "deploy" phase, which sets up all th
 ./cc-ansible deploy
 ```
 
-> **Note**: if you encounter errors and need to re-run the deploy step, which is expensive, you can skip parts you know have already succeeded. You can watch the Ansible output to see which "role" (service) it is updating. If you know a certain role has completed successfully, you can try skipping it on the next run with the `--skip-tags` option, e.g. `--skip-tags keystone,nova` to skip the Keystone and Nova provisioning. Note that flags must come after the subcommand, e.g. `./cc-ansible deploy --skip-tags keystone,nova`.
+??? tip "Re-running a failed deploy"
+
+    If you encounter errors and need to re-run the deploy step, which is expensive, you can skip parts you know have already succeeded. You can watch the Ansible output to see which "role" (service) it is updating. If you know a certain role has completed successfully, you can try skipping it on the next run with the `--skip-tags` option, e.g. `--skip-tags keystone,nova` to skip the Keystone and Nova provisioning. Note that flags must come after the subcommand, e.g. `./cc-ansible deploy --skip-tags keystone,nova`.
 
 ### Run post-deployment configuration
 

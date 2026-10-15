@@ -1,6 +1,8 @@
 # MySQL Replication Error
 
-> **Note**: this alert is out-of-date, as replication is not turned on for most deployments anymore. This runbook may be removed at a later date.
+!!! warning "Out of date"
+
+    This alert is out-of-date, as replication is not turned on for most deployments anymore. This runbook may be removed at a later date.
 
 **Summary**: This error occurs when the MySQL slave server for some reason cannot replicate changes made to the master database.
 
@@ -15,7 +17,9 @@
 1. On a node with access to the master database, run [`scripts/mysql_replication_snapshot`](https://github.com/ChameleonCloud/ansible-playbooks/blob/master/scripts/mysql\_replication\_snapshot). The script should write out a copy of the Keystone database to the working directory and also print the binlog position; take note of this position as you will need it later.
 2. Copy the Keystone database file to a node with access to the slave database.
 
-> _Tip_: Use `scp -3 hostA:mysql_keystone_master-*.sql.gz hostB:` if there is no remote authentication set up between two sites; the `-3` flag instructs scp to use your local credentials to first download from hostA, then upload to hostB.
+!!! tip
+
+    Use `scp -3 hostA:mysql_keystone_master-*.sql.gz hostB:` if there is no remote authentication set up between two sites; the `-3` flag instructs scp to use your local credentials to first download from hostA, then upload to hostB.
 
 1. On the node with access to the slave database, run [`scripts/mysql_replication_restore`](https://github.com/ChameleonCloud/ansible-playbooks/blob/master/scripts/mysql\_replication\_restore). This script takes in a path to the Keystone database snapshot and a binlog position. It will wipe away the slave Keystone database tables and replace it with values from the master, and then set up replication starting from the binlog position at which the snapshot was taken. Once this completes, the databases should be in sync again.
 2. Check `show slave status\G` on the slave to verify replication is working again.

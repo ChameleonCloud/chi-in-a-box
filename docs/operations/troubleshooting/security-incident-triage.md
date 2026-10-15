@@ -17,7 +17,9 @@ iftop # for network (might not be installed)
 ps aux
 ```
 
-> **Note**: Make sure you hold this open for a bit - do you see any weird processes? Something taking up a lot of resources, especially one that has a weird or very simple name?
+!!! note
+
+    Make sure you hold this open for a bit - do you see any weird processes? Something taking up a lot of resources, especially one that has a weird or very simple name?
 
 To get a list of open files and processes for a given user:
 

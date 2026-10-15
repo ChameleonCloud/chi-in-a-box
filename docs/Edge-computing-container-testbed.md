@@ -15,7 +15,9 @@ CHI-in-a-Box supports deploying a "flavor" of the Chameleon testbed optimized fo
 
 ### Pre-deployment
 
-> **Note**: Setup of encrypted Wireguard tunnels is a manual step currently. Future versions of CHI-in-a-Box will improve this.
+!!! note
+
+    Setup of encrypted Wireguard tunnels is a manual step currently. Future versions of CHI-in-a-Box will improve this.
 
 The following guide uses `wireguard-tools` to simplify some steps of the tunnel setup and configuration, but this is not strictly required. To install this package:
  
@@ -134,6 +136,8 @@ tunnel_interface: wg1
 
 ## Device enrollment
 
-> **Note**: currently devices must be enrolled by site operators via a not-very-streamlined process. The [Chameleon Edge SDK](https://github.com/chameleoncloud/python-chi-edge) is under active development and will be 100% responsible for device enrollment in the future, both ensuring that the devices have all required software installed and are securely connected to the central control plane.
+!!! note
+
+    Currently devices must be enrolled by site operators via a not-very-streamlined process. The [Chameleon Edge SDK](https://github.com/chameleoncloud/python-chi-edge) is under active development and will be 100% responsible for device enrollment in the future, both ensuring that the devices have all required software installed and are securely connected to the central control plane.
 
 If you've gotten this far, ask the Chameleon operators about the current state-of-the-art for device enrollment as it's rapidly evolving.

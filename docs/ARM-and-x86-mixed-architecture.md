@@ -60,7 +60,9 @@ openstack image create --file ironic-python-agent-aarch64.kernel ironic-python-a
 
 1. Configure your ARM nodes to deploy with the ARM64-compiled IPA image, and also set the architecture on the node, which will help iPXE understand it is an ARM node at boot time.
 
-> ⚠️ Requires `python-doniclient>=0.4.0`
+!!! warning
+
+    Requires `python-doniclient>=0.4.0`
 
 ```shell
 openstack hardware set --architecture aarch64 --deploy_kernel $kernel_uuid --deploy_ramdisk $ramdisk_uuid $node
