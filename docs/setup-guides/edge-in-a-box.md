@@ -146,7 +146,7 @@ k3s_server_port: "6443"
 
 To drive the Kubernetes backend through an openstack interface, Edge-in-a-Box uses Openstack Zun, the dedicated container service in conjunction with a k8s compute driver developped by the Chameleon team for Zun to provide container services through an Openstack cloud layer. After enabling K3S, it is essential to enable zun as well as the K8S compute module for it. Add the following config options to
 
-&#x20; **`${CC_ANSIBLE_SITE}/defaults.yml`**
+**`${CC_ANSIBLE_SITE}/defaults.yml`**
 
 ```yaml
 enable_zun: yes
@@ -163,7 +163,7 @@ The result is that edge-in-a-Box maintaints a Hub and Spoke network configuratio
 
 To enable Tunelo and neutron wireguard, add the following options to
 
-&#x20; **`${CC_ANSIBLE_SITE}/defaults.yml`**
+**`${CC_ANSIBLE_SITE}/defaults.yml`**
 
 ```yaml
 enable_neutron_wireguard: yes
@@ -182,7 +182,7 @@ neutron_wireguard_create_hub_in_root_netns: True
 
 To enable advance reservation of edge devices, Edge-in-a-Box deploys Openstack Blazar. Using the chameleon-developed Kubernetes plugin for it, Blazar can set reservation labels on worker nodes in Kubernetes. To enable blazar and its Kubernetes plugin, add the following lines to
 
-&#x20; **`${CC_ANSIBLE_SITE}/defaults.yml`**
+**`${CC_ANSIBLE_SITE}/defaults.yml`**
 
 ```yaml
 enable_blazar: yes
@@ -200,7 +200,7 @@ Edge-in-a-Box deploys Doni to manage edge device enrollment. Doni is essentially
 
 To deploy Doni and configure it, add the following option to
 
-&#x20; **`${CC_ANSIBLE_SITE}/defaults.yml`**
+**`${CC_ANSIBLE_SITE}/defaults.yml`**
 
 ```yaml
 enable_doni: yes
@@ -210,7 +210,7 @@ enable_doni: yes
 
 To manage edge devices without physical access, edge-in-a-box assumes the existence of a balena cloud deployment. Doni then handles the responsibility of enrolling devices in balena. The setup of Balena-Cloud is entirely up to the operator but once done, to point Doni to the right balena-cloud fleet, add the following option to
 
-&#x20; **`${CC_ANSIBLE_SITE}/defaults.yml`**
+**`${CC_ANSIBLE_SITE}/defaults.yml`**
 
 ```yaml
 default_balena_fleet: <name_of_your_balena_fleet>
@@ -325,7 +325,7 @@ To ensure that Kubernetes core services and any unintended services do not get s
 
 Add the worker node taint to
 
-&#x20; **`${CC_ANSIBLE_SITE}/defaults.yml`**
+**`${CC_ANSIBLE_SITE}/defaults.yml`**
 
 ```yaml
 k8s_worker_taint:
