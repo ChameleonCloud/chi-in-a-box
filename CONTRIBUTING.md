@@ -9,7 +9,7 @@ This project and everyone participating in it is governed by the [Code of Conduc
 > Please don't file an issue just to ask a question. You'll get faster results with one of the folowing:
 
 We have an official message board where the community can chime in.
-* [Github Discussions for CHI-in-a-box Operators](https://github.com/ChameleonCloud/chi-in-a-box/discussions)
+* [Chameleon forum, CHI-in-a-Box category](https://forum.chameleoncloud.org/c/chi-in-a-box/7)
 * [Chameleon Helpdesk](https://chameleoncloud.org/user/help/ticket/new/)
 * [Chameleon user facing documentation](https://chameleoncloud.readthedocs.io/en/latest/contents.html)
 * [Upstream Kolla-Ansible documentation](https://docs.openstack.org/kolla-ansible/train/)
@@ -26,7 +26,7 @@ While our goal is ease of use and "Operator Ergonomics", this is fundamentally a
 
 In rough order from least to most involved:
 
-### Join the [discussions](https://github.com/ChameleonCloud/chi-in-a-box/discussions)!
+### Join the [forum](https://forum.chameleoncloud.org/c/chi-in-a-box/7)!
 Even if you don't contribute code, participating in the community, asking questions, and responding to others is enormously helpful. This helps us gauge interest in new features, and makes it possible to discover common issues that others have encountered.
 
 ### Reporting Bugs
