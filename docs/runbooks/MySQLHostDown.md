@@ -2,7 +2,7 @@
 
 **Consequences**: If the MySQL process is indeed down or unreachable, then most of the system will not be operational. If this is the case, other alerts will likely fire around OpenStack APIs being down, amongst others. If no other alerts are firing, it's possible it is only a monitoring misconfiguration. Restoring a down or unreachable MySQL process should be a high-priority item in the event of an outage as most systems rely on it.
 
-### Possible causes
+## Possible causes
 
 **The MySQL process has failed**:
 

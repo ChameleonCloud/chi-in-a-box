@@ -2,7 +2,7 @@
 
 **Consequences**: Periodic jobs serve many purposes so the impact depends on the job, though typically is limited in user impact. Most jobs are responsible for cleaning up testbed state; over time if these jobs are left failing, users may experience nodes that cannot be provisioned. Jobs are also involved in creating backups of data, and if they stop working, the ability to restore from backups diminishes.
 
-### Possible causes
+## Possible causes
 
 **Authentication errors**: Many jobs interface with OpenStack APIs, and user a special user for this. If this user is changed or disabled, jobs can fail.
 

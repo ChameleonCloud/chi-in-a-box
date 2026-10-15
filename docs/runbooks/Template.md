@@ -2,7 +2,7 @@
 
 **Consequences**: _Short description of symptoms of error, what users could expect to experience, etc._
 
-### Possible causes
+## Possible causes
 
 _List possible causes and their mitigations, e.g._
 

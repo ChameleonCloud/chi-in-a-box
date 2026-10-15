@@ -10,11 +10,11 @@ Docs:
 
 - [Quota management](https://docs.ceph.com/en/reef/radosgw/admin/#quota-management) in the Ceph Reef admin guide
 
-### Get a shell
+## Get a shell
 
 Run the `ceph` and `radosgw-admin` commands on a Ceph admin host, in `cephadm shell` or on any host with the Ceph CLI and the admin keyring. Run the `openstack` commands with admin credentials for the site (for example `admin-openrc.sh`).
 
-### 1. Find out the current state
+## 1. Find out the current state
 
 How much space is there, what quotas already exist, and what are the biggest users.
 
@@ -56,7 +56,7 @@ openstack project show <project_id> -f value -c name
 
 **Which projects have no quota?** Write an [rgw-quota-sync](https://github.com/ChameleonCloud/rgw-quota-sync) config with the default you plan (its README covers the file and the RGW user it needs), then run it without `--apply`. This dry run changes nothing. Each `quota would change from disabled` line is a project with no quota today.
 
-### 2. Protect the projects already over the default
+## 2. Protect the projects already over the default
 
 Docs:
 
@@ -96,7 +96,7 @@ project_quotas:
     max_size: 2199023255552       # 2 TiB, uses 1.55
 ```
 
-### 3. Set the default for new projects
+## 3. Set the default for new projects
 
 Docs:
 
@@ -111,7 +111,7 @@ ceph config set client.rgw rgw_user_default_quota_max_size 1099511627776
 
 This applies only to RGW users created after the change, so existing projects still need step 4.
 
-### 4. Give every existing project a quota
+## 4. Give every existing project a quota
 
 Docs:
 
@@ -131,7 +131,7 @@ radosgw-admin quota set --quota-scope=user --uid='<project_id>$<project_id>' --m
 radosgw-admin quota enable --quota-scope=user --uid='<project_id>$<project_id>'
 ```
 
-### 5. Set a global quota as a backstop
+## 5. Set a global quota as a backstop
 
 Docs:
 
@@ -150,7 +150,7 @@ The global quota takes effect only once RGW loads it:
 - If `radosgw-admin realm list` shows a realm, run `radosgw-admin period update --commit`.
 - If there is no realm, restart every RGW daemon. With cephadm, `ceph orch ls rgw` shows the service, then `ceph orch restart rgw.<service>`.
 
-### Check
+## Check
 
 Docs:
 

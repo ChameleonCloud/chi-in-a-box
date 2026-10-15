@@ -2,7 +2,7 @@
 
 **Consequences**: If one of the OpenStack APIs is indeed down, or returning error codes, it will affect the reliability of the cluster as a whole, and large portions of the testbed may not be working.
 
-### Possible causes
+## Possible causes
 
 **Failure of monitoring to contact cluster**: this alert depends on metrics that are gathered by an external source (a Prometheus OpenStack metric exporter), and if the exporter fails to authenticate or otherwise cannot reach the cluster, this alert can fire, though nothing is really on 🔥.
 

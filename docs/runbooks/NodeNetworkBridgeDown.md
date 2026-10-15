@@ -2,7 +2,7 @@
 
 **Consequences**: If the bridge is being used by processes to send/receive traffic, those processes are effectively cut off from the network. This ranges from fine to very bad, depending on the process/service.
 
-### Possible causes
+## Possible causes
 
 **A Docker network was deleted**: if a Docker network was deleted or recreated recently, this alert can fire, because Linux typically creates a bridge for each Docker network. The bridge name will include part of the Docker network ID if this is the case. Typically this is benign if this is the cause.
 

@@ -6,7 +6,7 @@ This page covers one decision: is the server gone, so it is safe to undeploy, or
 
 **Never undeploy a node whose Nova server is alive.** Undeploy destroys the instance.
 
-### Check
+## Check
 
 Use admin credentials for the site (for example `admin-openrc.sh`). A non-admin cannot see other projects' servers and will wrongly report "not found". In the examples, `<node>` is the node name or uuid, `<node_uuid>`, `<instance_uuid>`, `<instance_name>` and `<port_uuid>` stand for real values, and only the rows that matter are shown.
 
@@ -50,7 +50,7 @@ $ openstack server show <instance_uuid> -c name -c id -c status -c OS-EXT-SRV-AT
 | status                              | ERROR           |
 ```
 
-### Decide
+## Decide
 
 | What the check shows | Action |
 |---|---|
@@ -58,7 +58,7 @@ $ openstack server show <instance_uuid> -c name -c id -c status -c OS-EXT-SRV-AT
 | The server is `ERROR` and `OS-EXT-SRV-ATTR:hypervisor_hostname` is empty | (BE VERY CAREFUL HERE AND DOUBLE CHECK) delete the server with `openstack server delete <instance_uuid>`. With no node recorded, this only removes Nova's record and does not touch the node. Run the check again: it now says not found, so undeploy |
 | The server exists in any other way (any other status, or a `hypervisor_hostname`) | do not undeploy; park the node and escalate with the node uuid, `instance_uuid`, `last_error` and the server's status |
 
-### Undeploy
+## Undeploy
 
 ```shell
 openstack baremetal node undeploy <node>
@@ -66,7 +66,7 @@ openstack baremetal node undeploy <node>
 
 Once the node leaves `deleting`/`cleaning`, check it is `available` with no `instance_uuid` and no `last_error`. If it goes to `error`, `deploy failed` or `clean failed`, park it. Do not retry in a loop.
 
-### Park
+## Park
 
 Put the node in maintenance with a reason that names a ticket in your site's issue tracker:
 

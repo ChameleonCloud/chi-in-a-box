@@ -8,7 +8,7 @@
 
 **Consequences**: While there is any error, replication will not take place. This means that projects and users will not be mirrored to a secondary site, so users who registered after the replication stopped may find that they cannot properly log in to those sites (because their accounts are not in the secondary site's Keystone database.)
 
-#### Possible causes
+## Possible causes
 
 **Network connectivity broken between sites**: Try pinging the address of the master host (`show slave status\G`). If network works, it could have been broken temporarily. This has in the past caused the slave to stop and not recover. Restarting the slave process can often fix this: `stop slave; start slave;`. Use `show slave status\G` to verify any fix.
 

@@ -131,9 +131,9 @@ After deploying the new version, you will instead see containers named `letsencr
 * Fluentd now parses logs from ironic-neutron-agent. These were missing from the match rules, preventing such logs from appearing in centralized logging.
 * heat_encryption_key length is now properly set to 32 characters
 
-# Detailed Upgrade Procedure
+## Detailed Upgrade Procedure
 
-## Prior to beginning upgrade
+### Prior to beginning upgrade
 
 1. Set boot_mode capability for all ironic nodes
     * in xena: if boot mode not set, then set it to BIOS
@@ -170,9 +170,9 @@ After deploying the new version, you will instead see containers named `letsencr
     1. For skylake nodes with firmware: “Intel(R) Ethernet 10G 4P X710/I350 rNDC - 24:6E:96:7E:1F:BE	18.0.17”: Update firmware to version 22.xx
     1. Set boot mode from bios -> uefi
 
-## During Upgrade
+### During Upgrade
 
-### Prepare:
+#### Prepare:
 
 1. Verify above pre-tasks
 1. Make a backup of:
@@ -184,9 +184,9 @@ After deploying the new version, you will instead see containers named `letsencr
 1. Use ./cc-ansible mariadb_backup to create a full DB backup
 1. Copy DB backup from mariadb_backup container to somewhere else
 
-### Execute:
+#### Execute:
 
-#### On target control node:
+##### On target control node:
 
 1. Get to the latest stable package versions and clean up old kernels:
     1. `apt-get update && apt-get dist-upgrade`
@@ -204,7 +204,7 @@ After deploying the new version, you will instead see containers named `letsencr
      docker stop ironic_ipxe
      ```
 
-#### On deploy host:
+##### On deploy host:
 
 1. Delete chi-in-a-box venv from `chi-in-a-box/venv`
 1. Delete any tools venv from site-config
