@@ -31,7 +31,7 @@ With the above settings, you would set the following values in your site configu
 
 #### $CC\_ANSIBLE\_SITE/inventory/host\_vars/
 
-```
+```yaml
 kolla_external_vip_interface: eno1
 network_interface: eno3
 ```
@@ -42,7 +42,7 @@ network_interface: eno3
 
 `bridge_name` is the name of the OVS bridge that will be created, and should be different from the linux bridges created above. We assume `br-ex` for the public bridge, and `br-internal` for the internal one.
 
-```
+```yaml
 ...
 neutron_networks:
   - name: public
@@ -98,7 +98,7 @@ Example configurations are below for each supported OS, but you're free to use y
 
     `20-veth-public.netdev`
 
-    ```
+    ```ini
     [NetDev]
     Name=veth-publica
     Kind=veth
@@ -108,7 +108,7 @@ Example configurations are below for each supported OS, but you're free to use y
 
     `20-veth-private.netdev`
 
-    ```
+    ```ini
     [NetDev]
     Name=veth-privatea
     Kind=veth
@@ -126,7 +126,7 @@ Example configurations are below for each supported OS, but you're free to use y
 
         Note the bridge names do not contain a `-` or `_`. There's an issue in how ansible renders strings containing these values, and it will cause prechecks to fail.
 
-    ```
+    ```yaml
     network:
       version: 2
       ethernets:
@@ -166,7 +166,7 @@ Example configurations are below for each supported OS, but you're free to use y
 
     Networkmanager must have its default configuration modified to support autoconnection of veth devices. Add the following at the end of your NetworkManager.conf file
 
-    ```
+    ```ini
     [device-veth-public]
     match-device=interface-name:veth-public*
     managed=1
@@ -182,7 +182,7 @@ Example configurations are below for each supported OS, but you're free to use y
 
     **Create Bridges**
 
-    ```
+    ```shell
     sudo nmcli connection add type bridge \
         con-name brpublic ifname brpublic \
         ipv4.method manual ipv4.dns 8.8.8.8 ipv4.gateway <gateway_ip> \
@@ -194,7 +194,7 @@ Example configurations are below for each supported OS, but you're free to use y
 
     **Create the veth connection profiles:**
 
-    ```
+    ```shell
     #Public Veth Pair
     sudo nmcli connection add type veth \
         connection.master brpublic connection.slave-type bridge \
@@ -205,7 +205,7 @@ Example configurations are below for each supported OS, but you're free to use y
         con-name veth-publicb  ifname veth-publicb veth.peer veth-publica
     ```
 
-    ```
+    ```shell
     #Private Veth Pair
     sudo nmcli connection add type veth \
         connection.master brinternal connection.slave-type bridge \
@@ -222,7 +222,7 @@ With the above settings, you would set the following values in your site configu
 
 #### $CC\_ANSIBLE\_SITE/inventory/host\_vars/
 
-```
+```yaml
 kolla_external_vip_interface: brpublic
 network_interface: brinternal
 ```
@@ -233,7 +233,7 @@ network_interface: brinternal
 
 `bridge_name` is the name of the OVS bridge that will be created, and should be different from the linux bridges created above. We assume `br-ex` for the public bridge, and `br-internal` for the internal one.
 
-```
+```yaml
 ...
 neutron_networks:
   - name: public

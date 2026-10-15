@@ -2,13 +2,13 @@
 
 
 1. clone this repo, we use the path `/opt/chi-in-a-box` by convention.
-    ```
+    ```shell
     cd /opt
     git clone https://github.com/chameleoncloud/chi-in-a-box
     cd chi-in-a-box
     ```
 1. install any missing dependencies
-    ```
+    ```shell
     apt-get install \
          python3 \
          python3-dev \
@@ -16,16 +16,16 @@
          jq
     ```
 1. install the cc-ansible tooling and its own dependencies
-    ```
+    ```shell
     ./cc-ansible install_deps
     ```
 1. template out a site-config directory. We'll use "/opt/site-config" by convention
-    ```
+    ```shell
     ./cc-ansible --site /opt/site-config init
     export CC_ANSIBLE_SITE=/opt/site-config
     ```
 1. Identify which network interface you want the APIs to listen on, and a spare IP available in that subnet.
-    ```
+    ```console
     $ ip -4 -br a
     lo               UNKNOWN        127.0.0.1/8
     eno33np0         UP             10.31.1.51/28 metric 100
@@ -33,7 +33,7 @@
     On our server, we would choose `eno33np0`, and select a second, known unused IP in the subnet `10.31.1.48/28`
 
 1. Edit `/opt/site-config/defaults.yml` to contain a "minimum viable" config.
-    ```
+    ```yaml
     ---
     kolla_base_distro: ubuntu
     network_interface: eno33np0
@@ -50,19 +50,19 @@
         external_interface: en34np1
     ```
 1. bootstrap the controller node(s). This will install various tooling and prerequisites such as the docker runtime, modification of /etc/hosts, and installation of tools into an isolated virtualenv under /etc/ansible/venv
-    ```
+    ```shell
     ./cc-ansible bootstrap-servers
     ```
 1. now that the tooling is installed, we can run some end-to-end prechecks
-    ```
+    ```shell
     ./cc-ansible prechecks
     ```
 1. download up to date containers
-    ```
+    ```shell
     ./cc-ansible pull
     ```
 
 1. Deploy all of the configured services
-    ```
+    ```shell
     ./cc-ansible deploy
     ```

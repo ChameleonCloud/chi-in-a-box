@@ -6,7 +6,7 @@ Values set here will be set site-wide, and will override defaults set elsewhere.
 
 The default configuration looks like the following:
 
-```
+```yaml
 ---
 # This file contains an example site configuration.
 # To enable features, each section MUST be customized to you needs.

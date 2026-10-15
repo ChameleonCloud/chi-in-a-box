@@ -23,7 +23,7 @@ Hammers are by default installed onto the `control` node in the site configurati
 systemctl list-timers 'hammer_*'
 ```
 
-```
+```text
 NEXT                         LEFT          LAST                         PASSED   UNIT                                        ACTIVATES
 Thu 2020-10-08 20:02:09 CDT  47min left    Thu 2020-10-08 19:08:34 CDT  5min ago hammer_unutilized_leases.timer              hammer_unutilized_leases.service
 Thu 2020-10-08 20:14:42 CDT  1h 0min left  n/a                          n/a      hammer_ironic_error_resetter.timer          hammer_ironic_error_resetter.service

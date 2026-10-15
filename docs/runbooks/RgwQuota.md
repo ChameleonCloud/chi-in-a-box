@@ -68,7 +68,7 @@ Keys under `project_quotas` are Keystone project ids, without the `$` part.
 
 Example, with a planned default of 1 TiB. Step 1 shows five projects and one service user over 1 TiB:
 
-```console
+```text
 170.16  <project_a>$<project_a>
 9.95    <project_b>$<project_b>
 9.88    <backup_user>

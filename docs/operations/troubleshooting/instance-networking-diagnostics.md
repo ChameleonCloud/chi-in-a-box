@@ -30,7 +30,7 @@ ip netns exec qrouter-$public_router_id iptables -t nat -vnL
 
 You should see rules like this:
 
-```
+```text
 Chain neutron-l3-agent-PREROUTING (1 references)
  pkts bytes target     prot opt in     out     source               destination
     0     0 REDIRECT   tcp  --  qr-+   *       0.0.0.0/0            169.254.169.254      tcp dpt:80 redir ports 9697
@@ -99,7 +99,7 @@ ssh $switch_user@$switch_ip
 
 Interact with the prompt to show which ports are assigned to which VLAN tag.
 
-```
+```text
 SWITCH_NAME# conf
 SWITCH_NAME(conf)# interface vlan <VLAN>
 SWITCH_NAME(conf-if-vl-<VLAN>)# show config
@@ -107,14 +107,14 @@ SWITCH_NAME(conf-if-vl-<VLAN>)# show config
 
 You should see the node's switchport ID listed as 'untagged' on this VLAN. If you do not see this, adding it manually might fix things temporarily. **Note**: this applies immediately! There is no confirm or save flow. Be advised.
 
-```
+```text
 # e.g. 'untagged Te 1/2/3'
 SWITCH_NAME(conf-if-vl-<VLAN>)# untagged <PORT_ID>
 ```
 
 If the switch is running OS10, you may have to do this instead:
 
-```
+```text
 # e.g. 'interface ethernet 1/1/12:2
 SWITCH_NAME(config)# interface ethernet <PORT_ID>
 SWITCH_NAME(conf-if-eth<PORT_ID>)# switchport access vlan <VLAN_ID>

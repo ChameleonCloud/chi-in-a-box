@@ -6,7 +6,7 @@ We've added the ability to export metrics from the IPMI interface of your system
 
 Example defaults.yml snippet:
 
-```
+```yaml
 prometheus_ipmi_exporter_modules:
   - name: default
     user: <IPMI_USER>

@@ -16,7 +16,7 @@ On the controller node, back up the following.
 
 [https://docs.openstack.org/kolla-ansible/latest/admin/mariadb-backup-and-restore.html](https://docs.openstack.org/kolla-ansible/latest/admin/mariadb-backup-and-restore.html#full)
 
-```
+```shell
 ./cc-ansible mariadb_backup
 docker run --rm -it \
   -v mariadb_backup:/mariadb_backup:ro \
@@ -37,7 +37,7 @@ On the Deploy node, back up the following:
 
 #### Ubuntu 20.04
 
-```
+```shell
 # Run these on your controller node, after making a backup.
 mv /etc/ansible /etc/ansible.bak
 mv /etc/kolla /etc/kolla.bak
@@ -47,7 +47,7 @@ mv /etc/kolla /etc/kolla.bak
 
 Once you've backed up your `chi-in-a-box` directory, run the following commands to get the latest code, and clean up leftover files.
 
-```
+```shell
 # Run this in your chi-in-a-box directory, AFTER MAKING A BACKUP!
 cd </path/to/chi-in-a-box>
 git fetch
@@ -61,7 +61,7 @@ rm -rf .facts
 
 We need to set some new passwords that the new version requires. The `kolla-mergepwd` command will pull in values that are set in `site-config.example`, but missing from your passwords file.
 
-```
+```shell
 # backup your passwords.yml file
 cp $SITE_CONFIG/passwords.yml $SITE_CONFIG/passwords.yml.bak
 
@@ -92,7 +92,7 @@ each line that looks like: `key: null` should be modified to look like `key:`
 
 #### Update inventory/hosts
 
-```
+```shell
 # make a backup of your inventory
 mv $SITE_CONFIG/inventory/hosts $SITE_CONFIG/inventory/hosts.bak
 
@@ -105,7 +105,7 @@ vim $SITE_CONFIG/inventory/hosts
 
 ### Get new containers, and deploy services
 
-```
+```shell
 cd $CHI_IN_A_BOX
 # Recreate the virtualenv, now that we've updated inventory/hosts
 ./cc-ansible bootstrap-servers

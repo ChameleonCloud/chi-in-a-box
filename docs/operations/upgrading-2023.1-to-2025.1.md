@@ -21,7 +21,7 @@ Ensure you have a consistent starting point on release 2023.1 and Ubuntu 22.04.
     * OK: non-overlapping files such as fluentd or haproxy drop-ins, ceph keyrings, …
 * Ensure chi-in-a-box is clean and up to date:
 
-```
+```shell
 cd chi-in-a-box
 git checkout stable/2023.1
 git fetch
@@ -33,7 +33,7 @@ rm -rf venv/
 
 * Ensure containers are clean and up to date:
 
-```
+```shell
 ./cc-ansible pull
 ./cc-ansible genconfig
 ./cc-ansible deploy
@@ -52,13 +52,13 @@ Migrating requires stopping all services that talk to RabbitMQ, updating their c
     2. Turn the list into kolla tags: `grep -R oslo_messaging_rabbit | cut -d "/" -f 1 | cut -d "-" -f 1 | sort -u | paste -s -d ","`
 2. Stop all services that talk to RabbitMQ. (Very important!)
 
-    ```
+    ```shell
     ./cc-ansible stop --yes-i-really-really-mean-it --tags <kolla tags from 1.2>
     ```
 3. Verify the containers are stopped in `docker ps --all`.
     1. If any are not stopped, use `systemctl stop <kolla-service-unit-name>` to stop them:
 
-        ```
+        ```shell
         systemctl | egrep '^\s*kolla-' | tr -s ' ' | cut -d ' ' -f 2 | xargs systemctl stop
         ```
 4. Set `om_enable_rabbitmq_quorum_queues: true` in `site-config/defaults.yml`.
@@ -74,13 +74,13 @@ See the [kolla-ansible docs on SLURP upgrades](https://docs.openstack.org/kolla-
 
 1. In `defaults.yml`, set:
 
-    ```
+    ```yaml
     rabbitmq_image: ghcr.io/chameleoncloud/kolla/rabbitmq-3-12
     ```
 2. Run `./cc-ansible upgrade --tags rabbitmq`
 3. In `defaults.yml`, set:
 
-    ```
+    ```yaml
     rabbitmq_image: ghcr.io/chameleoncloud/kolla/rabbitmq-3-13
     ```
 4. Run `./cc-ansible upgrade --tags rabbitmq`
@@ -101,7 +101,7 @@ Tentacle is the first release supporting both jammy and noble in its apt repos.
 
 #### Ensure the system is fully updated
 
-```
+```shell
 apt-get update
 apt-get dist-upgrade
 apt-get autoremove
@@ -117,18 +117,18 @@ Ensure you can connect to serial-over-LAN and/or the HTML5 console, and that you
 
 1. Make a copy of `/etc/kolla` from the controller node:
 
-    ```
+    ```shell
     tar -czvf /root/kolla-etc-2023-1.tgz /etc/kolla
     ```
 2. Make a copy of the most recent DB backup:
 
-    ```
+    ```shell
     cp /var/lib/docker/volumes/mariadb_backup/_data/<todays_backup> \
       /root/kolla-db-2023-1
     ```
 3. Make a copy of chi-in-a-box and site-config:
 
-    ```
+    ```shell
     tar -czvf ciab-2023-1.tgz chi-in-a-box/ site-config/
     ```
 
@@ -136,7 +136,7 @@ Ensure you can connect to serial-over-LAN and/or the HTML5 console, and that you
 
 ### Update chi-in-a-box
 
-```
+```shell
 git checkout chameleoncloud/2024.1
 rm -rf venv
 git submodule update --init --recursive
@@ -160,7 +160,7 @@ Ansible merges these in alphabetical order, with later files overriding earlier 
 1. Diff your current `site-config/inventory/hosts` against the [2023.1 chi-in-a-box inventory](https://raw.githubusercontent.com/ChameleonCloud/chi-in-a-box/refs/heads/stable/2023.1/site-config.example/inventory/hosts), and check whether anything is surprising.
 2. Copy the new inventory files:
 
-    ```
+    ```shell
     cp chi-in-a-box/site-config.example/inventory/10-base-hosts \
       $SITE_CONFIG/inventory/
     cp chi-in-a-box/site-config.example/inventory/50-kolla-hosts \
@@ -181,7 +181,7 @@ chi-in-a-box has a `cc-ansible update_passwords` command. Under the hood, it wil
 
 Run:
 
-```
+```shell
 ./cc-ansible update_passwords
 ```
 
@@ -208,29 +208,29 @@ All containers are tagged `2024.1-ubuntu-jammy`.
 
 1. In `defaults.yml`, set:
 
-    ```
+    ```yaml
     kolla_base_distro_version: noble
     distro_python_version: "3.12"
     ```
 2. On control nodes and hypervisors, recreate the venv with Python 3.12:
 
-    ```
+    ```shell
     rm -rf /etc/ansible/venv
     python3 -m venv /etc/ansible/venv
     ```
 3. Download the updated Docker and populate the venv:
 
-    ```
+    ```shell
     ./cc-ansible bootstrap-servers
     ```
 4. Pull the 24.04 containers:
 
-    ```
+    ```shell
     ./cc-ansible pull
     ```
 5. Deploy the 24.04 containers:
 
-    ```
+    ```shell
     ./cc-ansible deploy
     ```
 
@@ -244,18 +244,18 @@ Check that all running containers are tagged `2024.1-ubuntu-noble`.
 
 1. Make a copy of `/etc/kolla` from the controller node:
 
-    ```
+    ```shell
     tar -czvf /root/kolla-etc-2024-1.tgz /etc/kolla
     ```
 2. Make a copy of the most recent DB backup:
 
-    ```
+    ```shell
     cp /var/lib/docker/volumes/mariadb_backup/_data/<todays_backup> \
       /root/kolla-db-2024-1
     ```
 3. Make a copy of chi-in-a-box and site-config:
 
-    ```
+    ```shell
     tar -czvf ciab-2024-1.tgz chi-in-a-box/ site-config/
     ```
 
@@ -265,7 +265,7 @@ See the [kolla-ansible docs](https://docs.openstack.org/kolla-ansible/2025.1/ref
 
 In the Epoxy release of Kolla, the version of RabbitMQ is updated to 4.0. As a result, all queues must be migrated to a durable type before upgrading to Epoxy. Do this by setting the following options in `defaults.yml`, then following the migration procedure below.
 
-```
+```yaml
 om_enable_queue_manager: true
 om_enable_rabbitmq_quorum_queues: true
 om_enable_rabbitmq_transient_quorum_queue: true
@@ -275,22 +275,22 @@ om_enable_rabbitmq_stream_fanout: true
 1. `./cc-ansible genconfig`
 2. Stop all services that talk to RabbitMQ. (Very important!)
 
-    ```
+    ```shell
     ./cc-ansible stop --yes-i-really-really-mean-it --tags blazar,glance,heat,ironic,keystone,neutron,nova
     ```
 3. Update RabbitMQ settings:
 
-    ```
+    ```shell
     ./cc-ansible reconfigure --tags rabbitmq
     ```
 4. Clear the old queues:
 
-    ```
+    ```shell
     ./cc-ansible rabbitmq-reset-state
     ```
 5. Start the services back up with the new queue config:
 
-    ```
+    ```shell
     ./cc-ansible deploy --tags blazar,glance,heat,ironic,keystone,neutron,nova
     ```
 
@@ -308,7 +308,7 @@ See the [kolla-ansible docs](https://docs.openstack.org/kolla-ansible/2025.1/ref
 
 1. In `defaults.yml`, set:
 
-    ```
+    ```yaml
     rabbitmq_image: ghcr.io/chameleoncloud/kolla/rabbitmq-4-1
     ```
 2. Run `./cc-ansible upgrade --tags rabbitmq`
@@ -317,7 +317,7 @@ Leave `rabbitmq_image` set for the 2025.1 upgrade below: the kolla-ansible docs 
 
 ### Update chi-in-a-box
 
-```
+```shell
 git checkout chameleoncloud/2025.1
 rm -rf venv
 git submodule update --init --recursive
@@ -341,7 +341,7 @@ Ansible merges these in alphabetical order, with later files overriding earlier 
 1. Diff your current `site-config/inventory/{10-base,50-kolla,80-chi}-hosts` against the [2024.1 chi-in-a-box inventory in site-config.example](https://github.com/ChameleonCloud/chi-in-a-box/tree/chameleoncloud/2024.1/site-config.example/inventory). It is likely that only `10-base-hosts` differs.
 2. After making a backup, copy the new inventory files:
 
-    ```
+    ```shell
     cp chi-in-a-box/site-config.example/inventory/50-kolla-hosts \
       $SITE_CONFIG/inventory/
     cp chi-in-a-box/site-config.example/inventory/80-chi-hosts \
@@ -352,7 +352,7 @@ Ansible merges these in alphabetical order, with later files overriding earlier 
 
 As for 2024.1, run:
 
-```
+```shell
 ./cc-ansible update_passwords
 ```
 

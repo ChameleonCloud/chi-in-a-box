@@ -16,7 +16,7 @@ enable_ironic_ipxe: yes
 
 You must additionally provide a custom ironic.conf file that enables the iPXE plugin:
 
-```
+```shell
 # Copy ironic config to avoid overwriting
 cp path/to/chi-in-a-box/kolla/node_custom_config/ironic.conf \
     $CC_ANSIBLE_SITE/node_custom_config/ironic.conf

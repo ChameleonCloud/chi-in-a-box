@@ -4,7 +4,7 @@ Often, you'll need to schedule work on a node, and need to indicate that its not
 
 Run the hammer on one of your controller nodes:
 
-```
+```shell
 sudo cc-hammer python3 hammers/scripts/maintenance_reservation.py \
     --operator "your_user_name \
     --nodes "list,of_node,names" \

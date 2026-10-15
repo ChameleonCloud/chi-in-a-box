@@ -8,7 +8,7 @@ To use a single network for API, provisioning, and tenant networking, you'll nee
 
 When configuring your network, make sure to set the network-type to 'flat'
 
-```
+```yaml
   - name: physnet1
     bridge_name: br-physnet1
     external_interface: veth-internalb
@@ -23,7 +23,7 @@ When configuring your network, make sure to set the network-type to 'flat'
 
 You'll also need to override two defaults
 
-```
+```yaml
 ironic_provisioning_network: sharednet1
 neutron_tenant_network_types: flat
 ```

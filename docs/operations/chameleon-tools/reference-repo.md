@@ -14,7 +14,7 @@ The site tools containing the Reference Repo Generator are installed onto the
 steps are included in the `post-deploy`. You can also manually configure and
 run the tool by executing the `chameleon_reference_repo` playbook.
 
-```sh
+```shell
 cc-ansible --playbook playbooks/chameleon_reference_repo.yml
 ```
 
@@ -29,7 +29,7 @@ reference repo generator requires a valid `GITHUB_TOKEN` for authentication.
 You must provide this token securely (do not commit it to the repository),
 instead, you can pass it as an extra variable when running the playbook:
 
-```sh
+```shell
 cc-ansible --playbook playbooks/chameleon_reference_repo.yml --extra "github_token=YOUR_GITHUB_TOKEN"
 ```
 

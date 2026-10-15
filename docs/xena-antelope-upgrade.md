@@ -52,7 +52,7 @@ Welcome to the Antelope/2023.1 Release of CHI-in-a-Box! This release rolls up a 
 ### Host OS: 
 
 * Interface name changes during release-upgrade: Dependng on the network card driver in use, the "stable interface name" may change unexpectly after the upgrade, potentially breaking remote acess to the controller node. To avoid this, ensure each interface in netplan has a `match` stanza, like the following:
-      ```
+      ```yaml
       dataplane1:
         match:
           macaddress: 04:3f:72:ff:9b:33
@@ -71,19 +71,19 @@ Welcome to the Antelope/2023.1 Release of CHI-in-a-Box! This release rolls up a 
 * Boot mode default changed from BIOS -> UEFI: To prevent breakage, please ensure all nodes have the `boot_mode` capability set prior to upgrading.
 
       Detection: list ironic nodes and exclude any that have the `boot_mode` capability set"
-      ```
+      ```shell
       baremetal node list --fields name properties -f value | grep -v "boot_mode"
       # P3-CPU-017 {'capabilities': 'cpu_arch': 'x86_64', 'vendor': 'dell inc'}
       ```
       fix: while still on the xena release, for each node identified above, execute:
-      ```
+      ```shell
       openstack baremetal node set --property capabilities="boot_mode:bios" $node_name_or_uuid
       ```
 
 ### Keystone:
 
 * the `admin` keystone endpoint has been deprecated. Existing users of this endpoint should use the internal endpoint instead. To remove the now unused admin endpoints, run the following:
-      ```
+      ```shell
       openstack endpoint list --interface admin -f value | \
       awk '!/keystone/ {print $1}' | xargs openstack endpoint delete
       ```
@@ -104,14 +104,14 @@ Welcome to the Antelope/2023.1 Release of CHI-in-a-Box! This release rolls up a 
 We have replaced our custom letsencrypt integration with the one [that was introduced upstream, including backports of features from 2023.2](https://github.com/ChameleonCloud/kolla-ansible/commit/fee63ec239eb42a80b196b5c5676120ac1ebd715).
 
 All 3 of the following configuration lines in `defaults.yml` are necessary to enable the new feature.
-```
+```yaml
 kolla_enable_tls_external: true
 enable_letsencrypt: true
 letsencrypt_email: <email_for_letsencrypt>
 ```
 
 If Chameleon's customized variant was enabled before the upgrade, you will need to manually shut down and remove their containers:
-```
+```shell
 docker container stop letsencrypt_certbot
 docker container stop letsencrypt_acme
 docker container rm letsencrypt_certbot
@@ -143,7 +143,7 @@ After deploying the new version, you will instead see containers named `letsencr
 1. Ensure all ironic ports for dell os10 switches have the switchport renamed from (1/2/3:4) to (ethernet 1/2/3:4), using `openstack baremetal port set --fields uuid node_uuid local_link_connection`
 1. fix for any nova compute hosts with uuid!=hypervisor_hostname
     1. find hosts affected by the issue
-        ```
+        ```sql
         use nova;
         select hypervisor_hostname,uuid from compute_nodes WHERE hypervisor_type='ironic' AND isnull(deleted_at)  AND uuid!=hypervisor_hostname limit 100;
         ```
@@ -178,7 +178,7 @@ After deploying the new version, you will instead see containers named `letsencr
 1. Make a backup of:
     1. Deploy host: chi-in-a-box and site-config directories
     1. Control node: move /etc/kolla directory out of the way
-        ```
+        ```shell
         mv /etc/kolla /etc/kolla.bak
         ```
 1. Use ./cc-ansible mariadb_backup to create a full DB backup
@@ -197,7 +197,7 @@ After deploying the new version, you will instead see containers named `letsencr
 1. Check on interface definitions and any apt sources that need updating
 1. Delete kolla virtualenv from `/etc/ansible/venv`
 1. shut down containers which have had their names changed:
-     ```
+     ```shell
      docker stop letsencrypt_certbot
      docker stop letsencrypt_acme
      docker stop ironic_pxe
@@ -210,7 +210,7 @@ After deploying the new version, you will instead see containers named `letsencr
 1. Delete any tools venv from site-config
 1. Delete any venv from `/etc/ansible/venv`
 1. Update chi-in-a-box via:
-    ```
+    ```shell
     git checkout stable/2023.1
     git pull
     git submodule update --init
@@ -239,7 +239,7 @@ After deploying the new version, you will instead see containers named `letsencr
 1. Cc-ansible pull
 1. run `cc-ansible upgrade` (this will fail at nova, this is expected)
 1. Manually edit nova compute service “version” in the db to 61, [the oldest allowed in the upgrade check](https://github.com/openstack/nova/commit/a1731927ccd17aeb634c4eed61dce16de16fa7b3#diff-c0b6a5928be3ac40200a2078b084341bb9187a12b1f959ad862e0038c9029193L233)
-    ```
+    ```sql
     USE nova;
 
     UPDATE services 
@@ -252,7 +252,7 @@ After deploying the new version, you will instead see containers named `letsencr
 1. rerun `cc-ansible upgrade` this should now pass nova and continue.
 1. Apply cleanups for keystone admin endpoints:
     1. Cc-ansible deploy –tags keystone
-     ```
+     ```shell
      openstack endpoint list --interface admin -f value | \
      awk '!/keystone/ {print $1}' | xargs openstack endpoint delete
      ```

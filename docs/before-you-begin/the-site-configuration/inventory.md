@@ -4,7 +4,7 @@
 
 `inventory/hosts` is an ini formatted file. It defines the hosts and groups that cc-ansible will operate on. The majority of this file can be left as-is, and should only be customized by advanced users.
 
-```
+```ini
 # These initial groups are the only groups required to be modified. The
 # additional groups are for more control of the environment.
 [control]
@@ -41,7 +41,7 @@ Files in the `inventory/host_vars` directory set variables scoped to a given hos
 
 By default, it will look like the following:
 
-```
+```yaml
 # Initial assumption is that this is also the deployment node,
 # therefore any provisioning can be done locally.
 ansible_connection: local
