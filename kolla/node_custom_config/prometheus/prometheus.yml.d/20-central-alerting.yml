@@ -1,0 +1,12 @@
+---
+{% if upload_alerts_chameleon | bool %}
+alerting:
+  alertmanagers:
+    - scheme: "{{ prometheus_alertmanager_remote_url | urlsplit('scheme') }}"
+      path_prefix: "{{ prometheus_alertmanager_remote_url | urlsplit('path') }}"
+      basic_auth:
+        username: "{{ prometheus_remote_write_username }}"
+        password: "{{ prometheus_remote_write_password }}"
+      static_configs:
+        - targets: ["{{ prometheus_alertmanager_remote_url | urlsplit('netloc') }}"]
+{% endif %}

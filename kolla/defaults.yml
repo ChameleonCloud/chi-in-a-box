@@ -354,10 +354,17 @@ enable_central_logging: no
 enable_grafana: no
 
 loki_url: "https://logs.chameleoncloud.org"
-prometheus_remote_write_url: "https://metrics.chameleoncloud.org/api/v1/push"
+mimir_url: "https://metrics.chameleoncloud.org"
+prometheus_remote_write_url: "{{ mimir_url }}/api/v1/push"
+prometheus_alertmanager_remote_url: "{{ mimir_url }}/alertmanager"
 prometheus_remote_write_username: "{{ keystone_idp_client_id }}"
 upload_logs_chameleon: false
 upload_metrics_chameleon: false
+# Send alerts to the central Alertmanager instead of deploying one here.
+# This site's Prometheus still evaluates the rules.
+upload_alerts_chameleon: false
+enable_prometheus_alertmanager: "{{ enable_prometheus | bool and not upload_alerts_chameleon | bool }}"
+prometheus_load_alert_rules: "{{ enable_prometheus_alertmanager | bool or upload_alerts_chameleon | bool }}"
 
 # External Ceph
 enable_ceph: no
