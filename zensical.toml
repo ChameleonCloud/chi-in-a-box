@@ -13,6 +13,7 @@ repo_url = "https://github.com/ChameleonCloud/chi-in-a-box"
 repo_name = "ChameleonCloud/chi-in-a-box"
 edit_uri = "edit/chameleoncloud/2025.1/docs/"
 docs_dir = "docs"
+extra_css = ["assets/stylesheets/extra.css"]
 
 nav = [
   { "What is CHI-in-a-Box?" = "README.md" },

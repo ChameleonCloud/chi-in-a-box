@@ -1,0 +1,11 @@
+/* The draw.io diagrams have a hard-coded white background. Frame them so
+   they read as deliberate figures in dark mode instead of bare white boxes. */
+.md-typeset img[src$=".drawio.svg"] {
+  border-radius: 0.4rem;
+  padding: 0.6rem;
+  background-color: #fff;
+}
+
+[data-md-color-scheme="slate"] .md-typeset img[src$=".drawio.svg"] {
+  box-shadow: 0 0 0 1px var(--md-default-fg-color--lightest);
+}
