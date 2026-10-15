@@ -18,7 +18,7 @@ If not configured, Glance defaults to storing image data on the controller node,
 
 Customize this path by setting:
 
-```
+```yaml
 glance_backend_file: "yes"
 glance_file_datadir_volume: "/path/to/shared/storage/"
 ```

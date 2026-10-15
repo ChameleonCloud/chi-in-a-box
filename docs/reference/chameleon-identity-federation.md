@@ -18,13 +18,13 @@ Before an associate site can enable federation, that site must obtain a client i
 * Add the "admin" role and operator user.
     *   Find and take note of the desired user and group UUIDs. Be sure to query the user and project entities in the "chameleon" domain.
 
-        ```
+        ```shell
         openstack user show --domain chameleon <username>
         openstack project show --domain chameleon openstack
         ```
     *   Make the role assignment
 
-        ```
+        ```shell
         openstack role add --user <user_uuid> --project <project_uudi> admin
         ```
 

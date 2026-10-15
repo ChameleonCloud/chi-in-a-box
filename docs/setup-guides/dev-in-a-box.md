@@ -33,13 +33,13 @@ If launching a VM on Chameleon to host this, follow the following steps.
 
 1.  Prepare a working directory. We use `/opt` by convention. It must be writable by your current user.
 
-    ```bash
+    ```shell
     cd /opt
     sudo chown cc:cc /opt
     ```
 2.  Clone the chi-in-a-box repo, install, and initialize your site-configuration
 
-    ```sh
+    ```shell
     git clone https://github.com/ChameleonCloud/chi-in-a-box
     cd chi-in-a-box
     ./cc-ansible --site /opt/site-config/ init
@@ -52,7 +52,7 @@ If launching a VM on Chameleon to host this, follow the following steps.
 4.  Create some veth-pairs to act as "dummy" network interfaces.
 
     External API interface
-    ```bash
+    ```shell
     sudo ip link add name ext_api_veth type veth peer ext_api_vethb
     sudo ip addr add 192.168.100.2/24 dev ext_api_veth
     sudo ip link set ext_api_veth up
@@ -60,7 +60,7 @@ If launching a VM on Chameleon to host this, follow the following steps.
     ```
 
     Internal API interface
-    ```bash
+    ```shell
     sudo ip link add name int_api_veth type veth peer int_api_vethb
     sudo ip addr add 10.10.10.2/24 dev int_api_veth
     sudo ip link set int_api_veth up
@@ -68,7 +68,7 @@ If launching a VM on Chameleon to host this, follow the following steps.
     ```
 
     Neutron Provider Network interfaces
-    ```bash
+    ```shell
     sudo ip link add name physnet1_veth type veth peer physnet1_vethb
     sudo ip link set physnet1_veth up
     sudo ip link set physnet1_vethb up
@@ -88,36 +88,36 @@ If launching a VM on Chameleon to host this, follow the following steps.
     Here, `ens3` is our external facing interface, so we don't want to keep it
     firewalled for safety, but open up everything else.
 
-    ```
+    ```shell
     sudo firewall-cmd --zone=public --add-interface=ens3
     sudo firewall-cmd --set-default-zone trusted
     ```
 
 5.  In your site-config, replace defaults.yml with the one for dev-in-a-box
 
-    ```
+    ```shell
     cp /opt/site-config/dev-in-a-box.yml /opt/site-config/defaults.yml
     ```
 
 6.  Bootstrap the controller node, this will install apt packages, configure Docker, and modify /etc/hosts
 
-    ```
+    ```shell
     ./cc-ansible bootstrap-servers
     ```
 
 7.  Run prechecks to ensure common issues are avoided.
 
-    ```
+    ```shell
     ./cc-ansible prechecks
     ```
 
     *   this will probably yell about nscd.service. If so, run the following, then rerun prechecks.
 
-        ```
+        ```shell
         sudo systemctl disable --now nscd.service
         ```
 8. At this point, we should be ready to "deploy".
-     ```
+     ```shell
      ./cc-ansible deploy
      ```
     Deploy is a composite action, executing the following sub-actions:
@@ -140,20 +140,20 @@ If launching a VM on Chameleon to host this, follow the following steps.
     * Uploading default disk images for users to use
     * Installing various hammers and other utility services/cron-jobs.
      To run this step, execute:
-     ```
+     ```shell
      ./cc-ansible post-deploy
      ```
 
 10. Now, we'll create some "virtual" baremetal nodes, used to test out the site. These are just VMs run with libvirt, but are
 configured via IPMI and pxe network booted like a baremetal node, so we can exercise Ironic. The following playbook will install and configure the `tenks` utility to accomplish this. At the end of the invocation, it will print out some commands for you to run yourself to finish the setup.
 
-```
+```shell
 ./cc-ansible --playbook playbooks/fake_baremetal.yml
 ```
 
 11. Run the commands to bring up tenks. They will look something like the following, but may vary if you've changed your site-config from what's included here.
 
-```
+```shell
 cd /opt/tenks
 source .venv/bin/activate # activate tenks virtualenv
 source /opt/site-config/admin-openrc.sh # source admin credentials to enroll nodes
@@ -167,14 +167,14 @@ ansible-playbook \
 Once it's finished, we'll need to add an IP address to the bridge it attached
 for the ironic-provisioning network.
 
-```
+```shell
 sudo ip addr add 10.205.10.1/24 dev brtenks0
 ```
 
 12. At this point, it should all be up and running! Try out one of the "baremetal nodes"
 
     * `openstack baremetal node list`
-        ```
+        ```text
         +--------------------------------------+------+---------------+-------------+--------------------+-------------+
         | UUID                                 | Name | Instance UUID | Power State | Provisioning State | Maintenance |
         +--------------------------------------+------+---------------+-------------+--------------------+-------------+
@@ -182,27 +182,29 @@ sudo ip addr add 10.205.10.1/24 dev brtenks0
         +--------------------------------------+------+---------------+-------------+--------------------+-------------+
         ```
     * let's trigger an inspection.
-        ```
+        ```shell
         openstack baremetal node manage tk0
         openstack baremetal node inspect tk0
         ```
     * to see what's happening on the controller:
-        ```
+        ```shell
         sudo tail -f /var/log/kolla/ironic/ironic-conductor.log
         ```
     * once you see a line like
 
-        > Successfully set node 44d0ac06-77d6-4444-93ce-7c8db5b54fff power state to power on by power on.
+        ```text
+        Successfully set node 44d0ac06-77d6-4444-93ce-7c8db5b54fff power state to power on by power on.
+        ```
 
         this means that the VM has been successfully "powered on".
     * to watch the machine's "serial console", execute:
-        ```
+        ```shell
         sudo virsh console tk0
         ```
         Note: to exit this shell, press `ctrl+]`
 
 13. Download some real images to use! To avoid downloading "all" the images, we'll manually invoke the chameleon image download tool.
-    ```
+    ```shell
     sudo docker run --rm --net=host \
         -v "/etc/chameleon_image_tools/site.yaml:/etc/chameleon_image_tools/site.yaml" \
         ghcr.io/chameleoncloud/chameleon_image_tools:latest \
@@ -214,11 +216,11 @@ sudo ip addr add 10.205.10.1/24 dev brtenks0
 
 14. Lets launch a real instance. NOTE!: At this point, we've configured the node in ironic, but NOT in blazar, so we can launch instances without a reservation.
     * Our node should have finished inspection, so we'll need to move it from `manageable` back to `available`
-        ```
+        ```shell
         openstack baremetal node provide tk0
         ```
     * Now that it's "available", we can launch a server on it.
-        ```
+        ```shell
         openstack server create --flavor baremetal --image CC-Ubuntu22.04 --network sharednet1 test-instance
         ```
         If you access the console again via `sudo virsh console tk0`, you should see the image get written to disk, then the VM reboot into the final image.
@@ -231,12 +233,12 @@ sudo ip addr add 10.205.10.1/24 dev brtenks0
 
     2.  HAProxy and thus Horizon are listening on 192.168.100.254:80, which you can access after starting sshuttle. The username is `admin`, and the password can be viewed by running the following command:
 
-        ```
+        ```shell
         ./cc-ansible view_passwords | grep "^keystone_admin_password"
         ```
     2.  You can use the Openstack CLI or API directly. The CLI tools are pre-installed in the chi-in-a-box virtualenv, and the admin credentials in an `admin-openrc` file in your site-config directory. Access the tools as follows:
 
-        ```
+        ```shell
         source /opt/chi-in-a-box/venv/bin/activate
         source /opt/site-config/admin-openrc.sh
         openstack <put command here>

@@ -13,6 +13,7 @@ repo_url = "https://github.com/ChameleonCloud/chi-in-a-box"
 repo_name = "ChameleonCloud/chi-in-a-box"
 edit_uri = "edit/chameleoncloud/2025.1/docs/"
 docs_dir = "docs"
+extra_css = ["assets/stylesheets/extra.css"]
 
 nav = [
   { "What is CHI-in-a-Box?" = "README.md" },
@@ -80,6 +81,8 @@ nav = [
         { "maintenance_reservation" = "operations/chameleon-tools/hammers/maintenance_reservation.md" },
       ] },
       { "Disk image subscription" = "operations/chameleon-tools/image-tools.md" },
+      { "Periodic inspector" = "operations/chameleon-tools/periodic-inspector.md" },
+      { "Reference repo generator" = "operations/chameleon-tools/reference-repo.md" },
       { "Usage reporting" = "operations/chameleon-tools/usage-reporting.md" },
     ] },
     { "Troubleshooting" = [
@@ -117,6 +120,7 @@ nav = [
     { "User support guide" = "operations/user-support-guide.md" },
     { "Upgrading to a new Release" = "operations/upgrading-to-a-new-release.md" },
     { "Upgrading from 2023.1 to 2025.1" = "operations/upgrading-2023.1-to-2025.1.md" },
+    { "Upgrading from Xena to 2023.1" = "xena-antelope-upgrade.md" },
   ] },
   { "Development" = [
     { "Developing OpenStack Services" = "Developing-Openstack-Services.md" },
@@ -126,6 +130,8 @@ nav = [
 
 [project.theme]
 language = "en"
+logo = "assets/chi-in-a-box.png"
+favicon = "assets/chi-in-a-box.png"
 features = [
   "content.action.edit",
   "content.code.copy",
@@ -138,6 +144,8 @@ features = [
   "navigation.top",
   "navigation.tracking",
   "search.highlight",
+  "search.suggest",
+  "toc.follow",
 ]
 
 [[project.theme.palette]]

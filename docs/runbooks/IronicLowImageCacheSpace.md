@@ -2,7 +2,7 @@
 
 **Consequences**: When using "direct" deploy mode, Ironic conductor moves disk images to a temporary disk cache before transferring it to the target node via iSCSI. When there is not enough space in this directory, the conductor will raise an error to the user when they try to provision a node. Typically this happens for users with large disk images.
 
-### Possible causes
+## Possible causes
 
 Disk utilization issues usually require freeing up space somehow:
 

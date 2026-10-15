@@ -3,17 +3,17 @@ Nova can fail to launch instances inside a reservation that clearly still has fr
 This can be caused by multiple reasons:
 
 1. get the list of baremetal nodes in the lease.
-    ```
+    ```shell
     chameleon lease resource list <lease_id>
     ```
 1. If a subset of these nodes are failing, then check the specific node:
-    ```
+    ```shell
     openstack baremetal node show <uuid>
     ```
 1. Check if its in maintenance mode
     1. If yes, check the reason
 1. Check to see if it still has an associated instance ID. If so, run:
-    ```
+    ```shell
     openstack baremetal node undeploy <uuid>
     ```
 
@@ -27,12 +27,12 @@ If you see a conflict, reference https://github.com/ChameleonCloud/chi-in-a-box/
 There are also some commands to check the health of all nodes at a site:
 
 List all baremetal nodes in maintenance: 
-```
+```shell
 openstack baremetal node list --maintenance
 ```
 
 Ironic thinks nodes are active, but doesn’t know about a specific instance
-```
+```shell
 openstack baremetal node list --provision-state active --unassociated
 ```
 

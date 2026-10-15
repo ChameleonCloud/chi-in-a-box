@@ -18,7 +18,7 @@ Commands in this section will use the system package manager, and run with root 
 
     * Install Python dependencies and [jq](https://stedolan.github.io/jq/)
 
-    ```
+    ```shell
     sudo apt update && sudo apt install -f -y \
         python3 python3-virtualenv python3-venv virtualenv \
         jq
@@ -26,7 +26,7 @@ Commands in this section will use the system package manager, and run with root 
 
     * Ensure `/usr/bin/python` links to `python3`
 
-    ```
+    ```shell
     update-alternatives --install /usr/bin/python python /usr/bin/python3 1
     ```
 
@@ -34,18 +34,18 @@ Commands in this section will use the system package manager, and run with root 
 
 1.  Check out this repository:
 
-    ```bash
+    ```shell
     git clone https://github.com/ChameleonCloud/chi-in-a-box.git
     cd chi-in-a-box
     ```
 2.  Initialize your [site configuration ](../before-you-begin/the-site-configuration/)by running `./cc-ansible init`. This will place a default site configuration into `../site-config`. You can specify a different location by running
 
-    ```bash
+    ```shell
      ./cc-ansible --site ../site-config init
     ```
 3.  For example, running `./cc-ansible --site /opt/site-config init` should output:
 
-    ```bash
+    ```shell
     # Encryption successful
     # The beginnings of your site configuration were installed to /opt/site-config.
     # To use this site configuration automatically for future commands, you can
@@ -56,7 +56,7 @@ Commands in this section will use the system package manager, and run with root 
 
     This will set the `CC_ANSIBLE_SITE` env var to point to this site configuration path for convenience. Consider adding it to your deploy user's login script. Example for bash:
 
-    ```bash
+    ```shell
     echo "export CC_ANSIBLE_SITE=/opt/site-config" >> ~/.bashrc
     ```
 
@@ -74,7 +74,7 @@ In addition to the above setup, edge-in-a-box requires the following physical ne
 
 #### `${CC_ANSIBLE_SITE}/defaults.yml`
 
-```
+```yaml
 # neutron logical networks needed
 # public: where floating-ips live
 # caliconet: where container private ips live
@@ -111,7 +111,7 @@ Edge-in-a-box is built on a different set of components from traditional baremet
 
 #### `${CC_ANSIBLE_SITE}/defaults.yml`
 
-```
+```yaml
 openstack_region_name: "edge region name"
 chameleon_site_name: "edge site name"
 ```
@@ -120,7 +120,7 @@ chameleon_site_name: "edge site name"
 
 #### `${CC_ANSIBLE_SITE}/defaults.yml`
 
-```
+```yaml
 enable_ironic: no
 enable_nova: no
 enable_glance: no
@@ -133,7 +133,7 @@ Edge-in-a-Box uses Kubernetes as a backend to enable users to deploy their conta
 
 #### `${CC_ANSIBLE_SITE}/defaults.yml`
 
-```
+```yaml
 enable_k3s: yes
 
 # k3s_server_ip should be different from kolla_external_vip_address 
@@ -146,9 +146,9 @@ k3s_server_port: "6443"
 
 To drive the Kubernetes backend through an openstack interface, Edge-in-a-Box uses Openstack Zun, the dedicated container service in conjunction with a k8s compute driver developped by the Chameleon team for Zun to provide container services through an Openstack cloud layer. After enabling K3S, it is essential to enable zun as well as the K8S compute module for it. Add the following config options to
 
-&#x20; **`${CC_ANSIBLE_SITE}/defaults.yml`**
+**`${CC_ANSIBLE_SITE}/defaults.yml`**
 
-```
+```yaml
 enable_zun: yes
 enable_zun_compute_k8s: yes
 ```
@@ -163,9 +163,9 @@ The result is that edge-in-a-Box maintaints a Hub and Spoke network configuratio
 
 To enable Tunelo and neutron wireguard, add the following options to
 
-&#x20; **`${CC_ANSIBLE_SITE}/defaults.yml`**
+**`${CC_ANSIBLE_SITE}/defaults.yml`**
 
-```
+```yaml
 enable_neutron_wireguard: yes
 enable_tunelo: yes
 ```
@@ -174,7 +174,7 @@ enable_tunelo: yes
 
 **`${CC_ANSIBLE_SITE}/defaults.yml`**
 
-```
+```yaml
 neutron_wireguard_create_hub_in_root_netns: True
 ```
 
@@ -182,9 +182,9 @@ neutron_wireguard_create_hub_in_root_netns: True
 
 To enable advance reservation of edge devices, Edge-in-a-Box deploys Openstack Blazar. Using the chameleon-developed Kubernetes plugin for it, Blazar can set reservation labels on worker nodes in Kubernetes. To enable blazar and its Kubernetes plugin, add the following lines to
 
-&#x20; **`${CC_ANSIBLE_SITE}/defaults.yml`**
+**`${CC_ANSIBLE_SITE}/defaults.yml`**
 
-```
+```yaml
 enable_blazar: yes
 blazar_enable_device_plugin_k8s: yes
 ```
@@ -200,9 +200,9 @@ Edge-in-a-Box deploys Doni to manage edge device enrollment. Doni is essentially
 
 To deploy Doni and configure it, add the following option to
 
-&#x20; **`${CC_ANSIBLE_SITE}/defaults.yml`**
+**`${CC_ANSIBLE_SITE}/defaults.yml`**
 
-```
+```yaml
 enable_doni: yes
 ```
 
@@ -210,9 +210,9 @@ enable_doni: yes
 
 To manage edge devices without physical access, edge-in-a-box assumes the existence of a balena cloud deployment. Doni then handles the responsibility of enrolling devices in balena. The setup of Balena-Cloud is entirely up to the operator but once done, to point Doni to the right balena-cloud fleet, add the following option to
 
-&#x20; **`${CC_ANSIBLE_SITE}/defaults.yml`**
+**`${CC_ANSIBLE_SITE}/defaults.yml`**
 
-```
+```yaml
 default_balena_fleet: <name_of_your_balena_fleet>
 ```
 
@@ -220,25 +220,27 @@ default_balena_fleet: <name_of_your_balena_fleet>
 
 1.  Bootstrap your controller node by running `./cc-ansible bootstrap-servers` With the default configuration, it would be:
 
-    ```bash
+    ```shell
     ./cc-ansible bootstrap-servers
     ```
 
     This will install Docker on your target node and put SELinux into permissive mode
 
-    > currently [Kolla containers do not have working SELinux profiles.](https://bugs.launchpad.net/kolla-ansible/+bug/1797277)
+    !!! note
+
+        Currently [Kolla containers do not have working SELinux profiles.](https://bugs.launchpad.net/kolla-ansible/+bug/1797277)
 
 2. Reboot if needed to apply SELinux changes
 3.  If you plan to run the provisioning tools as a non-root user, you will need to allow access to Docker. One easy way is to add the user to the `docker` group, though this effectively gives the user root access. The deploy will install docker, but at this point you'll need to create the group manually.
 
-    ```bash
+    ```shell
     sudo groupadd -f docker
     sudo usermod -a -G docker $USER
     ```
 
     Log out and back in, and check your group membership using:
 
-    ```bash
+    ```shell
     groups
     #cc adm wheel systemd-journal docker
     ```
@@ -247,7 +249,7 @@ default_balena_fleet: <name_of_your_balena_fleet>
 
 *   kolla-ansible has a set of roles under `prechecks` to ensure that the system configuration is consistent and avoids known edge cases. Run these via the command
 
-    ```bash
+    ```shell
     ./cc-ansible prechecks
     ```
 * For example, if the subnets configured in `defaults.yml` do not match your interfaces, an error will be thrown here.
@@ -259,7 +261,7 @@ All Chameleon services are packaged as Docker containers and they need to be dow
 
 To pull the container images.
 
-```bash
+```shell
 ./cc-ansible pull
 ```
 
@@ -267,11 +269,13 @@ To pull the container images.
 
 Once the images are pulled, you can run the "deploy" phase, which sets up all the configuration for all the services and deploys them piece by piece. It's important to note however that in Edge-in-a-Box, several components are not functional yet due to the absence of the Kubeconfig file which is to be generated as part of the K3S playbook in the next step. A later section explores these circular dependencies in more detail.
 
-```bash
+```shell
 ./cc-ansible deploy
 ```
 
-> **Note**: if you encounter errors and need to re-run the deploy step, which is expensive, you can skip parts you know have already succeeded. You can watch the Ansible output to see which "role" (service) it is updating. If you know a certain role has completed successfully, you can try skipping it on the next run with the `--skip-tags` option, e.g. `--skip-tags keystone,nova` to skip the Keystone and Nova provisioning. Note that flags must come after the subcommand, e.g. `./cc-ansible deploy --skip-tags keystone,nova`.
+??? tip "Re-running a failed deploy"
+
+    If you encounter errors and need to re-run the deploy step, which is expensive, you can skip parts you know have already succeeded. You can watch the Ansible output to see which "role" (service) it is updating. If you know a certain role has completed successfully, you can try skipping it on the next run with the `--skip-tags` option, e.g. `--skip-tags keystone,nova` to skip the Keystone and Nova provisioning. Note that flags must come after the subcommand, e.g. `./cc-ansible deploy --skip-tags keystone,nova`.
 
 ### Deploy K3S Playbook
 
@@ -295,7 +299,7 @@ The K3S playbook performs a bulk of essential tasks in Edge-in-a-Box. Here is an
 
 To deploy K3S playbook, run the following command
 
-```
+```shell
 ./cc-ansible --playbook playbooks/k3s.yml
 ```
 
@@ -309,7 +313,7 @@ The following services require a `kubeconfig` file to access the Kubernetes clus
 * Blazar
 * Doni
 
-```
+```shell
 ./cc-ansible reconfigure --tags zun,blazar,doni --site ../site-config/
 ```
 
@@ -321,9 +325,9 @@ To ensure that Kubernetes core services and any unintended services do not get s
 
 Add the worker node taint to
 
-&#x20; **`${CC_ANSIBLE_SITE}/defaults.yml`**
+**`${CC_ANSIBLE_SITE}/defaults.yml`**
 
-```
+```yaml
 k8s_worker_taint:
     key: "worker-node"
     value: "true"
@@ -338,7 +342,7 @@ To avoid any downtime of core services or eviction of existing user pods, follow
 
 1.  Add the taint to the site's config and enable Zun tolerations but keep Doni tainting disabled
 
-    ```
+    ```yaml
     k8s_worker_taint:
         key: "worker-node"
         value: "true"
@@ -348,20 +352,21 @@ To avoid any downtime of core services or eviction of existing user pods, follow
     ```
 2.  Re-deploy K3S playbook to apply tolerations to the core device plugins `daemonsets`
 
-    ```
+    ```shell
     ./cc-ansible --playbook playbooks/k3s.yml
     ```
 3.  Redeploy Zun so that it starts adding tolerations to newly launched user containers
 
-    ```
+    ```shell
     ./cc-ansible reconfigure --tags zun --site ../site-config/
     ```
 4.  Finally, set `doni_enable_worker_taint` to `True` and re-deploy Doni
 
+    ```yaml
+    doni_enable_worker_taint: True
     ```
-    doni_enable_worker_taint: True 
 
-    # Run the following command
+    ```shell
     ./cc-ansible reconfigure --tags doni --site ../site-config/
     ```
 5. Re-sync all devices after re-deploying Doni.

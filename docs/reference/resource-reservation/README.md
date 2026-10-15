@@ -8,7 +8,7 @@
 
 [You must have installed the chameleon fork of python-blazarclient.](https://chameleoncloud.readthedocs.io/en/latest/technical/cli.html#openstack-client-installation)
 
-```
+```shell
 pip install \
 git+https://github.com/chameleoncloud/python-blazarclient@chameleoncloud/xena
 ```
@@ -21,13 +21,13 @@ You shouldn't need to do this manually, as Doni will manage this for you.
 
 If you need to, the command is
 
-```shell-session
+```shell
 openstack reservation host create
 ```
 
 ### Devices
 
-```
+```shell
 openstack reservation device create
 ```
 
@@ -60,7 +60,7 @@ options:
 
 Example:
 
-```shell-session
+```shell
 openstack reservation network create \
   --network-type vlan \
   --physical-network physnet1 \
@@ -70,13 +70,13 @@ openstack reservation network create \
 
 #### Add or update capability to a Reservable Network
 
-```shell-session
+```shell
 openstack reservation network set --extra key=value NETWORK_ID
 ```
 
 Example, change the physical network:
 
-```
+```shell
 openstack reservation network set --extra physical_network=physnet1
 ```
 
@@ -86,7 +86,7 @@ To indicate that a network can be connected to other sites at L2, we use the key
 
 For example, if you have plumbed VLANs from your dataplane switch to a FABRIC facility port, indicate these with:
 
-```
+```shell
 openstack reservation network set --extra stitch_provider=fabric
 ```
 
@@ -94,7 +94,7 @@ openstack reservation network set --extra stitch_provider=fabric
 
 Create a new reservable floating IP
 
-```
+```shell
 openstack reservation floatingip create <NETWORK_ID> <FLOATING_IP_ADDRESS>
 ```
 
@@ -104,13 +104,13 @@ openstack reservation floatingip create <NETWORK_ID> <FLOATING_IP_ADDRESS>
 
 To disable a host for maintenance, run the following command. This makes the host unreservable for users, while still allowing administrators to create leases on it. The healing monitor does not flip `reservable` for hosts that are flagged as disabled.
 
-```
+```shell
 openstack reservation host set <host id/name> --extra disabled=true
 ```
 
 Disabling a host also sets it as unreservable. For example, `openstack reservation host list` should show the disabled host with `disabled` set to True:
 
-```
+```text
 openstack reservation host list -c hypervisor_hostname -c disabled -c reservable
 +--------------------------------------+------------+----------+
 | hypervisor_hostname                  | reservable | disabled |
@@ -123,13 +123,13 @@ openstack reservation host list -c hypervisor_hostname -c disabled -c reservable
 
 To enable the host again after maintenance, unset the disabled flag:
 
-```
+```shell
 openstack reservation host unset <host id/name> --extra disabled
 ```
 
 This does not turn `reservable` back on immediately, but the healing monitor should set it to True eventually.
 
-```
+```text
 openstack reservation host list -c hypervisor_hostname -c disabled -c reservable
 +--------------------------------------+------------+----------+
 | hypervisor_hostname                  | reservable | disabled |

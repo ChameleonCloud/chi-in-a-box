@@ -18,7 +18,7 @@ To check, run `show ztd-status`
 
 \`\`
 
-```
+```text
 # The bad state
 show ztd-status
 
@@ -58,7 +58,7 @@ To check your current config, run `show spanning-tree`
 
 As a workaround, set the switch to `RSTP` instead of `Rapid-PVST` mode.
 
-```
+```text
 # enter configure mode
 configure
 # set spanning tree to RSTP

@@ -15,7 +15,7 @@ select vlan_id,allocated,network_id from ml2_vlan_allocations left join networks
 
 This should print something like the following:
 
-```
+```text
 +---------+-----------+--------------------------------------+
 | vlan_id | allocated | network_id                           |
 +---------+-----------+--------------------------------------+

@@ -16,7 +16,7 @@ enable_ironic_ipxe: yes
 
 You must additionally provide a custom ironic.conf file that enables the iPXE plugin:
 
-```
+```shell
 # Copy ironic config to avoid overwriting
 cp path/to/chi-in-a-box/kolla/node_custom_config/ironic.conf \
     $CC_ANSIBLE_SITE/node_custom_config/ironic.conf
@@ -60,7 +60,9 @@ openstack image create --file ironic-python-agent-aarch64.kernel ironic-python-a
 
 1. Configure your ARM nodes to deploy with the ARM64-compiled IPA image, and also set the architecture on the node, which will help iPXE understand it is an ARM node at boot time.
 
-> ⚠️ Requires `python-doniclient>=0.4.0`
+!!! warning
+
+    Requires `python-doniclient>=0.4.0`
 
 ```shell
 openstack hardware set --architecture aarch64 --deploy_kernel $kernel_uuid --deploy_ramdisk $ramdisk_uuid $node

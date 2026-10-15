@@ -12,7 +12,7 @@ description: Bringing up only the control plane
 
 Here, we see that there is more than 20GB free in the root file system.
 
-```
+```console
 [root@dev01 ~]# df -h /
 Filesystem               Size  Used Avail Use% Mounted on
 /dev/mapper/cl_dev-root  228G  135G   94G  60% /
@@ -22,7 +22,7 @@ Filesystem               Size  Used Avail Use% Mounted on
 
 We see that total memory is more than 8G.
 
-```
+```console
 [root@dev01 ~]# free -h
               total        used        free      shared  buff/cache   available
 Mem:           125G        3.6G        106G         39M         15G        121G
@@ -43,7 +43,7 @@ Swap:          4.0G          0B        4.0G
     * system hostname: `dev01`
     * Here, we have chosen an interface named `eth_public_api` to act as the `kolla_external_vip_interface`
 
-    ```
+    ```console
     [root@dev01 ~]# ip addr show eth_public_api
     2: em1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP group default qlen 1000
         link/ether 44:a8:42:26:ef:aa brd ff:ff:ff:ff:ff:ff
@@ -65,7 +65,7 @@ Swap:          4.0G          0B        4.0G
     * system hostname: `dev01`
     * Here, we have chosen an interface named `eth_internal_api` to act as the `kolla_internal_vip_address`
 
-    ```
+    ```console
     [root@dev01 ~]# ip addr show eth_internal_api
     2: em1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP group default qlen 1000
         link/ether 44:a8:42:26:ef:aa brd ff:ff:ff:ff:ff:ff
@@ -79,7 +79,7 @@ Swap:          4.0G          0B        4.0G
 
     It's important that the system hostname resolves to the interface IP addresses, not to one of the VIPs
 
-    ```
+    ```console
     [root@dev01 ~]# hostname
     dev01
     [root@dev01 ~]# getent hosts dev01
@@ -96,7 +96,7 @@ We need somewhere to run the tools, and an account to run them as. We recommend 
 
 #### Ensure permissions and groups
 
-```
+```console
 # Create and join deploy-group
 [deploy-user@dev01 ~]$ sudo groupadd <deploy-group>
 [deploy-user@dev01 ~]$ sudo usermod -a -G <deploy-group> <deploy-user>
@@ -108,7 +108,7 @@ We need somewhere to run the tools, and an account to run them as. We recommend 
 
 Log out and back in to refresh group membership, then verify.
 
-```
+```console
 [deploy-user@dev01 ~]$ groups
 ... <deploy-group> docker
 ```
@@ -117,7 +117,7 @@ Log out and back in to refresh group membership, then verify.
 
 For this example, we'll be putting files into `/opt/`, so we need to ensure that it can be read and written by members of `deploy-group`
 
-```
+```console
 [deploy-user@dev01 ~]$ sudo chown root:<deploy-group> /opt
 [deploy-user@dev01 ~]$ sudo chmod g+rw /opt
 ```
@@ -126,7 +126,7 @@ For this example, we'll be putting files into `/opt/`, so we need to ensure that
 
 Now we need to install some dependencies, then check out and set up chi-in-a-box
 
-```
+```shell
 # Install Dependencies
 sudo apt update && sudo apt install -f -y \
     python3 \
@@ -139,7 +139,7 @@ sudo apt update && sudo apt install -f -y \
 
 Clone and initialize chi-in-a-box. This assumes that we're using the `/opt` directory that was set up in the last section.
 
-```
+```shell
 git clone https://github.com/ChameleonCloud/chi-in-a-box /opt/chi-in-a-box
 cd /opt/chi-in-a-box
 ./cc-ansible init --site /opt/site-config
@@ -149,7 +149,7 @@ cd /opt/chi-in-a-box
 
 You'll need to configure a few lines in the file `/opt/site-config/inventory/hosts`, to tell cc-ansible which services to install where. Here, each of the `control`,`network`,`monitoring`,and `storage` groups get one entry, `dev01`, the hostname of your controller node. You don't need to modify the rest of the file.
 
-```
+```ini
 # /opt/site-config/inventory/hosts
 
 # These initial groups are the only groups required to be modified. The
@@ -181,7 +181,7 @@ In your site config directory, `/opt/site-config`, you now have a file called `d
 
 For a minimal deployment, you only need the following lines uncommented. The values are from the prior section.
 
-```
+```yaml
 # /opt/site-config/defaults.yml
 
 kolla_base_distro: ubuntu
@@ -202,7 +202,7 @@ This will install docker, configure /etc/hosts, and generally configure the syst
 
 Afterwards, you should see that `/etc/hosts` contains an entry for your hostname, mapping it to the interface address. Note that this is NOT the haproxy VIP!
 
-```
+```console
 $ cat /etc/hosts
 ...
 # BEGIN ANSIBLE GENERATED HOSTS
@@ -243,7 +243,7 @@ Run `./cc-ansible --site /opt/site-config edit_passwords`
 
 Your default editor will open, and you'll see the following. Ensure that `docker_registry_password` is configured as follows.
 
-```
+```yaml
 ...
 docker_registry_password: kaQBdG9PRwlpTzknnhfGmvPf
 ...

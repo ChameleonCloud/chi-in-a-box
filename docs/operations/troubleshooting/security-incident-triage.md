@@ -17,7 +17,9 @@ iftop # for network (might not be installed)
 ps aux
 ```
 
-> **Note**: Make sure you hold this open for a bit - do you see any weird processes? Something taking up a lot of resources, especially one that has a weird or very simple name?
+!!! note
+
+    Make sure you hold this open for a bit - do you see any weird processes? Something taking up a lot of resources, especially one that has a weird or very simple name?
 
 To get a list of open files and processes for a given user:
 
@@ -27,7 +29,7 @@ lsof -u $user
 
 To kill anything being done by a user (this is *very* destructive :bomb:):
 
-```
+```shell
 kill -9 $(lsof -t -u $user)
 ```
 
@@ -43,7 +45,7 @@ lsof -nP -i -sTCP:LISTEN
 
 Check to see if any processes are listening on all interfaces. If one is, it will show up like this, with an asterisk in place of the bind address:
 
-```
+```text
 TCP *:22 (LISTEN)
 ```
 

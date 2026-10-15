@@ -8,7 +8,7 @@ Commands in this section will use the system package manager, and run with root 
 
     * Install Python dependencies and [jq](https://stedolan.github.io/jq/)
 
-    ```
+    ```shell
     sudo apt update && sudo apt install -f -y \
         python3 python3-virtualenv python3-venv virtualenv \
         jq
@@ -16,7 +16,7 @@ Commands in this section will use the system package manager, and run with root 
 
     * Ensure `/usr/bin/python` links to `python3`
 
-    ```
+    ```shell
     update-alternatives --install /usr/bin/python python /usr/bin/python3 1
     ```
 
@@ -24,7 +24,7 @@ Commands in this section will use the system package manager, and run with root 
 
 * cc-ansible will install all of its own dependencies into a python virtualenv, located inside the chi-in-a-box git checkout directory. You'll need to do this before running other `cc-ansible` subcommands.
 
-```bash
+```shell
 ./cc-ansible install_deps
 ```
 
@@ -32,18 +32,18 @@ Commands in this section will use the system package manager, and run with root 
 
 1.  Check out this repository:
 
-    ```bash
+    ```shell
     git clone https://github.com/ChameleonCloud/chi-in-a-box.git
     cd chi-in-a-box
     ```
 2.  Initialize your [site configuration ](../../before-you-begin/the-site-configuration/)by running `./cc-ansible init`. This will place a default site configuration into `../site-config`. You can specify a different location by running
 
-    ```bash
+    ```shell
      ./cc-ansible --site ../site-config init
     ```
 3.  For example, running `./cc-ansible --site /opt/site-config init` should output:
 
-    ```bash
+    ```shell
     # Encryption successful
     # The beginnings of your site configuration were installed to /opt/site-config.
     # To use this site configuration automatically for future commands, you can
@@ -54,7 +54,7 @@ Commands in this section will use the system package manager, and run with root 
 
     This will set the `CC_ANSIBLE_SITE` env var to point to this site configuration path for convenience. Consider adding it to your deploy user's login script. Example for bash:
 
-    ```bash
+    ```shell
     echo "export CC_ANSIBLE_SITE=/opt/site-config" >> ~/.bashrc
     ```
 
@@ -96,7 +96,9 @@ If you are only using two interfaces, you must do some additional configuration 
     localhost ansible_connection=local
     ```
 
-    > **Note** If you used `./cc-ansible init` this may have been done automatically for you.
+    !!! note
+
+        If you used `./cc-ansible init` this may have been done automatically for you.
 
 #### `${CC_ANSIBLE_SITE}/inventory/host_vars/<hostname>`
 
@@ -120,7 +122,7 @@ The certificate must be placed in `${CC_ANSIBLE_SITE}/certificates/haproxy.pem`
 
 An HAProxy PEM file is a concatenation of the certificate, any intermediate certificates in the chain, and then the private key.
 
-```bash
+```shell
 cat certificate.crt intermediates.pem private.key \
     > ${CC_ANSIBLE_SITE}/certificates/haproxy.pem
 ```
@@ -171,25 +173,27 @@ cat certificate.crt intermediates.pem private.key \
 
 1.  Bootstrap your controller node by running `./cc-ansible bootstrap-servers` With the default configuration, it would be:
 
-    ```bash
+    ```shell
     ./cc-ansible bootstrap-servers
     ```
 
     This will install Docker on your target node and put SELinux into permissive mode
 
-    > currently [Kolla containers do not have working SELinux profiles.](https://bugs.launchpad.net/kolla-ansible/+bug/1797277)
+    !!! note
+
+        Currently [Kolla containers do not have working SELinux profiles.](https://bugs.launchpad.net/kolla-ansible/+bug/1797277)
 
 2. Reboot if needed to apply SELinux changes
 3.  If you plan to run the provisioning tools as a non-root user, you will need to allow access to Docker. One easy way is to add the user to the `docker` group, though this effectively gives the user root access. The deploy will install docker, but at this point you'll need to create the group manually.
 
-    ```bash
+    ```shell
     sudo groupadd -f docker
     sudo usermod -a -G docker $USER
     ```
 
     Log out and back in, and check your group membership using:
 
-    ```bash
+    ```shell
     groups
     #cc adm wheel systemd-journal docker
     ```
@@ -198,7 +202,7 @@ cat certificate.crt intermediates.pem private.key \
 
 *   kolla-ansible has a set of roles under `prechecks` to ensure that the system configuration is consistent and avoids known edge cases. Run these via the command
 
-    ```bash
+    ```shell
     ./cc-ansible prechecks
     ```
 * For example, if the subnets configured in `defaults.yml` do not match your interfaces, an error will be thrown here.
@@ -211,12 +215,12 @@ All Chameleon services are packaged as Docker containers and they need to be dow
 1. The Chameleon Docker registry requires authentication. use the read-only password `kaQBdG9PRwlpTzknnhfGmvPf`
 2.  run the following command, and set the value for key `docker_registry_password`
 
-    ```bash
+    ```shell
     ./cc-ansible edit_passwords
     ```
 3.  Pull the container images.
 
-    ```bash
+    ```shell
     ./cc-ansible pull
     ```
 
@@ -224,11 +228,13 @@ All Chameleon services are packaged as Docker containers and they need to be dow
 
 Once the images are pulled, you can run the "deploy" phase, which sets up all the configuration for all the services and deploys them piece by piece.
 
-```bash
+```shell
 ./cc-ansible deploy
 ```
 
-> **Note**: if you encounter errors and need to re-run the deploy step, which is expensive, you can skip parts you know have already succeeded. You can watch the Ansible output to see which "role" (service) it is updating. If you know a certain role has completed successfully, you can try skipping it on the next run with the `--skip-tags` option, e.g. `--skip-tags keystone,nova` to skip the Keystone and Nova provisioning. Note that flags must come after the subcommand, e.g. `./cc-ansible deploy --skip-tags keystone,nova`.
+??? tip "Re-running a failed deploy"
+
+    If you encounter errors and need to re-run the deploy step, which is expensive, you can skip parts you know have already succeeded. You can watch the Ansible output to see which "role" (service) it is updating. If you know a certain role has completed successfully, you can try skipping it on the next run with the `--skip-tags` option, e.g. `--skip-tags keystone,nova` to skip the Keystone and Nova provisioning. Note that flags must come after the subcommand, e.g. `./cc-ansible deploy --skip-tags keystone,nova`.
 
 ### Run post-deployment configuration
 
@@ -244,7 +250,7 @@ However, much of the bare metal functionality will not work, as there are a few 
 
 All of these will be provisioned by running the post-deploy script:
 
-```bash
+```shell
 ./cc-ansible post-deploy
 ```
 
@@ -256,7 +262,7 @@ Ironic needs to be configured to use these images to netboot nodes, and you'll n
 
 To set them as default, add the following to your `defaults.yml`
 
-```
+```yaml
 ironic_deploy_kernel: <pxe_deploy_kernel_uuid>
 ironic_deploy_ramdisk: <pxe_deploy_ramdisk_uuid>
 ```
@@ -265,7 +271,7 @@ Then, run `cc-ansible deploy --tags ironic` to deploy the change.
 
 These will be used if not overridden for a specific node, which can be done via:
 
-```
+```shell
 openstack hardware set --deploy_kernel <deploy_kernel_uuid> --deploy_ramdisk <deploy_ramdisk_uuid> <node_uuid>
 ```
 

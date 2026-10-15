@@ -34,7 +34,9 @@ systemctl start chameleon-image-deploy.service
 
 ### IPA Image Tester
 
-> **Outdated:** the commands in this section use the retired `chameleon_image_tools` image. The site tools image has no `ipa_test` command.
+!!! warning "Outdated"
+
+    The commands in this section use the retired `chameleon_image_tools` image. The site tools image has no `ipa_test` command.
 
 Ironic Python Agent (IPA) is an agent for controlling and deploying Ironic controlled baremetal nodes. In order to support various hardware types, Chameleon builds and deploys
 custom IPA images based on OpenStack upstream releases. To deploy Chameleon IPA images to site Glance, please use the [deployer tool](#deployer).

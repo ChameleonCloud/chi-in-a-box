@@ -8,7 +8,7 @@ The `cc-ansible` script in the root of the repo is used to drive the deployment.
 
 Most commands require specifying a path to the _site configuration_, which contains your site-specific variables, overrides, and configuration. You can specify this in two ways, either with the `--site` flag, or by setting the env variable `CC_ANSIBLE_SITE`.
 
-```bash
+```shell
 ./cc-ansible --site /path/to/site-config <cmd>
 # Or, by setting env
 export CC_ANSIBLE_SITE=/path/to/site-config
@@ -19,7 +19,7 @@ export CC_ANSIBLE_SITE=/path/to/site-config
 
 Playbooks are set up to target a host group with the same name. This means the `hammers` playbook will target the `hammers` host group etc. To run a playbook, you can use the `./cc-ansible` wrapper script, which just sets up two important parameters for you: the Ansible Vault configuration, and the inventory path.
 
-```bash
+```shell
 # Run the 'hammers' playbook (deploys/updates the hammers periodic tasks)
 ./cc-ansible --playbook playbooks/hammers.yml
 # Preview what the 'hammers' playbook would change, without applying it
@@ -31,7 +31,7 @@ Playbooks are set up to target a host group with the same name. This means the `
 
 Much of the deployment is ultimately controlled by [Kolla-Ansible](https://docs.openstack.org/kolla-ansible/latest/). To invoke, you can use the `./cc-ansible` tool much like you could use `kolla-ansible`:
 
-```bash
+```shell
 # Deploy the Neutron components
 ./cc-ansible deploy --tags neutron
 # Pull latest images for all components
@@ -44,13 +44,13 @@ Much of the deployment is ultimately controlled by [Kolla-Ansible](https://docs.
 
 There is a `post-deploy` script you can run to finish things up. This will install compatible versions of all OpenStack clients for your deployment and set up some OpenStack entities needed to do bare metal provisioning.
 
-```bash
+```shell
 ./cc-ansible post-deploy
 ```
 
 Finally, consider adding the following to your .bashrc or similar:
 
-```bash
+```shell
 # Pre-set site so you don't have to type it each time
 export CC_ANSIBLE_SITE=/opt/config/<your_site>
 
@@ -71,7 +71,7 @@ fi
 
 Secrets like database and user passwords or sensitive API keys should be encrypted with [Ansible Vault](https://docs.ansible.com/ansible/latest/user\_guide/vault.html) in a `passwords.yml` file located in the site configuration. This is encrypted with a symmetrical cipher key (`vault_password`). This key should **never be stored in source control**. You can edit or view the encrypted contents with the `./cc-ansible` tool:
 
-```bash
+```shell
 # Opens an interactive editor for editing passwords
 ./cc-ansible edit_passwords
 # Prints unencrypted passwords to stdout

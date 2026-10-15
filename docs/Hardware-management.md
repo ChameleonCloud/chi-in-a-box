@@ -16,7 +16,7 @@ The client, `python-doniclient`, integrates with the openstack commandline inter
 
 #### List Hardware
 
-```shell-session
+```text
 openstack hardware list --max-width=100
 +------+------------------------+---------------+------------------------+-------------------------+
 | name | project_id             | hardware_type | properties             | uuid                    |
@@ -48,7 +48,7 @@ openstack hardware list --max-width=100
 
 Using the --all flag will print additional information.
 
-```
+```text
 +------+------------------------+---------------+------------------------+-------------------------+
 | name | project_id             | hardware_type | properties             | uuid                    |
 +------+------------------------+---------------+------------------------+-------------------------+
@@ -79,7 +79,7 @@ Using the --all flag will print additional information.
 
 View a single node by UUID
 
-```
+```text
 openstack hardware show --max-width=100 5d6ff05d-b959-40a5-8869-1994d37b5cb9
 +---------------+----------------------------------------------------------------------------------+
 | Field         | Value                                                                            |
@@ -152,7 +152,7 @@ To do so, use the `hardware import` command, and specify a json, structured as a
 
 Then, run the command:
 
-```
+```shell
 openstack hardware import \
     [--dry-run] \
     [--skip-existing] \
@@ -182,7 +182,9 @@ It's possible to "block out" a period of time for a bare metal node so that user
 
 For each availability window, a maintenance lease is created in the reservation system. This lease will show up in the host calendar so that users can see when the node will be available once again.
 
-> **Note**: avoid manually updating the maintenance leases or deleting them in Blazar! Instead, manage them via the inventory service.
+!!! warning
+
+    Avoid manually updating the maintenance leases or deleting them in Blazar! Instead, manage them via the inventory service.
 
 ```shell
 # Note: obtain the hardware's $UUID by, e.g., openstack hardware list

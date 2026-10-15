@@ -40,7 +40,7 @@ docker restart haproxy
 
 Finally, enable external TLS in your defaults.yml
 
-```
+```yaml
 kolla_enable_tls_external: true
 ```
 
@@ -60,7 +60,7 @@ When providing your own certificate file, care must be taken to format it for HA
 
 This should end up looking something like:
 
-```
+```text
 -----BEGIN PRIVATE KEY-----
 [Your private key]
 -----END PRIVATE KEY-----

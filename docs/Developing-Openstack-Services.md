@@ -8,7 +8,7 @@ The following methods are listed in order of roughly "easiest to hardest".
 
 In the `defaults.yml`, specify `kolla_dev_repos_git` as a git URL prefix, and for each service to enable dev mode in, create options `NAME_dev_mode` and `NAME_source_version`. For example, to enable blazar dev mode:
 
-```
+```yaml
 kolla_dev_repos_git: https://github.com/chameleoncloud # git URL prefix
 blazar_dev_mode: yes
 blazar_source_version: chameleoncloud/2025.1 # git branch
@@ -16,8 +16,8 @@ blazar_source_version: chameleoncloud/2025.1 # git branch
 
 Then run `./cc-ansible --tags blazar reconfigure`. The source will be placed in `/opt/stack/blazar`, and mounted into the container. After updating the source, you can restart the docker container for the service, and the changes will be reloaded.
 
-```
-// example for neutron + neutron plugin
+```yaml
+# example for neutron + neutron plugin
 kolla_dev_repos_git: https://github.com/chameleoncloud
 neutron_dev_mode: yes
 neutron_source_version: chameleoncloud/2025.1
@@ -38,7 +38,7 @@ This is the "quick way" to edit a container's contents, without going through th
 
 As an example, we'll reference horizon:
 
-```
+```dockerfile
 FROM ghcr.io/chameleoncloud/kolla/horizon:2025.1-ubuntu-noble
 
 COPY new_package /src/new_package
@@ -61,7 +61,7 @@ CHI-in-a-box, kolla-ansible, and kolla allow for customization at many levels.
 The containers and their dockerfiles are defined in the [kolla repository](https://github.com/ChameleonCloud/kolla), for example, [certbot](https://github.com/ChameleonCloud/kolla/blob/chameleoncloud/xena/docker/letsencrypt/letsencrypt-certbot/Dockerfile.j2).\
 These dockerfiles contain macros and support templating.
 
-```
+```jinja
 {% block letsencrypt_certbot_header %}{% endblock %}
 ```
 
@@ -116,7 +116,7 @@ In order to create blazar hosts, and use nova servers, you must have hypervisors
 
 To add fake hypervisors, in `defaults.yml`, remove the line `nova_compute_virt_type: kvm`, and add the following lines
 
-```
+```yaml
 enable_nova_fake: "yes"
 num_nova_fake_per_node: 5 # Number of fake hypervisors to create
 ```
@@ -145,7 +145,7 @@ Create the server: `openstack --os-compute-api-version 2.37 server create --imag
 
 For some services, it may be useful to create a network on your development instance. Here is an example network that can help with certain tasks.
 
-```
+```shell
 # Create network
 openstack network create \
     --provider-network-type flat \
@@ -166,7 +166,7 @@ After this is created, you can use the network ID when creating a Floating IP, f
 
 Openstack testing frameworks do not show the output from `LOG` statements. To see this output, modify the root logger:
 
-```
+```python
 from flask.logging import default_handler
 from oslo_log import log as logging
 root = logging.getLogger()
@@ -186,7 +186,7 @@ We are working on a "safe subset" configuration, but it's not ready yet.
 
 After setting your site up, including `post-deploy`, set the following parameters in your defaults.yml:
 
-```
+```yaml
 tempest_fixed_network_name: "sharednet1"
 tempest_public_network_uuid:  <uuid of public neutron network>
 tempest_compute_image_uuid:  <uuid of glance image to test instances with>
@@ -198,7 +198,7 @@ If updating an existing site to add this feature, you'll need to add the followi
 Then, run `cc-ansible --playbook playbooks/tempest.yml` to install the tempest config file and tools. They will be installed into `~/tempest` by default, but you can override this by setting `tempest_install_dir` in your defaults.yml.
 
 After installing, run the following:
-```
+```shell
 cd ~/tempest
 source .venv/bin/activate
 
