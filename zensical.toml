@@ -129,6 +129,8 @@ nav = [
 
 [project.theme]
 language = "en"
+logo = "assets/chi-in-a-box.png"
+favicon = "assets/chi-in-a-box.png"
 features = [
   "content.action.edit",
   "content.code.copy",
@@ -141,6 +143,8 @@ features = [
   "navigation.top",
   "navigation.tracking",
   "search.highlight",
+  "search.suggest",
+  "toc.follow",
 ]
 
 [[project.theme.palette]]
