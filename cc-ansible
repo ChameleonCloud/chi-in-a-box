@@ -62,7 +62,7 @@ install_deps() {
   # upgrade pip and build tools
   pip install --upgrade \
     pip \
-    setuptools \
+    'setuptools<82.0.0' \
     wheel
 
   local pip_requirements="$DIR/requirements.txt"

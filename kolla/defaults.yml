@@ -17,6 +17,13 @@ admin_openrc_directory: "{{ site_config_dir }}"
 # virtualenv specifies the path to the kolla virtualenv.
 virtualenv: /etc/ansible/venv
 
+# Extra packages for the virtualenv above, from openstack.kolla's docker_sdk role defaults,
+# plus setuptools: ansible's pip module imports pkg_resources, and python 3.12 venvs have no setuptools.
+docker_sdk_additional_pip_packages:
+  - "requests"
+  - "dbus-python"
+  - "setuptools<82.0.0"
+
 chameleon_portal_url: https://www.chameleoncloud.org
 chameleon_reference_api_url: https://api.chameleoncloud.org
 # this needs to match the uid for your site at https://api.chameleoncloud.org/sites.json
