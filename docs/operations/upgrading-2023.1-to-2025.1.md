@@ -244,11 +244,14 @@ All containers are tagged `2024.1-ubuntu-jammy`, except containers that 2024.1 n
     rm -rf /etc/ansible/venv
     apt install python3-venv python3-setuptools
     python3 -m venv --system-site-packages /etc/ansible/venv
+    chown -R kolla:kolla /etc/ansible/venv
     ```
 
     The venv has to exist before `bootstrap-servers` runs. The 2024.1 kolla collection's `docker_sdk` role runs `/etc/ansible/venv/bin/python -m pip install packaging` before it creates the venv, so with no venv it fails with `No such file or directory: b'/etc/ansible/venv/bin/python'`. The 2025.1 collection fixes this.
 
     Keep `--system-site-packages`. It's what `bootstrap-servers` uses itself, and it gives the venv the apt `setuptools`/`pkg_resources`, which the k3s pip task needs. A plain `python3 -m venv` on 24.04 doesn't have them.
+
+    The venv must belong to `kolla`, because `bootstrap-servers` runs its pip installs as that user. If root owns it, pip falls back to `/home/kolla/.local`, `bootstrap-servers` still passes, and later commands fail with `No module named 'docker'`. If that already happened, `chown` the venv, run `rm -rf /home/kolla/.local/lib/python3.12`, and run `bootstrap-servers` again.
 
 3. Download the updated Docker and install the Docker SDK into the venv:
 
