@@ -22,10 +22,9 @@ Before an associate site can enable federation, that site must obtain a client i
         openstack user show --domain chameleon <username>
         openstack project show --domain chameleon openstack
         ```
+
     *   Make the role assignment
 
         ```shell
         openstack role add --user <user_uuid> --project <project_uudi> admin
         ```
-
-###

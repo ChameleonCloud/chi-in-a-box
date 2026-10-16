@@ -247,5 +247,3 @@ neutron_networks:
     mtu: 9000
 ...
 ```
-
-###

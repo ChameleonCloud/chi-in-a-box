@@ -38,11 +38,13 @@ Commands in this section will use the system package manager, and run with root 
     git clone https://github.com/ChameleonCloud/chi-in-a-box.git
     cd chi-in-a-box
     ```
+
 2.  Initialize your [site configuration ](../before-you-begin/the-site-configuration/)by running `./cc-ansible init`. This will place a default site configuration into `../site-config`. You can specify a different location by running
 
     ```shell
      ./cc-ansible --site ../site-config init
     ```
+
 3.  For example, running `./cc-ansible --site /opt/site-config init` should output:
 
     ```shell
@@ -252,6 +254,7 @@ default_balena_fleet: <name_of_your_balena_fleet>
     ```shell
     ./cc-ansible prechecks
     ```
+
 * For example, if the subnets configured in `defaults.yml` do not match your interfaces, an error will be thrown here.
 * Similarly, kolla-ansible is not compatible with the service `nscd`, and will require that it be disabled before succeeding.
 
@@ -350,16 +353,19 @@ To avoid any downtime of core services or eviction of existing user pods, follow
     zun_tolerate_worker_taint: True
     doni_enable_worker_taint: False 
     ```
+
 2.  Re-deploy K3S playbook to apply tolerations to the core device plugins `daemonsets`
 
     ```shell
     ./cc-ansible --playbook playbooks/k3s.yml
     ```
+
 3.  Redeploy Zun so that it starts adding tolerations to newly launched user containers
 
     ```shell
     ./cc-ansible reconfigure --tags zun --site ../site-config/
     ```
+
 4.  Finally, set `doni_enable_worker_taint` to `True` and re-deploy Doni
 
     ```yaml
@@ -369,6 +375,7 @@ To avoid any downtime of core services or eviction of existing user pods, follow
     ```shell
     ./cc-ansible reconfigure --tags doni --site ../site-config/
     ```
+
 5. Re-sync all devices after re-deploying Doni.
 
 The edge site should now be operational.
