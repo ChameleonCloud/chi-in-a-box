@@ -126,24 +126,7 @@ Ensure you can connect to serial-over-LAN and/or the HTML5 console, and that you
 
 ### Backup!
 
-1. Make a copy of `/etc/kolla` from the controller node:
-
-    ```shell
-    tar -czvf /root/kolla-etc-2023-1.tgz /etc/kolla
-    ```
-2. Take a DB backup, then copy it out of the docker volume:
-
-    ```shell
-    ./cc-ansible mariadb_backup
-    cp /var/lib/docker/volumes/mariadb_backup/_data/<todays_backup> \
-      /root/kolla-db-2023-1
-    ```
-3. Make a copy of chi-in-a-box and site-config. This includes `vault_password` and `passwords.yml`, so restrict access to it:
-
-    ```shell
-    tar -czvf ciab-2023-1.tgz chi-in-a-box/ site-config/
-    chmod 600 ciab-2023-1.tgz
-    ```
+Back up the database, `/etc/kolla`, chi-in-a-box and site-config by following [Taking backups](backups.md) with `REL=2023.1`, and copy the files off the host.
 
 ## OpenStack 2023.1 -> 2024.1
 
@@ -279,22 +262,7 @@ Check that all running containers are tagged `2024.1-ubuntu-noble`.
 
 ### Backup!
 
-1. Make a copy of `/etc/kolla` from the controller node:
-
-    ```shell
-    tar -czvf /root/kolla-etc-2024-1.tgz /etc/kolla
-    ```
-2. Make a copy of the most recent DB backup:
-
-    ```shell
-    cp /var/lib/docker/volumes/mariadb_backup/_data/<todays_backup> \
-      /root/kolla-db-2024-1
-    ```
-3. Make a copy of chi-in-a-box and site-config:
-
-    ```shell
-    tar -czvf ciab-2024-1.tgz chi-in-a-box/ site-config/
-    ```
+Back up the database, `/etc/kolla`, chi-in-a-box and site-config by following [Taking backups](backups.md) with `REL=2024.1`, and copy the files off the host.
 
 ### RabbitMQ: more queue migration
 
