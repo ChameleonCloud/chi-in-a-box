@@ -238,15 +238,19 @@ All containers are tagged `2024.1-ubuntu-jammy`, except containers that 2024.1 n
     distro_python_version: "3.12"
     ```
 
-2. On control nodes and hypervisors, remove the Python 3.10 venv:
+2. On control nodes and hypervisors, replace the Python 3.10 venv with an empty Python 3.12 one:
 
     ```shell
     rm -rf /etc/ansible/venv
+    apt install python3-venv python3-setuptools
+    python3 -m venv --system-site-packages /etc/ansible/venv
     ```
 
-    Don't recreate it by hand. `bootstrap-servers` creates it with system site-packages. A plain `python3 -m venv` on 24.04 has no `setuptools`/`pkg_resources`, which the k3s pip task needs.
+    The venv has to exist before `bootstrap-servers` runs. The 2024.1 kolla collection's `docker_sdk` role runs `/etc/ansible/venv/bin/python -m pip install packaging` before it creates the venv, so with no venv it fails with `No such file or directory: b'/etc/ansible/venv/bin/python'`. The 2025.1 collection fixes this.
 
-3. Download the updated Docker and recreate the venv:
+    Keep `--system-site-packages`. It's what `bootstrap-servers` uses itself, and it gives the venv the apt `setuptools`/`pkg_resources`, which the k3s pip task needs. A plain `python3 -m venv` on 24.04 doesn't have them.
+
+3. Download the updated Docker and install the Docker SDK into the venv:
 
     ```shell
     ./cc-ansible bootstrap-servers
