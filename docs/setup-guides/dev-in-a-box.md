@@ -24,6 +24,7 @@ If launching a VM on Chameleon to host this, follow the following steps.
     flavor: m1.xlarge
     image: CC-Ubuntu20.04
     network: sharednet1
+
 2. Attach a floating IP
 3. Allow SSH via the floating IP (by applying the appropriate security group)
 4. SSH into the node as cc@floating-ip
@@ -37,6 +38,7 @@ If launching a VM on Chameleon to host this, follow the following steps.
     cd /opt
     sudo chown cc:cc /opt
     ```
+
 2.  Clone the chi-in-a-box repo, install, and initialize your site-configuration
 
     ```shell
@@ -44,6 +46,7 @@ If launching a VM on Chameleon to host this, follow the following steps.
     cd chi-in-a-box
     ./cc-ansible --site /opt/site-config/ init
     ```
+
 3.  export an env var so you don't need to type "--site" for the remaining commands
 
     <pre class="language-bash"><code class="lang-bash">export CC_ANSIBLE_SITE=/opt/site-config/
@@ -116,6 +119,7 @@ If launching a VM on Chameleon to host this, follow the following steps.
         ```shell
         sudo systemctl disable --now nscd.service
         ```
+
 8. At this point, we should be ready to "deploy".
      ```shell
      ./cc-ansible deploy
@@ -181,6 +185,7 @@ sudo ip addr add 10.205.10.1/24 dev brtenks0
         | 44d0ac06-77d6-4444-93ce-7c8db5b54fff | tk0  | None          | power off   | available          | False       |
         +--------------------------------------+------+---------------+-------------+--------------------+-------------+
         ```
+
     * let's trigger an inspection.
         ```shell
         openstack baremetal node manage tk0
@@ -197,6 +202,7 @@ sudo ip addr add 10.205.10.1/24 dev brtenks0
         ```
 
         this means that the VM has been successfully "powered on".
+
     * to watch the machine's "serial console", execute:
         ```shell
         sudo virsh console tk0
@@ -219,6 +225,7 @@ sudo ip addr add 10.205.10.1/24 dev brtenks0
         ```shell
         openstack baremetal node provide tk0
         ```
+
     * Now that it's "available", we can launch a server on it.
         ```shell
         openstack server create --flavor baremetal --image CC-Ubuntu22.04 --network sharednet1 test-instance
@@ -236,6 +243,7 @@ sudo ip addr add 10.205.10.1/24 dev brtenks0
         ```shell
         ./cc-ansible view_passwords | grep "^keystone_admin_password"
         ```
+
     2.  You can use the Openstack CLI or API directly. The CLI tools are pre-installed in the chi-in-a-box virtualenv, and the admin credentials in an `admin-openrc` file in your site-config directory. Access the tools as follows:
 
         ```shell

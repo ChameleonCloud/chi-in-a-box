@@ -36,11 +36,13 @@ Commands in this section will use the system package manager, and run with root 
     git clone https://github.com/ChameleonCloud/chi-in-a-box.git
     cd chi-in-a-box
     ```
+
 2.  Initialize your [site configuration ](../../before-you-begin/the-site-configuration/)by running `./cc-ansible init`. This will place a default site configuration into `../site-config`. You can specify a different location by running
 
     ```shell
      ./cc-ansible --site ../site-config init
     ```
+
 3.  For example, running `./cc-ansible --site /opt/site-config init` should output:
 
     ```shell
@@ -138,6 +140,7 @@ cat certificate.crt intermediates.pem private.key \
     kolla_internal_vip_address: <spare IP on private subnet>
     kolla_external_vip_address: <spare IP on public subnet>
     ```
+
 2.  If you haven't been provided a keystone\_idp\_client\_id by your federated ID provider, disable it for now:
 
     ```yaml
@@ -145,6 +148,7 @@ cat certificate.crt intermediates.pem private.key \
     enable_keystone_federation_openid: no
     keystone_idp_client_id: null
     ```
+
 3.  To give nodes internet access, at lease one internal and one external network must be enabled.
 
     ```yaml
@@ -162,6 +166,7 @@ cat certificate.crt intermediates.pem private.key \
         # This should be your public IP block assigned to your deployment.
         cidr: 0.0.0.0/32
     ```
+
 4.  To enable bare metal provisioning, provide a vlan and subnet for ironic to use. This vlan should be included in the neutron `on_demand_vlan_range` above.
 
     ```yaml
@@ -205,6 +210,7 @@ cat certificate.crt intermediates.pem private.key \
     ```shell
     ./cc-ansible prechecks
     ```
+
 * For example, if the subnets configured in `defaults.yml` do not match your interfaces, an error will be thrown here.
 * Similarly, kolla-ansible is not compatible with the service `nscd`, and will require that it be disabled before succeeding.
 
@@ -218,6 +224,7 @@ All Chameleon services are packaged as Docker containers and they need to be dow
     ```shell
     ./cc-ansible edit_passwords
     ```
+
 3.  Pull the container images.
 
     ```shell

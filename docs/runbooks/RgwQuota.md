@@ -119,6 +119,8 @@ Docs:
 - [Set user quota](https://docs.ceph.com/en/reef/radosgw/admin/#set-user-quota)
 - [Enabling and disabling user quota](https://docs.ceph.com/en/reef/radosgw/admin/#enabling-and-disabling-user-quota)
 
+Steps:
+
 1. Run rgw-quota-sync without `--apply` again. Check that no `would change` line sets a quota below a project's usage from step 1.
 1. Run it with `--apply`.
 

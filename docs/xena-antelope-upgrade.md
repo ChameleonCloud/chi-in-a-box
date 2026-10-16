@@ -147,6 +147,7 @@ After deploying the new version, you will instead see containers named `letsencr
         use nova;
         select hypervisor_hostname,uuid from compute_nodes WHERE hypervisor_type='ironic' AND isnull(deleted_at)  AND uuid!=hypervisor_hostname limit 100;
         ```
+
     1. for each host found with the issue, set reservation=disabled. the `hypervisor_hostname` is the ironic node uuid, and so it can be used for the lease.
     1. Once the host is not in an active reservation:
         1. delete it from blazar
@@ -181,6 +182,7 @@ After deploying the new version, you will instead see containers named `letsencr
         ```shell
         mv /etc/kolla /etc/kolla.bak
         ```
+
 1. Use ./cc-ansible mariadb_backup to create a full DB backup
 1. Copy DB backup from mariadb_backup container to somewhere else
 
@@ -215,10 +217,12 @@ After deploying the new version, you will instead see containers named `letsencr
     git pull
     git submodule update --init
     ```
+
 1. Install new tools into venv via:
     1. `cc-ansible install_deps` # this doesn’t need a site-config
     1. Source the new venv:
         `source venv/bin/activate`
+
 1. Update site-config/inventory/hosts by:
     1. mv inventory/hosts inventory/hosts.bak
     1. cp chi-in-a-box/site-config.example/inventory/hosts site-config/inventory/hosts
@@ -248,6 +252,7 @@ After deploying the new version, you will instead see containers named `letsencr
     AND services.topic="compute" 
     AND services.version < 61;
     ```
+
 1. rerun `cc-ansible deploy --tags nova` to create service user
 1. rerun `cc-ansible upgrade` this should now pass nova and continue.
 1. Apply cleanups for keystone admin endpoints:
