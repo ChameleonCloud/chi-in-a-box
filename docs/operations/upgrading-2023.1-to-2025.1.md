@@ -2,6 +2,8 @@
 
 This guide upgrades a site from OpenStack 2023.1 on Ubuntu 22.04 to OpenStack 2025.1 on Ubuntu 24.04, in three stages: OpenStack 2023.1 to 2024.1, Ubuntu 22.04 to 24.04, then OpenStack 2024.1 to 2025.1. Do the pre-work first.
 
+Unless a step says otherwise, run `./cc-ansible` and `git` commands on the deploy host, from your chi-in-a-box checkout, with `CC_ANSIBLE_SITE` set to your site-config directory (see [Command-line interface](../before-you-begin/command-line-interface.md)). `defaults.yml` means `$CC_ANSIBLE_SITE/defaults.yml`. Run `docker` and `systemctl` commands as root on the host named in the step.
+
 ## Pre-Work
 
 Ensure you have a consistent starting point on release 2023.1 and Ubuntu 22.04.
@@ -38,7 +40,13 @@ rm -rf venv/
 ./cc-ansible deploy
 ```
 
-* Run `docker ps` and check that all containers are running tag `2023.1-ubuntu-jammy`.
+* On each host, check that all kolla containers are running tag `2023.1-ubuntu-jammy`. This prints any that aren't:
+
+    ```shell
+    docker ps --format '{{.Names}} {{.Image}}' | grep 'chameleoncloud/kolla/' | grep -v ':2023.1-ubuntu-jammy$'
+    ```
+
+    Containers from other images, such as `hammers` or `chameleon_usage`, have their own tags and are not affected by this upgrade.
 
 ### Switch to RabbitMQ quorum queues
 
@@ -52,20 +60,27 @@ Migrating requires stopping all services that talk to RabbitMQ, updating their c
 
     For example, a CHI@Edge site gives `blazar,keystone,neutron,zun`. Keystone is in the list, so the APIs are down from step 2 until step 8.
 
-2. Stop all services that talk to RabbitMQ. (Very important!)
+2. Back in chi-in-a-box on the deploy host, stop all services that talk to RabbitMQ. (Very important!)
 
     ```shell
     ./cc-ansible stop --yes-i-really-really-mean-it --tags <kolla tags from 1.2>
     ```
 
-3. Verify the containers are stopped in `docker ps --all`.
-    1. If any are not stopped, use `systemctl stop <kolla-service-unit-name>` to stop them:
+3. On each host, verify those containers are stopped. This lists any still running; replace the CHI@Edge tags with your list from step 1:
+
+    ```shell
+    docker ps --format '{{.Names}}' | grep -E '^(blazar|keystone|neutron|zun)_'
+    ```
+
+    1. Each kolla container has a systemd unit that restarts it, named `kolla-<container name>-container.service`. If any are still running, stop their units, for example:
 
         ```shell
-        systemctl | egrep '^\s*kolla-' | tr -s ' ' | cut -d ' ' -f 2 | xargs systemctl stop
+        systemctl stop kolla-neutron_server-container.service
         ```
 
-4. Set `om_enable_rabbitmq_quorum_queues: true` in `site-config/defaults.yml`.
+        Stop only these services. Don't stop every `kolla-*` unit: that also stops `rabbitmq`, `mariadb` and `haproxy`, which step 8 doesn't start again.
+
+4. Set `om_enable_rabbitmq_quorum_queues: true` in `defaults.yml`.
 5. `./cc-ansible genconfig`
 6. `./cc-ansible reconfigure --tags rabbitmq`
 7. `./cc-ansible rabbitmq-reset-state`
@@ -105,7 +120,16 @@ Remove the `rabbitmq_image` override before upgrading to 2024.1. The `rabbitmq-3
 
 #### Ensure netplan pins MAC addresses
 
-The 22.04 to 24.04 upgrade may rename network interfaces. Ensure each interface has a `match: macaddress` stanza.
+The 22.04 to 24.04 upgrade may rename network interfaces. Your site-config refers to interfaces by name (for example `network_interface`), so pin each name: in `/etc/netplan/`, give each interface a `match: macaddress` stanza and a `set-name` with its current name.
+
+```yaml
+network:
+  ethernets:
+    eno1:
+      match:
+        macaddress: "aa:bb:cc:dd:ee:ff"
+      set-name: eno1
+```
 
 #### Ensure Mellanox OFED is not installed
 
@@ -113,7 +137,13 @@ The Mellanox apt repo may break `do-release-upgrade`. Ensure OFED is uninstalled
 
 #### Set the ceph apt repo to debian-tentacle
 
-Tentacle is the first release supporting both jammy and noble in its apt repos.
+Tentacle is the first release supporting both jammy and noble in its apt repos. chi-in-a-box doesn't configure this repo; if a host has one, it was added by hand. Find it with:
+
+```shell
+grep -r download.ceph.com /etc/apt/sources.list /etc/apt/sources.list.d/
+```
+
+If that prints nothing, skip this step.
 
 #### Ensure the system is fully updated
 
@@ -164,19 +194,17 @@ Ansible merges these in alphabetical order, with later files overriding earlier 
 2. Copy the new inventory files:
 
     ```shell
-    cp chi-in-a-box/site-config.example/inventory/10-base-hosts \
-      $SITE_CONFIG/inventory/
-    cp chi-in-a-box/site-config.example/inventory/50-kolla-hosts \
-      $SITE_CONFIG/inventory/
-    cp chi-in-a-box/site-config.example/inventory/80-chi-hosts \
-      $SITE_CONFIG/inventory/
+    cp site-config.example/inventory/10-base-hosts \
+      site-config.example/inventory/50-kolla-hosts \
+      site-config.example/inventory/80-chi-hosts \
+      "$CC_ANSIBLE_SITE/inventory/"
     ```
 
 3. Most likely, customize `10-base-hosts` with your changes. If necessary, apply customizations to `50-kolla-hosts` or `80-chi-hosts` as well. Don't carry over groups for retired services, such as `[jupyterhub:children]`.
 4. Move the old `inventory/hosts` out of the inventory directory. Ansible reads every file there, so leaving it in place merges it with the new files:
 
     ```shell
-    mv $SITE_CONFIG/inventory/hosts $SITE_CONFIG/inventory-hosts-2023.1.bak
+    mv "$CC_ANSIBLE_SITE/inventory/hosts" "$CC_ANSIBLE_SITE/inventory-hosts-2023.1.bak"
     ```
 
 #### Update passwords
@@ -204,7 +232,13 @@ Run:
 
 ### Verification
 
-All containers are tagged `2024.1-ubuntu-jammy`, except containers that 2024.1 no longer manages, which keep running their 2023.1 image:
+All kolla containers are tagged `2024.1-ubuntu-jammy`. On each host, this prints any that aren't:
+
+```shell
+docker ps --format '{{.Names}} {{.Image}}' | grep 'chameleoncloud/kolla/' | grep -v ':2024.1-ubuntu-jammy$'
+```
+
+The exceptions are containers that 2024.1 no longer manages, which keep running their 2023.1 image:
 
 * `prometheus_ipmi_exporter`: once you've confirmed you don't need it, remove it on each host that runs it. Its kolla systemd unit restarts the container, so stop the unit rather than the container, then remove the unit file, the container, and its config:
 
@@ -219,6 +253,8 @@ All containers are tagged `2024.1-ubuntu-jammy`, except containers that 2024.1 n
 ## Ubuntu 22.04 -> 24.04
 
 ### Upgrade the operating system
+
+On each host in your inventory, including the deploy host:
 
 1. `do-release-upgrade`
 2. Reboot once it has completed.
@@ -266,7 +302,11 @@ All containers are tagged `2024.1-ubuntu-jammy`, except containers that 2024.1 n
 
 ### Verification
 
-Check that all running containers are tagged `2024.1-ubuntu-noble`.
+Check that all running kolla containers are tagged `2024.1-ubuntu-noble`. On each host, this prints any that aren't:
+
+```shell
+docker ps --format '{{.Names}} {{.Image}}' | grep 'chameleoncloud/kolla/' | grep -v ':2024.1-ubuntu-noble$'
+```
 
 ## OpenStack 2024.1 -> 2025.1
 
@@ -316,7 +356,7 @@ Use the kolla tags of every enabled service that talks to RabbitMQ. Regenerate t
 
 Verification:
 
-1. Run `./cc-ansible prechecks`. It will warn if old queues persist for a service. If so, repeat these steps:
+1. Run `./cc-ansible prechecks`. It fails, naming each queue that hasn't been migrated, if old queues persist for a service. If so, repeat these steps:
     1. `./cc-ansible stop --yes-i-really-really-mean-it --tags <service>`, and wait for the containers to exit
     2. `./cc-ansible rabbitmq-reset-state`
     3. `./cc-ansible deploy --tags <service>`
@@ -362,16 +402,15 @@ The inventory is split into:
 Ansible merges these in alphabetical order, with later files overriding earlier ones in case of conflicts. Controller nodes are customized in `10-base-hosts`; `50-kolla-hosts` and `80-chi-hosts` can likely be left unmodified.
 
 1. Diff your current `site-config/inventory/{10-base,50-kolla,80-chi}-hosts` against the [2024.1 chi-in-a-box inventory in site-config.example](https://github.com/ChameleonCloud/chi-in-a-box/tree/chameleoncloud/2024.1/site-config.example/inventory). It is likely that only `10-base-hosts` differs.
-2. After making a backup, copy the new inventory files:
+2. Copy the new inventory files over your 2024.1 copies. The backup you took above holds the old ones.
 
     ```shell
-    cp chi-in-a-box/site-config.example/inventory/50-kolla-hosts \
-      $SITE_CONFIG/inventory/
-    cp chi-in-a-box/site-config.example/inventory/80-chi-hosts \
-      $SITE_CONFIG/inventory/
+    cp site-config.example/inventory/50-kolla-hosts \
+      site-config.example/inventory/80-chi-hosts \
+      "$CC_ANSIBLE_SITE/inventory/"
     ```
 
-3. Carry any host customizations over from your old files. Notable changes in 2025.1: the swift groups are removed, a `valkey` group is added, and groups for retired chi services are removed.
+3. Carry any host customizations over from your old files. Notable changes in 2025.1: the swift groups are removed, `valkey` and `nova-metadata` groups are added, and groups for retired chi services are removed.
 
 #### Remove image overrides
 
@@ -410,4 +449,10 @@ This adds any entries present in `site-config.example/passwords.yml` and missing
 
 ### Verification
 
-All containers are tagged `2025.1-ubuntu-noble`. If a container is still on a 2024.1 image, check site-config for a leftover `<service>_tag` override.
+All kolla containers are tagged `2025.1-ubuntu-noble`. On each host, this prints any that aren't:
+
+```shell
+docker ps --format '{{.Names}} {{.Image}}' | grep 'chameleoncloud/kolla/' | grep -v ':2025.1-ubuntu-noble$'
+```
+
+If a container is still on a 2024.1 image, check site-config for a leftover `<service>_tag` override.
