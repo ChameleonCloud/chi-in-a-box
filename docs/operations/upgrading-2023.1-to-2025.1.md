@@ -51,17 +51,20 @@ Migrating requires stopping all services that talk to RabbitMQ, updating their c
     2. Turn the list into kolla tags: `grep -Rl oslo_messaging_rabbit | cut -d "/" -f 1 | cut -d "-" -f 1 | sort -u | paste -s -d ","`
 
     For example, a CHI@Edge site gives `blazar,keystone,neutron,zun`. Keystone is in the list, so the APIs are down from step 2 until step 8.
+
 2. Stop all services that talk to RabbitMQ. (Very important!)
 
     ```shell
     ./cc-ansible stop --yes-i-really-really-mean-it --tags <kolla tags from 1.2>
     ```
+
 3. Verify the containers are stopped in `docker ps --all`.
     1. If any are not stopped, use `systemctl stop <kolla-service-unit-name>` to stop them:
 
         ```shell
         systemctl | egrep '^\s*kolla-' | tr -s ' ' | cut -d ' ' -f 2 | xargs systemctl stop
         ```
+
 4. Set `om_enable_rabbitmq_quorum_queues: true` in `site-config/defaults.yml`.
 5. `./cc-ansible genconfig`
 6. `./cc-ansible reconfigure --tags rabbitmq`
@@ -84,12 +87,14 @@ See the [kolla-ansible docs on SLURP upgrades](https://docs.openstack.org/kolla-
     ```yaml
     rabbitmq_image: ghcr.io/chameleoncloud/kolla/rabbitmq-3-12
     ```
+
 2. Run `./cc-ansible upgrade --tags rabbitmq`
 3. In `defaults.yml`, set:
 
     ```yaml
     rabbitmq_image: ghcr.io/chameleoncloud/kolla/rabbitmq-3-13
     ```
+
 4. Run `./cc-ansible upgrade --tags rabbitmq`
 
 After each upgrade, verify the version with `docker exec rabbitmq rabbitmqctl version`, and check that services reconnect. Each restart causes a brief burst of `AMQP server ... is unreachable` errors in service logs, which should stop within a minute.
@@ -166,6 +171,7 @@ Ansible merges these in alphabetical order, with later files overriding earlier 
     cp chi-in-a-box/site-config.example/inventory/80-chi-hosts \
       $SITE_CONFIG/inventory/
     ```
+
 3. Most likely, customize `10-base-hosts` with your changes. If necessary, apply customizations to `50-kolla-hosts` or `80-chi-hosts` as well. Don't carry over groups for retired services, such as `[jupyterhub:children]`.
 4. Move the old `inventory/hosts` out of the inventory directory. Ansible reads every file there, so leaving it in place merges it with the new files:
 
@@ -231,6 +237,7 @@ All containers are tagged `2024.1-ubuntu-jammy`, except containers that 2024.1 n
     kolla_base_distro_version: noble
     distro_python_version: "3.12"
     ```
+
 2. On control nodes and hypervisors, remove the Python 3.10 venv:
 
     ```shell
@@ -238,16 +245,19 @@ All containers are tagged `2024.1-ubuntu-jammy`, except containers that 2024.1 n
     ```
 
     Don't recreate it by hand. `bootstrap-servers` creates it with system site-packages. A plain `python3 -m venv` on 24.04 has no `setuptools`/`pkg_resources`, which the k3s pip task needs.
+
 3. Download the updated Docker and recreate the venv:
 
     ```shell
     ./cc-ansible bootstrap-servers
     ```
+
 4. Pull the 24.04 containers:
 
     ```shell
     ./cc-ansible pull
     ```
+
 5. Deploy the 24.04 containers:
 
     ```shell
@@ -285,16 +295,19 @@ Use the kolla tags of every enabled service that talks to RabbitMQ. Regenerate t
     ```shell
     ./cc-ansible stop --yes-i-really-really-mean-it --tags <kolla tags>
     ```
+
 3. Update RabbitMQ settings:
 
     ```shell
     ./cc-ansible reconfigure --tags rabbitmq
     ```
+
 4. Clear the old queues:
 
     ```shell
     ./cc-ansible rabbitmq-reset-state
     ```
+
 5. Start the services back up with the new queue config:
 
     ```shell
@@ -318,6 +331,7 @@ See the [kolla-ansible docs](https://docs.openstack.org/kolla-ansible/2025.1/ref
     ```yaml
     rabbitmq_image: ghcr.io/chameleoncloud/kolla/rabbitmq-4-1
     ```
+
 2. Run `./cc-ansible upgrade --tags rabbitmq`
 
 Leave `rabbitmq_image` set for the 2025.1 upgrade below: the kolla-ansible docs say it must stay overridden, or the upgrade downgrades RabbitMQ to 4.0.
@@ -356,6 +370,7 @@ Ansible merges these in alphabetical order, with later files overriding earlier 
     cp chi-in-a-box/site-config.example/inventory/80-chi-hosts \
       $SITE_CONFIG/inventory/
     ```
+
 3. Carry any host customizations over from your old files. Notable changes in 2025.1: the swift groups are removed, a `valkey` group is added, and groups for retired chi services are removed.
 
 #### Remove image overrides
@@ -387,6 +402,7 @@ This adds any entries present in `site-config.example/passwords.yml` and missing
     If it shows `io.containerd.snapshotter.v1`, Docker uses the containerd image store. Set `containerd_root_path: /var/lib/containerd` (containerd's current root) in `defaults.yml` **before** the next step. Otherwise the `openstack.kolla` docker role moves containerd's root to `/var/lib/docker/containerd`, and Docker loses track of every running container and image.
 
     If this already happened, set the variable and re-run `bootstrap-servers`. containerd re-attaches without restarting the containers. Afterwards you can delete `/var/lib/docker/containerd`.
+
 3. Re-bootstrap with newer dependencies: `./cc-ansible bootstrap-servers`
 4. Ensure all containers can be pulled: `./cc-ansible pull`
 5. Ensure all config can be generated: `./cc-ansible genconfig`
