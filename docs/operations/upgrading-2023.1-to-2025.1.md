@@ -233,6 +233,12 @@ All containers are tagged `2024.1-ubuntu-jammy`, except containers that 2024.1 n
 
 1. `do-release-upgrade`
 2. Reboot once it has completed.
+3. On the deploy host, rebuild chi-in-a-box's venv. The Python 3.10 venv can't import anything under Python 3.12:
+
+    ```shell
+    rm -rf venv
+    ./cc-ansible install_deps
+    ```
 
 ### Upgrade Kolla containers
 
@@ -242,13 +248,14 @@ All containers are tagged `2024.1-ubuntu-jammy`, except containers that 2024.1 n
     kolla_base_distro_version: noble
     distro_python_version: "3.12"
     ```
-2. On control nodes and hypervisors, recreate the venv with Python 3.12:
+2. On control nodes and hypervisors, remove the Python 3.10 venv:
 
     ```shell
     rm -rf /etc/ansible/venv
-    python3 -m venv /etc/ansible/venv
     ```
-3. Download the updated Docker and populate the venv:
+
+    Don't recreate it by hand. `bootstrap-servers` creates it with system site-packages. A plain `python3 -m venv` on 24.04 has no `setuptools`/`pkg_resources`, which the k3s pip task needs.
+3. Download the updated Docker and recreate the venv:
 
     ```shell
     ./cc-ansible bootstrap-servers
@@ -302,11 +309,13 @@ om_enable_rabbitmq_transient_quorum_queue: true
 om_enable_rabbitmq_stream_fanout: true
 ```
 
+Use the kolla tags of every enabled service that talks to RabbitMQ. Regenerate the list as in step 1 of [Switch to RabbitMQ quorum queues](#switch-to-rabbitmq-quorum-queues) rather than reusing an example: a baremetal site typically gives `blazar,glance,heat,ironic,keystone,neutron,nova`, and a CHI@Edge site gives `blazar,keystone,neutron,zun`.
+
 1. `./cc-ansible genconfig`
 2. Stop all services that talk to RabbitMQ. (Very important!)
 
     ```shell
-    ./cc-ansible stop --yes-i-really-really-mean-it --tags blazar,glance,heat,ironic,keystone,neutron,nova
+    ./cc-ansible stop --yes-i-really-really-mean-it --tags <kolla tags>
     ```
 3. Update RabbitMQ settings:
 
@@ -321,7 +330,7 @@ om_enable_rabbitmq_stream_fanout: true
 5. Start the services back up with the new queue config:
 
     ```shell
-    ./cc-ansible deploy --tags blazar,glance,heat,ironic,keystone,neutron,nova
+    ./cc-ansible deploy --tags <kolla tags>
     ```
 
 Verification:
@@ -348,7 +357,9 @@ Leave `rabbitmq_image` set for the 2025.1 upgrade below: the kolla-ansible docs 
 ### Update chi-in-a-box
 
 ```shell
+git fetch
 git checkout chameleoncloud/2025.1
+git pull --ff-only
 rm -rf venv
 git submodule update --init --recursive
 ./cc-ansible install_deps
@@ -377,6 +388,11 @@ Ansible merges these in alphabetical order, with later files overriding earlier 
     cp chi-in-a-box/site-config.example/inventory/80-chi-hosts \
       $SITE_CONFIG/inventory/
     ```
+3. Carry any host customizations over from your old files. Notable changes in 2025.1: the swift groups are removed, a `valkey` group is added, and groups for retired chi services are removed.
+
+#### Remove image overrides
+
+Remove any `<service>_tag` overrides left over from 2024.1, such as `blazar_tag`. Otherwise they pin those services to old images. Keep `rabbitmq_image`, as described in [RabbitMQ: upgrade 3.x to 4.x](#rabbitmq-upgrade-3x-to-4x).
 
 #### Update passwords
 
@@ -388,14 +404,26 @@ As for 2024.1, run:
 
 This adds any entries present in `site-config.example/passwords.yml` and missing from your passwords file, and populates passwords for empty entries.
 
+!!! warning
+    `update_passwords` prints the added lines **with their values**. For example, kolla-mergepwd copies `valkey_master_password` from `redis_master_password`. Don't paste that output into tickets or chat. If it was exposed, rotate the password.
+
 ### Perform the upgrade
 
 1. Verify the above steps: `./cc-ansible prechecks`
-2. Re-bootstrap with newer dependencies: `./cc-ansible bootstrap-servers`
-3. Ensure all containers can be pulled: `./cc-ansible pull`
-4. Ensure all config can be generated: `./cc-ansible genconfig`
-5. Upgrade: `./cc-ansible upgrade`
+2. On every host, check which storage driver Docker uses:
+
+    ```shell
+    docker info | grep driver-type
+    ```
+
+    If it shows `io.containerd.snapshotter.v1`, Docker uses the containerd image store. Set `containerd_root_path: /var/lib/containerd` (containerd's current root) in `defaults.yml` **before** the next step. Otherwise the `openstack.kolla` docker role moves containerd's root to `/var/lib/docker/containerd`, and Docker loses track of every running container and image.
+
+    If this already happened, set the variable and re-run `bootstrap-servers`. containerd re-attaches without restarting the containers. Afterwards you can delete `/var/lib/docker/containerd`.
+3. Re-bootstrap with newer dependencies: `./cc-ansible bootstrap-servers`
+4. Ensure all containers can be pulled: `./cc-ansible pull`
+5. Ensure all config can be generated: `./cc-ansible genconfig`
+6. Upgrade: `./cc-ansible upgrade`
 
 ### Verification
 
-All containers are tagged `2025.1-ubuntu-noble`.
+All containers are tagged `2025.1-ubuntu-noble`. If a container is still on a 2024.1 image, check site-config for a leftover `<service>_tag` override.
