@@ -38,6 +38,8 @@ tempest_reservation_device_plugin: "{{ blazar_enable_device_plugin_k8s | default
 tempest_reservation_floatingip_plugin: false
 tempest_reservation_network_plugin: false
 tempest_reservation_network_storage_plugin: false
+# Device machine_name that device reservation tests reserve.
+tempest_reservation_device_machine_name: raspberrypi4-64
 
 # Copied from chi@edge prod tempest.conf, should match neutron config.
 tempest_network_api_extensions: address-group,address-scope,router-admin-state-down-before-update,agent,agent-resources-synced,allowed-address-pairs,auto-allocated-topology,availability_zone,availability_zone_filter,default-subnetpools,dhcp_agent_scheduler,dvr,empty-string-filtering,external-net,extra_dhcp_opt,extraroute,extraroute-atomic,filter-validation,floating-ip-port-forwarding-detail,fip-port-details,flavors,floatingip-pools,ip-substring-filtering,router,ext-gw-mode,l3-ha,l3-flavors,l3-port-ip-change-not-allowed,l3_agent_scheduler,multi-provider,net-mtu,net-mtu-writable,network_availability_zone,network-ip-availability,network-segment-range,pagination,port-device-profile,port-mac-override,port-mac-address-regenerate,port-numa-affinity-policy,binding,binding-extended,port-security,project-id,provider,quota-check-limit,quotas,quota_details,rbac-policies,rbac-address-group,rbac-address-scope,rbac-security-groups,rbac-subnetpool,revision-if-match,standard-attr-revisions,router_availability_zone,security-groups-normalized-cidr,port-security-groups-filtering,security-groups-remote-address-group,security-groups-shared-filtering,security-group,service-type,sorting,standard-attr-description,stateful-security-group,subnet_onboard,subnet-service-types,subnet_allocation,subnetpool-prefix-ops,standard-attr-tag,standard-attr-timestamp

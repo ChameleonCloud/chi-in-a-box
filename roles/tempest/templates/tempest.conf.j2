@@ -101,3 +101,6 @@ device_plugin = {{ tempest_reservation_device_plugin | bool }}
 floatingip_plugin = {{ tempest_reservation_floatingip_plugin | bool }}
 network_plugin = {{ tempest_reservation_network_plugin | bool }}
 network_storage_plugin = {{ tempest_reservation_network_storage_plugin | bool }}
+
+[reservation]
+device_machine_name = {{ tempest_reservation_device_machine_name }}
