@@ -217,13 +217,13 @@ ironic_erase_devices_metadata_during_deploy: false
 # M.S. 2026/08/19
 # Epoxy disabled the separate inspector service by default. We enable it until
 # hammers and scripts can be migrated.
-enable_ironic_inspector: true
+enable_ironic_inspector: "{{ enable_ironic | bool }}"
 
 # M.S. 2026/08/19
 # Epoxy disabled the ironic neutron agent by default, claiming it's only
 # needed for flat networks, or for networking-baremetal netconf driven config.
 # Re-enable until we can verify.
-enable_ironic_neutron_agent: true
+enable_ironic_neutron_agent: "{{ enable_ironic | bool }}"
 
 ironic_inspector_store: database
 
