@@ -40,13 +40,29 @@ rm -rf venv/
 ./cc-ansible deploy
 ```
 
-* On each host, check that all kolla containers are running tag `2023.1-ubuntu-jammy`. This prints any that aren't:
+* On each host, check that all kolla containers are running tag `2023.1-ubuntu-jammy`:
 
     ```shell
-    docker ps --format '{{.Names}} {{.Image}}' | grep 'chameleoncloud/kolla/' | grep -v ':2023.1-ubuntu-jammy$'
+    docker ps --format 'table {{.Names}}\t{{.Image}}'
     ```
 
-    Containers from other images, such as `hammers` or `chameleon_usage`, have their own tags and are not affected by this upgrade.
+    Correct: every `ghcr.io/chameleoncloud/kolla/` image ends in `:2023.1-ubuntu-jammy`.
+
+    ```text
+    NAMES        IMAGE
+    blazar_api   ghcr.io/chameleoncloud/kolla/blazar-api:2023.1-ubuntu-jammy
+    keystone     ghcr.io/chameleoncloud/kolla/keystone:2023.1-ubuntu-jammy
+    ```
+
+    Incorrect: any other tag. For example, this `blazar_api` is pinned by a `blazar_tag` left in site-config. Remove the pin and deploy again.
+
+    ```text
+    NAMES        IMAGE
+    blazar_api   ghcr.io/chameleoncloud/kolla/blazar-api:2023.1-kvm-res
+    keystone     ghcr.io/chameleoncloud/kolla/keystone:2023.1-ubuntu-jammy
+    ```
+
+    Images outside `ghcr.io/chameleoncloud/kolla/`, such as hammers, have their own tags and are not affected by this upgrade.
 
 ### Switch to RabbitMQ quorum queues
 
@@ -66,10 +82,27 @@ Migrating requires stopping all services that talk to RabbitMQ, updating their c
     ./cc-ansible stop --yes-i-really-really-mean-it --tags <kolla tags from 1.2>
     ```
 
-3. On each host, verify those containers are stopped. This lists any still running; replace the CHI@Edge tags with your list from step 1:
+3. On each host, verify those containers are stopped:
 
     ```shell
-    docker ps --format '{{.Names}}' | grep -E '^(blazar|keystone|neutron|zun)_'
+    docker ps --format 'table {{.Names}}\t{{.Status}}'
+    ```
+
+    Correct: no container for a service from step 1 is listed. With the CHI@Edge list, `rabbitmq`, `mariadb` and `haproxy` are still up, and nothing named `blazar*`, `keystone*`, `neutron*` or `zun*` is:
+
+    ```text
+    NAMES      STATUS
+    rabbitmq   Up 3 weeks
+    mariadb    Up 3 weeks
+    haproxy    Up 3 weeks
+    ```
+
+    Incorrect: a container from one of those services is still up, such as `neutron_server` here:
+
+    ```text
+    NAMES            STATUS
+    neutron_server   Up 3 weeks
+    rabbitmq         Up 3 weeks
     ```
 
     1. Each kolla container has a systemd unit that restarts it, named `kolla-<container name>-container.service`. If any are still running, stop their units, for example:
@@ -88,10 +121,21 @@ Migrating requires stopping all services that talk to RabbitMQ, updating their c
 9. Verify that services start without errors about RabbitMQ in their logs, and that RabbitMQ does not log errors about durable queues. Check the queue types:
 
     ```shell
-    docker exec rabbitmq rabbitmqctl list_queues -q type durable | sort | uniq -c
+    docker exec rabbitmq rabbitmqctl list_queues --silent type durable | sort | uniq -c
     ```
 
-    Most queues should now be `quorum true`. `*_fanout_*` and `reply_*` queues stay `classic false` on 2023.1 and 2024.1, which is expected; they are migrated in the 2025.1 stage.
+    Correct: most queues are `quorum true`. The remaining `classic false` queues are `*_fanout_*` and `reply_*` queues, which stay classic on 2023.1 and 2024.1 and are migrated in the 2025.1 stage. The counts depend on your site:
+
+    ```text
+         31 classic false
+         64 quorum true
+    ```
+
+    Incorrect: no `quorum` queues, or almost none. A service was still running and recreated its queues with the old settings. Repeat steps 2 to 8.
+
+    ```text
+         95 classic false
+    ```
 
 ### Upgrade RabbitMQ versions
 
@@ -112,7 +156,7 @@ See the [kolla-ansible docs on SLURP upgrades](https://docs.openstack.org/kolla-
 
 4. Run `./cc-ansible upgrade --tags rabbitmq`
 
-After each upgrade, verify the version with `docker exec rabbitmq rabbitmqctl version`, and check that services reconnect. Each restart causes a brief burst of `AMQP server ... is unreachable` errors in service logs, which should stop within a minute.
+After each upgrade, verify the version with `docker exec rabbitmq rabbitmqctl version`. Correct: it starts with `3.12` after step 2 and `3.13` after step 4, for example `3.12.13` (the patch number varies). If it still shows the previous version, check that `rabbitmq_image` is set in `defaults.yml`. Also check that services reconnect. Each restart causes a brief burst of `AMQP server ... is unreachable` errors in service logs, which should stop within a minute.
 
 Remove the `rabbitmq_image` override before upgrading to 2024.1. The `rabbitmq-3-13` image is only published for 2023.1, so the 2024.1 `pull` would fail. The default 2024.1 `rabbitmq` image is already 3.13. (This differs from the 2025.1 stage below, where the override must stay set.)
 
@@ -140,10 +184,14 @@ The Mellanox apt repo may break `do-release-upgrade`. Ensure OFED is uninstalled
 Tentacle is the first release supporting both jammy and noble in its apt repos. chi-in-a-box doesn't configure this repo; if a host has one, it was added by hand. Find it with:
 
 ```shell
-grep -r download.ceph.com /etc/apt/sources.list /etc/apt/sources.list.d/
+grep -r download.ceph.com /etc/apt/
 ```
 
-If that prints nothing, skip this step.
+If that prints nothing, the host has no Ceph repo; skip this step. If it prints a line with another release, edit that file to say `debian-tentacle`:
+
+```text
+/etc/apt/sources.list.d/ceph.list:deb https://download.ceph.com/debian-reef/ jammy main
+```
 
 #### Ensure the system is fully updated
 
@@ -232,13 +280,23 @@ Run:
 
 ### Verification
 
-All kolla containers are tagged `2024.1-ubuntu-jammy`. On each host, this prints any that aren't:
+On each host, check the image tags:
 
 ```shell
-docker ps --format '{{.Names}} {{.Image}}' | grep 'chameleoncloud/kolla/' | grep -v ':2024.1-ubuntu-jammy$'
+docker ps --format 'table {{.Names}}\t{{.Image}}'
 ```
 
-The exceptions are containers that 2024.1 no longer manages, which keep running their 2023.1 image:
+Correct: every `ghcr.io/chameleoncloud/kolla/` image ends in `:2024.1-ubuntu-jammy`, except containers that 2024.1 no longer manages, which keep running their 2023.1 image:
+
+```text
+NAMES                      IMAGE
+keystone                   ghcr.io/chameleoncloud/kolla/keystone:2024.1-ubuntu-jammy
+prometheus_ipmi_exporter   ghcr.io/chameleoncloud/kolla/prometheus-ipmi-exporter:2023.1-ubuntu-jammy
+```
+
+Incorrect: any other container still on a 2023.1 tag. Check site-config for a leftover `<service>_tag` override, then run `./cc-ansible upgrade --tags <service>`.
+
+The containers 2024.1 no longer manages:
 
 * `prometheus_ipmi_exporter`: once you've confirmed you don't need it, remove it on each host that runs it. Its kolla systemd unit restarts the container, so stop the unit rather than the container, then remove the unit file, the container, and its config:
 
@@ -302,11 +360,20 @@ On each host in your inventory, including the deploy host:
 
 ### Verification
 
-Check that all running kolla containers are tagged `2024.1-ubuntu-noble`. On each host, this prints any that aren't:
+On each host, check the image tags:
 
 ```shell
-docker ps --format '{{.Names}} {{.Image}}' | grep 'chameleoncloud/kolla/' | grep -v ':2024.1-ubuntu-noble$'
+docker ps --format 'table {{.Names}}\t{{.Image}}'
 ```
+
+Correct: every `ghcr.io/chameleoncloud/kolla/` image ends in `:2024.1-ubuntu-noble`.
+
+```text
+NAMES      IMAGE
+keystone   ghcr.io/chameleoncloud/kolla/keystone:2024.1-ubuntu-noble
+```
+
+Incorrect: an image still ends in `:2024.1-ubuntu-jammy`. Check that `kolla_base_distro_version: noble` is in `defaults.yml` and that `deploy` ran on that host.
 
 ## OpenStack 2024.1 -> 2025.1
 
@@ -356,7 +423,7 @@ Use the kolla tags of every enabled service that talks to RabbitMQ. Regenerate t
 
 Verification:
 
-1. Run `./cc-ansible prechecks`. It fails, naming each queue that hasn't been migrated, if old queues persist for a service. If so, repeat these steps:
+1. Run `./cc-ansible prechecks`. Correct: the RabbitMQ checks pass. Incorrect: old queues persist for a service, and prechecks fails, naming each queue that hasn't been migrated, for example `om_enable_rabbitmq_stream_fanout is True but <queue> is not a stream.` If so, repeat these steps:
     1. `./cc-ansible stop --yes-i-really-really-mean-it --tags <service>`, and wait for the containers to exit
     2. `./cc-ansible rabbitmq-reset-state`
     3. `./cc-ansible deploy --tags <service>`
@@ -438,7 +505,13 @@ This adds any entries present in `site-config.example/passwords.yml` and missing
     docker info | grep driver-type
     ```
 
-    If it shows `io.containerd.snapshotter.v1`, Docker uses the containerd image store. Set `containerd_root_path: /var/lib/containerd` (containerd's current root) in `defaults.yml` **before** the next step. Otherwise the `openstack.kolla` docker role moves containerd's root to `/var/lib/docker/containerd`, and Docker loses track of every running container and image.
+    If it prints nothing, Docker uses the classic `overlay2` storage driver and you can go on to the next step. If it prints this line, Docker uses the containerd image store:
+
+    ```text
+      driver-type: io.containerd.snapshotter.v1
+    ```
+
+    In that case, set `containerd_root_path: /var/lib/containerd` (containerd's current root) in `defaults.yml` **before** the next step. Otherwise the `openstack.kolla` docker role moves containerd's root to `/var/lib/docker/containerd`, and Docker loses track of every running container and image.
 
     If this already happened, set the variable and re-run `bootstrap-servers`. containerd re-attaches without restarting the containers. Afterwards you can delete `/var/lib/docker/containerd`.
 
@@ -449,10 +522,24 @@ This adds any entries present in `site-config.example/passwords.yml` and missing
 
 ### Verification
 
-All kolla containers are tagged `2025.1-ubuntu-noble`. On each host, this prints any that aren't:
+On each host, check the image tags:
 
 ```shell
-docker ps --format '{{.Names}} {{.Image}}' | grep 'chameleoncloud/kolla/' | grep -v ':2025.1-ubuntu-noble$'
+docker ps --format 'table {{.Names}}\t{{.Image}}'
 ```
 
-If a container is still on a 2024.1 image, check site-config for a leftover `<service>_tag` override.
+Correct: every `ghcr.io/chameleoncloud/kolla/` image ends in `:2025.1-ubuntu-noble`.
+
+```text
+NAMES        IMAGE
+blazar_api   ghcr.io/chameleoncloud/kolla/blazar-api:2025.1-ubuntu-noble
+keystone     ghcr.io/chameleoncloud/kolla/keystone:2025.1-ubuntu-noble
+```
+
+Incorrect: a container still on a 2024.1 image, like `blazar_api` here. Check site-config for a leftover `<service>_tag` override, such as `blazar_tag`.
+
+```text
+NAMES        IMAGE
+blazar_api   ghcr.io/chameleoncloud/kolla/blazar-api:2024.1-ubuntu-noble
+keystone     ghcr.io/chameleoncloud/kolla/keystone:2025.1-ubuntu-noble
+```
