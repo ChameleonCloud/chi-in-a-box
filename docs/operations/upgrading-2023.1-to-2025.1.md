@@ -84,12 +84,14 @@ See the [kolla-ansible docs on SLURP upgrades](https://docs.openstack.org/kolla-
     ```yaml
     rabbitmq_image: ghcr.io/chameleoncloud/kolla/rabbitmq-3-12
     ```
+
 2. Run `./cc-ansible upgrade --tags rabbitmq`
 3. In `defaults.yml`, set:
 
     ```yaml
     rabbitmq_image: ghcr.io/chameleoncloud/kolla/rabbitmq-3-13
     ```
+
 4. Run `./cc-ansible upgrade --tags rabbitmq`
 
 After each upgrade, verify the version with `docker exec rabbitmq rabbitmqctl version`, and check that services reconnect. Each restart causes a brief burst of `AMQP server ... is unreachable` errors in service logs, which should stop within a minute.
