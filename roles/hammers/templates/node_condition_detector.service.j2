@@ -1,0 +1,23 @@
+# {{ ansible_managed }}
+
+[Unit]
+Description=node_condition_detector: Prometheus exporter for ironic node conditions
+After=docker.service
+Requires=docker.service
+
+[Service]
+Restart=always
+RestartSec=30
+ExecStartPre=-/usr/bin/docker rm -f node_condition_detector
+ExecStart=/usr/bin/docker run \
+    --net=host \
+    --rm \
+    --name node_condition_detector \
+    --label org.chameleoncloud.hammer=node_condition_detector \
+    --env-file {{ hammers_env_file }} \
+    {{ hammers_v2_docker_image }} \
+    node_condition_detector --cloud envvars --addr {{ api_interface_address }} --port {{ node_condition_detector_port }}
+ExecStop=/usr/bin/docker stop node_condition_detector
+
+[Install]
+WantedBy=multi-user.target
