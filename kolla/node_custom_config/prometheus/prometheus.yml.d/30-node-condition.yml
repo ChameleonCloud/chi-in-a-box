@@ -1,0 +1,8 @@
+{% if hammers_enable_node_condition_detector | bool and groups['hammers'] | default([]) | length > 0 %}
+# node_condition_detector, run by roles/hammers
+scrape_configs:
+  - job_name: node_condition
+    static_configs:
+      - targets:
+          - "{{ 'api' | kolla_address(groups['hammers'][0], override_var='prometheus_target_address') | put_address_in_context('url') }}:{{ node_condition_detector_port }}"
+{% endif %}

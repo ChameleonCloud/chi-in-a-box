@@ -48,6 +48,7 @@
     src: hammers.env.j2
     mode: 0600
     dest: "{{ hammers_env_file }}"
+  register: hammers_env
 
 - name: Configure slack webhook file
   become: true
@@ -109,3 +110,43 @@
     timer_state: "{{ 'started' if item.value.enabled else 'stopped' }}"
     timer_enabled: "{{item.value.enabled}}"
   loop: "{{ hammers_v2 | dict2items }}"
+
+- name: node_condition_detector exporter
+  when: node_condition_detector_on_this_host | bool
+  become: true
+  block:
+    - name: pull node_condition_detector image
+      docker_image:
+        source: pull
+        name: "{{ hammers_v2_docker_image }}"
+        force_source: yes
+      register: node_condition_detector_image
+
+    - name: template node_condition_detector unit
+      template:
+        src: node_condition_detector.service.j2
+        dest: /etc/systemd/system/node_condition_detector.service
+      register: node_condition_detector_unit
+
+    - name: start node_condition_detector
+      ansible.builtin.systemd_service:
+        name: node_condition_detector.service
+        daemon_reload: true
+        enabled: true
+        state: "{{ 'restarted' if (node_condition_detector_unit.changed or node_condition_detector_image.changed or hammers_env.changed) else 'started' }}"
+
+- name: stop node_condition_detector where it shouldn't run
+  when: not node_condition_detector_on_this_host | bool
+  become: true
+  block:
+    - name: check for a node_condition_detector unit
+      stat:
+        path: /etc/systemd/system/node_condition_detector.service
+      register: node_condition_detector_unit_file
+
+    - name: stop node_condition_detector
+      ansible.builtin.systemd_service:
+        name: node_condition_detector.service
+        enabled: false
+        state: stopped
+      when: node_condition_detector_unit_file.stat.exists
