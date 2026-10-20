@@ -360,6 +360,13 @@ mimir_url: "https://metrics.chameleoncloud.org"
 prometheus_remote_write_url: "{{ mimir_url }}/api/v1/push"
 prometheus_alertmanager_remote_url: "{{ mimir_url }}/alertmanager"
 prometheus_remote_write_username: "{{ keystone_idp_client_id }}"
+# Loki and Prometheus share the central-monitoring credentials.
+external_loki_enabled: "{{ upload_logs_chameleon | bool }}"
+loki_username: "{{ prometheus_remote_write_username }}"
+loki_password: "{{ prometheus_remote_write_password }}"
+loki_custom_labels:
+  keystone_idp_client_id: "{{ keystone_idp_client_id }}"
+  chameleon_site_name: "{{ chameleon_site_name }}"
 upload_logs_chameleon: false
 upload_metrics_chameleon: false
 # Send alerts to the central Alertmanager instead of deploying one here.
