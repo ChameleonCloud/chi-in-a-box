@@ -74,6 +74,7 @@ nav = [
   { "Operations" = [
     { "Hardware management" = "Hardware-management.md" },
     { "Certificate management" = "Certificate-management.md" },
+    { "Rebinding Neutron ports after a switch change" = "operations/rebind-neutron-ports-after-switch-change.md" },
     { "Chameleon tools" = [
       "operations/chameleon-tools/README.md",
       { "Hammers 🔨" = [
