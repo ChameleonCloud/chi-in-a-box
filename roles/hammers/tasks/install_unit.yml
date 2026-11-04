@@ -15,11 +15,11 @@
     - name: template unit file
       template:
         src: hammers.service.j2
-        dest: "/etc/systemd/system/{{ service_name }}.service"
+        dest: "/etc/systemd/system/{{ chameleon_site_name }}-{{ service_name }}.service"
     - name: template timer file
       template:
         src: hammers.timer.j2
-        dest: "/etc/systemd/system/{{ service_name }}.timer"
+        dest: "/etc/systemd/system/{{ chameleon_site_name }}-{{ service_name }}.timer"
     - name: Set timer state
       ansible.builtin.systemd_service:
         name: "{{ service_name }}.timer"

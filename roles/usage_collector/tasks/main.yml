@@ -83,14 +83,14 @@
   become: true
   template:
     src: usage_collector.service.j2
-    dest: /etc/systemd/system/usage_collector.service
+    dest: /etc/systemd/system/{{ chameleon_site_name }}-usage_collector.service
     mode: "0644"
 
 - name: Deploy usage_collector timer unit
   become: true
   template:
     src: usage_collector.timer.j2
-    dest: /etc/systemd/system/usage_collector.timer
+    dest: /etc/systemd/system/{{ chameleon_site_name }}-usage_collector.timer
     mode: "0644"
 
 - name: Reload systemd

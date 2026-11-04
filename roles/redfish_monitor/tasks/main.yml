@@ -24,7 +24,7 @@
 - name: Create redfish_monitor services.
   template:
     src: "redfish_monitor.service.j2"
-    dest: "/usr/lib/systemd/system/redfish_monitor.service"
+    dest: "/usr/lib/systemd/system/{{ chameleon_site_name }}-redfish_monitor.service"
   notify:
     - reload systemd daemon
     - restart redfish monitor
