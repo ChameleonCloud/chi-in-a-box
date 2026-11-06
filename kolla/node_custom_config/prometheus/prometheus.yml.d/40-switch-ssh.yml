@@ -1,0 +1,31 @@
+{% if enable_prometheus_blackbox_exporter | bool and switch_configs | length > 0 %}
+# Probe SSH on each switch that Neutron manages (switch_configs), from the
+# Prometheus host. networking-generic-switch needs this SSH connection to
+# configure switch ports. If it fails, deploys on that switch's nodes fail.
+#
+# Labels:
+#   instance:    the switch's management address, with no port
+#   name:        switch_configs name; the same as Neutron's [genericswitch:<name>]
+#                and Ironic's local_link_connection.switch_info
+#   device_type: switch_configs device_type, verbatim
+scrape_configs:
+  - job_name: switch_ssh
+    metrics_path: /probe
+    params:
+      module: [ssh_banner]
+    static_configs:
+{% for switch in switch_configs %}
+      - targets: ["{{ switch.address }}:22"]
+        labels:
+          instance: "{{ switch.address }}"
+          name: "{{ switch.name }}"
+          device_type: "{{ switch.device_type }}"
+{% endfor %}
+    relabel_configs:
+      # Send the switch address to the blackbox exporter as ?target=
+      - source_labels: [__address__]
+        target_label: __param_target
+      # Scrape the blackbox exporter on this host
+      - target_label: __address__
+        replacement: "{{ api_interface_address | put_address_in_context('url') }}:{{ prometheus_blackbox_exporter_port }}"
+{% endif %}
