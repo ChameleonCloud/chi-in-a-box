@@ -16,7 +16,7 @@
   become: true
   template:
     src: envvars.j2
-    dest: "{{ chameleon_reference_repo_config_dir }}/envvars"
+    dest: "{{ chameleon_reference_repo_config_dir }}/reference-repo.env"
     mode: '0600'
     owner: 'root'
     group: 'root'
@@ -34,15 +34,16 @@
     src: chameleon-reference-repo.timer.j2
     dest: /etc/systemd/system/chameleon-reference-repo.timer
     mode: '0644'
+  register: chameleon_reference_repo_timer
 
 - name: Reload systemd
   become: true
   systemd:
     daemon_reload: yes
 
-- name: Enable and start chameleon-reference-repo.timer
+- name: Set chameleon-reference-repo.timer state
   become: true
   systemd:
     name: chameleon-reference-repo.timer
-    enabled: yes
-    state: started
+    enabled: "{{ enable_chameleon_reference_repo | bool }}"
+    state: "{{ ('restarted' if chameleon_reference_repo_timer.changed else 'started') if enable_chameleon_reference_repo | bool else 'stopped' }}"
