@@ -4,3 +4,5 @@ chameleon_reference_repo_config_dir: /etc/hammers
 
 chameleon_reference_repo_url: https://github.com/ChameleonCloud/reference-repository.git
 chameleon_reference_repo_push_changes: true
+# systemd OnCalendar expression.
+chameleon_reference_repo_calendar: monthly
