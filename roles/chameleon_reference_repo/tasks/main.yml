@@ -43,7 +43,10 @@
 
 - name: Set chameleon-reference-repo.timer state
   become: true
+  vars:
+    _enabled: "{{ enable_chameleon_reference_repo | bool }}"
+    _changed: "{{ chameleon_reference_repo_timer.changed }}"
   systemd:
     name: chameleon-reference-repo.timer
-    enabled: "{{ enable_chameleon_reference_repo | bool }}"
-    state: "{{ ('restarted' if chameleon_reference_repo_timer.changed else 'started') if enable_chameleon_reference_repo | bool else 'stopped' }}"
+    enabled: "{{ _enabled }}"
+    state: "{{ 'stopped' if not _enabled else ('restarted' if _changed else 'started') }}"

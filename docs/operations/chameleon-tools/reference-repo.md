@@ -36,8 +36,12 @@ The playbook pulls the site tools image at the version set by
 To push changes to the GitHub reference repository (enabled by default), the
 reference repo generator requires a valid `GITHUB_TOKEN` for authentication.
 
+Create a fine-grained personal access token on a shared bot account. Limit it
+to the `ChameleonCloud/reference-repository` repository, with read and write
+access to Contents and Pull requests.
+
 You must provide this token securely (do not commit it to the repository).
-Add it to the site passwords as `github_token`:
+Add it to the site passwords as `reference_repo_github_token`:
 
 ```shell
 cc-ansible edit_passwords

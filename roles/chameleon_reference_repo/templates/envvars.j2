@@ -7,6 +7,6 @@ OS_PASSWORD={{ keystone_admin_password }}
 OS_PROJECT_DOMAIN_NAME=Default
 OS_PROJECT_NAME={{ keystone_admin_project }}
 OS_REGION_NAME={{ openstack_region_name }}
-{% if github_token is defined %}
-GITHUB_TOKEN={{ github_token }}
+{% if reference_repo_github_token is defined %}
+GITHUB_TOKEN={{ reference_repo_github_token }}
 {% endif %}
