@@ -222,6 +222,9 @@ ironic_erase_devices_metadata_during_deploy: false
 # Re-enable until we can verify.
 enable_ironic_neutron_agent: "{{ enable_ironic | bool }}"
 
+# not needed when neutron networking is used.
+enable_ironic_dnsmasq: false
+
 ironic_inspector_store: database
 
 # Temporary workaround, disable ironic scope enforcement until policy updated
