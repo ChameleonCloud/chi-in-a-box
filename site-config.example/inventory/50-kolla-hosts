@@ -28,18 +28,8 @@ monitoring
 [etcd:children]
 control
 
-[influxdb:children]
-monitoring
-
 [prometheus:children]
 monitoring
-
-[telegraf:children]
-compute
-control
-monitoring
-network
-storage
 
 [hacluster:children]
 control
@@ -142,20 +132,18 @@ control
 [skyline:children]
 control
 
+# TODO(vurmil): Remove after G/2026.1 release as Redis migration is no longer required
 [redis:children]
+control
+
+[valkey:children]
 control
 
 [blazar:children]
 control
 
-[venus:children]
-monitoring
-
 [letsencrypt:children]
 loadbalancer
-
-[valkey:children]
-control
 
 # Additional control implemented here. These groups allow you to control which
 # services run on which hosts at a per-service level.
@@ -171,10 +159,10 @@ common
 [fluentd:children]
 common
 
-[kolla-logs:children]
+[kolla_logs:children]
 common
 
-[kolla-toolbox:children]
+[kolla_toolbox:children]
 common
 
 [opensearch:children]
@@ -217,10 +205,16 @@ nova
 nova
 
 # Neutron
-[neutron-server:children]
-control
+[ironic-neutron-agent:children]
+neutron
+
+[neutron-bgp-dragent:children]
+neutron
 
 [neutron-dhcp-agent:children]
+neutron
+
+[neutron-infoblox-ipam-agent:children]
 neutron
 
 [neutron-l3-agent:children]
@@ -229,37 +223,57 @@ neutron
 [neutron-metadata-agent:children]
 neutron
 
-[neutron-ovn-metadata-agent:children]
-compute
-network
-
-[neutron-bgp-dragent:children]
-neutron
-
-[neutron-infoblox-ipam-agent:children]
-neutron
-
 [neutron-metering-agent:children]
 neutron
 
-[ironic-neutron-agent:children]
-neutron
+[neutron-periodic-worker:children]
+control
+
+[neutron-rpc-server:children]
+control
+
+[neutron-server:children]
+control
 
 [neutron-ovn-agent:children]
 compute
 network
+
+[neutron-ovn-maintenance-worker:children]
+control
+
+[neutron-ovn-metadata-agent:children]
+compute
+network
+
+[neutron-ovn-vpn-agent:children]
+neutron
 
 # Cinder
 [cinder-api:children]
 cinder
 
 [cinder-backup:children]
+cinder
+
+[cinder-backup-lvm:children]
+storage
+
+[cinder-backup-multiple:children]
+cinder
 storage
 
 [cinder-scheduler:children]
 cinder
 
 [cinder-volume:children]
+cinder
+
+[cinder-volume-lvm:children]
+storage
+
+[cinder-volume-multiple:children]
+cinder
 storage
 
 # Cloudkitty
@@ -321,7 +335,7 @@ ironic
 [ironic-conductor:children]
 ironic
 
-[ironic-inspector:children]
+[ironic-dnsmasq:children]
 ironic
 
 [ironic-tftp:children]
@@ -539,8 +553,12 @@ monitoring
 [prometheus-libvirt-exporter:children]
 compute
 
-[prometheus-snmp-exporter:children]
-monitoring
+[prometheus-openstack-network-exporter:children]
+compute
+network
+
+[prometheus-valkey-exporter:children]
+valkey
 
 [masakari-api:children]
 control
@@ -578,12 +596,6 @@ ovn-database
 
 [ovn-sb-db-relay:children]
 ovn-database
-
-[venus-api:children]
-venus
-
-[venus-manager:children]
-venus
 
 [letsencrypt-webserver:children]
 letsencrypt
