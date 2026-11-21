@@ -1,3 +1,6 @@
 # Kolla Ansible 2026.1 requires at least ansible-core 2.19
 # and up to ansible-core 2.20
 ansible-core >=2.19,!=2.19.0,<2.21
+
+# needed for 'password_hash' ansible filter;
+passlib
