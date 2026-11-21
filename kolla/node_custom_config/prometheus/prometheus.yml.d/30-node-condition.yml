@@ -1,3 +1,4 @@
+---
 {% if hammers_enable_node_condition_detector | bool and groups['hammers'] | default([]) | length > 0 %}
 # node_condition_detector, run by roles/hammers
 scrape_configs:

@@ -1,3 +1,4 @@
+---
 {% if enable_prometheus_blackbox_exporter | bool and switch_configs | length > 0 %}
 # Probe SSH on each switch that Neutron manages (switch_configs), from the
 # Prometheus host. networking-generic-switch needs this SSH connection to
