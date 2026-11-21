@@ -308,6 +308,7 @@ enable_preemptible: no
 # Prometheus
 enable_prometheus: yes
 enable_prometheus_external: no
+enable_prometheus_pushgateway: "{{ enable_prometheus | bool }}"
 prometheus_port: "9090"
 prometheus_user: "prometheus"
 prometheus_alertmanager_slack_channel: "#notifications"
