@@ -11,7 +11,7 @@ site_description = "Deploy and operate a Chameleon testbed site"
 site_url = "https://chi-in-a-box.readthedocs.io/en/latest/"
 repo_url = "https://github.com/ChameleonCloud/chi-in-a-box"
 repo_name = "ChameleonCloud/chi-in-a-box"
-edit_uri = "edit/chameleoncloud/2025.1/docs/"
+edit_uri = "edit/chameleoncloud/2026.1/docs/"
 docs_dir = "docs"
 extra_css = ["assets/stylesheets/extra.css"]
 

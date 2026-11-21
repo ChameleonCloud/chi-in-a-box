@@ -4,7 +4,7 @@ name: Docs build check
 on:
   push:
     branches:
-      - chameleoncloud/2025.1
+      - chameleoncloud/2026.1
     paths:
       - "docs/**"
       - "zensical.toml"
