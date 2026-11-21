@@ -3,7 +3,7 @@
   roles:
     - role: post_networking
     - role: post_ironic
-      when: enable_ironic
+      when: enable_ironic | bool
 
 - hosts: neutron-l3-agent
   tasks:

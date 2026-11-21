@@ -1,4 +1,4 @@
 - hosts: fake-baremetal
   roles:
     - role: fake-baremetal
-      when: enable_ironic
+      when: enable_ironic | bool
