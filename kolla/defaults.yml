@@ -216,11 +216,8 @@ encoded_ironic_pxe_root_password: "{{ ironic_pxe_root_password | password_hash('
 ironic_kernel_append_params: nofb vga=normal console=tty0 console=ttyS0,{{ ironic_console_serial_speed }} rootpwd="{{ encoded_ironic_pxe_root_password }}"
 ironic_erase_devices_metadata_during_deploy: false
 
-# M.S. 2026/08/19
-# Epoxy disabled the ironic neutron agent by default, claiming it's only
-# needed for flat networks, or for networking-baremetal netconf driven config.
-# Re-enable until we can verify.
-enable_ironic_neutron_agent: "{{ enable_ironic | bool }}"
+# Only needed if using flat, instead of neutron networking.
+enable_ironic_neutron_agent: false
 
 # not needed when neutron networking is used.
 enable_ironic_dnsmasq: false
