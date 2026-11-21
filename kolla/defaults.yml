@@ -178,7 +178,6 @@ horizon_custom_themes:
     label: ChameleonCloud
 
 # Keystone IdP federation
-identity_provider_key: "{{ 'EABNO4wxhX0ZOryErTXnWPUkCAcWxTFHwZ6f_zjDHLg' if keycloak_hostname == 'auth.dev.chameleoncloud.org' else '02GplnOEWB4gwqrZDyyiaNdIrhgdinNnObXcPHy2RTo' }}"
 identity_provider_url: "{{ keycloak_url }}/auth/realms/{{ keycloak_realm_name }}"
 identity_provider_name: chameleon
 identity_provider_domain_name: chameleon
@@ -192,8 +191,10 @@ keystone_identity_providers:
     identifier: "{{ identity_provider_url }}"
     public_name: Login with Chameleon
     attribute_mapping: chameleon_mapping
-    metadata_folder: "{{ node_custom_config }}/keystone/federation/metadata"
-    certificate_file: "{{ node_custom_config }}/keystone/federation/{{ identity_provider_key }}.pem"
+    metadata_url: "{{ identity_provider_url }}/.well-known/openid-configuration"
+    client_id: "{{ keystone_idp_client_id }}"
+    client_secret: "{{ keystone_idp_client_secret }}"
+keystone_federation_oidc_jwks_uri: "{{ identity_provider_url }}/protocol/openid-connect/certs"
 keystone_identity_mappings:
   - name: chameleon_mapping
     file: "{{ node_custom_config }}/keystone/idp_mapping.json"
