@@ -51,8 +51,8 @@
 
 - name: Set fact for public allocation pool
   ansible.builtin.set_fact:
-    public_allocation_pool_start: "{{ public_conf.allocation_pools[0].start | default(public_conf.cidr | next_nth_usable(2)) }}"
-    public_allocation_pool_end: "{{ public_conf.allocation_pools[0].end | default(public_conf.cidr | ipaddr('last_usable') | ipmath(-1)) }}"
+    public_allocation_pool_start: "{{ public_conf.allocation_pools[0].start | default(public_conf.cidr | ansible.utils.next_nth_usable(2)) }}"
+    public_allocation_pool_end: "{{ public_conf.allocation_pools[0].end | default(public_conf.cidr | ansible.utils.ipaddr('last_usable') | ansible.utils.ipmath(-1)) }}"
   when:
     - public_conf.cidr is defined
 
@@ -69,7 +69,7 @@
       name: "{{ public_subnet_name }}"
       cidr: "{{ public_conf.cidr }}"
       enable_dhcp: false
-      gateway_ip: "{{ public_conf.gateway_ip | default(public_conf.cidr | ipaddr('last_usable')) }}"
+      gateway_ip: "{{ public_conf.gateway_ip | default(public_conf.cidr | ansible.utils.ipaddr('last_usable')) }}"
       allocation_pool_start: "{{ public_allocation_pool_start }}"
       allocation_pool_end: "{{ public_allocation_pool_end }}"
       state: present

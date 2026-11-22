@@ -111,7 +111,7 @@
     ovs_bridge_name: "{{ provisioning_network_physnet.bridge_name }}"
     vlan_tag: "{{ provisioning_network_return.networks[0]['provider_segmentation_id'] }}"
     gateway_ip: "{{ ironic_provisioning_network_gateway }}"
-    gateway_prefix: "{{ironic_provisioning_network_cidr | ipaddr('prefix')}}"
+    gateway_prefix: "{{ironic_provisioning_network_cidr | ansible.utils.ipaddr('prefix')}}"
   block:
     - name: create OVS patch port for ironic-gw
       command: "ovs-vsctl add-port {{ovs_bridge_name}} vlan{{vlan_tag}} tag={{vlan_tag}} -- set Interface vlan{{vlan_tag}} type=internal"

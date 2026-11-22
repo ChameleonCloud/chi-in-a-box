@@ -208,7 +208,7 @@ enable_ironic: yes
 enable_ironic_ipxe: yes
 ironic_provisioning_network: ironic-provisioning
 ironic_provisioning_network_cidr: 10.51.0.0/24
-ironic_provisioning_network_gateway: "{{ ironic_provisioning_network_cidr | ipaddr('next_usable') }}"
+ironic_provisioning_network_gateway: "{{ ironic_provisioning_network_cidr | ansible.utils.ipaddr('next_usable') }}"
 ironic_cleaning_network: "{{ ironic_provisioning_network }}"
 ironic_inspection_network: "{{ ironic_provisioning_network }}"
 ironic_image_cache_size: 20480 # MB

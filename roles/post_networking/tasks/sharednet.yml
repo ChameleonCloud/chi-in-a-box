@@ -63,8 +63,8 @@
       network_name: "{{ item.sharednet.name | default(default_sharednet_name) }}"
       name: "{{ item.sharednet.name | default(default_sharednet_name) }}-subnet"
       cidr: "{{ cidr }}"
-      allocation_pool_start: "{{ item.sharednet.allocation_pools[0].start | default(cidr | next_nth_usable(2)) }}"
-      allocation_pool_end: "{{ item.sharednet.allocation_pools[0].end | default(cidr | ipaddr('last_usable') | ipmath(-1)) }}"
+      allocation_pool_start: "{{ item.sharednet.allocation_pools[0].start | default(cidr | ansible.utils.next_nth_usable(2)) }}"
+      allocation_pool_end: "{{ item.sharednet.allocation_pools[0].end | default(cidr | ansible.utils.ipaddr('last_usable') | ansible.utils.ipmath(-1)) }}"
   vars:
     cidr: "{{ item.sharednet.cidr | default(default_sharednet_cidr) }}"
   loop: "{{ neutron_networks }}"

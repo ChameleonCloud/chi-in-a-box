@@ -5,7 +5,7 @@
       - device: "{{ ironic_gateway_interface }}"
         bootproto: static
         address: "{{ ironic_provisioning_network_gateway }}"
-        netmask: "{{ ironic_provisioning_network_cidr | ipaddr('netmask') }}"
+        netmask: "{{ ironic_provisioning_network_cidr | ansible.utils.ipaddr('netmask') }}"
   when: enable_ironic | bool and
     ironic_provisioning_network_vlan is defined
 
