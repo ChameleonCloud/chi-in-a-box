@@ -17,7 +17,7 @@
   when:
     - manage_ironic_gateway_interface | bool
     - enable_ironic | bool
-    - ironic_gateway_interface | is_defined
+    - ironic_gateway_interface is defined
 
 - name: Create provisioning network.
   kolla_toolbox:
