@@ -25,6 +25,7 @@
     module_name: os_network
     module_args:
       auth: "{{ openstack_auth }}"
+      cloud: "{{ openstack_auth_cloud }}"
       project: "{{ keystone_admin_project }}"
       name: "{{ ironic_provisioning_network }}"
       region_name: "{{ openstack_region_name }}"
@@ -42,6 +43,7 @@
     module_name: os_subnet
     module_args:
       auth: "{{ openstack_auth }}"
+      cloud: "{{ openstack_auth_cloud }}"
       project: "{{ keystone_admin_project }}"
       network_name: "{{ ironic_provisioning_network }}"
       name: "{{ ironic_provisioning_network }}-subnet"

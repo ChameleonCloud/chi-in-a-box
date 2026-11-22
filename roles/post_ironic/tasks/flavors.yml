@@ -5,6 +5,7 @@
     module_name: openstack.cloud.compute_flavor_info
     module_args:
       auth: "{{ openstack_auth }}"
+      cloud: "{{ openstack_auth_cloud }}"
       name: "{{ baremetal_flavor.name }}"
   register: baremetal_flavor_lookup
   run_once: True
@@ -20,6 +21,7 @@
     module_name: openstack.cloud.compute_flavor
     module_args:
       auth: "{{ openstack_auth }}"
+      cloud: "{{ openstack_auth_cloud }}"
       state: present
       # Reuse existing ID during delete+recreate
       id: "{{ flavor_id | default(omit) }}"

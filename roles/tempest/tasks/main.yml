@@ -26,6 +26,7 @@
     module_name: openstack.cloud.networks_info
     module_args:
       auth: "{{ openstack_auth }}"
+      cloud: "{{ openstack_auth_cloud }}"
       filters:
         name: "{{ tempest_public_network_name }}"
   register: tempest_public_network_info

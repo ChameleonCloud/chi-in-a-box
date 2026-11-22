@@ -30,6 +30,7 @@
     module_name: openstack.cloud.image_info
     module_args:
       auth: "{{ openstack_auth }}"
+      cloud: "{{ openstack_auth_cloud }}"
       image: "{{ item }}"
   run_once: True
   register: "image_info"
@@ -50,6 +51,7 @@
     module_name: openstack.cloud.networks_info
     module_args:
       auth: "{{ openstack_auth }}"
+      cloud: "{{ openstack_auth_cloud }}"
       filters:
         name: "{{ ironic_provisioning_network }}"
   run_once: True

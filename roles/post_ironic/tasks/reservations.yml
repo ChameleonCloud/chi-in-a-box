@@ -5,6 +5,7 @@
     module_name: os_nova_host_aggregate
     module_args:
       auth: "{{ openstack_auth }}"
+      cloud: "{{ openstack_auth_cloud }}"
       state: present
       name: freepool
   become: True

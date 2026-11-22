@@ -19,6 +19,7 @@
     module_name: openstack.cloud.routers_info
     module_args:
       auth: "{{ openstack_auth }}"
+      cloud: "{{ openstack_auth_cloud }}"
       name: "{{ admin_router_name }}"
   delegate_to: "{{ groups['control'][0] }}"
   run_once: true

@@ -10,6 +10,7 @@
     module_name: openstack.cloud.network
     module_args:
       auth: "{{ openstack_auth }}"
+      cloud: "{{ openstack_auth_cloud }}"
       project: "{{ keystone_admin_project }}"
       name: "{{ caliconet_network_name }}"
       provider_network_type: local
@@ -25,6 +26,7 @@
     module_name: openstack.cloud.subnet
     module_args:
       auth: "{{ openstack_auth }}"
+      cloud: "{{ openstack_auth_cloud }}"
       project: "{{ keystone_admin_project }}"
       network_name: "{{ caliconet_network_name }}"
       name: "{{ caliconet_subnet_name }}"

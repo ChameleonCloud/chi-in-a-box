@@ -21,6 +21,7 @@
     module_name: os_user
     module_args:
       auth: "{{ openstack_auth }}"
+      cloud: "{{ openstack_auth_cloud }}"
       name: "{{ instance_metrics_writer_username }}"
       password: "{{ instance_metrics_writer_password }}"
       domain: default

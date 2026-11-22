@@ -12,6 +12,7 @@
     module_name: openstack.cloud.networks_info
     module_args:
       auth: "{{ openstack_auth }}"
+      cloud: "{{ openstack_auth_cloud }}"
       name: "{{ shared_network.sharednet.name | default(default_sharednet_name) }}"
       filters:
         shared: yes
@@ -25,6 +26,7 @@
     module_name: openstack.cloud.network
     module_args:
       auth: "{{ openstack_auth }}"
+      cloud: "{{ openstack_auth_cloud }}"
       project: "{{ keystone_admin_project }}"
       name: "{{ item.sharednet.name | default(default_sharednet_name) }}"
       provider_network_type: "{{ item.network_type | default('vlan') }}"
@@ -48,6 +50,7 @@
     module_name: openstack.cloud.subnets_info
     module_args:
       auth: "{{ openstack_auth }}"
+      cloud: "{{ openstack_auth_cloud }}"
       name: "{{ (shared_network.sharednet.name | default(default_sharednet_name)) + '-subnet' }}"
   register: existing_sharednet_subnet_lookup
   become: true
@@ -59,6 +62,7 @@
     module_name: openstack.cloud.subnet
     module_args:
       auth: "{{ openstack_auth }}"
+      cloud: "{{ openstack_auth_cloud }}"
       project: "{{ keystone_admin_project }}"
       network_name: "{{ item.sharednet.name | default(default_sharednet_name) }}"
       name: "{{ item.sharednet.name | default(default_sharednet_name) }}-subnet"
@@ -84,6 +88,7 @@
     module_name: openstack.cloud.routers_info
     module_args:
       auth: "{{ openstack_auth }}"
+      cloud: "{{ openstack_auth_cloud }}"
       name: sharednet-router
   register: sharednet_router_lookup
   become: true
@@ -104,6 +109,7 @@
     module_name: openstack.cloud.router
     module_args:
       auth: "{{ openstack_auth }}"
+      cloud: "{{ openstack_auth_cloud }}"
       project: "{{ keystone_admin_project }}"
       name: sharednet-router
       interfaces: "{{ (existing_subnets + created_subnets) | map(attribute='name') | list }}"

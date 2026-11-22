@@ -12,6 +12,7 @@
     module_name: openstack.cloud.router
     module_args:
       auth: "{{ openstack_auth }}"
+      cloud: "{{ openstack_auth_cloud }}"
       project: "{{ keystone_admin_project }}"
       name: "{{ admin_router_name }}"
       interfaces:

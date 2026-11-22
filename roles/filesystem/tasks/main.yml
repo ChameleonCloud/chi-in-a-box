@@ -3,15 +3,8 @@
   become: true
   command: >
     docker exec kolla_toolbox openstack
-    --os-interface internal
-    --os-auth-url {{ openstack_auth.auth_url }}
-    --os-identity-api-version 3
-    --os-project-domain-name {{ openstack_auth.user_domain_name }}
-    --os-project-name {{ keystone_admin_project }}
-    --os-username {{ keystone_admin_user }}
+    --os-cloud {{ openstack_auth_cloud }}
     --os-password {{ keystone_admin_password }}
-    --os-user-domain-name {{ openstack_auth.user_domain_name }}
-    --os-region-name {{ openstack_region_name }}
     share type create {{ default_share_type }} false
     --extra-specs vendor_name=Ceph storage_protocol=NFS
   register: manila_default_share_type
@@ -29,6 +22,7 @@
     module_name: openstack.cloud.address_scope
     module_args:
       auth: "{{ openstack_auth }}"
+      cloud: "{{ openstack_auth_cloud }}"
       state: present
       name: "{{ filesystem_address_scope }}"
       ip_version: 4
@@ -45,6 +39,7 @@
     module_name: openstack.cloud.subnet_pool
     module_args:
       auth: "{{ openstack_auth }}"
+      cloud: "{{ openstack_auth_cloud }}"
       state: present
       name: "{{ filesystem_subnet_pool }}"
       prefixes: "{{ filesystem_subnet_pool_prefixes }}"
@@ -67,6 +62,7 @@
     module_name: os_network
     module_args:
       auth: "{{ openstack_auth }}"
+      cloud: "{{ openstack_auth_cloud }}"
       name: "{{ filesystem_ganesha_network }}"
       region_name: "{{ openstack_region_name }}"
       provider_network_type: vlan
@@ -89,6 +85,7 @@
     module_name: os_subnet
     module_args:
       auth: "{{ openstack_auth }}"
+      cloud: "{{ openstack_auth_cloud }}"
       network_name: "{{ filesystem_ganesha_network }}"
       name: "{{ filesystem_ganesha_network }}-subnet"
       use_default_subnetpool: true
@@ -108,6 +105,7 @@
     module_name: openstack.cloud.routers_info
     module_args:
       auth: "{{ openstack_auth }}"
+      cloud: "{{ openstack_auth_cloud }}"
       name: "{{ filesystem_ganesha_router }}"
   become: True
   register: ganesha_router
@@ -118,6 +116,7 @@
     module_name: os_router
     module_args:
       auth: "{{ openstack_auth }}"
+      cloud: "{{ openstack_auth_cloud }}"
       name: "{{ filesystem_ganesha_router }}"
       network: public
       admin_state_up: true

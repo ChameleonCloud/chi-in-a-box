@@ -11,6 +11,7 @@
     module_name: openstack.cloud.project
     module_args:
       auth: "{{ openstack_auth }}"
+      cloud: "{{ openstack_auth_cloud }}"
       name: "{{ item.project_name }}"
       domain: default
       state: present
@@ -27,6 +28,7 @@
     module_name: openstack.cloud.identity_user
     module_args:
       auth: "{{ openstack_auth }}"
+      cloud: "{{ openstack_auth_cloud }}"
       name: "{{ item.username }}"
       password: "{{ tempest_account_password }}"
       domain: default
@@ -47,6 +49,7 @@
     module_name: openstack.cloud.role_assignment
     module_args:
       auth: "{{ openstack_auth }}"
+      cloud: "{{ openstack_auth_cloud }}"
       user: "{{ item.0.username }}"
       project: "{{ item.0.project_name }}"
       role: "{{ item.1 }}"

@@ -21,6 +21,7 @@
     module_name: os_image
     module_args:
       auth: "{{ openstack_auth }}"
+      cloud: "{{ openstack_auth_cloud }}"
       state: present
       name: "{{ item.name }}"
       is_public: yes

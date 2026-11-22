@@ -15,6 +15,7 @@
     module_name: openstack.cloud.network
     module_args:
       auth: "{{ openstack_auth }}"
+      cloud: "{{ openstack_auth_cloud }}"
       project: "service"
       name: "{{ tunelo_calico_network_name }}"
       provider_network_type: local
@@ -30,6 +31,7 @@
     module_name: openstack.cloud.subnet
     module_args:
       auth: "{{ openstack_auth }}"
+      cloud: "{{ openstack_auth_cloud }}"
       project: "service"
       network_name: "{{ tunelo_calico_network_name }}"
       name: "{{ tunelo_calico_subnet_name }}"
