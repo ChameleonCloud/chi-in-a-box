@@ -9,7 +9,8 @@
     module_name: community.mysql.mysql_query
     module_args:
       login_host: "{{ database_address }}"
-      login_user: "{{ database_user }}"
+      login_user: "{{ chameleon_database_shard_root_user }}"
+      login_port: "{{ database_port }}"
       login_password: "{{ database_password }}"
       query: "CREATE DATABASE IF NOT EXISTS openstack_audit"
 
@@ -22,7 +23,8 @@
     module_name: community.mysql.mysql_query
     module_args:
       login_host: "{{ database_address }}"
-      login_user: "{{ database_user }}"
+      login_user: "{{ chameleon_database_shard_root_user }}"
+      login_port: "{{ database_port }}"
       login_password: "{{ database_password }}"
       query: "{{ lookup('template', 'audit_table.sql.j2').split('-- ---') | map('trim') | reject('equalto', '') | list }}"
   loop: "{{ audit_tables }}"
@@ -39,7 +41,8 @@
     module_name: community.mysql.mysql_query
     module_args:
       login_host: "{{ database_address }}"
-      login_user: "{{ database_user }}"
+      login_user: "{{ chameleon_database_shard_root_user }}"
+      login_port: "{{ database_port }}"
       login_password: "{{ database_password }}"
       query: >-
         ALTER TABLE openstack_audit.audit_{{ item.name }}
@@ -59,7 +62,8 @@
     module_name: community.mysql.mysql_query
     module_args:
       login_host: "{{ database_address }}"
-      login_user: "{{ database_user }}"
+      login_user: "{{ chameleon_database_shard_root_user }}"
+      login_port: "{{ database_port }}"
       login_password: "{{ database_password }}"
       query:
         - >-
@@ -83,7 +87,8 @@
     module_name: community.mysql.mysql_query
     module_args:
       login_host: "{{ database_address }}"
-      login_user: "{{ database_user }}"
+      login_user: "{{ chameleon_database_shard_root_user }}"
+      login_port: "{{ database_port }}"
       login_password: "{{ database_password }}"
       query: >-
         ALTER TABLE openstack_audit.audit_{{ item.name }}
@@ -102,7 +107,8 @@
     module_name: community.mysql.mysql_query
     module_args:
       login_host: "{{ database_address }}"
-      login_user: "{{ database_user }}"
+      login_user: "{{ chameleon_database_shard_root_user }}"
+      login_port: "{{ database_port }}"
       login_password: "{{ database_password }}"
       query: >
         SELECT column_name FROM information_schema.COLUMNS
@@ -125,7 +131,8 @@
     module_name: community.mysql.mysql_query
     module_args:
       login_host: "{{ database_address }}"
-      login_user: "{{ database_user }}"
+      login_user: "{{ chameleon_database_shard_root_user }}"
+      login_port: "{{ database_port }}"
       login_password: "{{ database_password }}"
       query: "{{ lookup('template', 'audit_backfill.sql.j2').split('-- ---') | map('trim') | reject('equalto', '') | list }}"
   loop: "{{ audit_tables }}"
@@ -142,7 +149,8 @@
     module_name: community.mysql.mysql_query
     module_args:
       login_host: "{{ database_address }}"
-      login_user: "{{ database_user }}"
+      login_user: "{{ chameleon_database_shard_root_user }}"
+      login_port: "{{ database_port }}"
       login_password: "{{ database_password }}"
       query:
         - "DROP TRIGGER IF EXISTS {{ item.source_db }}.trg_{{ item.source_table }}_audit_ins"

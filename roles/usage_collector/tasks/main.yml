@@ -29,7 +29,8 @@
     module_name: mysql_user
     module_args:
       login_host: "{{ database_address }}"
-      login_user: "{{ database_user }}"
+      login_user: "{{ chameleon_database_shard_root_user }}"
+      login_port: "{{ database_port }}"
       login_password: "{{ database_password }}"
       name: "{{ usage_collector_mysql_user }}"
       host: "{{ usage_collector_mysql_host | default('%') }}"

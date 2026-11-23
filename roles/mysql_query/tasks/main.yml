@@ -6,7 +6,8 @@
     module_name: community.mysql.mysql_query
     module_args:
       login_host: "{{ database_address }}"
-      login_user: "root"
+      login_user: "{{ chameleon_database_shard_root_user }}"
+      login_port: "{{ database_port }}"
       login_password: "{{ database_password }}"
       login_db: "{{db}}"
       query: "{{query}}"

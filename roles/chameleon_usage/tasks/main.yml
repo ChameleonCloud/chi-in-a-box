@@ -36,7 +36,8 @@
     module_args:
       login_host: "{{ database_address }}"
       login_password: "{{ database_password }}"
-      login_user: "{{ database_user }}"
+      login_user: "{{ chameleon_database_shard_root_user }}"
+      login_port: "{{ database_port }}"
       name: "{{ chameleon_usage_mysql_user }}"
       host: "%"
       password: "{{ chameleon_usage_mysql_password }}"
