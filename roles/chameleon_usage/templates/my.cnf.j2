@@ -1,11 +1,11 @@
 [clientroot]
 host = {{ mysql_host }}
-port = 3306
-user = root
+port = {{ database_port }}
+user = {{ chameleon_database_shard_root_user }}
 password = {{ root_password }}
 
 [clientcc]
 host = {{ mysql_host }}
-port = 3306
+port = {{ database_port }}
 user = {{ chameleon_usage_mysql_user }}
 password = {{ chameleon_usage_mysql_password }}

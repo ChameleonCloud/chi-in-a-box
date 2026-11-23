@@ -42,6 +42,25 @@ mariabackup_location: mariadb_backup
 mysqldump_location: /var/db/backup
 backup_location: "{{ mariabackup_location if enable_mariabackup | bool else mysqldump_location }}"
 
+# Database access for Chameleon tools (hammers, usage reporting, audit tables)
+chameleon_database_shard_id: "{{ mariadb_default_database_shard_id | int }}"
+chameleon_database_shard_root_user: "{% if enable_proxysql | bool %}{{ mariadb_shard_root_user_prefix }}{{ chameleon_database_shard_id }}{% else %}{{ database_user }}{% endif %}"
+hammers_mysql_user: cc_hammers
+chameleon_usage_mysql_user: cc_usage
+usage_collector_mysql_user: cc_usage_collector
+proxysql_extra_projects:
+  chameleon:
+    users:
+      - user: "{{ hammers_mysql_user }}"
+        password: "{{ hammers_mysql_password }}"
+        shard_id: "{{ chameleon_database_shard_id }}"
+      - user: "{{ chameleon_usage_mysql_user }}"
+        password: "{{ chameleon_usage_mysql_password }}"
+        shard_id: "{{ chameleon_database_shard_id }}"
+      - user: "{{ usage_collector_mysql_user }}"
+        password: "{{ usage_collector_mysql_password }}"
+        shard_id: "{{ chameleon_database_shard_id }}"
+
 # Blazar
 enable_blazar: yes
 enable_blazar_allocation_enforcement: no
