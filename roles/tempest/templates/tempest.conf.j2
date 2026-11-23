@@ -35,7 +35,7 @@ image_ssh_user = cc
 {% if enable_nova | default(false) | bool %}
 image_ref = {{ tempest_compute_image_uuid }}
 image_ref_alt = {{ tempest_compute_image_uuid }}
-flavor_ref = {{ tempest_baremetal_flavor_uuid }}
+flavor_ref = {{ tempest_compute_flavor_uuid }}
 {% endif %}
 build_timeout = 900
 fixed_network_name = {{ tempest_fixed_network_name }}

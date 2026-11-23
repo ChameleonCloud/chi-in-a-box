@@ -28,6 +28,8 @@ tempest_account_roles:
 # tempest_account_password: ""
 
 tempest_public_network_name: public
+tempest_compute_image_name: CC-Ubuntu24.04
+tempest_compute_flavor_name: baremetal
 tempest_floating_network_name: "{{ tempest_public_network_name }}"
 tempest_fixed_network_name: "{{ 'caliconet' if (enable_zun_compute_k8s | default(false) | bool) else 'sharednet1' }}"
 

@@ -188,9 +188,9 @@ After setting your site up, including `post-deploy`, set the following parameter
 
 ```yaml
 tempest_fixed_network_name: "sharednet1"
-tempest_public_network_uuid:  <uuid of public neutron network>
-tempest_compute_image_uuid:  <uuid of glance image to test instances with>
-tempest_baremetal_flavor_uuid: <uuid of the barmetal flavor>
+tempest_public_network_name: public  # default, uuid looked up from Neutron
+tempest_compute_image_name: CC-Ubuntu24.04  # default, uuid looked up from Glance
+tempest_compute_flavor_name: baremetal  # default, uuid looked up from Nova
 ```
 
 If updating an existing site to add this feature, you'll need to add the following ansible group to your `inventory/hosts` file.

@@ -20,29 +20,54 @@
   run_once: true
   delegate_to: "{{ groups['control'][0] }}"
 
-- name: look up public network
-  kolla_toolbox:
-    container_engine: "{{ kolla_container_engine }}"
-    module_name: openstack.cloud.networks_info
-    module_args:
-      auth: "{{ openstack_auth }}"
-      cloud: "{{ openstack_auth_cloud }}"
-      filters:
-        name: "{{ tempest_public_network_name }}"
-  register: tempest_public_network_info
+- name: look up tempest's public network, image and flavor
   run_once: true
   become: true
   delegate_to: "{{ groups['control'][0] }}"
+  block:
+    - name: look up public network
+      kolla_toolbox:
+        container_engine: "{{ kolla_container_engine }}"
+        module_name: openstack.cloud.networks_info
+        module_args:
+          auth: "{{ openstack_auth }}"
+          cloud: "{{ openstack_auth_cloud }}"
+          filters:
+            name: "{{ tempest_public_network_name }}"
+      register: tempest_public_network_info
 
-- ansible.builtin.assert:
-    that: tempest_public_network_info.networks | length > 0
-    fail_msg: |
-      Network '{{ tempest_public_network_name }}' not found in
-      {{ openstack_region_name }}. Override tempest_public_network_name
-      or create the network first.
+    - name: look up compute image
+      kolla_toolbox:
+        container_engine: "{{ kolla_container_engine }}"
+        module_name: openstack.cloud.image_info
+        module_args:
+          auth: "{{ openstack_auth }}"
+          cloud: "{{ openstack_auth_cloud }}"
+          filters:
+            name: "{{ tempest_compute_image_name }}"
+      register: tempest_compute_image_info
+
+    - name: look up compute flavor
+      kolla_toolbox:
+        container_engine: "{{ kolla_container_engine }}"
+        module_name: openstack.cloud.compute_flavor_info
+        module_args:
+          auth: "{{ openstack_auth }}"
+          cloud: "{{ openstack_auth_cloud }}"
+          name: "{{ tempest_compute_flavor_name }}"
+      register: tempest_compute_flavor_info
+
+- name: check each name matches exactly one resource
+  ansible.builtin.assert:
+    that:
+      - tempest_public_network_info.networks | length == 1
+      - tempest_compute_image_info.images | length == 1
+      - tempest_compute_flavor_info.flavors | length == 1
 
 - ansible.builtin.set_fact:
     tempest_public_network_uuid: "{{ tempest_public_network_info.networks[0].id }}"
+    tempest_compute_image_uuid: "{{ tempest_compute_image_info.images[0].id }}"
+    tempest_compute_flavor_uuid: "{{ tempest_compute_flavor_info.flavors[0].id }}"
 
 - name: template tempest.conf
   become: true
