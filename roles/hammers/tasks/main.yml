@@ -33,7 +33,7 @@
         path: "{{ hammers_kubeconfig_path }}"
         line: "placeholder"
         create: yes
-  when: "{{ enable_k3s | bool }}"
+  when: enable_k3s | bool
 
 - name: Configure Hammers docker bash wrapper
   become: true
